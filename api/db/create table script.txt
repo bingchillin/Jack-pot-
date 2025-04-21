@@ -1,0 +1,202 @@
+create table role
+(
+	id_role serial not null,
+	title varchar(250),
+	description varchar(1000),
+	constraint pk_role primary key(id_role)
+);
+
+create table person
+(
+	id_person serial not null,
+	mail varchar(250) not null,
+	firstname varchar(250) not null,
+	surname varchar(250) not null,
+	password varchar(500) not null,
+	number_phone varchar(50) null,
+	id_role int,
+	constraint pk_person primary key(id_person),
+	constraint fk_role foreign key (id_role) references role (id_role)
+
+);
+
+create table relationship
+(
+	id_relationship serial not null,
+	title varchar(250) not null,
+	description varchar(1000),
+	constraint pk_relationship primary key(id_relationship)
+);
+
+create table contact
+(
+	id_contact serial not null,
+	relation varchar(250),
+	description varchar(1000),
+	is_active bool default (false) not null,
+	value_return varchar(100),
+	id_person int,
+	id_relationship int,
+	constraint pk_contact primary key(id_contact),
+	constraint fk_person foreign key (id_person) references person (id_person),
+	constraint fk_relationship foreign key (id_relationship) references relationship (id_relationship)
+
+);
+
+create table category_type
+(
+	id_category_type serial not null,
+	title varchar(250),
+	description varchar(1000),
+	advise varchar(5000),
+	constraint pk_category_type primary key(id_category_type)
+);
+
+create table object
+(
+	id_object serial not null,
+	title varchar(250),
+	description varchar(1000),
+	is_working bool default (false) not null,
+	is_automatic bool default (false) not null,
+	value_return varchar(100),
+	height varchar(100),
+	weight varchar(100),
+	advise varchar(100),
+	preference_number int,
+	id_person int,
+	id_category_type int,
+	constraint pk_object primary key(id_object),
+	constraint fk_person foreign key (id_person) references person (id_person),
+	constraint fk_category_type foreign key (id_category_type) references category_type (id_category_type)
+);
+
+create table composant
+(
+	id_composant serial not null,
+	title varchar(250),
+	description varchar(1000),
+	is_working bool default (false) not null,
+	int_ret int,
+	string_ret varchar(100),
+	long_ret bigint,
+	id_object int,
+	constraint pk_composant primary key(id_composant),
+	constraint fk_object foreign key (id_object) references object (id_object)
+);
+
+create table plant_type
+(
+	id_plant_type serial not null,
+	title varchar(250),
+	description varchar(1000),
+	height varchar(100),
+	weight varchar(100),
+	advise varchar(5000),
+	category varchar(5000),
+	constraint pk_plant_type primary key(id_plant_type)
+);
+
+create table avatar
+(
+	id_avatar serial not null,
+	title varchar(250),
+	description varchar(1000),
+	picture_path varchar(5000),
+	evolution_number int,
+	id_plant_type int,
+	constraint pk_avatar primary key(id_avatar),
+	constraint fk_plant_type foreign key (id_plant_type) references plant_type (id_plant_type)
+);
+
+create table object_profile
+(
+	id_object_profile serial not null,
+	title varchar(250),
+	description varchar(1000),
+	price varchar(500),
+	height varchar(100),
+	weight varchar(100),
+	advise varchar(100),
+	category varchar(100),
+	strenght varchar(100),
+	speed varchar(100),
+	life varchar(100),
+	id_object int,
+	id_plant_type int,
+	constraint pk_object_profile primary key(id_object_profile),
+	constraint fk_object foreign key (id_object) references object (id_object),
+	constraint fk_plant_type foreign key (id_plant_type) references plant_type (id_plant_type)
+);
+
+create table notification
+(
+	id_notification serial not null,
+	title varchar(250),
+	description varchar(1000),
+	value_custom_01 varchar(500),
+	value_custom_02 varchar(500),
+	id_object int,
+	id_person int,
+	constraint pk_notification primary key(id_notification),
+	constraint fk_person foreign key (id_person) references person (id_person)
+);
+
+create table parameter_type
+(
+	id_parameter_type serial not null,
+	title varchar(250),
+	short_description varchar(1000),
+	description varchar(5000),
+	is_display bool default (false) not null,
+	constraint pk_parameter_type primary key(id_parameter_type)
+);
+
+create table lnk_person_parameter
+(
+	id_lnk_person_parameter serial not null,
+	is_value bool default (false) not null,
+	id_person int,
+	id_parameter_type int,
+	constraint pk_lnk_person_parameter primary key(id_lnk_person_parameter),
+	constraint fk_person foreign key (id_person) references person (id_person),
+	constraint fk_parameter_type foreign key (id_parameter_type) references parameter_type (id_parameter_type)
+);
+
+create table event_party
+(
+	id_event_party serial not null,
+	title varchar(250),
+	description varchar(5000),
+	is_launch bool default (false) not null,
+	begin_date date,
+	end_date date,
+	rules varchar(5000),
+	constraint pk_id_event_party primary key(id_event_party)
+);
+
+create table game
+(
+	id_game  serial not null,
+	title varchar(250),
+	description varchar(5000),
+	id_won  int,
+	id_lose  int,
+	begin_date date,
+	end_date date,
+	rules varchar(5000),
+	id_event_party int,
+	constraint pk_game primary key(id_game),
+	constraint fk_event_party foreign key (id_event_party) references event_party (id_event_party)
+);
+
+
+create table lnk_participation_person_event_party
+(
+	id_lnk_participation_person_event_party serial not null,
+	id_person  int,
+	id_event_party int,
+	constraint pk_lnk_participation_person_event_party primary key(id_lnk_participation_person_event_party),
+	constraint fk_person foreign key (id_person) references person (id_person),
+	constraint fk_event_party foreign key (id_event_party) references event_party (id_event_party)
+);

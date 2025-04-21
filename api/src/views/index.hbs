@@ -1,0 +1,24 @@
+<div class="container vh-100">
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-6 text-center">
+            <div class="mb-4">
+                <h1>Page de connexion</h1>
+            </div>
+            <div class="mb-5">
+                <p>Connectez-vous pour accéder à votre espace personnel.</p>
+            </div>
+
+            <form action="/auth/login" method="POST">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="email" placeholder="Email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" id="password" placeholder="Mot de passe" name="password" required>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary">Connexion</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

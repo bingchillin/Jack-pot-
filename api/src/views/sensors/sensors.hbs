@@ -1,0 +1,217 @@
+<!-- Modale création capteur -->
+<div class="modal fade" id="createSensorModal" data-bs-backdrop="static" tabindex="-1"
+     aria-labelledby="createSensorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createSensorModalLabel">Créer un capteur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/sensor" method="POST" id="createSensorForm">
+                    <div class="mb-3">
+                        <label for="user" class="form-label">Utilisateur</label>
+                        <select class="select2" id="userSelect" name="email" style="width: 100%">
+                            <option value="" selected disabled>Choisir un utilisateur</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control border border-danger" id="name" name="name">
+                            <div class="input-group-append">
+                                <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                      data-bs-placement="top" title="Obligatoire">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="humidityLevel" class="form-label">Niveau d'humidité</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control border border-success" id="humidityLevel"
+                                   name="humidityLevel" value="100">
+                            <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                  data-bs-placement="top" title="En pourcentage">
+                                    %
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="waterLevel" class="form-label">Niveau d'eau</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control border border-success" id="waterLevel"
+                                   name="waterLevel" value="100">
+                            <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                  data-bs-placement="top" title="En pourcentage">
+                                    %
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="motor" class="form-label">État du moteur</label>
+                        <select class="select2" id="motor" name="motor" style="width: 100%">
+                            <option value="false">Fermer</option>
+                            <option value="true">Ouvert</option>
+                        </select>
+                    </div>
+                    <div class="pt-3">
+                        <button type="submit" class="btn btn-primary" id="createButton">Créer</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin modale création capteur -->
+
+<!-- Modale modification capteur -->
+<div class="modal fade" id="updateSensorModal" data-bs-backdrop="static" tabindex="-1"
+     aria-labelledby="updateSensorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateSensorModalLabel">Modifier un capteur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/sensor" method="POST" id="updateSensorForm">
+                    <input type="hidden" id="editId" name="id">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control border border-danger" id="editName" name="name">
+                            <div class="input-group-append">
+                                <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                      data-bs-placement="top" title="Obligatoire">
+                                    <i class="bi bi-info circle-fill"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="humidityLevel" class="form-label">Niveau d'humidité</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control border" id="editHumidityLevel" name="humidityLevel"
+                                   placeholder="100%">
+                            <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                  data-bs-placement="top" title="En pourcentage">
+                                    %
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="waterLevel" class="form-label">Niveau d'eau</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control border" id="editWaterLevel"
+                                   name="waterLevel" placeholder="100%">
+                            <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                  data-bs-placement="top" title="En pourcentage">
+                                    %
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="motor" class="form-label">État du moteur</label>
+                        <select class="select2" id="editMotor" name="motor" style="width: 100%">
+                            <option value="true">Ouvert</option>
+                            <option value="false">Fermer</option>
+                        </select>
+                    </div>
+                    <div class="pt-3">
+                        <button type="submit" class="btn btn-primary" id="updateButton">Modifier</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin modale modification capteur -->
+
+<!-- Modale suppression capteur -->
+<div class="modal fade" id="deleteSensorModal" data-bs-backdrop="static" tabindex="-1"
+     aria-labelledby="deleteSensorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteSensorModalLabel">Supprimer un capteur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="deleteId" name="id">
+                <p>Êtes-vous sûr de vouloir supprimer ce capteur ?</p>
+                <div class="pt-3">
+                    <button type="submit" class="btn btn-danger" id="deleteButton">Supprimer</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin modale suppression capteur -->
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-end mt-3">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSensorModal">
+                Créer un capteur
+            </button>
+        </div>
+        <table id="example" class="table" style="width:100%">
+            <thead>
+            <tr>
+                <th>Utilisateur</th>
+                <th>Nom</th>
+                <th>Humidité</th>
+                <th>Niveau d'eau</th>
+                <th>État du Moteur</th>
+                <th>Date de création</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each sensors}}
+                <tr>
+                    <td>{{email}}</td>
+                    <td>{{name}}</td>
+                    <td>{{humidityLevel}} %</td>
+                    <td>{{waterLevel}} %</td>
+                    <td>{{motorStatus}}</td>
+                    <td>{{formatDate createdAt}}</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                    <div class="d-flex align-items-center">
+
+                                        <a class="dropdown-item" id="idButton" data-sensor-id="{{_id}}"
+                                           data-bs-toggle="modal" data-bs-target="#updateSensorModal"><i
+                                                class="bi bi-pencil-square m-3"></i>Modifier</a>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="d-flex align-items-center">
+                                        <a class="dropdown-item" id="idButtonDelete" data-sensor-id="{{_id}}"
+                                           data-bs-toggle="modal" data-bs-target="#deleteSensorModal"><i
+                                                class="bi bi-trash m-3"></i>Supprimer</a>
+                                    </div>
+
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/assets/js/backoffice/sensors/script.js"></script>
