@@ -1,77 +1,55 @@
-import {Controller, Delete, Get, Param, Patch, Post, UseGuards, Body} from '@nestjs/common';
-import {LocalAuthGuard} from "../auth/local-auth.guard";
-import {AuthService} from "../auth/auth.service";
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { PersonService } from '../person/person.service';
-import { UpdatePersonDto } from 'src/person/dto/update-person.dto';
-import { CreatePersonDto } from 'src/person/dto/create-person.dto';
-import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
-import { ApiDocs } from './swagger.docs';
+import { PersonDocs } from './swagger/person.docs';
+import { CreatePersonDto } from '../person/dto/create-person.dto';
+import { UpdatePersonDto } from '../person/dto/update-person.dto';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { AuthService } from 'src/auth/auth.service';
+import { AuthDocs } from './swagger/auth.docs';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('z-Deprecated')
 @Controller('api')
 export class ApiController {
-    constructor(
-        private readonly personService: PersonService,
-        private readonly authService: AuthService,
-    ) {}
+  constructor(
+    private readonly personService: PersonService,
+    private readonly authService: AuthService,
+  ) {}
 
-    // ================================ Person ================================
-    @ApiTags('Person')
-    @Post('/person')
-    @ApiDocs.createPerson.operation
-    @ApiDocs.createPerson.body
-    @ApiDocs.createPerson.responses.success
-    @ApiDocs.createPerson.responses.error
-    createPerson(@Body() createPersonDto: CreatePersonDto) {
-        return this.personService.create(createPersonDto);
-    }
+  @Post('/person')
+  @PersonDocs.create()
+  createPerson(@Body() dto: CreatePersonDto) {
+    return this.personService.create(dto);
+  }
 
-    @ApiTags('Person')
-    @Get('/persons')
-    @ApiDocs.findAllPersons.operation
-    @ApiDocs.findAllPersons.response
-    findAllPersons() {
-        return this.personService.findAll();
-    }
+  @Get('/persons')
+  @PersonDocs.findAll()
+  findAllPersons() {
+    return this.personService.findAll();
+  }
 
-    @ApiTags('Person')
-    @Get('/person/:id')
-    @ApiDocs.findOnePerson.operation
-    @ApiDocs.findOnePerson.param
-    @ApiDocs.findOnePerson.responses.success
-    @ApiDocs.findOnePerson.responses.error
-    findOnePerson(@Param('id') id: string) {
-        return this.personService.findOne(+id);
-    }
+  @Get('/person/:id')
+  @PersonDocs.findOne()
+  findOnePerson(@Param('id') id: string) {
+    return this.personService.findOne(+id);
+  }
 
-    @ApiTags('Person')
-    @Patch('/person/:id')
-    @ApiDocs.updatePerson.operation
-    @ApiDocs.updatePerson.param
-    @ApiDocs.updatePerson.body
-    @ApiDocs.updatePerson.responses.success
-    @ApiDocs.updatePerson.responses.error
-    updatePerson(@Param('id') id: string, @Body() updatePersonDto: UpdatePersonDto) {
-        return this.personService.update(+id, updatePersonDto);
-    }
+  @Patch('/person/:id')
+  @PersonDocs.update()
+  updatePerson(@Param('id') id: string, @Body() dto: UpdatePersonDto) {
+    return this.personService.update(+id, dto);
+  }
 
-    @ApiTags('Person')
-    @Delete('/person/:id')
-    @ApiDocs.removePerson.operation
-    @ApiDocs.removePerson.param
-    @ApiDocs.removePerson.responses.success
-    @ApiDocs.removePerson.responses.error
-    removePerson(@Param('id') id: string) {
-        return this.personService.remove(+id);
-    }
-    // ================================ Person ================================
+  @Delete('/person/:id')
+  @PersonDocs.remove()
+  removePerson(@Param('id') id: string) {
+    return this.personService.remove(+id);
+  }
 
-    // ================================ Auth ================================
-    @ApiTags('Auth')
-    @UseGuards(LocalAuthGuard)
-    @ApiExcludeEndpoint()
-    @Post('login')
-    login(@Body() loginDto: { mail: string; password: string }) {
-        return this.authService.login(loginDto);
-    }
-    // ================================ Auth ================================
+  @UseGuards(LocalAuthGuard)
+  @Post('login')
+  @AuthDocs.login()
+  login(@Body() loginDto: { mail: string; password: string }) {
+    return this.authService.login(loginDto);
+  }
 }

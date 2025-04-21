@@ -3,9 +3,8 @@ import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiTags, ApiBody, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiBody, ApiExcludeEndpoint } from '@nestjs/swagger';
 
-@ApiTags('Person')
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('person')
 export class PersonController {

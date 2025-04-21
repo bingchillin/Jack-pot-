@@ -1,30 +1,62 @@
-import { IsEmail, IsString, IsOptional, MinLength } from 'class-validator';
+import { IsEmail, IsString, IsOptional, MinLength, IsPhoneNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePersonDto {
-    @ApiProperty({ example: 'test@test.com', description: 'Email address' })
+    @ApiProperty({ 
+        example: 'john.doe@example.com', 
+        description: 'Email address',
+        format: 'email',
+        required: true
+    })
     @IsEmail()
     mail: string;
 
-    @ApiProperty({ example: 'John', description: 'First name' })
+    @ApiProperty({ 
+        example: 'John', 
+        description: 'First name',
+        minLength: 2,
+        required: true
+    })
     @IsString()
     firstname: string;
 
-    @ApiProperty({ example: 'Doe', description: 'Last name' })
+    @ApiProperty({ 
+        example: 'Doe', 
+        description: 'Last name',
+        minLength: 2,
+        required: true
+    })
     @IsString()
     surname: string;
 
-    @ApiProperty({ example: 'password123', description: 'Password (min 6 characters)' })
+    @ApiProperty({ 
+        example: 'securePassword123', 
+        description: 'Password (min 6 characters)',
+        minLength: 6,
+        required: true,
+        format: 'password'
+    })
     @IsString()
     @MinLength(6)
     password: string;
 
-    @ApiProperty({ example: '123456789', description: 'Phone number', required: false })
+    @ApiProperty({ 
+        example: '+33612345678', 
+        description: 'Phone number in international format',
+        required: false,
+        pattern: '^\\+[1-9]\\d{1,14}$'
+    })
     @IsString()
     @IsOptional()
+    @IsPhoneNumber()
     numberPhone?: string;
 
-    @ApiProperty({ example: 1, description: 'Role ID', required: false })
+    @ApiProperty({ 
+        example: 1, 
+        description: 'Role ID (1: Admin, 2: User)',
+        required: false,
+        minimum: 1
+    })
     @IsOptional()
     idRole?: number;
 } 
