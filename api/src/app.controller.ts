@@ -2,6 +2,7 @@ import {Controller, Get, Render, Request, Post, UseGuards, Res, HttpException, H
 import {LocalAuthGuard} from "./auth/local-auth.guard";
 import {AuthService} from './auth/auth.service';
 import {JwtAuthGuard} from "./auth/jwt-auth.guard";
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
@@ -9,21 +10,20 @@ export class AppController {
     }
 
     @Get()
+    @ApiExcludeEndpoint()
     @Render('index')
     loginPage() {
         return {layout: 'login'};
     }
 
     @UseGuards(LocalAuthGuard)
+    @ApiExcludeEndpoint()
     @Post('auth/login')
     async login(@Request() req, @Res() res) {
         const tokens = await this.authService.login(req.user);
-        if (req.user.role !== 'admin') {
-            throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-        }
         res.cookie('user_token', tokens.access_token, {httpOnly: true});
         res.cookie('refresh_token', tokens.refresh_token, {httpOnly: true});
-        return res.redirect('/user');
+        return res.redirect('/dashboard');
     }
 
     @UseGuards(LocalAuthGuard)
@@ -33,6 +33,7 @@ export class AppController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @ApiExcludeEndpoint()
     @Get('profile')
     getProfile(@Request() req) {
         return req.user;

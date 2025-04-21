@@ -5,6 +5,7 @@ import { join } from 'path';
 import * as hbs from 'express-handlebars';
 import * as cookieParser from 'cookie-parser';
 import {HttpExceptionFilter} from "./http-exception/http-exception.filter";
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -35,6 +36,18 @@ async function bootstrap() {
   );
 
   app.setViewEngine('hbs');
+
+  // Swagger configuration
+  const config = new DocumentBuilder()
+    .setTitle('Jackpot\' API')
+    .setDescription('The Jackpot\' API documentation')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(3000);
 }
 bootstrap();
