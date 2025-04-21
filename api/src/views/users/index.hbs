@@ -1,0 +1,215 @@
+<!-- Modale création utilisateur -->
+<div class="modal fade" id="createUserModal" data-bs-backdrop="static" tabindex="-1"
+     aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createUserModalLabel">Créer un utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/user" method="POST" id="createUserForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control border border-danger" id="name" name="name">
+                            <div class="input-group-append">
+                                <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                      data-bs-placement="top" title="Obligatoire">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <div class="input-group">
+                            <input type="email" class="form-control border border-danger" id="email" name="email">
+                            <div class="input-group-append">
+                                <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                      data-bs-placement="top" title="Obligatoire">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control border border-danger" id="password"
+                                   name="password">
+                            <div class="input-group-append">
+                                <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                      data-bs-placement="top" title="Obligatoire">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Rôle</label>
+                        <select class="select2" id="role" name="role" style="width: 100%">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="pt-3">
+                        <button type="submit" class="btn btn-primary" id="createButton">Créer</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin modale création utilisateur -->
+
+<!-- Modale modification utilisateur -->
+<div class="modal fade" id="updateUserModal" data-bs-backdrop="static" tabindex="-1"
+     aria-labelledby="updateUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateUserModalLabel">Modifier un utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/user" method="POST" id="updateUserForm">
+                    <input type="hidden" id="editId" name="id">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control border border-danger" id="editName" name="name">
+                            <div class="input-group-append">
+                                <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                      data-bs-placement="top" title="Obligatoire">
+                                    <i class="bi bi-info circle-fill"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <div class="input-group">
+                            <input type="email" class="form-control border border-danger" id="editEmail" name="email">
+                            <div class="input-group-append">
+                                <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                      data-bs-placement="top" title="Obligatoire">
+                                    <i class="bi bi-info
+                                    circle-fill"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control border border-danger" id="editPassword"
+                                   name="password">
+                            <div class="input-group-append">
+                                <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
+                                      data-bs-placement="top" title="Obligatoire">
+                                    <i class="bi bi-info"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Rôle</label>
+                        <select class="select2" id="editRole" name="role" style="width: 100%">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="pt-3">
+                        <button type="submit" class="btn btn-primary" id="updateButton">Modifier</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin modale modification utilisateur -->
+
+<!-- Modale suppression utilisateur -->
+<div class="modal fade" id="deleteUserModal" data-bs-backdrop="static" tabindex="-1"
+     aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteUserModalLabel">Supprimer un utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="deleteId" name="id">
+                <p>Êtes-vous sûr de vouloir supprimer cet utilisateur ?</p>
+                <div class="pt-3">
+                    <button type="submit" class="btn btn-danger" id="deleteButton">Supprimer</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin modale suppression utilisateur -->
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-end mt-3">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                Créer un utilisateur
+            </button>
+        </div>
+        <table id="example" class="table" style="width:100%">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Date de création</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each users}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>{{email}}</td>
+                    <td>{{role}}</td>
+                    <td>{{formatDate createdAt}}</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                    <div class="d-flex align-items-center">
+
+                                        <a class="dropdown-item" id="idButton" data-user-id="{{_id}}"
+                                           data-bs-toggle="modal" data-bs-target="#updateUserModal"><i
+                                                class="bi bi-pencil-square m-3"></i>Modifier</a>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="d-flex align-items-center">
+                                        <a class="dropdown-item" id="idButtonDelete" data-user-id="{{_id}}"
+                                           data-bs-toggle="modal" data-bs-target="#deleteUserModal"><i
+                                                class="bi bi-trash m-3"></i>Supprimer</a>
+                                    </div>
+
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/assets/js/backoffice/users/script.js"></script>
