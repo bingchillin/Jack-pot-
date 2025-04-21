@@ -26,7 +26,6 @@ function setupInputField(id) {
         }
     });
 }
-
 async function fetchUsersAndPopulateSelect(selectId) {
     try {
         const response = await fetch('/api/users');

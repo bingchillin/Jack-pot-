@@ -10,22 +10,8 @@
             <div class="modal-body">
                 <form action="/sensor" method="POST" id="createSensorForm">
                     <div class="mb-3">
-                        <label for="user" class="form-label">Utilisateur</label>
-                        <select class="select2" id="userSelect" name="email" style="width: 100%">
-                            <option value="" selected disabled>Choisir un utilisateur</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
                         <label for="name" class="form-label">Nom</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control border border-danger" id="name" name="name">
-                            <div class="input-group-append">
-                                <span class="input-group-text tt" style="height: 100%;" data-bs-toggle="tooltip"
-                                      data-bs-placement="top" title="Obligatoire">
-                                    <i class="bi bi-info-circle-fill"></i>
-                                </span>
-                            </div>
-                        </div>
+                        <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="mb-3">
                         <label for="humidityLevel" class="form-label">Niveau d'humidité</label>
