@@ -6,10 +6,11 @@ import { PersonModule } from '../person/person.module';
 import { PlantModule } from '../plant/plant.module';
 import { EventPartyModule } from '../event-party/event-party.module';
 import { GameModule } from '../game/game.module';
+import { PlantPersonModule } from '../plant-person/plant-person.module';
 
 @Module({
   controllers: [ApiController],
   providers: [ApiService],
-  imports: [AuthModule, PersonModule, PlantModule, EventPartyModule, GameModule]
+  imports: [AuthModule, PersonModule, PlantModule, EventPartyModule, GameModule, PlantPersonModule]
 })
 export class ApiModule { }
