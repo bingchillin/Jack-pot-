@@ -24,12 +24,31 @@ export const PersonDocs = {
                     description: 'Person created successfully',
                     type: Person,
                     example: {
-                        "mail": "test@test.com",
-                        "firstname": "Test",
-                        "surname": "User",
-                        "numberPhone": "123456789",
-                        "idRole": 1,
-                        "idPerson": 2
+                        idPerson: 1,
+                        mail: 'john.doe@example.com',
+                        firstname: 'John',
+                        surname: 'Doe',
+                        numberPhone: '+33612345678',
+                        role: {
+                            idRole: 1,
+                            title: 'Admin',
+                            description: 'Administrator role'
+                        },
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Bad request - Invalid input data',
+                    example: {
+                        statusCode: 400,
+                        message: [
+                            'mail must be an email',
+                            'password must be longer than or equal to 6 characters',
+                            'numberPhone must be a valid phone number'
+                        ],
+                        error: 'Bad Request'
                     }
                 },
                 {
@@ -56,19 +75,31 @@ export const PersonDocs = {
                 example: [
                     {
                         idPerson: 1,
-                        mail: "john.doe@example.com",
-                        firstname: "John",
-                        surname: "Doe",
-                        numberPhone: "+33612345678",
-                        idRole: 1
+                        mail: 'john.doe@example.com',
+                        firstname: 'John',
+                        surname: 'Doe',
+                        numberPhone: '+33612345678',
+                        role: {
+                            idRole: 1,
+                            title: 'Admin',
+                            description: 'Administrator role'
+                        },
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idPerson: 2,
-                        mail: "jane.smith@example.com",
-                        firstname: "Jane",
-                        surname: "Smith",
-                        numberPhone: "+33687654321",
-                        idRole: 2
+                        mail: 'jane.smith@example.com',
+                        firstname: 'Jane',
+                        surname: 'Smith',
+                        numberPhone: '+33698765432',
+                        role: {
+                            idRole: 2,
+                            title: 'User',
+                            description: 'Regular user role'
+                        },
+                        createdAt: '2024-03-19T11:30:00.000Z',
+                        updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 ]
             }],
@@ -92,12 +123,17 @@ export const PersonDocs = {
                     type: Person,
                     example: {
                         idPerson: 1,
-                        mail: "john.doe@example.com",
-                        firstname: "John",
-                        surname: "Doe",
-                        password: "securePassword123",
-                        numberPhone: "+33612345678",
-                        idRole: 1
+                        mail: 'john.doe@example.com',
+                        firstname: 'John',
+                        surname: 'Doe',
+                        numberPhone: '+33612345678',
+                        role: {
+                            idRole: 1,
+                            title: 'Admin',
+                            description: 'Administrator role'
+                        },
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
@@ -137,11 +173,28 @@ export const PersonDocs = {
                     type: Person,
                     example: {
                         idPerson: 1,
-                        mail: "john.doe@example.com",
-                        firstname: "Johnny",
-                        surname: "Doe",
-                        numberPhone: "+33612345678",
-                        idRole: 2
+                        mail: 'john.doe@example.com',
+                        firstname: 'Johnny',
+                        surname: 'Doe',
+                        numberPhone: '+33612345679',
+                        role: {
+                            idRole: 2,
+                            title: 'User',
+                            description: 'Regular user role'
+                        },
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T12:30:00.000Z'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Bad request - Invalid input data',
+                    example: {
+                        statusCode: 400,
+                        message: [
+                            'numberPhone must be a valid phone number'
+                        ],
+                        error: 'Bad Request'
                     }
                 },
                 {
@@ -170,9 +223,9 @@ export const PersonDocs = {
             responses: [
                 {
                     status: 200,
-                    description: '',
+                    description: 'Person deleted successfully',
                     example: {
-                        message: ""
+                        message: 'Person deleted successfully'
                     }
                 },
                 {

@@ -47,9 +47,8 @@ export class CreatePersonDto {
         pattern: '^\\+[1-9]\\d{1,14}$'
     })
     @IsString()
-    @IsOptional()
     @IsPhoneNumber()
-    numberPhone?: string;
+    numberPhone: string;
 
     @ApiProperty({ 
         example: 1, 
@@ -57,6 +56,5 @@ export class CreatePersonDto {
         required: false,
         minimum: 1
     })
-    @IsOptional()
-    idRole?: number;
+    idRole: number;
 } 

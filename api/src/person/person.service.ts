@@ -5,12 +5,14 @@ import { Person } from './entities/person.entity';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import * as bcrypt from 'bcrypt';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class PersonService {
     constructor(
         @InjectRepository(Person)
-        private personRepository: Repository<Person>
+        private personRepository: Repository<Person>,
+        private roleService: RoleService
     ) {}
 
     async create(createPersonDto: CreatePersonDto): Promise<Person> {
@@ -23,22 +25,29 @@ export class PersonService {
         }
 
         const hashedPassword = await bcrypt.hash(createPersonDto.password, 10);
-        
         const person = this.personRepository.create({
             ...createPersonDto,
             password: hashedPassword
         });
 
-        return this.personRepository.save(person);
+        if (createPersonDto.idRole) {
+            const role = await this.roleService.findOne(createPersonDto.idRole);
+            person.role = role;
+        }
+
+        return await this.personRepository.save(person);
     }
 
     async findAll(): Promise<Person[]> {
-        return this.personRepository.find();
+        return await this.personRepository.find({
+            relations: ['role']
+        });
     }
 
     async findOne(id: number): Promise<Person> {
         const person = await this.personRepository.findOne({
-            where: { idPerson: id }
+            where: { idPerson: id },
+            relations: ['role']
         });
 
         if (!person) {
@@ -50,7 +59,8 @@ export class PersonService {
 
     async findByEmail(email: string): Promise<Person> {
         const person = await this.personRepository.findOne({
-            where: { mail: email }
+            where: { mail: email },
+            relations: ['role']
         });
 
         if (!person) {
@@ -67,25 +77,17 @@ export class PersonService {
             updatePersonDto.password = await bcrypt.hash(updatePersonDto.password, 10);
         }
 
-        if (updatePersonDto.mail && updatePersonDto.mail !== person.mail) {
-            const existingPerson = await this.personRepository.findOne({
-                where: { mail: updatePersonDto.mail }
-            });
-
-            if (existingPerson) {
-                throw new ConflictException('Email already exists');
-            }
+        if (updatePersonDto.idRole) {
+            const role = await this.roleService.findOne(updatePersonDto.idRole);
+            person.role = role;
         }
 
-        await this.personRepository.update(id, updatePersonDto);
-        return this.findOne(id);
+        Object.assign(person, updatePersonDto);
+        return await this.personRepository.save(person);
     }
 
     async remove(id: number): Promise<void> {
-        const result = await this.personRepository.delete(id);
-        
-        if (result.affected === 0) {
-            throw new NotFoundException(`Person with ID ${id} not found`);
-        }
+        const person = await this.findOne(id);
+        await this.personRepository.remove(person);
     }
 } 
