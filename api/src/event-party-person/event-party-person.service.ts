@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DeepPartial } from 'typeorm';
 import { EventPartyPerson } from './entities/event-party-person.entity';
 import { CreateEventPartyPersonDto } from './dto/create-event-party-person.dto';
 import { UpdateEventPartyPersonDto } from './dto/update-event-party-person.dto';
@@ -13,7 +13,7 @@ export class EventPartyPersonService {
     ) {}
 
     async create(createEventPartyPersonDto: CreateEventPartyPersonDto): Promise<EventPartyPerson> {
-        const eventPartyPerson = this.eventPartyPersonRepository.create(createEventPartyPersonDto);
+        const eventPartyPerson = this.eventPartyPersonRepository.create(createEventPartyPersonDto as DeepPartial<EventPartyPerson>);
         return await this.eventPartyPersonRepository.save(eventPartyPerson);
     }
 
