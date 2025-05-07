@@ -15,7 +15,10 @@ import { EventPartyService } from 'src/event-party/event-party.service';
 import { EventPartyDocs } from './swagger/event-party.docs';
 import { CreateEventPartyDto } from 'src/event-party/dto/create-event-party.dto';
 import { UpdateEventPartyDto } from 'src/event-party/dto/update-event-party.dto';
-
+import { GameDocs } from './swagger/game.docs';
+import { CreateGameDto } from 'src/game/dto/create-game.dto';
+import { GameService } from 'src/game/game.service';
+import { UpdateGameDto } from 'src/game/dto/update-game.dto';
 @ApiTags('z-API')
 @Controller('api')
 export class ApiController {
@@ -24,6 +27,7 @@ export class ApiController {
     private readonly authService: AuthService,
     private readonly plantService: PlantService,
     private readonly eventPartyService: EventPartyService,
+    private readonly gameService: GameService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -123,4 +127,34 @@ export class ApiController {
   removeEventParty(@Param('id') id: string) {
     return this.eventPartyService.remove(+id);
   } 
+
+  @Post('/game')
+  @GameDocs.create()
+  createGame(@Body() dto: CreateGameDto) {
+    return this.gameService.create(dto);
+  }
+
+  @Get('/games')
+  @GameDocs.findAll()
+  findAllGames() {
+    return this.gameService.findAll();
+  }
+
+  @Get('/game/:id')
+  @GameDocs.findOne()
+  findOneGame(@Param('id') id: string) {
+    return this.gameService.findOne(+id);
+  }
+
+  @Patch('/game/:id')
+  @GameDocs.update()
+  updateGame(@Param('id') id: string, @Body() dto: UpdateGameDto) {
+    return this.gameService.update(+id, dto);
+  }
+
+  @Delete('/game/:id')
+  @GameDocs.remove()
+  removeGame(@Param('id') id: string) {
+    return this.gameService.remove(+id);
+  }
 }
