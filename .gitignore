@@ -1,6 +1,11 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,androidstudio,macos,android,dart,node,nextjs
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,androidstudio,macos,android,dart,node,nextjs
 
+### Environment Variables ###
+.env
+.env.*
+!.env.example
+
 ### Android ###
 # Gradle files
 .gradle/
