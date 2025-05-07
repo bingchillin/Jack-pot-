@@ -11,6 +11,10 @@ import { PlantService } from 'src/plant/plant.service';
 import { PlantDocs } from './swagger/plant.docs';
 import { CreatePlantDto } from 'src/plant/dto/create-plant.dto';
 import { UpdatePlantDto } from 'src/plant/dto/update-plant.dto';
+import { EventPartyService } from 'src/event-party/event-party.service';
+import { EventPartyDocs } from './swagger/event-party.docs';
+import { CreateEventPartyDto } from 'src/event-party/dto/create-event-party.dto';
+import { UpdateEventPartyDto } from 'src/event-party/dto/update-event-party.dto';
 
 @ApiTags('z-API')
 @Controller('api')
@@ -19,6 +23,7 @@ export class ApiController {
     private readonly personService: PersonService,
     private readonly authService: AuthService,
     private readonly plantService: PlantService,
+    private readonly eventPartyService: EventPartyService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -88,4 +93,34 @@ export class ApiController {
   removePlant(@Param('id') id: string) {
     return this.plantService.remove(+id);
   }  
+
+  @Post('/event-party')
+  @EventPartyDocs.create()
+  createEventParty(@Body() dto: CreateEventPartyDto) {
+    return this.eventPartyService.create(dto);
+  }
+
+  @Get('/event-parties')
+  @EventPartyDocs.findAll()
+  findAllEventParties() {
+    return this.eventPartyService.findAll();
+  }
+
+  @Get('/event-party/:id')
+  @EventPartyDocs.findOne()
+  findOneEventParty(@Param('id') id: string) {
+    return this.eventPartyService.findOne(+id);
+  }
+
+  @Patch('/event-party/:id')
+  @EventPartyDocs.update()
+  updateEventParty(@Param('id') id: string, @Body() dto: UpdateEventPartyDto) {
+    return this.eventPartyService.update(+id, dto);
+  } 
+
+  @Delete('/event-party/:id')
+  @EventPartyDocs.remove()
+  removeEventParty(@Param('id') id: string) {
+    return this.eventPartyService.remove(+id);
+  } 
 }
