@@ -262,6 +262,4 @@ export class ApiController {
   removeEventPartyPerson(@Param('id') id: string) {
     return this.eventPartyPersonService.remove(+id);
   }
-  
-  
 }
