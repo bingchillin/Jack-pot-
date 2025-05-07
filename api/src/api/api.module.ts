@@ -7,10 +7,12 @@ import { PlantModule } from '../plant/plant.module';
 import { EventPartyModule } from '../event-party/event-party.module';
 import { GameModule } from '../game/game.module';
 import { PlantPersonModule } from '../plant-person/plant-person.module';
+import { GamePersonModule } from '../game-person/game-person.module';
+import { EventPartyPersonModule } from '../event-party-person/event-party-person.module';
 
 @Module({
   controllers: [ApiController],
   providers: [ApiService],
-  imports: [AuthModule, PersonModule, PlantModule, EventPartyModule, GameModule, PlantPersonModule]
+  imports: [AuthModule, PersonModule, PlantModule, EventPartyModule, GameModule, PlantPersonModule, GamePersonModule, EventPartyPersonModule]
 })
 export class ApiModule { }

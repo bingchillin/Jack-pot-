@@ -27,7 +27,10 @@ import { GamePersonService } from 'src/game-person/game-person.service';
 import { CreateGamePersonDto } from 'src/game-person/dto/create-game-person.dto';
 import { GamePersonDocs } from './swagger/game-person.docs';
 import { UpdateGamePersonDto } from 'src/game-person/dto/update-game-person.dto';
-
+import { EventPartyPersonDocs } from './swagger/event-party-person.docs';
+import { CreateEventPartyPersonDto } from 'src/event-party-person/dto/create-event-party-person.dto';
+import { EventPartyPersonService } from 'src/event-party-person/event-party-person.service';
+import { UpdateEventPartyPersonDto } from 'src/event-party-person/dto/update-event-party-person.dto';
 @ApiTags('z-API')
 @Controller('api')
 export class ApiController {
@@ -39,6 +42,7 @@ export class ApiController {
     private readonly gameService: GameService,
     private readonly plantPersonService: PlantPersonService,
     private readonly gamePersonService: GamePersonService,
+    private readonly eventPartyPersonService: EventPartyPersonService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -228,4 +232,36 @@ export class ApiController {
   removeGamePerson(@Param('id') id: string) {
     return this.gamePersonService.remove(+id);
   }
+
+  @Post('/event-party-person')
+  @EventPartyPersonDocs.create()
+  createEventPartyPerson(@Body() dto: CreateEventPartyPersonDto) {
+    return this.eventPartyPersonService.create(dto);
+  }
+
+  @Get('/event-party-persons')
+  @EventPartyPersonDocs.findAll()
+  findAllEventPartyPersons() {
+    return this.eventPartyPersonService.findAll();
+  }
+
+  @Get('/event-party-person/:id')
+  @EventPartyPersonDocs.findOne()
+  findOneEventPartyPerson(@Param('id') id: string) {
+    return this.eventPartyPersonService.findOne(+id);
+  }
+
+  @Patch('/event-party-person/:id')
+  @EventPartyPersonDocs.update()
+  updateEventPartyPerson(@Param('id') id: string, @Body() dto: UpdateEventPartyPersonDto) {
+    return this.eventPartyPersonService.update(+id, dto);
+  }
+
+  @Delete('/event-party-person/:id')
+  @EventPartyPersonDocs.remove()
+  removeEventPartyPerson(@Param('id') id: string) {
+    return this.eventPartyPersonService.remove(+id);
+  }
+  
+  
 }
