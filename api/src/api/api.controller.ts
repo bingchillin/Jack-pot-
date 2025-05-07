@@ -31,6 +31,11 @@ import { EventPartyPersonDocs } from './swagger/event-party-person.docs';
 import { CreateEventPartyPersonDto } from 'src/event-party-person/dto/create-event-party-person.dto';
 import { EventPartyPersonService } from 'src/event-party-person/event-party-person.service';
 import { UpdateEventPartyPersonDto } from 'src/event-party-person/dto/update-event-party-person.dto';
+import { CreateRoleDto } from 'src/role/dto/create-role.dto';
+import { RoleDocs } from './swagger/role.docs';
+import { UpdateRoleDto } from 'src/role/dto/update-role.dto';
+import { RoleService } from 'src/role/role.service';
+
 @ApiTags('z-API')
 @Controller('api')
 export class ApiController {
@@ -43,6 +48,7 @@ export class ApiController {
     private readonly plantPersonService: PlantPersonService,
     private readonly gamePersonService: GamePersonService,
     private readonly eventPartyPersonService: EventPartyPersonService,
+    private readonly roleService: RoleService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -261,5 +267,35 @@ export class ApiController {
   @EventPartyPersonDocs.remove()
   removeEventPartyPerson(@Param('id') id: string) {
     return this.eventPartyPersonService.remove(+id);
+  }
+
+  @Post('/role')
+  @RoleDocs.create()
+  createRole(@Body() dto: CreateRoleDto) {
+    return this.roleService.create(dto);
+  } 
+
+  @Get('/roles')
+  @RoleDocs.findAll()
+  findAllRoles() {
+    return this.roleService.findAll();
+  }
+
+  @Get('/role/:id')
+  @RoleDocs.findOne()
+  findOneRole(@Param('id') id: string) {
+    return this.roleService.findOne(+id);
+  }
+
+  @Patch('/role/:id')
+  @RoleDocs.update()
+  updateRole(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
+    return this.roleService.update(+id, dto);
+  }
+
+  @Delete('/role/:id')
+  @RoleDocs.remove()
+  removeRole(@Param('id') id: string) {
+    return this.roleService.remove(+id);
   }
 }
