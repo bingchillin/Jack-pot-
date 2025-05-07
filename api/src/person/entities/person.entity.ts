@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { Role } from '../../role/entities/role.entity';
 
 @Entity('person')
 export class Person {
@@ -22,6 +23,13 @@ export class Person {
     @Column({ length: 50, nullable: true, name: 'number_phone' })
     numberPhone: string;
 
-    @Column({ name: 'id_role', nullable: true })
-    idRole: number;
+    @ManyToOne(() => Role)
+    @JoinColumn({ name: 'id_role' })
+    role: Role;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 } 
