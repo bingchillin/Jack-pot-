@@ -6,7 +6,7 @@ import { UpdatePersonDto } from '../person/dto/update-person.dto';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthDocs } from './swagger/auth.docs';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @ApiTags('z-Deprecated')
 @Controller('api')
@@ -47,6 +47,7 @@ export class ApiController {
   }
 
   @UseGuards(LocalAuthGuard)
+  @ApiExcludeEndpoint()
   @Post('login')
   @AuthDocs.login()
   login(@Body() loginDto: { mail: string; password: string }) {

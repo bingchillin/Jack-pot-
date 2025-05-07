@@ -12,37 +12,21 @@ export const AuthDocs = {
             },
             responses: [
                 {
-                    status: 200,
+                    status: 201,
                     description: 'Login successful',
                     example: {
-                        access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-                        token_type: "Bearer",
-                        expires_in: 3600,
-                        user: {
-                            idPerson: 1,
-                            mail: "john.doe@example.com",
-                            firstname: "John",
-                            surname: "Doe",
-                            idRole: 1
-                        }
+                        "access_token": "this is a fake access token",
+                        "refresh_token": "this is a fake refresh token",
+                        "expires_in": 3600
                     }
                 },
                 {
-                    status: 401,
+                    status: 200,
                     description: 'Invalid credentials',
                     example: {
                         statusCode: 401,
-                        message: "Invalid email or password",
+                        message: "No message, just HTML",
                         error: "Unauthorized"
-                    }
-                },
-                {
-                    status: 400,
-                    description: 'Bad request',
-                    example: {
-                        statusCode: 400,
-                        message: ["email must be a valid email", "password must be at least 8 characters"],
-                        error: "Bad Request"
                     }
                 }
             ],
@@ -54,14 +38,14 @@ export const AuthDocs = {
             summary: 'Refresh token',
             description: 'Refreshes an expired JWT token using a refresh token.',
             bodyExample: {
-                refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                refresh_token: "this is a fake refresh token"
             },
             responses: [
                 {
                     status: 200,
                     description: 'Token refreshed successfully',
                     example: {
-                        access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                        access_token: "this is a fake access token",
                         token_type: "Bearer",
                         expires_in: 3600
                     }
