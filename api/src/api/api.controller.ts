@@ -23,6 +23,10 @@ import { PlantPersonService } from 'src/plant-person/plant-person.service';
 import { CreatePlantPersonDto } from 'src/plant-person/dto/create-plant-person.dto';
 import { PlantPersonDocs } from './swagger/plant-person.docs';
 import { UpdatePlantPersonDto } from 'src/plant-person/dto/update-plant-person.dto';
+import { GamePersonService } from 'src/game-person/game-person.service';
+import { CreateGamePersonDto } from 'src/game-person/dto/create-game-person.dto';
+import { GamePersonDocs } from './swagger/game-person.docs';
+import { UpdateGamePersonDto } from 'src/game-person/dto/update-game-person.dto';
 
 @ApiTags('z-API')
 @Controller('api')
@@ -34,6 +38,7 @@ export class ApiController {
     private readonly eventPartyService: EventPartyService,
     private readonly gameService: GameService,
     private readonly plantPersonService: PlantPersonService,
+    private readonly gamePersonService: GamePersonService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -192,5 +197,35 @@ export class ApiController {
   @PlantPersonDocs.remove()
   removePlantPerson(@Param('id') id: string) {
     return this.plantPersonService.remove(+id);
+  }
+
+  @Post('/game-person')
+  @GamePersonDocs.create()
+  createGamePerson(@Body() dto: CreateGamePersonDto) {
+    return this.gamePersonService.create(dto);
+  }
+
+  @Get('/game-persons')
+  @GamePersonDocs.findAll()
+  findAllGamePersons() {
+    return this.gamePersonService.findAll();
+  }
+
+  @Get('/game-person/:id')
+  @GamePersonDocs.findOne()
+  findOneGamePerson(@Param('id') id: string) {
+    return this.gamePersonService.findOne(+id);
+    }
+
+  @Patch('/game-person/:id')
+  @GamePersonDocs.update()
+  updateGamePerson(@Param('id') id: string, @Body() dto: UpdateGamePersonDto) {
+    return this.gamePersonService.update(+id, dto);
+  }
+
+  @Delete('/game-person/:id')
+  @GamePersonDocs.remove()
+  removeGamePerson(@Param('id') id: string) {
+    return this.gamePersonService.remove(+id);
   }
 }
