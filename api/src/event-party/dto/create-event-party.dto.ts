@@ -7,24 +7,26 @@ export class CreateEventPartyDto {
         description: 'Title of the event party',
         minLength: 3,
         maxLength: 250,
-        required: true
+        required: false
     })
+    @IsOptional()
     @IsString()
     @MinLength(3)
     @MaxLength(250)
-    title: string;
+    title?: string;
 
     @ApiProperty({ 
         example: 'Join us for an exciting summer gaming tournament with amazing prizes!', 
         description: 'Detailed description of the event party',
         minLength: 10,
         maxLength: 5000,
-        required: true
+        required: false
     })
+    @IsOptional()
     @IsString()
     @MinLength(10)
     @MaxLength(5000)
-    description: string;
+    description?: string;
 
     @ApiProperty({ 
         example: false, 

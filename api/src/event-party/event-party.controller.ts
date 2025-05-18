@@ -32,6 +32,20 @@ export class EventPartyController {
         return this.eventPartyService.findOne(+id);
     }
 
+    @Get(':id/games')
+    @UseGuards(JwtAuthGuard)
+    @ApiExcludeEndpoint()
+    findGames(@Param('id') id: string) {
+        return this.eventPartyService.findWithGames(+id);
+    }
+
+    @Get(':id/participants')
+    @UseGuards(JwtAuthGuard)
+    @ApiExcludeEndpoint()
+    findParticipants(@Param('id') id: string) {
+        return this.eventPartyService.findWithParticipants(+id);
+    }
+
     @Patch(':id')
     @UseGuards(JwtAuthGuard)
     @ApiExcludeEndpoint()

@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { EventParty } from '../../event-party/entities/event-party.entity';
+import { GamePerson } from '../../game-person/entities/game-person.entity';
 
 @Entity('game')
 export class Game {
@@ -30,6 +31,9 @@ export class Game {
     @ManyToOne(() => EventParty)
     @JoinColumn({ name: 'id_event_party' })
     eventParty: EventParty;
+
+    @OneToMany(() => GamePerson, gamePerson => gamePerson.game)
+    players: GamePerson[];
 
     @CreateDateColumn()
     createdAt: Date;
