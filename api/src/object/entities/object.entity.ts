@@ -1,13 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany, Index } from 'typeorm';
 import { CategoryType } from '../../category-type/entities/category-type.entity';
 import { Person } from '../../person/entities/person.entity';
 import { ObjectProfile } from '../../object-profile/entities/object-profile.entity';
+import { Plant } from '../../plant/entities/plant.entity';
+import { EventParty } from '../../event-party/entities/event-party.entity';
 
 @Entity('object')
 export class ObjectEntity {
     @PrimaryGeneratedColumn({ name: 'id_object' })
     idObject: number;
 
+    @Index()
     @Column({ length: 250, nullable: true })
     title: string;
 
@@ -23,16 +26,22 @@ export class ObjectEntity {
     @Column({ name: 'id_person', nullable: true })
     idPerson: number;
 
-    @ManyToOne(() => CategoryType, categoryType => categoryType.objects)
+    @ManyToOne(() => CategoryType, categoryType => categoryType.objects, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'id_category_type' })
     categoryType: CategoryType;
 
-    @ManyToOne(() => Person)
+    @ManyToOne(() => Person, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'id_person' })
     person: Person;
 
-    @OneToMany(() => ObjectProfile, objectProfile => objectProfile.object)
+    @OneToMany(() => ObjectProfile, objectProfile => objectProfile.object, { onDelete: 'CASCADE' })
     objectProfiles: ObjectProfile[];
+
+    @OneToMany(() => Plant, plant => plant.object, { cascade: true })
+    plants: Plant[];
+
+    @OneToMany(() => EventParty, eventParty => eventParty.object)
+    eventParties: EventParty[];
 
     @CreateDateColumn()
     createdAt: Date;
