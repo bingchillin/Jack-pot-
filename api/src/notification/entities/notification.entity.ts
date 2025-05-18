@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { Person } from '../../person/entities/person.entity';
 import { ObjectEntity } from '../../object/entities/object.entity';
 
@@ -19,17 +19,18 @@ export class Notification {
     @Column({ name: 'id_person', nullable: true })
     idPerson: number;
 
-    @ManyToOne(() => Person)
+    @ManyToOne(() => Person, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'id_person' })
     person: Person;
 
     @Column({ name: 'id_object', nullable: true })
     idObject: number;
 
-    @ManyToOne(() => ObjectEntity)
+    @ManyToOne(() => ObjectEntity, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'id_object' })
     object: ObjectEntity;
 
+    @Index()
     @Column({ default: false })
     isRead: boolean;
 

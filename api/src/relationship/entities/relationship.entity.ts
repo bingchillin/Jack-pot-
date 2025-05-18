@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
 import { Contact } from '../../contact/entities/contact.entity';
 
 @Entity('relationship')
@@ -6,7 +6,8 @@ export class Relationship {
     @PrimaryGeneratedColumn({ name: 'id_relationship' })
     idRelationship: number;
 
-    @Column({ length: 250, nullable: false })
+    @Index({ unique: true })
+    @Column({ length: 250, nullable: true })
     title: string;
 
     @Column({ length: 1000, nullable: true })

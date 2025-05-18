@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { Object } from '../../object/entities/object.entity';
+import { ObjectEntity } from '../../object/entities/object.entity';
 
 @Entity('category_type')
 export class CategoryType {
@@ -15,8 +15,8 @@ export class CategoryType {
     @Column({ length: 5000, nullable: true })
     advise: string;
 
-    @OneToMany(() => Object, object => object.categoryType)
-    objects: Object[];
+    @OneToMany(() => ObjectEntity, object => object.categoryType)
+    objects: ObjectEntity[];
 
     @CreateDateColumn()
     createdAt: Date;

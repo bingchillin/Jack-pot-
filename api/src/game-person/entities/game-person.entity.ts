@@ -7,7 +7,7 @@ export class GamePerson {
     @PrimaryGeneratedColumn({ name: 'id_game_person' })
     idGamePerson: number;
 
-    @ManyToOne(() => Game)
+    @ManyToOne(() => Game, game => game.players)
     @JoinColumn({ name: 'id_game' })
     game: Game;
 

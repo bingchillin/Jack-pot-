@@ -18,7 +18,7 @@ export class Avatar {
     @Column({ name: 'id_plant_type', nullable: true })
     idPlantType: number;
 
-    @ManyToOne(() => PlantType)
+    @ManyToOne(() => PlantType, plantType => plantType.avatars)
     @JoinColumn({ name: 'id_plant_type' })
     plantType: PlantType;
 
