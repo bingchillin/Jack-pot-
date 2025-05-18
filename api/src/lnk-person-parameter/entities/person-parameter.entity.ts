@@ -19,14 +19,14 @@ export class PersonParameter {
     @Column({ name: 'id_person', nullable: true })
     idPerson: number;
 
-    @ManyToOne(() => Person)
+    @ManyToOne(() => Person, person => person.personParameters, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'id_person' })
     person: Person;
 
     @Column({ name: 'id_parameter_type', nullable: true })
     idParameterType: number;
 
-    @ManyToOne(() => ParameterType)
+    @ManyToOne(() => ParameterType, parameterType => parameterType.personParameters, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'id_parameter_type' })
     parameterType: ParameterType;
 

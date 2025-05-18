@@ -21,7 +21,7 @@ export class EventPartyService {
         return await this.eventPartyRepository.find({
             relations: ['games', 'participants', 'participants.person'],
             order: {
-                beginDate: 'DESC'
+                createdAt: 'DESC'
             }
         });
     }
