@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiBody } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -21,7 +21,10 @@ export class RoleController {
     @Get()
     @UseGuards(JwtAuthGuard)
     @ApiExcludeEndpoint()
-    findAll() {
+    findAll(@Query('title') title?: string) {
+        if (title) {
+            return this.roleService.findByTitle(title);
+        }
         return this.roleService.findAll();
     }
 

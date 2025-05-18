@@ -13,23 +13,34 @@ export class RoleService {
     ) {}
 
     async create(createRoleDto: CreateRoleDto): Promise<Role> {
-        const role = this.roleRepository.create({
-            title: createRoleDto.title,
-            description: createRoleDto.description
-        });
+        const role = this.roleRepository.create(createRoleDto);
         return await this.roleRepository.save(role);
     }
 
     async findAll(): Promise<Role[]> {
-        return await this.roleRepository.find();
+        return await this.roleRepository.find({
+            relations: ['persons']
+        });
     }
 
     async findOne(id: number): Promise<Role> {
         const role = await this.roleRepository.findOne({ 
-            where: { idRole: id }
+            where: { idRole: id },
+            relations: ['persons']
         });
         if (!role) {
             throw new NotFoundException(`Role with ID ${id} not found`);
+        }
+        return role;
+    }
+
+    async findByTitle(title: string): Promise<Role> {
+        const role = await this.roleRepository.findOne({
+            where: { title },
+            relations: ['persons']
+        });
+        if (!role) {
+            throw new NotFoundException(`Role with title ${title} not found`);
         }
         return role;
     }

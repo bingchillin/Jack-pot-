@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { PlantService } from './plant.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
@@ -21,7 +21,10 @@ export class PlantController {
     @Get()
     @UseGuards(JwtAuthGuard)
     @ApiExcludeEndpoint()
-    findAll() {
+    findAll(@Query('personId') personId?: number) {
+        if (personId) {
+            return this.plantService.findByPersonId(personId);
+        }
         return this.plantService.findAll();
     }
 
@@ -35,6 +38,7 @@ export class PlantController {
     @Patch(':id')
     @UseGuards(JwtAuthGuard)
     @ApiExcludeEndpoint()
+    @ApiBody({ type: UpdatePlantDto })
     update(@Param('id') id: string, @Body() updatePlantDto: UpdatePlantDto) {
         return this.plantService.update(+id, updatePlantDto);
     }
