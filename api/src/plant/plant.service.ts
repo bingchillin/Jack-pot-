@@ -18,11 +18,16 @@ export class PlantService {
     }
 
     async findAll(): Promise<Plant[]> {
-        return await this.plantRepository.find();
+        return await this.plantRepository.find({
+            relations: ['person']
+        });
     }
 
     async findOne(id: number): Promise<Plant> {
-        const plant = await this.plantRepository.findOne({ where: { idPlant: id } });
+        const plant = await this.plantRepository.findOne({ 
+            where: { idPlant: id },
+            relations: ['person']
+        });
         if (!plant) {
             throw new NotFoundException(`Plant with ID ${id} not found`);
         }
@@ -38,5 +43,12 @@ export class PlantService {
     async remove(id: number): Promise<void> {
         const plant = await this.findOne(id);
         await this.plantRepository.remove(plant);
+    }
+
+    async findByPersonId(personId: number): Promise<Plant[]> {
+        return await this.plantRepository.find({
+            where: { person: { idPerson: personId } },
+            relations: ['person']
+        });
     }
 } 
