@@ -7,11 +7,11 @@ export class EventPartyPerson {
     @PrimaryGeneratedColumn({ name: 'id_lnk_participation_person_event_party' })
     idEventPartyPerson: number;
 
-    @ManyToOne(() => EventParty)
+    @ManyToOne(() => EventParty, eventParty => eventParty.eventPartyPersons, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'id_event_party' })
     eventParty: EventParty;
 
-    @ManyToOne(() => Person)
+    @ManyToOne(() => Person, person => person.eventPartyPersons, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'id_person' })
     person: Person;
 

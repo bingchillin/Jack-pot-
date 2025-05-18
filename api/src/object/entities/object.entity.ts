@@ -4,6 +4,7 @@ import { Person } from '../../person/entities/person.entity';
 import { ObjectProfile } from '../../object-profile/entities/object-profile.entity';
 import { Plant } from '../../plant/entities/plant.entity';
 import { EventParty } from '../../event-party/entities/event-party.entity';
+import { Composant } from '../../composant/entities/composant.entity';
 
 @Entity('object')
 export class ObjectEntity {
@@ -42,6 +43,9 @@ export class ObjectEntity {
 
     @OneToMany(() => EventParty, eventParty => eventParty.object)
     eventParties: EventParty[];
+
+    @OneToMany(() => Composant, composant => composant.object)
+    composants: Composant[];
 
     @CreateDateColumn()
     createdAt: Date;
