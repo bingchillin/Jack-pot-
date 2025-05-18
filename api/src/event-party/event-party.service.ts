@@ -18,11 +18,19 @@ export class EventPartyService {
     }
 
     async findAll(): Promise<EventParty[]> {
-        return await this.eventPartyRepository.find();
+        return await this.eventPartyRepository.find({
+            relations: ['games', 'participants', 'participants.person'],
+            order: {
+                beginDate: 'DESC'
+            }
+        });
     }
 
     async findOne(id: number): Promise<EventParty> {
-        const eventParty = await this.eventPartyRepository.findOne({ where: { idEventParty: id } });
+        const eventParty = await this.eventPartyRepository.findOne({ 
+            where: { idEventParty: id },
+            relations: ['games', 'participants', 'participants.person']
+        });
         if (!eventParty) {
             throw new NotFoundException(`Event party with ID ${id} not found`);
         }
@@ -38,5 +46,27 @@ export class EventPartyService {
     async remove(id: number): Promise<void> {
         const eventParty = await this.findOne(id);
         await this.eventPartyRepository.remove(eventParty);
+    }
+
+    async findWithGames(id: number): Promise<EventParty> {
+        const eventParty = await this.eventPartyRepository.findOne({
+            where: { idEventParty: id },
+            relations: ['games']
+        });
+        if (!eventParty) {
+            throw new NotFoundException(`Event party with ID ${id} not found`);
+        }
+        return eventParty;
+    }
+
+    async findWithParticipants(id: number): Promise<EventParty> {
+        const eventParty = await this.eventPartyRepository.findOne({
+            where: { idEventParty: id },
+            relations: ['participants', 'participants.person']
+        });
+        if (!eventParty) {
+            throw new NotFoundException(`Event party with ID ${id} not found`);
+        }
+        return eventParty;
     }
 } 
