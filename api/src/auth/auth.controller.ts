@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { Request } from 'express';
 import { AuthDocs } from 'src/api/swagger/auth.docs';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth/user')
 export class AuthController {
@@ -11,7 +12,7 @@ export class AuthController {
     @Post('login')
     @UseGuards(LocalAuthGuard)
     @AuthDocs.login()
-    async login(@Req() req: Request) {
+    async login(@Body() loginDto: LoginDto, @Req() req: Request) {
         return this.authService.login(req.user);
     }
 
