@@ -1,4 +1,5 @@
 import { ApiGroup } from '../decorator/api-group.decorator';
+import { LoginDto } from '../../auth/dto/login.dto';
 
 export const AuthDocs = {
     login: () =>
@@ -6,22 +7,7 @@ export const AuthDocs = {
             tag: 'Auth',
             summary: 'User login',
             description: 'Authenticates a user and returns a JWT token for subsequent requests.',
-            bodyType: {
-                type: 'object',
-                properties: {
-                    mail: {
-                        type: 'string',
-                        example: 'john.doe@example.com',
-                        description: 'User email address'
-                    },
-                    password: {
-                        type: 'string',
-                        example: 'securePassword123',
-                        description: 'User password'
-                    }
-                },
-                required: ['mail', 'password']
-            },
+            bodyType: LoginDto,
             bodyExample: {
                 mail: 'john.doe@example.com',
                 password: 'securePassword123'
