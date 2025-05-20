@@ -6,9 +6,25 @@ export const AuthDocs = {
             tag: 'Auth',
             summary: 'User login',
             description: 'Authenticates a user and returns a JWT token for subsequent requests.',
+            bodyType: {
+                type: 'object',
+                properties: {
+                    mail: {
+                        type: 'string',
+                        example: 'john.doe@example.com',
+                        description: 'User email address'
+                    },
+                    password: {
+                        type: 'string',
+                        example: 'securePassword123',
+                        description: 'User password'
+                    }
+                },
+                required: ['mail', 'password']
+            },
             bodyExample: {
-                mail: "john.doe@example.com",
-                password: "securePassword123"
+                mail: 'john.doe@example.com',
+                password: 'securePassword123'
             },
             responses: [
                 {
@@ -37,8 +53,19 @@ export const AuthDocs = {
             tag: 'Auth',
             summary: 'Refresh token',
             description: 'Refreshes an expired JWT token using a refresh token.',
+            bodyType: {
+                type: 'object',
+                properties: {
+                    refresh_token: {
+                        type: 'string',
+                        example: 'this is a fake refresh token',
+                        description: 'The refresh token to use'
+                    }
+                },
+                required: ['refresh_token']
+            },
             bodyExample: {
-                refresh_token: "this is a fake refresh token"
+                refresh_token: 'this is a fake refresh token'
             },
             responses: [
                 {
