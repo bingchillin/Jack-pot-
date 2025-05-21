@@ -1,7 +1,64 @@
 import { ApiGroup } from '../decorator/api-group.decorator';
 import { LoginDto } from '../../auth/dto/login.dto';
+import { SignupDto } from '../../auth/dto/signup.dto';
 
 export const AuthDocs = {
+    signup: () =>
+        ApiGroup({
+            tag: 'Auth',
+            summary: 'User signup',
+            description: 'Creates a new user account and returns authentication tokens.',
+            bodyType: SignupDto,
+            bodyExample: {
+                mail: 'john.doe@example.com',
+                password: 'securePassword123',
+                firstname: 'John',
+                surname: 'Doe',
+                numberPhone: '+33612345678'
+            },
+            responses: [
+                {
+                    status: 201,
+                    description: 'User created successfully',
+                    example: {
+                        access_token: "this is a fake access token",
+                        refresh_token: "this is a fake refresh token",
+                        expires_in: 3600,
+                        user: {
+                            idPerson: 1,
+                            mail: "john.doe@example.com",
+                            firstname: "John",
+                            surname: "Doe",
+                            numberPhone: "+33612345678"
+                        }
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Invalid input data',
+                    example: {
+                        statusCode: 400,
+                        message: [
+                            "mail must be an email",
+                            "password must be longer than or equal to 6 characters",
+                            "firstname must be a string",
+                            "surname must be a string"
+                        ],
+                        error: "Bad Request"
+                    }
+                },
+                {
+                    status: 409,
+                    description: 'User already exists',
+                    example: {
+                        statusCode: 409,
+                        message: "User already exists",
+                        error: "Conflict"
+                    }
+                }
+            ],
+        }),
+
     login: () =>
         ApiGroup({
             tag: 'Auth',

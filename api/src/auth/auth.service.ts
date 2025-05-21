@@ -3,6 +3,7 @@ import { PersonService } from "../person/person.service";
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
+import { SignupDto } from './dto/signup.dto';
 
 @Injectable()
 export class AuthService {
@@ -34,29 +35,49 @@ export class AuthService {
         return result;
     }
 
-    async login(person: any) {
-        this.logger.debug(`Generating tokens for user: ${person.mail}`);
-        
-        const payload = {
-            sub: person.idPerson,
-            email: person.mail,
-            name: `${person.firstname} ${person.surname}`,
-            iat: Math.floor(Date.now() / 1000)
-        };
+    async signup(signupDto: SignupDto) {
+        // Check if user already exists
+        const existingUser = await this.personService.findByEmail(signupDto.mail);
+        if (existingUser) {
+            throw new UnauthorizedException('User already exists');
+        }
 
-        const [accessToken, refreshToken] = await Promise.all([
-            this.jwtService.sign(payload),
-            this.jwtService.sign(
-                { sub: person.idPerson },
-                { expiresIn: '7d' }
-            ),
-        ]);
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(signupDto.password, 10);
 
-        this.logger.debug(`Tokens generated successfully for user: ${person.mail}`);
+        // Create new user with default role (assuming role ID 2 is for regular users)
+        const newUser = await this.personService.create({
+            ...signupDto,
+            password: hashedPassword,
+            idRole: 2, // Default role for new users
+        });
+
+        // Generate tokens
+        const tokens = await this.generateTokens(newUser);
+
         return {
-            access_token: accessToken,
-            refresh_token: refreshToken,
-            expires_in: 3600,
+            ...tokens,
+            user: {
+                idPerson: newUser.idPerson,
+                mail: newUser.mail,
+                firstname: newUser.firstname,
+                surname: newUser.surname,
+                numberPhone: newUser.numberPhone,
+            },
+        };
+    }
+
+    async login(user: any) {
+        const tokens = await this.generateTokens(user);
+        return {
+            ...tokens,
+            user: {
+                idPerson: user.idPerson,
+                mail: user.mail,
+                firstname: user.firstname,
+                surname: user.surname,
+                numberPhone: user.numberPhone,
+            },
         };
     }
 
@@ -77,5 +98,36 @@ export class AuthService {
             this.logger.warn('Token refresh failed - Invalid refresh token');
             throw new UnauthorizedException('Invalid refresh token');
         }
+    }
+
+    private async generateTokens(user: any) {
+        const [accessToken, refreshToken] = await Promise.all([
+            this.jwtService.signAsync(
+                {
+                    sub: user.idPerson,
+                    mail: user.mail,
+                },
+                {
+                    secret: process.env.JWT_SECRET,
+                    expiresIn: '1h',
+                },
+            ),
+            this.jwtService.signAsync(
+                {
+                    sub: user.idPerson,
+                    mail: user.mail,
+                },
+                {
+                    secret: process.env.JWT_REFRESH_SECRET,
+                    expiresIn: '7d',
+                },
+            ),
+        ]);
+
+        return {
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            expires_in: 3600,
+        };
     }
 }
