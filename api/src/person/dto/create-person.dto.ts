@@ -48,7 +48,8 @@ export class CreatePersonDto {
     })
     @IsString()
     @IsPhoneNumber()
-    numberPhone: string;
+    @IsOptional()
+    numberPhone?: string;
 
     @ApiProperty({ 
         example: 1, 
