@@ -35,6 +35,7 @@ import { CreateRoleDto } from 'src/role/dto/create-role.dto';
 import { RoleDocs } from './swagger/role.docs';
 import { UpdateRoleDto } from 'src/role/dto/update-role.dto';
 import { RoleService } from 'src/role/role.service';
+import { ApiService } from './api.service';
 
 @ApiTags('z-API')
 @Controller('api')
@@ -49,6 +50,7 @@ export class ApiController {
     private readonly gamePersonService: GamePersonService,
     private readonly eventPartyPersonService: EventPartyPersonService,
     private readonly roleService: RoleService,
+    private readonly apiService: ApiService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -225,7 +227,7 @@ export class ApiController {
   @GamePersonDocs.findOne()
   findOneGamePerson(@Param('id') id: string) {
     return this.gamePersonService.findOne(+id);
-    }
+  }
 
   @Patch('/game-person/:id')
   @GamePersonDocs.update()
