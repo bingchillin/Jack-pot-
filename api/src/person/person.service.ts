@@ -24,11 +24,7 @@ export class PersonService {
             throw new ConflictException('Email already exists');
         }
 
-        const hashedPassword = await bcrypt.hash(createPersonDto.password, 10);
-        const person = this.personRepository.create({
-            ...createPersonDto,
-            password: hashedPassword
-        });
+        const person = this.personRepository.create(createPersonDto);
 
         if (createPersonDto.idRole) {
             const role = await this.roleService.findOne(createPersonDto.idRole);
