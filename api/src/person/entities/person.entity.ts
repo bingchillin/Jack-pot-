@@ -17,7 +17,7 @@ export class Person {
 
     @Index({ unique: true })
     @Column({ length: 250, nullable: true })
-    mail: string;
+    email: string;
 
     @Column({ length: 250, nullable: true })
     firstname: string;

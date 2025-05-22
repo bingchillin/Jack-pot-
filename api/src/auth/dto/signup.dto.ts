@@ -9,7 +9,7 @@ export class SignupDto {
         required: true
     })
     @IsEmail()
-    mail: string;
+    email: string;
 
     @ApiProperty({
         example: 'securePassword123',

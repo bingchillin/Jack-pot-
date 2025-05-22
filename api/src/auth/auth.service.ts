@@ -37,7 +37,7 @@ export class AuthService {
 
     async signup(signupDto: SignupDto) {
         // Check if user already exists
-        const existingUser = await this.personService.findByEmail(signupDto.mail);
+        const existingUser = await this.personService.findByEmail(signupDto.email);
         if (existingUser) {
             throw new UnauthorizedException('User already exists');
         }
@@ -59,7 +59,7 @@ export class AuthService {
             ...tokens,
             user: {
                 idPerson: newUser.idPerson,
-                mail: newUser.mail,
+                email: newUser.email,
                 firstname: newUser.firstname,
                 surname: newUser.surname,
                 numberPhone: newUser.numberPhone,
@@ -92,7 +92,7 @@ export class AuthService {
                 throw new UnauthorizedException();
             }
             
-            this.logger.debug(`Token refreshed successfully for user: ${person.mail}`);
+            this.logger.debug(`Token refreshed successfully for user: ${person.email}`);
             return this.login(person);
         } catch (e) {
             this.logger.warn('Token refresh failed - Invalid refresh token');
