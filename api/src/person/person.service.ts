@@ -57,15 +57,11 @@ export class PersonService {
         return person;
     }
 
-    async findByEmail(email: string): Promise<Person> {
+    async findByEmail(email: string): Promise<Person | null> {
         const person = await this.personRepository.findOne({
             where: { mail: email },
             relations: ['role']
         });
-
-        if (!person) {
-            throw new NotFoundException(`Person with email ${email} not found`);
-        }
 
         return person;
     }
