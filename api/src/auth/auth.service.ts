@@ -73,7 +73,7 @@ export class AuthService {
             ...tokens,
             user: {
                 idPerson: user.idPerson,
-                mail: user.mail,
+                email: user.email,
                 firstname: user.firstname,
                 surname: user.surname,
                 numberPhone: user.numberPhone,
@@ -105,7 +105,7 @@ export class AuthService {
             this.jwtService.signAsync(
                 {
                     sub: user.idPerson,
-                    mail: user.mail,
+                    email: user.email,
                 },
                 {
                     secret: process.env.JWT_SECRET,
@@ -115,7 +115,7 @@ export class AuthService {
             this.jwtService.signAsync(
                 {
                     sub: user.idPerson,
-                    mail: user.mail,
+                    email: user.email,
                 },
                 {
                     secret: process.env.JWT_REFRESH_SECRET,
