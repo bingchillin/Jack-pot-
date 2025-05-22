@@ -9,7 +9,7 @@ export class CreatePersonDto {
         required: true
     })
     @IsEmail()
-    mail: string;
+    email: string;
 
     @ApiProperty({ 
         example: 'John', 

@@ -17,7 +17,7 @@ export class PersonService {
 
     async create(createPersonDto: CreatePersonDto): Promise<Person> {
         const existingPerson = await this.personRepository.findOne({
-            where: { mail: createPersonDto.mail }
+            where: { email: createPersonDto.email }
         });
 
         if (existingPerson) {
@@ -59,7 +59,7 @@ export class PersonService {
 
     async findByEmail(email: string): Promise<Person | null> {
         const person = await this.personRepository.findOne({
-            where: { mail: email },
+            where: { email: email },
             relations: ['role']
         });
 
