@@ -10,7 +10,7 @@ export const AuthDocs = {
             description: 'Creates a new user account and returns authentication tokens.',
             bodyType: SignupDto,
             bodyExample: {
-                mail: 'john.doe@example.com',
+                email: 'john.doe@example.com',
                 password: 'securePassword123',
                 firstname: 'John',
                 surname: 'Doe',
@@ -26,7 +26,7 @@ export const AuthDocs = {
                         expires_in: 3600,
                         user: {
                             idPerson: 1,
-                            mail: "john.doe@example.com",
+                            email: "john.doe@example.com",
                             firstname: "John",
                             surname: "Doe",
                             numberPhone: "+33612345678"
@@ -39,7 +39,7 @@ export const AuthDocs = {
                     example: {
                         statusCode: 400,
                         message: [
-                            "mail must be an email",
+                            "email must be an email",
                             "password must be longer than or equal to 6 characters",
                             "firstname must be a string",
                             "surname must be a string"
@@ -66,7 +66,7 @@ export const AuthDocs = {
             description: 'Authenticates a user and returns a JWT token for subsequent requests.',
             bodyType: LoginDto,
             bodyExample: {
-                mail: 'john.doe@example.com',
+                email: 'john.doe@example.com',
                 password: 'securePassword123'
             },
             responses: [
@@ -168,7 +168,7 @@ export const AuthDocs = {
                     description: 'User information retrieved successfully',
                     example: {
                         idPerson: 1,
-                        mail: "john.doe@example.com",
+                        email: "john.doe@example.com",
                         firstname: "John",
                         surname: "Doe",
                         numberPhone: "+33612345678",

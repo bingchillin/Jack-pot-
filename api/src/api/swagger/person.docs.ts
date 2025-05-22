@@ -11,12 +11,12 @@ export const PersonDocs = {
             description: 'Creates a new person with the provided details. The email must be unique.',
             bodyType: CreatePersonDto,
             bodyExample: {
-                mail: "john.doe@example.com",
+                email: "john.doe@example.com",
                 firstname: "John",
                 surname: "Doe",
                 password: "securePassword123",
                 numberPhone: "+33612345678",
-                idRole: 1
+                idRole: 2
             },
             responses: [
                 {
@@ -25,7 +25,7 @@ export const PersonDocs = {
                     type: Person,
                     example: {
                         idPerson: 1,
-                        mail: 'john.doe@example.com',
+                        email: 'john.doe@example.com',
                         firstname: 'John',
                         surname: 'Doe',
                         numberPhone: '+33612345678',
@@ -40,15 +40,16 @@ export const PersonDocs = {
                 },
                 {
                     status: 400,
-                    description: 'Bad request - Invalid input data',
+                    description: 'Invalid input data',
                     example: {
                         statusCode: 400,
                         message: [
-                            'mail must be an email',
-                            'password must be longer than or equal to 6 characters',
-                            'numberPhone must be a valid phone number'
+                            'email must be an email',
+                            'firstname must be a string',
+                            'surname must be a string',
+                            'password must be longer than or equal to 6 characters'
                         ],
-                        error: 'Bad Request'
+                        error: "Bad Request"
                     }
                 },
                 {
@@ -75,7 +76,7 @@ export const PersonDocs = {
                 example: [
                     {
                         idPerson: 1,
-                        mail: 'john.doe@example.com',
+                        email: 'john.doe@example.com',
                         firstname: 'John',
                         surname: 'Doe',
                         numberPhone: '+33612345678',
@@ -89,7 +90,7 @@ export const PersonDocs = {
                     },
                     {
                         idPerson: 2,
-                        mail: 'jane.smith@example.com',
+                        email: 'jane.smith@example.com',
                         firstname: 'Jane',
                         surname: 'Smith',
                         numberPhone: '+33698765432',
@@ -123,7 +124,7 @@ export const PersonDocs = {
                     type: Person,
                     example: {
                         idPerson: 1,
-                        mail: 'john.doe@example.com',
+                        email: 'john.doe@example.com',
                         firstname: 'John',
                         surname: 'Doe',
                         numberPhone: '+33612345678',
@@ -173,7 +174,7 @@ export const PersonDocs = {
                     type: Person,
                     example: {
                         idPerson: 1,
-                        mail: 'john.doe@example.com',
+                        email: 'john.doe@example.com',
                         firstname: 'Johnny',
                         surname: 'Doe',
                         numberPhone: '+33612345679',
