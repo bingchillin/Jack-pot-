@@ -1,6 +1,9 @@
 import { ApiGroup } from '../decorator/api-group.decorator';
 import { LoginDto } from '../../auth/dto/login.dto';
 import { SignupDto } from '../../auth/dto/signup.dto';
+import { VerifyEmailDto } from '../../auth/dto/verify-email.dto';
+import { RequestPasswordResetDto } from '../../auth/dto/request-password-reset.dto';
+import { ResetPasswordDto } from '../../auth/dto/reset-password.dto';
 
 export const AuthDocs = {
     signup: () =>
@@ -182,6 +185,94 @@ export const AuthDocs = {
                         statusCode: 401,
                         message: "Unauthorized",
                         error: "Unauthorized"
+                    }
+                }
+            ],
+        }),
+
+    verifyEmail: () =>
+        ApiGroup({
+            tag: 'Auth',
+            summary: 'Verify user email address',
+            description: 'Verifies a user\'s email address using the token sent to their email.',
+            bodyType: VerifyEmailDto,
+            bodyExample: {
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+            },
+            responses: [
+                {
+                    status: 200,
+                    description: 'Email verified successfully',
+                    example: {
+                        message: 'Email verified successfully'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Invalid verification token',
+                    example: {
+                        statusCode: 400,
+                        message: 'Invalid verification token',
+                        error: 'Bad Request'
+                    }
+                }
+            ],
+        }),
+
+    requestPasswordReset: () =>
+        ApiGroup({
+            tag: 'Auth',
+            summary: 'Request password reset',
+            description: 'Sends a password reset link to the user\'s email address.',
+            bodyType: RequestPasswordResetDto,
+            bodyExample: {
+                email: 'john.doe@example.com'
+            },
+            responses: [
+                {
+                    status: 200,
+                    description: 'If email exists, a reset link will be sent',
+                    example: {
+                        message: 'If your email is registered, you will receive a password reset link'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Invalid email format',
+                    example: {
+                        statusCode: 400,
+                        message: ['email must be an email'],
+                        error: 'Bad Request'
+                    }
+                }
+            ],
+        }),
+
+    resetPassword: () =>
+        ApiGroup({
+            tag: 'Auth',
+            summary: 'Reset password',
+            description: 'Resets the user\'s password using the token sent to their email.',
+            bodyType: ResetPasswordDto,
+            bodyExample: {
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                newPassword: 'newSecurePassword123'
+            },
+            responses: [
+                {
+                    status: 200,
+                    description: 'Password reset successfully',
+                    example: {
+                        message: 'Password reset successfully'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Invalid or expired reset token',
+                    example: {
+                        statusCode: 400,
+                        message: 'Invalid or expired reset token',
+                        error: 'Bad Request'
                     }
                 }
             ],

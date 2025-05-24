@@ -6,6 +6,7 @@ import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import * as bcrypt from 'bcrypt';
 import { RoleService } from '../role/role.service';
+import { MoreThan } from 'typeorm';
 
 @Injectable()
 export class PersonService {
@@ -81,5 +82,27 @@ export class PersonService {
     async remove(id: number): Promise<void> {
         const person = await this.findOne(id);
         await this.personRepository.remove(person);
+    }
+
+    async findOneByVerificationToken(token: string): Promise<Person> {
+        return this.personRepository.findOne({ where: { emailVerificationToken: token } });
+    }
+
+    async findOneByEmail(email: string): Promise<Person> {
+        return this.personRepository.findOne({ where: { email } });
+    }
+
+    async findOneByResetToken(token: string): Promise<Person> {
+        return this.personRepository.findOne({ 
+            where: { 
+                passwordResetToken: token,
+                passwordResetExpires: MoreThan(new Date())
+            } 
+        });
+    }
+
+    async hashPassword(password: string): Promise<string> {
+        const salt = await bcrypt.genSalt();
+        return bcrypt.hash(password, salt);
     }
 } 

@@ -1,9 +1,13 @@
-import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger, BadRequestException } from '@nestjs/common';
 import { PersonService } from "../person/person.service";
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ConfigService } from '@nestjs/config';
 import { SignupDto } from './dto/signup.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { MailerService } from '../mailer/mailer.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +16,7 @@ export class AuthService {
     constructor(
         private readonly personService: PersonService,
         private jwtService: JwtService,
-        private readonly configService: ConfigService
+        private readonly mailerService: MailerService
     ) {}
 
     async validateUser(email: string, password: string): Promise<any> {
@@ -129,5 +133,55 @@ export class AuthService {
             refresh_token: refreshToken,
             expires_in: 3600,
         };
+    }
+
+    async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+        const person = await this.personService.findOneByVerificationToken(verifyEmailDto.token);
+        
+        if (!person) {
+            throw new BadRequestException('Invalid verification token');
+        }
+
+        person.isEmailVerified = true;
+        person.emailVerificationToken = null;
+        await this.personService.update(person.idPerson, person);
+
+        return { message: 'Email verified successfully' };
+    }
+
+    async requestPasswordReset(requestPasswordResetDto: RequestPasswordResetDto) {
+        const person = await this.personService.findOneByEmail(requestPasswordResetDto.email);
+        
+        if (!person) {
+            // Don't reveal that the email doesn't exist
+            return { message: 'If your email is registered, you will receive a password reset link' };
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetExpires = new Date();
+        resetExpires.setHours(resetExpires.getHours() + 1); // Token expires in 1 hour
+
+        person.passwordResetToken = resetToken;
+        person.passwordResetExpires = resetExpires;
+        await this.personService.update(person.idPerson, person);
+
+        await this.mailerService.sendPasswordResetEmail(person.email, resetToken);
+
+        return { message: 'If your email is registered, you will receive a password reset link' };
+    }
+
+    async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        const person = await this.personService.findOneByResetToken(resetPasswordDto.token);
+        
+        if (!person || person.passwordResetExpires < new Date()) {
+            throw new BadRequestException('Invalid or expired reset token');
+        }
+
+        person.password = await this.personService.hashPassword(resetPasswordDto.newPassword);
+        person.passwordResetToken = null;
+        person.passwordResetExpires = null;
+        await this.personService.update(person.idPerson, person);
+
+        return { message: 'Password reset successfully' };
     }
 }
