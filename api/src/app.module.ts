@@ -43,6 +43,7 @@ import { ObjectProfileModule } from './object-profile/object-profile.module';
 import { EventPartyModule } from './event-party/event-party.module';
 import { ComposantModule } from './composant/composant.module';
 import { PlantTypeModule } from './plant-type/plant-type.module';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -113,7 +114,8 @@ import { PlantTypeModule } from './plant-type/plant-type.module';
     ObjectProfileModule,
     EventPartyModule,
     ComposantModule,
-    PlantTypeModule
+    PlantTypeModule,
+    MailerModule
   ],
   controllers: [AppController],
   providers: [AppService],
