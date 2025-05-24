@@ -29,6 +29,18 @@ export class Person {
     @Exclude()
     password: string;
 
+    @Column({ default: false })
+    isEmailVerified: boolean;
+
+    @Column({ nullable: true })
+    emailVerificationToken: string;
+
+    @Column({ nullable: true })
+    passwordResetToken: string;
+
+    @Column({ nullable: true })
+    passwordResetExpires: Date;
+
     @Index()
     @Column({ length: 50, nullable: true, name: 'number_phone' })
     numberPhone: string;
