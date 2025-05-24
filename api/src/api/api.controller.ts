@@ -50,7 +50,6 @@ export class ApiController {
     private readonly gamePersonService: GamePersonService,
     private readonly eventPartyPersonService: EventPartyPersonService,
     private readonly roleService: RoleService,
-    private readonly apiService: ApiService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -300,4 +299,6 @@ export class ApiController {
   removeRole(@Param('id') id: string) {
     return this.roleService.remove(+id);
   }
+
+
 }
