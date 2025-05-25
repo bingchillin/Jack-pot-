@@ -1,6 +1,6 @@
-import { CreateNotificationDto } from '../../notification/dto/create-notification.dto';
-import { UpdateNotificationDto } from '../../notification/dto/update-notification.dto';
-import { Notification } from '../../notification/entities/notification.entity';
+import { CreateNotificationDto } from 'src/notification/dto/create-notification.dto';
+import { UpdateNotificationDto } from 'src/notification/dto/update-notification.dto';
+import { Notification } from 'src/notification/entities/notification.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const NotificationDocs = {
@@ -8,12 +8,13 @@ export const NotificationDocs = {
         ApiGroup({
             tag: 'Notifications',
             summary: 'Create a new notification',
-            description: 'Creates a new notification for a person.',
+            description: 'Creates a new notification for a user.',
             bodyType: CreateNotificationDto,
             bodyExample: {
                 idPerson: 1,
-                title: 'New Message',
-                message: 'You have received a new message from John Doe',
+                title: "New Plant Care Reminder",
+                message: "Time to water your rose bush!",
+                type: "REMINDER",
                 isRead: false
             },
             responses: [
@@ -23,31 +24,42 @@ export const NotificationDocs = {
                     type: Notification,
                     example: {
                         idNotification: 1,
-                        idPerson: 1,
-                        title: 'New Message',
-                        message: 'You have received a new message from John Doe',
-                        isRead: false,
                         person: {
                             idPerson: 1,
-                            mail: 'john.doe@example.com',
+                            email: 'john.doe@example.com',
                             firstname: 'John',
                             surname: 'Doe'
                         },
+                        title: "New Plant Care Reminder",
+                        message: "Time to water your rose bush!",
+                        type: "REMINDER",
+                        isRead: false,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
                     status: 400,
-                    description: 'Bad request - Invalid input data',
+                    description: 'Invalid input data',
                     example: {
                         statusCode: 400,
                         message: [
+                            'idPerson must be a number',
                             'title must be a string',
                             'message must be a string',
-                            'idPerson must be a number'
+                            'type must be one of: INFO, WARNING, ERROR, SUCCESS, REMINDER',
+                            'isRead must be a boolean'
                         ],
-                        error: 'Bad Request'
+                        error: "Bad Request"
+                    }
+                },
+                {
+                    status: 404,
+                    description: 'Person not found',
+                    example: {
+                        "statusCode": 404,
+                        "timestamp": "2025-04-21T17:44:57.369Z",
+                        "path": "/api/notification"
                     }
                 }
             ],
@@ -57,7 +69,7 @@ export const NotificationDocs = {
         ApiGroup({
             tag: 'Notifications',
             summary: 'Get all notifications',
-            description: 'Retrieves a list of all notifications in the system. Can be filtered by personId.',
+            description: 'Retrieves a list of all notifications in the system.',
             responses: [{
                 status: 200,
                 description: 'List of notifications retrieved successfully',
@@ -65,33 +77,33 @@ export const NotificationDocs = {
                 example: [
                     {
                         idNotification: 1,
-                        idPerson: 1,
-                        title: 'New Message',
-                        message: 'You have received a new message from John Doe',
-                        isRead: false,
                         person: {
                             idPerson: 1,
-                            mail: 'john.doe@example.com',
+                            email: 'john.doe@example.com',
                             firstname: 'John',
                             surname: 'Doe'
                         },
+                        title: "New Plant Care Reminder",
+                        message: "Time to water your rose bush!",
+                        type: "REMINDER",
+                        isRead: false,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idNotification: 2,
-                        idPerson: 1,
-                        title: 'Event Reminder',
-                        message: 'Your event "Party" starts in 1 hour',
-                        isRead: true,
                         person: {
                             idPerson: 1,
-                            mail: 'john.doe@example.com',
+                            email: 'john.doe@example.com',
                             firstname: 'John',
                             surname: 'Doe'
                         },
-                        createdAt: '2024-03-19T11:30:00.000Z',
-                        updatedAt: '2024-03-19T11:30:00.000Z'
+                        title: "Event Registration Confirmation",
+                        message: "You have successfully registered for the Spring Garden Party!",
+                        type: "SUCCESS",
+                        isRead: true,
+                        createdAt: '2024-03-18T15:45:00.000Z',
+                        updatedAt: '2024-03-18T15:45:00.000Z'
                     }
                 ]
             }],
@@ -115,16 +127,16 @@ export const NotificationDocs = {
                     type: Notification,
                     example: {
                         idNotification: 1,
-                        idPerson: 1,
-                        title: 'New Message',
-                        message: 'You have received a new message from John Doe',
-                        isRead: false,
                         person: {
                             idPerson: 1,
-                            mail: 'john.doe@example.com',
+                            email: 'john.doe@example.com',
                             firstname: 'John',
                             surname: 'Doe'
                         },
+                        title: "New Plant Care Reminder",
+                        message: "Time to water your rose bush!",
+                        type: "REMINDER",
+                        isRead: false,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -163,18 +175,18 @@ export const NotificationDocs = {
                     type: Notification,
                     example: {
                         idNotification: 1,
-                        idPerson: 1,
-                        title: 'New Message',
-                        message: 'You have received a new message from John Doe',
-                        isRead: true,
                         person: {
                             idPerson: 1,
-                            mail: 'john.doe@example.com',
+                            email: 'john.doe@example.com',
                             firstname: 'John',
                             surname: 'Doe'
                         },
+                        title: "New Plant Care Reminder",
+                        message: "Time to water your rose bush!",
+                        type: "REMINDER",
+                        isRead: true,
                         createdAt: '2024-03-19T10:30:00.000Z',
-                        updatedAt: '2024-03-19T12:30:00.000Z'
+                        updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 },
                 {

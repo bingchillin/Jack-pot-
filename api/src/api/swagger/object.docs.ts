@@ -1,6 +1,6 @@
-import { CreateObjectDto } from '../../object/dto/create-object.dto';
-import { UpdateObjectDto } from '../../object/dto/update-object.dto';
-import { ObjectEntity } from '../../object/entities/object.entity';
+import { CreateObjectDto } from 'src/object/dto/create-object.dto';
+import { UpdateObjectDto } from 'src/object/dto/update-object.dto';
+import { ObjectEntity } from 'src/object/entities/object.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const ObjectDocs = {
@@ -8,12 +8,14 @@ export const ObjectDocs = {
         ApiGroup({
             tag: 'Objects',
             summary: 'Create a new object',
-            description: 'Creates a new object with the provided details.',
+            description: 'Creates a new object for plant care or garden management.',
             bodyType: CreateObjectDto,
             bodyExample: {
-                title: 'Plant Pot',
-                description: 'A ceramic pot for plants',
-                dimensions: '20x20x30cm'
+                name: "Watering Can",
+                description: "A 2-liter watering can for indoor plants",
+                type: "TOOL",
+                isAvailable: true,
+                idPerson: 1
             },
             responses: [
                 {
@@ -22,24 +24,42 @@ export const ObjectDocs = {
                     type: ObjectEntity,
                     example: {
                         idObject: 1,
-                        title: 'Plant Pot',
-                        description: 'A ceramic pot for plants',
-                        dimensions: '20x20x30cm',
+                        name: "Watering Can",
+                        description: "A 2-liter watering can for indoor plants",
+                        type: "TOOL",
+                        isAvailable: true,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
                     status: 400,
-                    description: 'Bad request - Invalid input data',
+                    description: 'Invalid input data',
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
+                            'name must be a string',
                             'description must be a string',
-                            'dimensions must be a string'
+                            'type must be one of: TOOL, SEED, PLANT, FERTILIZER, PESTICIDE',
+                            'isAvailable must be a boolean',
+                            'idPerson must be a number'
                         ],
-                        error: 'Bad Request'
+                        error: "Bad Request"
+                    }
+                },
+                {
+                    status: 404,
+                    description: 'Person not found',
+                    example: {
+                        "statusCode": 404,
+                        "timestamp": "2025-04-21T17:44:57.369Z",
+                        "path": "/api/object"
                     }
                 }
             ],
@@ -57,17 +77,31 @@ export const ObjectDocs = {
                 example: [
                     {
                         idObject: 1,
-                        title: 'Plant Pot',
-                        description: 'A ceramic pot for plants',
-                        dimensions: '20x20x30cm',
+                        name: "Watering Can",
+                        description: "A 2-liter watering can for indoor plants",
+                        type: "TOOL",
+                        isAvailable: true,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idObject: 2,
-                        title: 'Watering Can',
-                        description: 'A metal watering can',
-                        dimensions: '15x15x25cm',
+                        name: "Organic Fertilizer",
+                        description: "Natural fertilizer for vegetables and herbs",
+                        type: "FERTILIZER",
+                        isAvailable: true,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
                     }
@@ -93,9 +127,16 @@ export const ObjectDocs = {
                 example: [
                     {
                         idObject: 1,
-                        title: 'Plant Pot',
+                        name: 'Plant Pot',
                         description: 'A ceramic pot for plants',
-                        dimensions: '20x20x30cm',
+                        type: 'TOOL',
+                        isAvailable: true,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -121,9 +162,16 @@ export const ObjectDocs = {
                     type: ObjectEntity,
                     example: {
                         idObject: 1,
-                        title: 'Plant Pot',
-                        description: 'A ceramic pot for plants',
-                        dimensions: '20x20x30cm',
+                        name: "Watering Can",
+                        description: "A 2-liter watering can for indoor plants",
+                        type: "TOOL",
+                        isAvailable: true,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -153,9 +201,8 @@ export const ObjectDocs = {
             },
             bodyType: UpdateObjectDto,
             bodyExample: {
-                title: 'Updated Plant Pot',
-                description: 'An updated ceramic pot for plants',
-                dimensions: '25x25x35cm'
+                description: "Updated: A 2-liter watering can with fine spray nozzle for indoor plants",
+                isAvailable: false
             },
             responses: [
                 {
@@ -164,11 +211,18 @@ export const ObjectDocs = {
                     type: ObjectEntity,
                     example: {
                         idObject: 1,
-                        title: 'Updated Plant Pot',
-                        description: 'An updated ceramic pot for plants',
-                        dimensions: '25x25x35cm',
+                        name: "Watering Can",
+                        description: "Updated: A 2-liter watering can with fine spray nozzle for indoor plants",
+                        type: "TOOL",
+                        isAvailable: false,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
-                        updatedAt: '2024-03-19T12:30:00.000Z'
+                        updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 },
                 {
@@ -177,9 +231,8 @@ export const ObjectDocs = {
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
                             'description must be a string',
-                            'dimensions must be a string'
+                            'isAvailable must be a boolean'
                         ],
                         error: 'Bad Request'
                     }

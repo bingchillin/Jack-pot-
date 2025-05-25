@@ -1,6 +1,6 @@
-import { CreateContactDto } from '../../contact/dto/create-contact.dto';
-import { UpdateContactDto } from '../../contact/dto/update-contact.dto';
-import { Contact } from '../../contact/entities/contact.entity';
+import { CreateContactDto } from 'src/contact/dto/create-contact.dto';
+import { UpdateContactDto } from 'src/contact/dto/update-contact.dto';
+import { Contact } from 'src/contact/entities/contact.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const ContactDocs = {
@@ -8,14 +8,15 @@ export const ContactDocs = {
         ApiGroup({
             tag: 'Contacts',
             summary: 'Create a new contact',
-            description: 'Creates a new contact with the provided details.',
+            description: 'Creates a new contact for a person with the provided details.',
             bodyType: CreateContactDto,
             bodyExample: {
+                relation: "Friend",
+                description: "Close friend from gardening club",
+                isActive: true,
+                valueReturn: "Accepted",
                 idPerson: 1,
-                title: 'John Doe',
-                description: 'Friend from gardening club',
-                mail: 'john.doe@example.com',
-                numberPhone: '+1234567890'
+                idRelationship: 1
             },
             responses: [
                 {
@@ -24,15 +25,20 @@ export const ContactDocs = {
                     type: Contact,
                     example: {
                         idContact: 1,
-                        idPerson: 1,
-                        title: 'John Doe',
-                        description: 'Friend from gardening club',
-                        mail: 'john.doe@example.com',
-                        numberPhone: '+1234567890',
+                        relation: "Friend",
+                        description: "Close friend from gardening club",
+                        isActive: true,
+                        valueReturn: "Accepted",
                         person: {
                             idPerson: 1,
-                            firstname: 'Jane',
-                            surname: 'Smith'
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        relationship: {
+                            idRelationship: 1,
+                            title: 'Friend',
+                            description: 'Friend relationship type'
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
@@ -40,17 +46,27 @@ export const ContactDocs = {
                 },
                 {
                     status: 400,
-                    description: 'Bad request - Invalid input data',
+                    description: 'Invalid input data',
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
+                            'relation must be a string',
                             'description must be a string',
-                            'mail must be an email',
-                            'numberPhone must be a string',
-                            'idPerson must be a number'
+                            'isActive must be a boolean',
+                            'valueReturn must be a string',
+                            'idPerson must be a number',
+                            'idRelationship must be a number'
                         ],
-                        error: 'Bad Request'
+                        error: "Bad Request"
+                    }
+                },
+                {
+                    status: 404,
+                    description: 'Person or relationship not found',
+                    example: {
+                        "statusCode": 404,
+                        "timestamp": "2025-04-21T17:44:57.369Z",
+                        "path": "/api/contact"
                     }
                 }
             ],
@@ -68,30 +84,40 @@ export const ContactDocs = {
                 example: [
                     {
                         idContact: 1,
-                        idPerson: 1,
-                        title: 'John Doe',
-                        description: 'Friend from gardening club',
-                        mail: 'john.doe@example.com',
-                        numberPhone: '+1234567890',
+                        relation: "Friend",
+                        description: "Close friend from gardening club",
+                        isActive: true,
+                        valueReturn: "Accepted",
                         person: {
                             idPerson: 1,
-                            firstname: 'Jane',
-                            surname: 'Smith'
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        relationship: {
+                            idRelationship: 1,
+                            title: 'Friend',
+                            description: 'Friend relationship type'
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idContact: 2,
-                        idPerson: 1,
-                        title: 'Alice Johnson',
-                        description: 'Plant supplier',
-                        mail: 'alice.johnson@example.com',
-                        numberPhone: '+1987654321',
+                        relation: "Family",
+                        description: "Family member",
+                        isActive: true,
+                        valueReturn: "Pending",
                         person: {
-                            idPerson: 1,
+                            idPerson: 2,
+                            email: 'jane.smith@example.com',
                             firstname: 'Jane',
                             surname: 'Smith'
+                        },
+                        relationship: {
+                            idRelationship: 2,
+                            title: 'Family',
+                            description: 'Family relationship type'
                         },
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
@@ -118,15 +144,20 @@ export const ContactDocs = {
                     type: Contact,
                     example: {
                         idContact: 1,
-                        idPerson: 1,
-                        title: 'John Doe',
-                        description: 'Friend from gardening club',
-                        mail: 'john.doe@example.com',
-                        numberPhone: '+1234567890',
+                        relation: "Friend",
+                        description: "Close friend from gardening club",
+                        isActive: true,
+                        valueReturn: "Accepted",
                         person: {
                             idPerson: 1,
-                            firstname: 'Jane',
-                            surname: 'Smith'
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        relationship: {
+                            idRelationship: 1,
+                            title: 'Friend',
+                            description: 'Friend relationship type'
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
@@ -157,10 +188,10 @@ export const ContactDocs = {
             },
             bodyType: UpdateContactDto,
             bodyExample: {
-                title: 'Updated John Doe',
-                description: 'Updated friend from gardening club',
-                mail: 'john.doe.updated@example.com',
-                numberPhone: '+1234567891'
+                relation: "Close Friend",
+                description: "Updated close friend from gardening club",
+                isActive: true,
+                valueReturn: "Accepted"
             },
             responses: [
                 {
@@ -169,15 +200,20 @@ export const ContactDocs = {
                     type: Contact,
                     example: {
                         idContact: 1,
-                        idPerson: 1,
-                        title: 'Updated John Doe',
-                        description: 'Updated friend from gardening club',
-                        mail: 'john.doe.updated@example.com',
-                        numberPhone: '+1234567891',
+                        relation: "Close Friend",
+                        description: "Updated close friend from gardening club",
+                        isActive: true,
+                        valueReturn: "Accepted",
                         person: {
                             idPerson: 1,
-                            firstname: 'Jane',
-                            surname: 'Smith'
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        relationship: {
+                            idRelationship: 1,
+                            title: 'Friend',
+                            description: 'Friend relationship type'
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T12:30:00.000Z'
@@ -189,10 +225,10 @@ export const ContactDocs = {
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
+                            'relation must be a string',
                             'description must be a string',
-                            'mail must be an email',
-                            'numberPhone must be a string'
+                            'isActive must be a boolean',
+                            'valueReturn must be a string'
                         ],
                         error: 'Bad Request'
                     }
