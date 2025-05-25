@@ -1,6 +1,6 @@
-import { CreateObjectProfileDto } from '../../object-profile/dto/create-object-profile.dto';
-import { UpdateObjectProfileDto } from '../../object-profile/dto/update-object-profile.dto';
-import { ObjectProfile } from '../../object-profile/entities/object-profile.entity';
+import { CreateObjectProfileDto } from 'src/object-profile/dto/create-object-profile.dto';
+import { UpdateObjectProfileDto } from 'src/object-profile/dto/update-object-profile.dto';
+import { ObjectProfile } from 'src/object-profile/entities/object-profile.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const ObjectProfileDocs = {
@@ -8,14 +8,18 @@ export const ObjectProfileDocs = {
         ApiGroup({
             tag: 'Object Profiles',
             summary: 'Create a new object profile',
-            description: 'Creates a new object profile with the provided details.',
+            description: 'Creates a new object profile for garden items.',
             bodyType: CreateObjectProfileDto,
             bodyExample: {
-                idObject: 1,
-                idPlantType: 1,
-                title: 'Garden Profile',
-                description: 'Profile for garden objects',
-                advise: 'Place in a sunny location'
+                name: "Watering Can Profile",
+                description: "Profile for a standard 2-liter watering can",
+                type: "TOOL",
+                parameters: {
+                    capacity: "2 liters",
+                    material: "Plastic",
+                    color: "Green"
+                },
+                idObject: 1
             },
             responses: [
                 {
@@ -24,20 +28,20 @@ export const ObjectProfileDocs = {
                     type: ObjectProfile,
                     example: {
                         idObjectProfile: 1,
-                        idObject: 1,
-                        idPlantType: 1,
-                        title: 'Garden Profile',
-                        description: 'Profile for garden objects',
-                        advise: 'Place in a sunny location',
+                        name: "Watering Can Profile",
+                        description: "Profile for a standard 2-liter watering can",
+                        type: "TOOL",
+                        parameters: {
+                            capacity: "2 liters",
+                            material: "Plastic",
+                            color: "Green"
+                        },
                         object: {
                             idObject: 1,
-                            title: 'Garden Bench',
-                            description: 'Wooden garden bench'
-                        },
-                        plantType: {
-                            idPlantType: 1,
-                            title: 'Flower',
-                            description: 'Decorative flowering plants'
+                            name: "Watering Can",
+                            description: "A 2-liter watering can for indoor plants",
+                            type: "TOOL",
+                            isAvailable: true
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
@@ -45,17 +49,26 @@ export const ObjectProfileDocs = {
                 },
                 {
                     status: 400,
-                    description: 'Bad request - Invalid input data',
+                    description: 'Invalid input data',
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
+                            'name must be a string',
                             'description must be a string',
-                            'advise must be a string',
-                            'idObject must be a number',
-                            'idPlantType must be a number'
+                            'type must be one of: TOOL, SEED, PLANT, FERTILIZER, PESTICIDE',
+                            'parameters must be an object',
+                            'idObject must be a number'
                         ],
-                        error: 'Bad Request'
+                        error: "Bad Request"
+                    }
+                },
+                {
+                    status: 404,
+                    description: 'Object not found',
+                    example: {
+                        "statusCode": 404,
+                        "timestamp": "2025-04-21T17:44:57.369Z",
+                        "path": "/api/object-profile"
                     }
                 }
             ],
@@ -73,40 +86,40 @@ export const ObjectProfileDocs = {
                 example: [
                     {
                         idObjectProfile: 1,
-                        idObject: 1,
-                        idPlantType: 1,
-                        title: 'Garden Profile',
-                        description: 'Profile for garden objects',
-                        advise: 'Place in a sunny location',
+                        name: "Watering Can Profile",
+                        description: "Profile for a standard 2-liter watering can",
+                        type: "TOOL",
+                        parameters: {
+                            capacity: "2 liters",
+                            material: "Plastic",
+                            color: "Green"
+                        },
                         object: {
                             idObject: 1,
-                            title: 'Garden Bench',
-                            description: 'Wooden garden bench'
-                        },
-                        plantType: {
-                            idPlantType: 1,
-                            title: 'Flower',
-                            description: 'Decorative flowering plants'
+                            name: "Watering Can",
+                            description: "A 2-liter watering can for indoor plants",
+                            type: "TOOL",
+                            isAvailable: true
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idObjectProfile: 2,
-                        idObject: 2,
-                        idPlantType: 2,
-                        title: 'Indoor Profile',
-                        description: 'Profile for indoor objects',
-                        advise: 'Keep away from direct sunlight',
+                        name: "Organic Fertilizer Profile",
+                        description: "Profile for organic vegetable fertilizer",
+                        type: "FERTILIZER",
+                        parameters: {
+                            weight: "2 kg",
+                            ingredients: ["Compost", "Worm castings", "Bone meal"],
+                            application: "Every 2 weeks"
+                        },
                         object: {
                             idObject: 2,
-                            title: 'Plant Stand',
-                            description: 'Metal plant stand'
-                        },
-                        plantType: {
-                            idPlantType: 2,
-                            title: 'Succulent',
-                            description: 'Drought-resistant plants'
+                            name: "Organic Fertilizer",
+                            description: "Natural fertilizer for vegetables and herbs",
+                            type: "FERTILIZER",
+                            isAvailable: true
                         },
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
@@ -133,20 +146,20 @@ export const ObjectProfileDocs = {
                     type: ObjectProfile,
                     example: {
                         idObjectProfile: 1,
-                        idObject: 1,
-                        idPlantType: 1,
-                        title: 'Garden Profile',
-                        description: 'Profile for garden objects',
-                        advise: 'Place in a sunny location',
+                        name: "Watering Can Profile",
+                        description: "Profile for a standard 2-liter watering can",
+                        type: "TOOL",
+                        parameters: {
+                            capacity: "2 liters",
+                            material: "Plastic",
+                            color: "Green"
+                        },
                         object: {
                             idObject: 1,
-                            title: 'Garden Bench',
-                            description: 'Wooden garden bench'
-                        },
-                        plantType: {
-                            idPlantType: 1,
-                            title: 'Flower',
-                            description: 'Decorative flowering plants'
+                            name: "Watering Can",
+                            description: "A 2-liter watering can for indoor plants",
+                            type: "TOOL",
+                            isAvailable: true
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
@@ -177,8 +190,13 @@ export const ObjectProfileDocs = {
             },
             bodyType: UpdateObjectProfileDto,
             bodyExample: {
-                title: 'Updated Garden Profile',
-                description: 'Updated profile for garden objects'
+                description: "Updated: Profile for a premium 2-liter watering can with fine spray nozzle",
+                parameters: {
+                    capacity: "2 liters",
+                    material: "Stainless Steel",
+                    color: "Silver",
+                    features: ["Fine spray nozzle", "Ergonomic handle"]
+                }
             },
             responses: [
                 {
@@ -187,23 +205,24 @@ export const ObjectProfileDocs = {
                     type: ObjectProfile,
                     example: {
                         idObjectProfile: 1,
-                        idObject: 1,
-                        idPlantType: 1,
-                        title: 'Updated Garden Profile',
-                        description: 'Updated profile for garden objects',
-                        advise: 'Place in a sunny location',
+                        name: "Watering Can Profile",
+                        description: "Updated: Profile for a premium 2-liter watering can with fine spray nozzle",
+                        type: "TOOL",
+                        parameters: {
+                            capacity: "2 liters",
+                            material: "Stainless Steel",
+                            color: "Silver",
+                            features: ["Fine spray nozzle", "Ergonomic handle"]
+                        },
                         object: {
                             idObject: 1,
-                            title: 'Garden Bench',
-                            description: 'Wooden garden bench'
-                        },
-                        plantType: {
-                            idPlantType: 1,
-                            title: 'Flower',
-                            description: 'Decorative flowering plants'
+                            name: "Watering Can",
+                            description: "A 2-liter watering can for indoor plants",
+                            type: "TOOL",
+                            isAvailable: true
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
-                        updatedAt: '2024-03-19T12:30:00.000Z'
+                        updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 },
                 {
@@ -212,8 +231,8 @@ export const ObjectProfileDocs = {
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
-                            'description must be a string'
+                            'description must be a string',
+                            'parameters must be an object'
                         ],
                         error: 'Bad Request'
                     }

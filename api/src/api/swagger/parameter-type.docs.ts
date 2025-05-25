@@ -1,6 +1,6 @@
-import { CreateParameterTypeDto } from '../../parameter-type/dto/create-parameter-type.dto';
-import { UpdateParameterTypeDto } from '../../parameter-type/dto/update-parameter-type.dto';
-import { ParameterType } from '../../parameter-type/entities/parameter-type.entity';
+import { CreateParameterTypeDto } from 'src/parameter-type/dto/create-parameter-type.dto';
+import { UpdateParameterTypeDto } from 'src/parameter-type/dto/update-parameter-type.dto';
+import { ParameterType } from 'src/parameter-type/entities/parameter-type.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const ParameterTypeDocs = {
@@ -8,12 +8,14 @@ export const ParameterTypeDocs = {
         ApiGroup({
             tag: 'Parameter Types',
             summary: 'Create a new parameter type',
-            description: 'Creates a new parameter type with the provided details.',
+            description: 'Creates a new parameter type for plant care parameters.',
             bodyType: CreateParameterTypeDto,
             bodyExample: {
-                title: 'Temperature',
-                description: 'Temperature parameter type',
-                unit: '°C'
+                name: "Watering Frequency",
+                description: "How often a plant needs to be watered",
+                unit: "times per week",
+                minValue: 1,
+                maxValue: 7
             },
             responses: [
                 {
@@ -22,24 +24,28 @@ export const ParameterTypeDocs = {
                     type: ParameterType,
                     example: {
                         idParameterType: 1,
-                        title: 'Temperature',
-                        description: 'Temperature parameter type',
-                        unit: '°C',
+                        name: "Watering Frequency",
+                        description: "How often a plant needs to be watered",
+                        unit: "times per week",
+                        minValue: 1,
+                        maxValue: 7,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
                     status: 400,
-                    description: 'Bad request - Invalid input data',
+                    description: 'Invalid input data',
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
+                            'name must be a string',
                             'description must be a string',
-                            'unit must be a string'
+                            'unit must be a string',
+                            'minValue must be a number',
+                            'maxValue must be a number'
                         ],
-                        error: 'Bad Request'
+                        error: "Bad Request"
                     }
                 }
             ],
@@ -57,17 +63,21 @@ export const ParameterTypeDocs = {
                 example: [
                     {
                         idParameterType: 1,
-                        title: 'Temperature',
-                        description: 'Temperature parameter type',
-                        unit: '°C',
+                        name: "Watering Frequency",
+                        description: "How often a plant needs to be watered",
+                        unit: "times per week",
+                        minValue: 1,
+                        maxValue: 7,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idParameterType: 2,
-                        title: 'Humidity',
-                        description: 'Humidity parameter type',
-                        unit: '%',
+                        name: "Sunlight Exposure",
+                        description: "Amount of direct sunlight required",
+                        unit: "hours per day",
+                        minValue: 2,
+                        maxValue: 8,
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
                     }
@@ -119,9 +129,11 @@ export const ParameterTypeDocs = {
                     type: ParameterType,
                     example: {
                         idParameterType: 1,
-                        title: 'Temperature',
-                        description: 'Temperature parameter type',
-                        unit: '°C',
+                        name: "Watering Frequency",
+                        description: "How often a plant needs to be watered",
+                        unit: "times per week",
+                        minValue: 1,
+                        maxValue: 7,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -151,9 +163,8 @@ export const ParameterTypeDocs = {
             },
             bodyType: UpdateParameterTypeDto,
             bodyExample: {
-                title: 'Updated Temperature',
-                description: 'Updated temperature parameter type',
-                unit: 'K'
+                description: "Updated: How often a plant needs to be watered (including rainy days)",
+                maxValue: 10
             },
             responses: [
                 {
@@ -162,11 +173,13 @@ export const ParameterTypeDocs = {
                     type: ParameterType,
                     example: {
                         idParameterType: 1,
-                        title: 'Updated Temperature',
-                        description: 'Updated temperature parameter type',
-                        unit: 'K',
+                        name: "Watering Frequency",
+                        description: "Updated: How often a plant needs to be watered (including rainy days)",
+                        unit: "times per week",
+                        minValue: 1,
+                        maxValue: 10,
                         createdAt: '2024-03-19T10:30:00.000Z',
-                        updatedAt: '2024-03-19T12:30:00.000Z'
+                        updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 },
                 {
@@ -175,9 +188,8 @@ export const ParameterTypeDocs = {
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
                             'description must be a string',
-                            'unit must be a string'
+                            'maxValue must be a number'
                         ],
                         error: 'Bad Request'
                     }

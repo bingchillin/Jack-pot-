@@ -1,6 +1,6 @@
-import { CreatePlantDto } from '../../plant/dto/create-plant.dto';
-import { UpdatePlantDto } from '../../plant/dto/update-plant.dto';
-import { Plant } from '../../plant/entities/plant.entity';
+import { CreatePlantDto } from 'src/plant/dto/create-plant.dto';
+import { UpdatePlantDto } from 'src/plant/dto/update-plant.dto';
+import { Plant } from 'src/plant/entities/plant.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const PlantDocs = {
@@ -11,12 +11,13 @@ export const PlantDocs = {
             description: 'Creates a new plant with the provided details.',
             bodyType: CreatePlantDto,
             bodyExample: {
-                name: "Monstera Deliciosa",
-                description: "A beautiful tropical plant with distinctive split leaves",
+                name: "Rose Bush",
+                description: "Beautiful red rose bush",
                 price: 29.99,
-                category: "Indoor",
+                category: "Flowers",
                 isAvailable: true,
-                idPerson: 1
+                idPerson: 1,
+                idObject: 1
             },
             responses: [
                 {
@@ -25,21 +26,50 @@ export const PlantDocs = {
                     type: Plant,
                     example: {
                         idPlant: 1,
-                        name: "Monstera Deliciosa",
-                        description: "A beautiful tropical plant with distinctive split leaves",
+                        name: "Rose Bush",
+                        description: "Beautiful red rose bush",
                         price: 29.99,
-                        category: "Indoor",
+                        category: "Flowers",
                         isAvailable: true,
-                        idPerson: 1
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        object: {
+                            idObject: 1,
+                            title: 'Garden Plot 1',
+                            description: 'Main garden plot'
+                        },
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
                     status: 400,
-                    description: 'Bad request',
+                    description: 'Invalid input data',
                     example: {
-                        "statusCode": 400,
-                        "timestamp": "2025-04-21T17:42:32.749Z",
-                        "path": "/api/plants"
+                        statusCode: 400,
+                        message: [
+                            'name must be a string',
+                            'description must be a string',
+                            'price must be a number',
+                            'category must be a string',
+                            'isAvailable must be a boolean',
+                            'idPerson must be a number',
+                            'idObject must be a number'
+                        ],
+                        error: "Bad Request"
+                    }
+                },
+                {
+                    status: 404,
+                    description: 'Person or object not found',
+                    example: {
+                        "statusCode": 404,
+                        "timestamp": "2025-04-21T17:44:57.369Z",
+                        "path": "/api/plant"
                     }
                 }
             ],
@@ -57,21 +87,45 @@ export const PlantDocs = {
                 example: [
                     {
                         idPlant: 1,
-                        name: "Monstera Deliciosa",
-                        description: "A beautiful tropical plant with distinctive split leaves",
+                        name: "Rose Bush",
+                        description: "Beautiful red rose bush",
                         price: 29.99,
-                        category: "Indoor",
+                        category: "Flowers",
                         isAvailable: true,
-                        idPerson: 1
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        object: {
+                            idObject: 1,
+                            title: 'Garden Plot 1',
+                            description: 'Main garden plot'
+                        },
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idPlant: 2,
-                        name: "Fiddle Leaf Fig",
-                        description: "A popular indoor tree with large, glossy leaves",
-                        price: 49.99,
-                        category: "Indoor",
+                        name: "Tomato Plant",
+                        description: "Organic tomato plant",
+                        price: 15.99,
+                        category: "Vegetables",
                         isAvailable: true,
-                        idPerson: 1
+                        person: {
+                            idPerson: 2,
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
+                        },
+                        object: {
+                            idObject: 2,
+                            title: 'Garden Plot 2',
+                            description: 'Secondary garden plot'
+                        },
+                        createdAt: '2024-03-19T11:30:00.000Z',
+                        updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 ]
             }],
@@ -95,12 +149,24 @@ export const PlantDocs = {
                     type: Plant,
                     example: {
                         idPlant: 1,
-                        name: "Monstera Deliciosa",
-                        description: "A beautiful tropical plant with distinctive split leaves",
+                        name: "Rose Bush",
+                        description: "Beautiful red rose bush",
                         price: 29.99,
-                        category: "Indoor",
+                        category: "Flowers",
                         isAvailable: true,
-                        idPerson: 1
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        object: {
+                            idObject: 1,
+                            title: 'Garden Plot 1',
+                            description: 'Main garden plot'
+                        },
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
@@ -109,7 +175,7 @@ export const PlantDocs = {
                     example: {
                         "statusCode": 404,
                         "timestamp": "2025-04-21T17:44:57.369Z",
-                        "path": "/api/plants/4"
+                        "path": "/api/plant/4"
                     }
                 }
             ],
@@ -128,9 +194,11 @@ export const PlantDocs = {
             },
             bodyType: UpdatePlantDto,
             bodyExample: {
-                name: "Monstera Deliciosa",
+                name: "Updated Rose Bush",
+                description: "Updated beautiful red rose bush",
                 price: 34.99,
-                isAvailable: false
+                category: "Premium Flowers",
+                isAvailable: true
             },
             responses: [
                 {
@@ -139,12 +207,39 @@ export const PlantDocs = {
                     type: Plant,
                     example: {
                         idPlant: 1,
-                        name: "Monstera Deliciosa",
-                        description: "A beautiful tropical plant with distinctive split leaves",
+                        name: "Updated Rose Bush",
+                        description: "Updated beautiful red rose bush",
                         price: 34.99,
-                        category: "Indoor",
-                        isAvailable: false,
-                        idPerson: 1
+                        category: "Premium Flowers",
+                        isAvailable: true,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        object: {
+                            idObject: 1,
+                            title: 'Garden Plot 1',
+                            description: 'Main garden plot'
+                        },
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T12:30:00.000Z'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Bad request - Invalid input data',
+                    example: {
+                        statusCode: 400,
+                        message: [
+                            'name must be a string',
+                            'description must be a string',
+                            'price must be a number',
+                            'category must be a string',
+                            'isAvailable must be a boolean'
+                        ],
+                        error: 'Bad Request'
                     }
                 },
                 {
@@ -153,7 +248,7 @@ export const PlantDocs = {
                     example: {
                         "statusCode": 404,
                         "timestamp": "2025-04-21T17:44:57.369Z",
-                        "path": "/api/plants/4"
+                        "path": "/api/plant/4"
                     }
                 }
             ],
@@ -173,9 +268,9 @@ export const PlantDocs = {
             responses: [
                 {
                     status: 200,
-                    description: '',
+                    description: 'Plant deleted successfully',
                     example: {
-                        message: ""
+                        message: 'Plant deleted successfully'
                     }
                 },
                 {
@@ -184,7 +279,7 @@ export const PlantDocs = {
                     example: {
                         "statusCode": 404,
                         "timestamp": "2025-04-21T17:44:57.369Z",
-                        "path": "/api/plants/4"
+                        "path": "/api/plant/4"
                     }
                 }
             ],

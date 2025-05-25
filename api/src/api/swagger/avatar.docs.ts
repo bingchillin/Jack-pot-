@@ -1,6 +1,6 @@
-import { CreateAvatarDto } from '../../avatar/dto/create-avatar.dto';
-import { UpdateAvatarDto } from '../../avatar/dto/update-avatar.dto';
-import { Avatar } from '../../avatar/entities/avatar.entity';
+import { CreateAvatarDto } from 'src/avatar/dto/create-avatar.dto';
+import { UpdateAvatarDto } from 'src/avatar/dto/update-avatar.dto';
+import { Avatar } from 'src/avatar/entities/avatar.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const AvatarDocs = {
@@ -8,12 +8,14 @@ export const AvatarDocs = {
         ApiGroup({
             tag: 'Avatars',
             summary: 'Create a new avatar',
-            description: 'Creates a new avatar with the provided details.',
+            description: 'Creates a new avatar for a user profile.',
             bodyType: CreateAvatarDto,
             bodyExample: {
-                title: 'Default Avatar',
-                description: 'Default avatar for new users',
-                imageUrl: 'https://example.com/avatars/default.png'
+                name: "Garden Gnome",
+                description: "A friendly garden gnome avatar",
+                imageUrl: "https://example.com/avatars/garden-gnome.png",
+                isDefault: false,
+                idPerson: 1
             },
             responses: [
                 {
@@ -22,24 +24,42 @@ export const AvatarDocs = {
                     type: Avatar,
                     example: {
                         idAvatar: 1,
-                        title: 'Default Avatar',
-                        description: 'Default avatar for new users',
-                        imageUrl: 'https://example.com/avatars/default.png',
+                        name: "Garden Gnome",
+                        description: "A friendly garden gnome avatar",
+                        imageUrl: "https://example.com/avatars/garden-gnome.png",
+                        isDefault: false,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
                     status: 400,
-                    description: 'Bad request - Invalid input data',
+                    description: 'Invalid input data',
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
+                            'name must be a string',
                             'description must be a string',
-                            'imageUrl must be a URL'
+                            'imageUrl must be a string',
+                            'isDefault must be a boolean',
+                            'idPerson must be a number'
                         ],
-                        error: 'Bad Request'
+                        error: "Bad Request"
+                    }
+                },
+                {
+                    status: 404,
+                    description: 'Person not found',
+                    example: {
+                        "statusCode": 404,
+                        "timestamp": "2025-04-21T17:44:57.369Z",
+                        "path": "/api/avatar"
                     }
                 }
             ],
@@ -57,17 +77,31 @@ export const AvatarDocs = {
                 example: [
                     {
                         idAvatar: 1,
-                        title: 'Default Avatar',
-                        description: 'Default avatar for new users',
-                        imageUrl: 'https://example.com/avatars/default.png',
+                        name: "Garden Gnome",
+                        description: "A friendly garden gnome avatar",
+                        imageUrl: "https://example.com/avatars/garden-gnome.png",
+                        isDefault: false,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idAvatar: 2,
-                        title: 'Premium Avatar',
-                        description: 'Premium avatar for VIP users',
-                        imageUrl: 'https://example.com/avatars/premium.png',
+                        name: "Flower Fairy",
+                        description: "A magical flower fairy avatar",
+                        imageUrl: "https://example.com/avatars/flower-fairy.png",
+                        isDefault: true,
+                        person: {
+                            idPerson: 2,
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
+                        },
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
                     }
@@ -93,9 +127,16 @@ export const AvatarDocs = {
                     type: Avatar,
                     example: {
                         idAvatar: 1,
-                        title: 'Default Avatar',
-                        description: 'Default avatar for new users',
-                        imageUrl: 'https://example.com/avatars/default.png',
+                        name: "Garden Gnome",
+                        description: "A friendly garden gnome avatar",
+                        imageUrl: "https://example.com/avatars/garden-gnome.png",
+                        isDefault: false,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -125,8 +166,8 @@ export const AvatarDocs = {
             },
             bodyType: UpdateAvatarDto,
             bodyExample: {
-                title: 'Updated Default Avatar',
-                description: 'Updated default avatar for new users'
+                description: "Updated: A friendly garden gnome with a watering can avatar",
+                isDefault: true
             },
             responses: [
                 {
@@ -135,11 +176,18 @@ export const AvatarDocs = {
                     type: Avatar,
                     example: {
                         idAvatar: 1,
-                        title: 'Updated Default Avatar',
-                        description: 'Updated default avatar for new users',
-                        imageUrl: 'https://example.com/avatars/default.png',
+                        name: "Garden Gnome",
+                        description: "Updated: A friendly garden gnome with a watering can avatar",
+                        imageUrl: "https://example.com/avatars/garden-gnome.png",
+                        isDefault: true,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
-                        updatedAt: '2024-03-19T12:30:00.000Z'
+                        updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 },
                 {
@@ -148,8 +196,8 @@ export const AvatarDocs = {
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
-                            'description must be a string'
+                            'description must be a string',
+                            'isDefault must be a boolean'
                         ],
                         error: 'Bad Request'
                     }
@@ -215,9 +263,16 @@ export const AvatarDocs = {
                 example: [
                     {
                         idAvatar: 1,
-                        title: 'Default Avatar',
-                        description: 'Default avatar for new users',
-                        imageUrl: 'https://example.com/avatars/default.png',
+                        name: "Garden Gnome",
+                        description: "A friendly garden gnome avatar",
+                        imageUrl: "https://example.com/avatars/garden-gnome.png",
+                        isDefault: false,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -243,9 +298,16 @@ export const AvatarDocs = {
                 example: [
                     {
                         idAvatar: 1,
-                        title: 'Plant Type Avatar',
-                        description: 'Avatar for plant type users',
-                        imageUrl: 'https://example.com/avatars/plant.png',
+                        name: "Garden Gnome",
+                        description: "A friendly garden gnome avatar",
+                        imageUrl: "https://example.com/avatars/garden-gnome.png",
+                        isDefault: false,
+                        person: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }

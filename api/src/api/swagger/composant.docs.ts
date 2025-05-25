@@ -1,6 +1,6 @@
-import { CreateComposantDto } from '../../composant/dto/create-composant.dto';
-import { UpdateComposantDto } from '../../composant/dto/update-composant.dto';
-import { Composant } from '../../composant/entities/composant.entity';
+import { CreateComposantDto } from 'src/composant/dto/create-composant.dto';
+import { UpdateComposantDto } from 'src/composant/dto/update-composant.dto';
+import { Composant } from 'src/composant/entities/composant.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const ComposantDocs = {
@@ -8,14 +8,15 @@ export const ComposantDocs = {
         ApiGroup({
             tag: 'Composants',
             summary: 'Create a new composant',
-            description: 'Creates a new composant with the provided details.',
+            description: 'Creates a new composant for garden or plant management.',
             bodyType: CreateComposantDto,
             bodyExample: {
-                idObject: 1,
-                title: 'Wooden Leg',
-                description: 'Leg for garden bench',
-                quantity: 4,
-                price: 15.99
+                name: "Soil Mix",
+                description: "A balanced mix of potting soil, perlite, and compost",
+                type: "SOIL",
+                quantity: 5,
+                unit: "kg",
+                isAvailable: true
             },
             responses: [
                 {
@@ -24,33 +25,30 @@ export const ComposantDocs = {
                     type: Composant,
                     example: {
                         idComposant: 1,
-                        idObject: 1,
-                        title: 'Wooden Leg',
-                        description: 'Leg for garden bench',
-                        quantity: 4,
-                        price: 15.99,
-                        object: {
-                            idObject: 1,
-                            title: 'Garden Bench',
-                            description: 'Wooden garden bench'
-                        },
+                        name: "Soil Mix",
+                        description: "A balanced mix of potting soil, perlite, and compost",
+                        type: "SOIL",
+                        quantity: 5,
+                        unit: "kg",
+                        isAvailable: true,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
                     status: 400,
-                    description: 'Bad request - Invalid input data',
+                    description: 'Invalid input data',
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
+                            'name must be a string',
                             'description must be a string',
+                            'type must be one of: SOIL, FERTILIZER, PESTICIDE, TOOL, SEED',
                             'quantity must be a number',
-                            'price must be a number',
-                            'idObject must be a number'
+                            'unit must be a string',
+                            'isAvailable must be a boolean'
                         ],
-                        error: 'Bad Request'
+                        error: "Bad Request"
                     }
                 }
             ],
@@ -68,17 +66,23 @@ export const ComposantDocs = {
                 example: [
                     {
                         idComposant: 1,
-                        title: 'Soil Mix',
-                        description: 'A mix of soil and compost',
-                        objectId: 1,
+                        name: "Soil Mix",
+                        description: "A balanced mix of potting soil, perlite, and compost",
+                        type: "SOIL",
+                        quantity: 5,
+                        unit: "kg",
+                        isAvailable: true,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idComposant: 2,
-                        title: 'Fertilizer',
-                        description: 'Organic fertilizer',
-                        objectId: 1,
+                        name: "Organic Fertilizer",
+                        description: "Natural fertilizer for vegetables and herbs",
+                        type: "FERTILIZER",
+                        quantity: 2,
+                        unit: "kg",
+                        isAvailable: true,
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
                     }
@@ -104,9 +108,12 @@ export const ComposantDocs = {
                 example: [
                     {
                         idComposant: 1,
-                        title: 'Soil Mix',
-                        description: 'A mix of soil and compost',
-                        objectId: 1,
+                        name: "Soil Mix",
+                        description: "A balanced mix of potting soil, perlite, and compost",
+                        type: "SOIL",
+                        quantity: 5,
+                        unit: "kg",
+                        isAvailable: true,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -132,24 +139,23 @@ export const ComposantDocs = {
                 example: [
                     {
                         idComposant: 1,
-                        title: 'Soil Mix',
-                        description: 'A mix of soil and compost',
-                        objectId: 1,
+                        name: "Soil Mix",
+                        description: "A balanced mix of potting soil, perlite, and compost",
+                        type: "SOIL",
+                        quantity: 5,
+                        unit: "kg",
+                        isAvailable: true,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idComposant: 2,
-                        idObject: 1,
-                        title: 'Wooden Seat',
-                        description: 'Seat for garden bench',
-                        quantity: 1,
-                        price: 45.99,
-                        object: {
-                            idObject: 1,
-                            title: 'Garden Bench',
-                            description: 'Wooden garden bench'
-                        },
+                        name: "Organic Fertilizer",
+                        description: "Natural fertilizer for vegetables and herbs",
+                        type: "FERTILIZER",
+                        quantity: 2,
+                        unit: "kg",
+                        isAvailable: true,
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
                     }
@@ -175,16 +181,12 @@ export const ComposantDocs = {
                     type: Composant,
                     example: {
                         idComposant: 1,
-                        idObject: 1,
-                        title: 'Wooden Leg',
-                        description: 'Leg for garden bench',
-                        quantity: 4,
-                        price: 15.99,
-                        object: {
-                            idObject: 1,
-                            title: 'Garden Bench',
-                            description: 'Wooden garden bench'
-                        },
+                        name: "Soil Mix",
+                        description: "A balanced mix of potting soil, perlite, and compost",
+                        type: "SOIL",
+                        quantity: 5,
+                        unit: "kg",
+                        isAvailable: true,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -214,10 +216,9 @@ export const ComposantDocs = {
             },
             bodyType: UpdateComposantDto,
             bodyExample: {
-                title: 'Updated Wooden Leg',
-                description: 'Updated leg for garden bench',
-                quantity: 6,
-                price: 17.99
+                description: "Updated: A premium balanced mix of potting soil, perlite, and organic compost",
+                quantity: 3,
+                isAvailable: false
             },
             responses: [
                 {
@@ -226,18 +227,14 @@ export const ComposantDocs = {
                     type: Composant,
                     example: {
                         idComposant: 1,
-                        idObject: 1,
-                        title: 'Updated Wooden Leg',
-                        description: 'Updated leg for garden bench',
-                        quantity: 6,
-                        price: 17.99,
-                        object: {
-                            idObject: 1,
-                            title: 'Garden Bench',
-                            description: 'Wooden garden bench'
-                        },
+                        name: "Soil Mix",
+                        description: "Updated: A premium balanced mix of potting soil, perlite, and organic compost",
+                        type: "SOIL",
+                        quantity: 3,
+                        unit: "kg",
+                        isAvailable: false,
                         createdAt: '2024-03-19T10:30:00.000Z',
-                        updatedAt: '2024-03-19T12:30:00.000Z'
+                        updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 },
                 {
@@ -246,10 +243,9 @@ export const ComposantDocs = {
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
                             'description must be a string',
                             'quantity must be a number',
-                            'price must be a number'
+                            'isAvailable must be a boolean'
                         ],
                         error: 'Bad Request'
                     }

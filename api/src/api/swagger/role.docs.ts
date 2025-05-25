@@ -1,6 +1,6 @@
-import { CreateRoleDto } from '../../role/dto/create-role.dto';
-import { UpdateRoleDto } from '../../role/dto/update-role.dto';
-import { Role } from '../../role/entities/role.entity';
+import { CreateRoleDto } from 'src/role/dto/create-role.dto';
+import { UpdateRoleDto } from 'src/role/dto/update-role.dto';
+import { Role } from 'src/role/entities/role.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const RoleDocs = {
@@ -8,11 +8,11 @@ export const RoleDocs = {
         ApiGroup({
             tag: 'Roles',
             summary: 'Create a new role',
-            description: 'Creates a new role in the system.',
+            description: 'Creates a new role with the provided details.',
             bodyType: CreateRoleDto,
             bodyExample: {
-                title: 'Admin',
-                description: 'Administrator with full system access'
+                title: "User",
+                description: "Regular user role"
             },
             responses: [
                 {
@@ -21,17 +21,23 @@ export const RoleDocs = {
                     type: Role,
                     example: {
                         idRole: 1,
-                        title: 'Admin',
-                        description: 'Administrator with full system access'
+                        title: 'User',
+                        description: 'Regular user role',
+                        persons: [],
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
                     status: 400,
-                    description: 'Bad request',
+                    description: 'Invalid input data',
                     example: {
-                        "statusCode": 400,
-                        "timestamp": "2025-04-21T17:42:32.749Z",
-                        "path": "/api/role"
+                        statusCode: 400,
+                        message: [
+                            'title must be a string',
+                            'description must be a string'
+                        ],
+                        error: "Bad Request"
                     }
                 }
             ],
@@ -50,12 +56,18 @@ export const RoleDocs = {
                     {
                         idRole: 1,
                         title: 'Admin',
-                        description: 'Administrator with full system access'
+                        description: 'Administrator role',
+                        persons: [],
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idRole: 2,
                         title: 'User',
-                        description: 'Regular user with limited access'
+                        description: 'Regular user role',
+                        persons: [],
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 ]
             }],
@@ -80,7 +92,10 @@ export const RoleDocs = {
                     example: {
                         idRole: 1,
                         title: 'Admin',
-                        description: 'Administrator with full system access'
+                        description: 'Administrator role',
+                        persons: [],
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
@@ -108,8 +123,8 @@ export const RoleDocs = {
             },
             bodyType: UpdateRoleDto,
             bodyExample: {
-                title: 'Super Admin',
-                description: 'Super administrator with all system privileges'
+                title: "Super Admin",
+                description: "Super administrator role with full access"
             },
             responses: [
                 {
@@ -119,7 +134,22 @@ export const RoleDocs = {
                     example: {
                         idRole: 1,
                         title: 'Super Admin',
-                        description: 'Super administrator with all system privileges'
+                        description: 'Super administrator role with full access',
+                        persons: [],
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T12:30:00.000Z'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Bad request - Invalid input data',
+                    example: {
+                        statusCode: 400,
+                        message: [
+                            'title must be a string',
+                            'description must be a string'
+                        ],
+                        error: 'Bad Request'
                     }
                 },
                 {
@@ -148,9 +178,9 @@ export const RoleDocs = {
             responses: [
                 {
                     status: 200,
-                    description: '',
+                    description: 'Role deleted successfully',
                     example: {
-                        message: ""
+                        message: 'Role deleted successfully'
                     }
                 },
                 {

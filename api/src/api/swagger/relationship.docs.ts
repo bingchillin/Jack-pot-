@@ -1,6 +1,6 @@
-import { CreateRelationshipDto } from '../../relationship/dto/create-relationship.dto';
-import { UpdateRelationshipDto } from '../../relationship/dto/update-relationship.dto';
-import { Relationship } from '../../relationship/entities/relationship.entity';
+import { CreateRelationshipDto } from 'src/relationship/dto/create-relationship.dto';
+import { UpdateRelationshipDto } from 'src/relationship/dto/update-relationship.dto';
+import { Relationship } from 'src/relationship/entities/relationship.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const RelationshipDocs = {
@@ -13,8 +13,7 @@ export const RelationshipDocs = {
             bodyExample: {
                 idPerson1: 1,
                 idPerson2: 2,
-                title: 'Friends',
-                description: 'Close friends from gardening club'
+                type: "Friend"
             },
             responses: [
                 {
@@ -23,19 +22,18 @@ export const RelationshipDocs = {
                     type: Relationship,
                     example: {
                         idRelationship: 1,
-                        idPerson1: 1,
-                        idPerson2: 2,
-                        title: 'Friends',
-                        description: 'Close friends from gardening club',
+                        type: "Friend",
                         person1: {
                             idPerson: 1,
-                            firstname: 'Jane',
-                            surname: 'Smith'
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
                         },
                         person2: {
                             idPerson: 2,
-                            firstname: 'John',
-                            surname: 'Doe'
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
@@ -43,16 +41,24 @@ export const RelationshipDocs = {
                 },
                 {
                     status: 400,
-                    description: 'Bad request - Invalid input data',
+                    description: 'Invalid input data',
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
-                            'description must be a string',
                             'idPerson1 must be a number',
-                            'idPerson2 must be a number'
+                            'idPerson2 must be a number',
+                            'type must be a string'
                         ],
-                        error: 'Bad Request'
+                        error: "Bad Request"
+                    }
+                },
+                {
+                    status: 404,
+                    description: 'One or both persons not found',
+                    example: {
+                        "statusCode": 404,
+                        "timestamp": "2025-04-21T17:44:57.369Z",
+                        "path": "/api/relationship"
                     }
                 }
             ],
@@ -70,38 +76,36 @@ export const RelationshipDocs = {
                 example: [
                     {
                         idRelationship: 1,
-                        idPerson1: 1,
-                        idPerson2: 2,
-                        title: 'Friends',
-                        description: 'Close friends from gardening club',
+                        type: "Friend",
                         person1: {
                             idPerson: 1,
-                            firstname: 'Jane',
-                            surname: 'Smith'
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
                         },
                         person2: {
                             idPerson: 2,
-                            firstname: 'John',
-                            surname: 'Doe'
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idRelationship: 2,
-                        idPerson1: 1,
-                        idPerson2: 3,
-                        title: 'Colleagues',
-                        description: 'Work together at the garden center',
+                        type: "Family",
                         person1: {
                             idPerson: 1,
-                            firstname: 'Jane',
-                            surname: 'Smith'
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
                         },
                         person2: {
                             idPerson: 3,
-                            firstname: 'Alice',
-                            surname: 'Johnson'
+                            email: 'bob.wilson@example.com',
+                            firstname: 'Bob',
+                            surname: 'Wilson'
                         },
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
@@ -155,19 +159,18 @@ export const RelationshipDocs = {
                     type: Relationship,
                     example: {
                         idRelationship: 1,
-                        idPerson1: 1,
-                        idPerson2: 2,
-                        title: 'Friends',
-                        description: 'Close friends from gardening club',
+                        type: "Friend",
                         person1: {
                             idPerson: 1,
-                            firstname: 'Jane',
-                            surname: 'Smith'
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
                         },
                         person2: {
                             idPerson: 2,
-                            firstname: 'John',
-                            surname: 'Doe'
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
@@ -198,8 +201,7 @@ export const RelationshipDocs = {
             },
             bodyType: UpdateRelationshipDto,
             bodyExample: {
-                title: 'Updated Friends',
-                description: 'Updated close friends from gardening club'
+                type: "Close Friend"
             },
             responses: [
                 {
@@ -208,19 +210,18 @@ export const RelationshipDocs = {
                     type: Relationship,
                     example: {
                         idRelationship: 1,
-                        idPerson1: 1,
-                        idPerson2: 2,
-                        title: 'Updated Friends',
-                        description: 'Updated close friends from gardening club',
+                        type: "Close Friend",
                         person1: {
                             idPerson: 1,
-                            firstname: 'Jane',
-                            surname: 'Smith'
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
                         },
                         person2: {
                             idPerson: 2,
-                            firstname: 'John',
-                            surname: 'Doe'
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
                         },
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T12:30:00.000Z'
@@ -232,8 +233,7 @@ export const RelationshipDocs = {
                     example: {
                         statusCode: 400,
                         message: [
-                            'title must be a string',
-                            'description must be a string'
+                            'type must be a string'
                         ],
                         error: 'Bad Request'
                     }

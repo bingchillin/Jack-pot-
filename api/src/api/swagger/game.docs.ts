@@ -1,6 +1,6 @@
-import { CreateGameDto } from '../../game/dto/create-game.dto';
-import { UpdateGameDto } from '../../game/dto/update-game.dto';
-import { Game } from '../../game/entities/game.entity';
+import { CreateGameDto } from 'src/game/dto/create-game.dto';
+import { UpdateGameDto } from 'src/game/dto/update-game.dto';
+import { Game } from 'src/game/entities/game.entity';
 import { ApiGroup } from '../decorator/api-group.decorator';
 
 export const GameDocs = {
@@ -11,14 +11,14 @@ export const GameDocs = {
             description: 'Creates a new game with the provided details.',
             bodyType: CreateGameDto,
             bodyExample: {
-                title: "Chess Tournament Final",
-                description: "Final match of the chess tournament between the top two players",
+                title: "Plant Quiz",
+                description: "Test your knowledge about plants",
+                beginDate: "2024-03-20",
+                endDate: "2024-03-25",
+                rules: "Answer 10 questions about plants. Highest score wins!",
+                idEventParty: 1,
                 idWon: 1,
-                idLose: 2,
-                beginDate: "2024-07-15",
-                endDate: "2024-07-15",
-                rules: "1. Standard chess rules apply\n2. Time control: 90 minutes + 30 seconds increment\n3. No draw offers before move 30",
-                idEventParty: 1
+                idLose: 2
             },
             responses: [
                 {
@@ -27,23 +27,58 @@ export const GameDocs = {
                     type: Game,
                     example: {
                         idGame: 1,
-                        title: "Chess Tournament Final",
-                        description: "Final match of the chess tournament between the top two players",
-                        idWon: 1,
-                        idLose: 2,
-                        beginDate: "2024-07-15",
-                        endDate: "2024-07-15",
-                        rules: "1. Standard chess rules apply\n2. Time control: 90 minutes + 30 seconds increment\n3. No draw offers before move 30",
-                        idEventParty: 1
+                        title: "Plant Quiz",
+                        description: "Test your knowledge about plants",
+                        beginDate: "2024-03-20",
+                        endDate: "2024-03-25",
+                        rules: "Answer 10 questions about plants. Highest score wins!",
+                        eventParty: {
+                            idEventParty: 1,
+                            title: "Spring Garden Party",
+                            description: "Annual spring garden gathering"
+                        },
+                        winner: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        loser: {
+                            idPerson: 2,
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
+                        },
+                        players: [],
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
                     status: 400,
-                    description: 'Bad request',
+                    description: 'Invalid input data',
                     example: {
-                        "statusCode": 400,
-                        "timestamp": "2025-04-21T17:42:32.749Z",
-                        "path": "/api/games"
+                        statusCode: 400,
+                        message: [
+                            'title must be a string',
+                            'description must be a string',
+                            'beginDate must be a valid date',
+                            'endDate must be a valid date',
+                            'rules must be a string',
+                            'idEventParty must be a number',
+                            'idWon must be a number',
+                            'idLose must be a number'
+                        ],
+                        error: "Bad Request"
+                    }
+                },
+                {
+                    status: 404,
+                    description: 'Event party or person not found',
+                    example: {
+                        "statusCode": 404,
+                        "timestamp": "2025-04-21T17:44:57.369Z",
+                        "path": "/api/game"
                     }
                 }
             ],
@@ -61,25 +96,59 @@ export const GameDocs = {
                 example: [
                     {
                         idGame: 1,
-                        title: "Chess Tournament Final",
-                        description: "Final match of the chess tournament between the top two players",
-                        idWon: 1,
-                        idLose: 2,
-                        beginDate: "2024-07-15",
-                        endDate: "2024-07-15",
-                        rules: "1. Standard chess rules apply\n2. Time control: 90 minutes + 30 seconds increment\n3. No draw offers before move 30",
-                        idEventParty: 1
+                        title: "Plant Quiz",
+                        description: "Test your knowledge about plants",
+                        beginDate: "2024-03-20",
+                        endDate: "2024-03-25",
+                        rules: "Answer 10 questions about plants. Highest score wins!",
+                        eventParty: {
+                            idEventParty: 1,
+                            title: "Spring Garden Party",
+                            description: "Annual spring garden gathering"
+                        },
+                        winner: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        loser: {
+                            idPerson: 2,
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
+                        },
+                        players: [],
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idGame: 2,
-                        title: "Poker Championship",
-                        description: "Texas Hold'em poker tournament final table",
-                        idWon: 3,
-                        idLose: 4,
-                        beginDate: "2024-07-20",
-                        endDate: "2024-07-20",
-                        rules: "1. Texas Hold'em rules\n2. Starting stack: 10,000 chips\n3. Blinds increase every 20 minutes",
-                        idEventParty: 1
+                        title: "Garden Scavenger Hunt",
+                        description: "Find hidden items in the garden",
+                        beginDate: "2024-03-21",
+                        endDate: "2024-03-21",
+                        rules: "Find all 10 hidden items. Fastest time wins!",
+                        eventParty: {
+                            idEventParty: 1,
+                            title: "Spring Garden Party",
+                            description: "Annual spring garden gathering"
+                        },
+                        winner: {
+                            idPerson: 2,
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
+                        },
+                        loser: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        players: [],
+                        createdAt: '2024-03-19T11:30:00.000Z',
+                        updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 ]
             }],
@@ -103,14 +172,31 @@ export const GameDocs = {
                     type: Game,
                     example: {
                         idGame: 1,
-                        title: "Chess Tournament Final",
-                        description: "Final match of the chess tournament between the top two players",
-                        idWon: 1,
-                        idLose: 2,
-                        beginDate: "2024-07-15",
-                        endDate: "2024-07-15",
-                        rules: "1. Standard chess rules apply\n2. Time control: 90 minutes + 30 seconds increment\n3. No draw offers before move 30",
-                        idEventParty: 1
+                        title: "Plant Quiz",
+                        description: "Test your knowledge about plants",
+                        beginDate: "2024-03-20",
+                        endDate: "2024-03-25",
+                        rules: "Answer 10 questions about plants. Highest score wins!",
+                        eventParty: {
+                            idEventParty: 1,
+                            title: "Spring Garden Party",
+                            description: "Annual spring garden gathering"
+                        },
+                        winner: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        loser: {
+                            idPerson: 2,
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
+                        },
+                        players: [],
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 },
                 {
@@ -119,7 +205,7 @@ export const GameDocs = {
                     example: {
                         "statusCode": 404,
                         "timestamp": "2025-04-21T17:44:57.369Z",
-                        "path": "/api/games/4"
+                        "path": "/api/game/4"
                     }
                 }
             ],
@@ -138,10 +224,11 @@ export const GameDocs = {
             },
             bodyType: UpdateGameDto,
             bodyExample: {
-                title: "Chess Tournament Final 2024",
-                idWon: 2,
-                idLose: 1,
-                rules: "1. Standard chess rules apply\n2. Time control: 90 minutes + 30 seconds increment\n3. No draw offers before move 30\n4. New rule: Players must use their own chess clocks"
+                title: "Updated Plant Quiz",
+                description: "Updated test your knowledge about plants",
+                beginDate: "2024-03-21",
+                endDate: "2024-03-26",
+                rules: "Updated: Answer 15 questions about plants. Highest score wins!"
             },
             responses: [
                 {
@@ -150,14 +237,46 @@ export const GameDocs = {
                     type: Game,
                     example: {
                         idGame: 1,
-                        title: "Chess Tournament Final 2024",
-                        description: "Final match of the chess tournament between the top two players",
-                        idWon: 2,
-                        idLose: 1,
-                        beginDate: "2024-07-15",
-                        endDate: "2024-07-15",
-                        rules: "1. Standard chess rules apply\n2. Time control: 90 minutes + 30 seconds increment\n3. No draw offers before move 30\n4. New rule: Players must use their own chess clocks",
-                        idEventParty: 1
+                        title: "Updated Plant Quiz",
+                        description: "Updated test your knowledge about plants",
+                        beginDate: "2024-03-21",
+                        endDate: "2024-03-26",
+                        rules: "Updated: Answer 15 questions about plants. Highest score wins!",
+                        eventParty: {
+                            idEventParty: 1,
+                            title: "Spring Garden Party",
+                            description: "Annual spring garden gathering"
+                        },
+                        winner: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe'
+                        },
+                        loser: {
+                            idPerson: 2,
+                            email: 'jane.smith@example.com',
+                            firstname: 'Jane',
+                            surname: 'Smith'
+                        },
+                        players: [],
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T12:30:00.000Z'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Bad request - Invalid input data',
+                    example: {
+                        statusCode: 400,
+                        message: [
+                            'title must be a string',
+                            'description must be a string',
+                            'beginDate must be a valid date',
+                            'endDate must be a valid date',
+                            'rules must be a string'
+                        ],
+                        error: 'Bad Request'
                     }
                 },
                 {
@@ -166,7 +285,7 @@ export const GameDocs = {
                     example: {
                         "statusCode": 404,
                         "timestamp": "2025-04-21T17:44:57.369Z",
-                        "path": "/api/games/4"
+                        "path": "/api/game/4"
                     }
                 }
             ],
@@ -186,9 +305,9 @@ export const GameDocs = {
             responses: [
                 {
                     status: 200,
-                    description: '',
+                    description: 'Game deleted successfully',
                     example: {
-                        message: ""
+                        message: 'Game deleted successfully'
                     }
                 },
                 {
@@ -197,7 +316,7 @@ export const GameDocs = {
                     example: {
                         "statusCode": 404,
                         "timestamp": "2025-04-21T17:44:57.369Z",
-                        "path": "/api/games/4"
+                        "path": "/api/game/4"
                     }
                 }
             ],
