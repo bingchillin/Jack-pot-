@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { MailerService as NestMailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { MailerService as NestMailerService } from '@nestjs-modules/mailer';
 import { render } from '@react-email/render';
 import { VerificationEmail } from './templates/verification-email';
 import { ResetPasswordEmail } from './templates/reset-password-email';
@@ -12,7 +12,7 @@ export class MailerService {
   constructor(
     private readonly mailerService: NestMailerService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async sendVerificationEmail(email: string, token: string): Promise<void> {
     const verificationUrl = `${this.configService.get('FRONTEND_URL')}/verify-email?token=${token}`;
