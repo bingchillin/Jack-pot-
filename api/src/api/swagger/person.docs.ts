@@ -29,11 +29,25 @@ export const PersonDocs = {
                         firstname: 'John',
                         surname: 'Doe',
                         numberPhone: '+33612345678',
+                        isEmailVerified: false,
+                        emailVerificationToken: null,
+                        passwordResetToken: null,
+                        passwordResetExpires: null,
                         role: {
                             idRole: 1,
                             title: 'Admin',
-                            description: 'Administrator role'
+                            description: 'Administrator role',
+                            createdAt: '2024-03-19T10:30:00.000Z',
+                            updatedAt: '2024-03-19T10:30:00.000Z'
                         },
+                        contacts: [],
+                        personParameters: [],
+                        objects: [],
+                        notifications: [],
+                        eventPartyPersons: [],
+                        eventParties: [],
+                        gameParticipations: [],
+                        plants: [],
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -80,11 +94,25 @@ export const PersonDocs = {
                         firstname: 'John',
                         surname: 'Doe',
                         numberPhone: '+33612345678',
+                        isEmailVerified: false,
+                        emailVerificationToken: null,
+                        passwordResetToken: null,
+                        passwordResetExpires: null,
                         role: {
                             idRole: 1,
                             title: 'Admin',
-                            description: 'Administrator role'
+                            description: 'Administrator role',
+                            createdAt: '2024-03-19T10:30:00.000Z',
+                            updatedAt: '2024-03-19T10:30:00.000Z'
                         },
+                        contacts: [],
+                        personParameters: [],
+                        objects: [],
+                        notifications: [],
+                        eventPartyPersons: [],
+                        eventParties: [],
+                        gameParticipations: [],
+                        plants: [],
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
@@ -94,11 +122,25 @@ export const PersonDocs = {
                         firstname: 'Jane',
                         surname: 'Smith',
                         numberPhone: '+33698765432',
+                        isEmailVerified: true,
+                        emailVerificationToken: null,
+                        passwordResetToken: null,
+                        passwordResetExpires: null,
                         role: {
                             idRole: 2,
                             title: 'User',
-                            description: 'Regular user role'
+                            description: 'Regular user role',
+                            createdAt: '2024-03-19T10:30:00.000Z',
+                            updatedAt: '2024-03-19T10:30:00.000Z'
                         },
+                        contacts: [],
+                        personParameters: [],
+                        objects: [],
+                        notifications: [],
+                        eventPartyPersons: [],
+                        eventParties: [],
+                        gameParticipations: [],
+                        plants: [],
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
                     }
@@ -128,11 +170,25 @@ export const PersonDocs = {
                         firstname: 'John',
                         surname: 'Doe',
                         numberPhone: '+33612345678',
+                        isEmailVerified: false,
+                        emailVerificationToken: null,
+                        passwordResetToken: null,
+                        passwordResetExpires: null,
                         role: {
                             idRole: 1,
                             title: 'Admin',
-                            description: 'Administrator role'
+                            description: 'Administrator role',
+                            createdAt: '2024-03-19T10:30:00.000Z',
+                            updatedAt: '2024-03-19T10:30:00.000Z'
                         },
+                        contacts: [],
+                        personParameters: [],
+                        objects: [],
+                        notifications: [],
+                        eventPartyPersons: [],
+                        eventParties: [],
+                        gameParticipations: [],
+                        plants: [],
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -177,12 +233,26 @@ export const PersonDocs = {
                         email: 'john.doe@example.com',
                         firstname: 'Johnny',
                         surname: 'Doe',
-                        numberPhone: '+33612345679',
+                        numberPhone: '+33612345678',
+                        isEmailVerified: false,
+                        emailVerificationToken: null,
+                        passwordResetToken: null,
+                        passwordResetExpires: null,
                         role: {
                             idRole: 2,
                             title: 'User',
-                            description: 'Regular user role'
+                            description: 'Regular user role',
+                            createdAt: '2024-03-19T10:30:00.000Z',
+                            updatedAt: '2024-03-19T10:30:00.000Z'
                         },
+                        contacts: [],
+                        personParameters: [],
+                        objects: [],
+                        notifications: [],
+                        eventPartyPersons: [],
+                        eventParties: [],
+                        gameParticipations: [],
+                        plants: [],
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T12:30:00.000Z'
                     }

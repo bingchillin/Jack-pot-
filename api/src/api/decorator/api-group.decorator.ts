@@ -8,6 +8,7 @@ import {
     ApiParam,
     ApiBody,
     ApiResponse,
+    ApiQuery,
   } from '@nestjs/swagger';
   
   interface ApiGroupOptions {
@@ -17,6 +18,12 @@ import {
     param?: { 
       name: string; 
       type?: any; 
+      description?: string;
+      example?: any;
+    };
+    query?: {
+      name: string;
+      type?: any;
       description?: string;
       example?: any;
     };
@@ -44,6 +51,13 @@ import {
         type: options.param.type ?? 'string',
         description: options.param.description ?? '',
         example: options.param.example
+      }));
+    if (options.query)
+      decorators.push(ApiQuery({
+        name: options.query.name,
+        type: options.query.type ?? 'string',
+        description: options.query.description ?? '',
+        example: options.query.example
       }));
     if (options.bodyType) decorators.push(ApiBody({ 
       type: options.bodyType,

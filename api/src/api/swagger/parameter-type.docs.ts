@@ -11,9 +11,9 @@ export const ParameterTypeDocs = {
             description: 'Creates a new parameter type with the provided details.',
             bodyType: CreateParameterTypeDto,
             bodyExample: {
-                title: 'Height',
-                description: 'Person height in centimeters',
-                advise: 'Measure height in a straight standing position'
+                title: 'Temperature',
+                description: 'Temperature parameter type',
+                unit: '°C'
             },
             responses: [
                 {
@@ -22,9 +22,9 @@ export const ParameterTypeDocs = {
                     type: ParameterType,
                     example: {
                         idParameterType: 1,
-                        title: 'Height',
-                        description: 'Person height in centimeters',
-                        advise: 'Measure height in a straight standing position',
+                        title: 'Temperature',
+                        description: 'Temperature parameter type',
+                        unit: '°C',
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -37,7 +37,7 @@ export const ParameterTypeDocs = {
                         message: [
                             'title must be a string',
                             'description must be a string',
-                            'advise must be a string'
+                            'unit must be a string'
                         ],
                         error: 'Bad Request'
                     }
@@ -57,21 +57,47 @@ export const ParameterTypeDocs = {
                 example: [
                     {
                         idParameterType: 1,
-                        title: 'Height',
-                        description: 'Person height in centimeters',
-                        advise: 'Measure height in a straight standing position',
+                        title: 'Temperature',
+                        description: 'Temperature parameter type',
+                        unit: '°C',
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idParameterType: 2,
-                        title: 'Weight',
-                        description: 'Person weight in kilograms',
-                        advise: 'Measure weight in the morning before breakfast',
+                        title: 'Humidity',
+                        description: 'Humidity parameter type',
+                        unit: '%',
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
                     }
                 ]
+            }],
+        }),
+
+    findByTitle: () =>
+        ApiGroup({
+            tag: 'Parameter Types',
+            summary: 'Search parameter type by title',
+            description: 'Retrieves a parameter type that matches the provided title.',
+            query: {
+                name: 'title',
+                type: String,
+                description: 'The title to search for',
+                example: 'Temperature'
+            },
+            responses: [{
+                status: 200,
+                description: 'Parameter type found successfully',
+                type: ParameterType,
+                example: {
+                    idParameterType: 1,
+                    title: 'Temperature',
+                    description: 'Temperature parameter type',
+                    unit: '°C',
+                    createdAt: '2024-03-19T10:30:00.000Z',
+                    updatedAt: '2024-03-19T10:30:00.000Z'
+                }
             }],
         }),
 
@@ -93,9 +119,9 @@ export const ParameterTypeDocs = {
                     type: ParameterType,
                     example: {
                         idParameterType: 1,
-                        title: 'Height',
-                        description: 'Person height in centimeters',
-                        advise: 'Measure height in a straight standing position',
+                        title: 'Temperature',
+                        description: 'Temperature parameter type',
+                        unit: '°C',
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -125,8 +151,9 @@ export const ParameterTypeDocs = {
             },
             bodyType: UpdateParameterTypeDto,
             bodyExample: {
-                title: 'Updated Height',
-                description: 'Updated person height in centimeters'
+                title: 'Updated Temperature',
+                description: 'Updated temperature parameter type',
+                unit: 'K'
             },
             responses: [
                 {
@@ -135,9 +162,9 @@ export const ParameterTypeDocs = {
                     type: ParameterType,
                     example: {
                         idParameterType: 1,
-                        title: 'Updated Height',
-                        description: 'Updated person height in centimeters',
-                        advise: 'Measure height in a straight standing position',
+                        title: 'Updated Temperature',
+                        description: 'Updated temperature parameter type',
+                        unit: 'K',
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T12:30:00.000Z'
                     }
@@ -149,7 +176,8 @@ export const ParameterTypeDocs = {
                         statusCode: 400,
                         message: [
                             'title must be a string',
-                            'description must be a string'
+                            'description must be a string',
+                            'unit must be a string'
                         ],
                         error: 'Bad Request'
                     }

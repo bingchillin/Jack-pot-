@@ -196,4 +196,60 @@ export const AvatarDocs = {
                 }
             ],
         }),
+
+    findByTitle: () =>
+        ApiGroup({
+            tag: 'Avatars',
+            summary: 'Search avatars by title',
+            description: 'Retrieves avatars that match the provided title.',
+            query: {
+                name: 'title',
+                type: String,
+                description: 'The title to search for',
+                example: 'Default'
+            },
+            responses: [{
+                status: 200,
+                description: 'List of matching avatars retrieved successfully',
+                type: [Avatar],
+                example: [
+                    {
+                        idAvatar: 1,
+                        title: 'Default Avatar',
+                        description: 'Default avatar for new users',
+                        imageUrl: 'https://example.com/avatars/default.png',
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
+                    }
+                ]
+            }],
+        }),
+
+    findByPlantType: () =>
+        ApiGroup({
+            tag: 'Avatars',
+            summary: 'Get avatars by plant type',
+            description: 'Retrieves avatars associated with a specific plant type.',
+            param: {
+                name: 'plantTypeId',
+                type: Number,
+                description: 'The ID of the plant type',
+                example: 1
+            },
+            responses: [{
+                status: 200,
+                description: 'List of avatars for the plant type retrieved successfully',
+                type: [Avatar],
+                example: [
+                    {
+                        idAvatar: 1,
+                        title: 'Plant Type Avatar',
+                        description: 'Avatar for plant type users',
+                        imageUrl: 'https://example.com/avatars/plant.png',
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
+                    }
+                ]
+            }],
+        }),
 }; 

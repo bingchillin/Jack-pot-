@@ -11,10 +11,9 @@ export const ObjectDocs = {
             description: 'Creates a new object with the provided details.',
             bodyType: CreateObjectDto,
             bodyExample: {
-                title: 'Garden Bench',
-                description: 'Wooden garden bench',
-                price: 199.99,
-                isAvailable: true
+                title: 'Plant Pot',
+                description: 'A ceramic pot for plants',
+                dimensions: '20x20x30cm'
             },
             responses: [
                 {
@@ -23,10 +22,9 @@ export const ObjectDocs = {
                     type: ObjectEntity,
                     example: {
                         idObject: 1,
-                        title: 'Garden Bench',
-                        description: 'Wooden garden bench',
-                        price: 199.99,
-                        isAvailable: true,
+                        title: 'Plant Pot',
+                        description: 'A ceramic pot for plants',
+                        dimensions: '20x20x30cm',
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -39,8 +37,7 @@ export const ObjectDocs = {
                         message: [
                             'title must be a string',
                             'description must be a string',
-                            'price must be a number',
-                            'isAvailable must be a boolean'
+                            'dimensions must be a string'
                         ],
                         error: 'Bad Request'
                     }
@@ -60,21 +57,47 @@ export const ObjectDocs = {
                 example: [
                     {
                         idObject: 1,
-                        title: 'Garden Bench',
-                        description: 'Wooden garden bench',
-                        price: 199.99,
-                        isAvailable: true,
+                        title: 'Plant Pot',
+                        description: 'A ceramic pot for plants',
+                        dimensions: '20x20x30cm',
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
                     {
                         idObject: 2,
-                        title: 'Plant Stand',
-                        description: 'Metal plant stand',
-                        price: 89.99,
-                        isAvailable: true,
+                        title: 'Watering Can',
+                        description: 'A metal watering can',
+                        dimensions: '15x15x25cm',
                         createdAt: '2024-03-19T11:30:00.000Z',
                         updatedAt: '2024-03-19T11:30:00.000Z'
+                    }
+                ]
+            }],
+        }),
+
+    findByTitle: () =>
+        ApiGroup({
+            tag: 'Objects',
+            summary: 'Search objects by title',
+            description: 'Retrieves objects that match the provided title.',
+            query: {
+                name: 'title',
+                type: String,
+                description: 'The title to search for',
+                example: 'Plant Pot'
+            },
+            responses: [{
+                status: 200,
+                description: 'List of matching objects retrieved successfully',
+                type: [ObjectEntity],
+                example: [
+                    {
+                        idObject: 1,
+                        title: 'Plant Pot',
+                        description: 'A ceramic pot for plants',
+                        dimensions: '20x20x30cm',
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
                     }
                 ]
             }],
@@ -98,10 +121,9 @@ export const ObjectDocs = {
                     type: ObjectEntity,
                     example: {
                         idObject: 1,
-                        title: 'Garden Bench',
-                        description: 'Wooden garden bench',
-                        price: 199.99,
-                        isAvailable: true,
+                        title: 'Plant Pot',
+                        description: 'A ceramic pot for plants',
+                        dimensions: '20x20x30cm',
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     }
@@ -131,9 +153,9 @@ export const ObjectDocs = {
             },
             bodyType: UpdateObjectDto,
             bodyExample: {
-                title: 'Updated Garden Bench',
-                description: 'Updated wooden garden bench',
-                price: 219.99
+                title: 'Updated Plant Pot',
+                description: 'An updated ceramic pot for plants',
+                dimensions: '25x25x35cm'
             },
             responses: [
                 {
@@ -142,10 +164,9 @@ export const ObjectDocs = {
                     type: ObjectEntity,
                     example: {
                         idObject: 1,
-                        title: 'Updated Garden Bench',
-                        description: 'Updated wooden garden bench',
-                        price: 219.99,
-                        isAvailable: true,
+                        title: 'Updated Plant Pot',
+                        description: 'An updated ceramic pot for plants',
+                        dimensions: '25x25x35cm',
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T12:30:00.000Z'
                     }
@@ -158,7 +179,7 @@ export const ObjectDocs = {
                         message: [
                             'title must be a string',
                             'description must be a string',
-                            'price must be a number'
+                            'dimensions must be a string'
                         ],
                         error: 'Bad Request'
                     }
