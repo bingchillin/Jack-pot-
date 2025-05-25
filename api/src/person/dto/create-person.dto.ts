@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsOptional, MinLength, IsPhoneNumber } from 'class-validator';
+import { IsEmail, IsString, IsOptional, MinLength, IsPhoneNumber, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePersonDto {
@@ -58,4 +58,12 @@ export class CreatePersonDto {
         minimum: 1
     })
     idRole: number;
+
+    @IsBoolean()
+    @IsOptional()
+    isEmailVerified?: boolean;
+
+    @IsString()
+    @IsOptional()
+    emailVerificationToken?: string;
 } 

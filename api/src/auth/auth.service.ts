@@ -46,15 +46,23 @@ export class AuthService {
             throw new UnauthorizedException('User already exists');
         }
 
+        // Generate verification token
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+
         // Hash the password
         const hashedPassword = await bcrypt.hash(signupDto.password, 10);
 
-        // Create new user with default role (assuming role ID 2 is for regular users)
+        // Create new user with default role and verification token
         const newUser = await this.personService.create({
             ...signupDto,
             password: hashedPassword,
             idRole: 2, // Default role for new users
+            emailVerificationToken: verificationToken,
+            isEmailVerified: false
         });
+
+        // Send verification email
+        await this.mailerService.sendVerificationEmail(newUser.email, verificationToken);
 
         // Generate tokens
         const tokens = await this.generateTokens(newUser);
@@ -67,6 +75,7 @@ export class AuthService {
                 firstname: newUser.firstname,
                 surname: newUser.surname,
                 numberPhone: newUser.numberPhone,
+                isEmailVerified: newUser.isEmailVerified
             },
         };
     }
