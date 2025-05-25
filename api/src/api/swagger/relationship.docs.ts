@@ -110,6 +110,33 @@ export const RelationshipDocs = {
             }],
         }),
 
+    findByTitle: () =>
+        ApiGroup({
+            tag: 'Relationships',
+            summary: 'Search relationships by title',
+            description: 'Retrieves relationships that match the provided title.',
+            query: {
+                name: 'title',
+                type: String,
+                description: 'The title to search for',
+                example: 'Family'
+            },
+            responses: [{
+                status: 200,
+                description: 'List of matching relationships retrieved successfully',
+                type: [Relationship],
+                example: [
+                    {
+                        idRelationship: 1,
+                        title: 'Family',
+                        description: 'Family relationship type',
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
+                    }
+                ]
+            }],
+        }),
+
     findOne: () =>
         ApiGroup({
             tag: 'Relationships',

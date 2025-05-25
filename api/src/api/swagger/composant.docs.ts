@@ -68,16 +68,73 @@ export const ComposantDocs = {
                 example: [
                     {
                         idComposant: 1,
-                        idObject: 1,
-                        title: 'Wooden Leg',
-                        description: 'Leg for garden bench',
-                        quantity: 4,
-                        price: 15.99,
-                        object: {
-                            idObject: 1,
-                            title: 'Garden Bench',
-                            description: 'Wooden garden bench'
-                        },
+                        title: 'Soil Mix',
+                        description: 'A mix of soil and compost',
+                        objectId: 1,
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
+                    },
+                    {
+                        idComposant: 2,
+                        title: 'Fertilizer',
+                        description: 'Organic fertilizer',
+                        objectId: 1,
+                        createdAt: '2024-03-19T11:30:00.000Z',
+                        updatedAt: '2024-03-19T11:30:00.000Z'
+                    }
+                ]
+            }],
+        }),
+
+    findByTitle: () =>
+        ApiGroup({
+            tag: 'Composants',
+            summary: 'Search composants by title',
+            description: 'Retrieves composants that match the provided title.',
+            query: {
+                name: 'title',
+                type: String,
+                description: 'The title to search for',
+                example: 'Soil Mix'
+            },
+            responses: [{
+                status: 200,
+                description: 'List of matching composants retrieved successfully',
+                type: [Composant],
+                example: [
+                    {
+                        idComposant: 1,
+                        title: 'Soil Mix',
+                        description: 'A mix of soil and compost',
+                        objectId: 1,
+                        createdAt: '2024-03-19T10:30:00.000Z',
+                        updatedAt: '2024-03-19T10:30:00.000Z'
+                    }
+                ]
+            }],
+        }),
+
+    findByObject: () =>
+        ApiGroup({
+            tag: 'Composants',
+            summary: 'Get composants by object',
+            description: 'Retrieves composants associated with a specific object.',
+            query: {
+                name: 'objectId',
+                type: Number,
+                description: 'The ID of the object',
+                example: 1
+            },
+            responses: [{
+                status: 200,
+                description: 'List of composants for the object retrieved successfully',
+                type: [Composant],
+                example: [
+                    {
+                        idComposant: 1,
+                        title: 'Soil Mix',
+                        description: 'A mix of soil and compost',
+                        objectId: 1,
                         createdAt: '2024-03-19T10:30:00.000Z',
                         updatedAt: '2024-03-19T10:30:00.000Z'
                     },
