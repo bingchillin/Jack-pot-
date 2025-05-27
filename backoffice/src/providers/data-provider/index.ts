@@ -51,6 +51,9 @@ export const customDataProvider: DataProvider = {
         const response = await fetch(`${API_URL}/person/${id}`, {
           method: "DELETE",
         });
+        if (response.status === 200) {
+          return { data: {} };
+        }
         const data = await response.json();
         return { data };
       }
