@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsOptional, MinLength, IsPhoneNumber, IsBoolean } from 'class-validator';
+import { IsEmail, IsString, IsOptional, MinLength, IsBoolean, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePersonDto {
@@ -41,13 +41,14 @@ export class CreatePersonDto {
     password: string;
 
     @ApiProperty({ 
-        example: '+33612345678', 
-        description: 'Phone number in international format',
-        required: false,
-        pattern: '^\\+[1-9]\\d{1,14}$'
+        example: '1234567890', 
+        description: 'Phone number (9-15 digits)',
+        required: false
     })
     @IsString()
-    @IsPhoneNumber()
+    @Matches(/^[0-9]{9,15}$/, {
+        message: 'Phone number must be between 9 and 15 digits'
+    })
     @IsOptional()
     numberPhone?: string;
 

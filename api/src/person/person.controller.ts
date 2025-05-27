@@ -2,8 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ClassSeri
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
+import { CreatePersonResponseDto } from './dto/create-person-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiBody, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiBody, ApiExcludeEndpoint, ApiResponse } from '@nestjs/swagger';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('person')
@@ -13,6 +14,11 @@ export class PersonController {
     @Post()
     @ApiExcludeEndpoint()
     @ApiBody({ type: CreatePersonDto })
+    @ApiResponse({ 
+        status: 201, 
+        description: 'The person has been successfully created.',
+        type: CreatePersonResponseDto 
+    })
     create(@Body() createPersonDto: CreatePersonDto) {
         return this.personService.create(createPersonDto);
     }
