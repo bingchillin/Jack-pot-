@@ -8,12 +8,13 @@ import {
   useTable,
   CreateButton,
 } from "@refinedev/antd";
-import { type BaseRecord } from "@refinedev/core";
-import { Space, Table, Tag, Drawer } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, PlusCircleOutlined, UserOutlined } from "@ant-design/icons";
+import { type BaseRecord, type CrudFilter } from "@refinedev/core";
+import { Space, Table, Tag, Drawer, Input } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PersonDetails } from "@components/person/show";
+import { CreatePersonModal } from "@components/person/create";
 
 export default function PersonList() {
   const router = useRouter();
@@ -21,9 +22,20 @@ export default function PersonList() {
   const searchParams = useSearchParams();
   const [selectedPerson, setSelectedPerson] = useState<BaseRecord | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [searchEmail, setSearchEmail] = useState("");
 
-  const { tableProps } = useTable({
+  const { tableProps, tableQueryResult } = useTable({
     syncWithLocation: true,
+    filters: {
+      initial: [
+        {
+          field: "email",
+          operator: "contains",
+          value: searchEmail,
+        } as CrudFilter,
+      ],
+    },
   });
 
   // Handle URL-based drawer opening
@@ -68,10 +80,23 @@ export default function PersonList() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const handleCreate = () => {
+    setCreateModalVisible(true);
+  };
+
+  const handleCreateCancel = () => {
+    setCreateModalVisible(false);
+  };
+
+  const handleCreateSuccess = () => {
+    setCreateModalVisible(false);
+    // Refresh the table using tableQueryResult
+    tableQueryResult.refetch();
+  };
+
   return (
     <>
-      {/* Option 1: Add button outside of List component - This will definitely work */}
-      <div style={{ marginBottom: '16px' }}>
+      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <CreateButton
           icon={<PlusCircleOutlined />}
           size="large"
@@ -79,15 +104,24 @@ export default function PersonList() {
             height: "40px",
             fontWeight: 500,
           }}
+          onClick={handleCreate}
         >
           Add new person
         </CreateButton>
+        <Input
+          placeholder="Search by email"
+          prefix={<SearchOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />}
+          value={searchEmail}
+          onChange={(e) => setSearchEmail(e.target.value)}
+          style={{ width: 300 }}
+          size="large"
+          allowClear
+        />
       </div>
 
       <List
         title={false}
         canCreate={false}
-        // Remove headerButtons completely since we moved the button outside
       >
         <Table {...tableProps} rowKey="idPerson">
           <Table.Column dataIndex="idPerson" title={"ID"} />
@@ -143,6 +177,12 @@ export default function PersonList() {
       >
         {selectedPerson && <PersonDetails record={selectedPerson} />}
       </Drawer>
+
+      <CreatePersonModal
+        visible={createModalVisible}
+        onCancel={handleCreateCancel}
+        onSuccess={handleCreateSuccess}
+      />
     </>
   );
 }
