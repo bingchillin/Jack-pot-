@@ -49,13 +49,9 @@ export class AuthService {
         // Generate verification token
         const verificationToken = crypto.randomBytes(32).toString('hex');
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(signupDto.password, 10);
-
         // Create new user with default role and verification token
         const newUser = await this.personService.create({
             ...signupDto,
-            password: hashedPassword,
             idRole: 2, // Default role for new users
             emailVerificationToken: verificationToken,
             isEmailVerified: false

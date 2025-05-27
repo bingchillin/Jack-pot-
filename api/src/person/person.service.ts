@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Person } from './entities/person.entity';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
+import { CreatePersonResponseDto } from './dto/create-person-response.dto';
 import * as bcrypt from 'bcrypt';
 import { RoleService } from '../role/role.service';
 import { MoreThan } from 'typeorm';
@@ -16,7 +17,7 @@ export class PersonService {
         private roleService: RoleService
     ) {}
 
-    async create(createPersonDto: CreatePersonDto): Promise<Person> {
+    async create(createPersonDto: CreatePersonDto): Promise<CreatePersonResponseDto> {
         const existingPerson = await this.personRepository.findOne({
             where: { email: createPersonDto.email }
         });
@@ -25,14 +26,33 @@ export class PersonService {
             throw new ConflictException('Email already exists');
         }
 
-        const person = this.personRepository.create(createPersonDto);
+        // Hash the password before creating the person
+        const hashedPassword = await bcrypt.hash(createPersonDto.password, 10);
+        
+        const person = this.personRepository.create({
+            ...createPersonDto,
+            password: hashedPassword
+        });
 
         if (createPersonDto.idRole) {
             const role = await this.roleService.findOne(createPersonDto.idRole);
             person.role = role;
         }
 
-        return await this.personRepository.save(person);
+        const savedPerson = await this.personRepository.save(person);
+        
+        // Map to response DTO
+        const response: CreatePersonResponseDto = {
+            idPerson: savedPerson.idPerson,
+            email: savedPerson.email,
+            firstname: savedPerson.firstname,
+            surname: savedPerson.surname,
+            numberPhone: savedPerson.numberPhone,
+            idRole: savedPerson.idRole,
+            isEmailVerified: savedPerson.isEmailVerified
+        };
+
+        return response;
     }
 
     async findAll(): Promise<Person[]> {
