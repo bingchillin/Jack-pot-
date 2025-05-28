@@ -124,8 +124,8 @@ export const CreatePersonModal: React.FC<CreatePersonModalProps> = ({
             <Select
               size="large"
               options={[
-                { value: 1, label: "User" },
-                { value: 2, label: "Admin" },
+                { value: 1, label: "Admin" },
+                { value: 2, label: "User" },
               ]}
               style={{ width: "100%" }}
             />
