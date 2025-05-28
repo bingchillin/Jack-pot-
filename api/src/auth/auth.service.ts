@@ -58,21 +58,15 @@ export class AuthService {
             throw new UnauthorizedException('User already exists');
         }
 
-        // Generate verification code
-        const verificationCode = this.generateVerificationCode();
-        const verificationCodeExpires = this.setVerificationCodeExpiration();
-
         // Create new user with default role and verification code
         const newUser = await this.personService.create({
             ...signupDto,
-            idRole: 2, // Default role for new users
-            verificationCode,
-            verificationCodeExpires,
+            idRole: 2,
             isEmailVerified: false
         });
 
         // Send verification email
-        await this.mailerService.sendVerificationEmail(newUser.email, verificationCode);
+        await this.mailerService.sendVerificationEmail(newUser.email, signupDto.verificationCode);
 
         // Generate tokens
         const tokens = await this.generateTokens(newUser);
