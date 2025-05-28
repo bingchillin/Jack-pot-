@@ -8,10 +8,10 @@ import {
   useTable,
   CreateButton,
 } from "@refinedev/antd";
-import { type BaseRecord, type CrudFilter } from "@refinedev/core";
+import { type BaseRecord } from "@refinedev/core";
 import { Space, Table, Tag, Drawer, Input } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PersonDetails } from "@components/person/show";
 import { CreatePersonModal } from "@components/person/create";
@@ -25,24 +25,40 @@ export default function PersonList() {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [searchEmail, setSearchEmail] = useState("");
 
-  const { tableProps, tableQueryResult } = useTable({
-    syncWithLocation: true,
-    filters: {
-      initial: [
-        {
-          field: "email",
-          operator: "contains",
-          value: searchEmail,
-        } as CrudFilter,
-      ],
-    },
+  // Get all data without any server-side filtering
+  const { tableProps: originalTableProps, tableQueryResult } = useTable({
+    syncWithLocation: false, // Disable sync since we're doing client-side filtering
   });
+
+  // Client-side filtering of the data
+  const filteredData = useMemo(() => {
+    if (!originalTableProps?.dataSource) return [];
+    
+    if (!searchEmail.trim()) {
+      return originalTableProps.dataSource;
+    }
+
+    return originalTableProps.dataSource.filter((person: any) => 
+      person.email?.toLowerCase().includes(searchEmail.toLowerCase())
+    );
+  }, [originalTableProps?.dataSource, searchEmail]);
+
+  // Create modified tableProps with filtered data
+  const tableProps = {
+    ...originalTableProps,
+    dataSource: filteredData,
+    pagination: {
+      ...originalTableProps?.pagination,
+      total: filteredData.length,
+      current: 1, // Reset to first page when filtering
+    },
+  };
 
   // Handle URL-based drawer opening
   useEffect(() => {
     const showId = searchParams.get('show');
     if (showId) {
-      const person = tableProps?.dataSource?.find(p => p.idPerson === parseInt(showId));
+      const person = filteredData.find(p => p.idPerson === parseInt(showId));
       if (person) {
         setSelectedPerson(person);
         setDrawerVisible(true);
@@ -51,7 +67,7 @@ export default function PersonList() {
       setDrawerVisible(false);
       setSelectedPerson(null);
     }
-  }, [searchParams, tableProps?.dataSource]);
+  }, [searchParams, filteredData]);
 
   const getRoleIcon = (roleTitle: string) => {
     switch (roleTitle?.toLowerCase()) {
