@@ -1,88 +1,223 @@
 "use client";
 
 import type { AuthProvider } from "@refinedev/core";
-import Cookies from "js-cookie";
 
-const mockUsers = [
-  {
-    name: "John Doe",
-    email: "johndoe@mail.com",
-    roles: ["admin"],
-    avatar: "https://i.pravatar.cc/150?img=1",
-  },
-  {
-    name: "Jane Doe",
-    email: "janedoe@mail.com",
-    roles: ["editor"],
-    avatar: "https://i.pravatar.cc/150?img=1",
-  },
-];
+const ADMIN_ROLE_ID = 1; // Assuming 1 is the admin role ID
+
+const isTokenExpired = (token: string): boolean => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
 
 export const authProviderClient: AuthProvider = {
-  login: async ({ email, username, password, remember }) => {
-    // Suppose we actually send a request to the back end here.
-    const user = mockUsers[0];
-
-    if (user) {
-      Cookies.set("auth", JSON.stringify(user), {
-        expires: 30, // 30 days
-        path: "/",
+  login: async ({ email, password }) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: {
+            name: "LoginError",
+            message: data.message || "Invalid credentials",
+          },
+        };
+      }
+
+      // Check if user is admin
+      if (data.user.idRole !== ADMIN_ROLE_ID) {
+        return {
+          success: false,
+          error: {
+            name: "UnauthorizedError",
+            message: "You don't have permission to access the backoffice",
+          },
+        };
+      }
+
+      // Store the complete auth data
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
       return {
         success: true,
-        redirectTo: "/",
+        redirectTo: "/persons",
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          name: "LoginError",
+          message: "Something went wrong",
+        },
       };
     }
-
-    return {
-      success: false,
-      error: {
-        name: "LoginError",
-        message: "Invalid username or password",
-      },
-    };
   },
+
   logout: async () => {
-    Cookies.remove("auth", { path: "/" });
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
     return {
       success: true,
       redirectTo: "/login",
     };
   },
+
   check: async () => {
-    const auth = Cookies.get("auth");
-    if (auth) {
+    const token = localStorage.getItem("token");
+    const refreshToken = localStorage.getItem("refresh_token");
+    const user = localStorage.getItem("user");
+
+    if (!token || !user) {
       return {
-        authenticated: true,
+        authenticated: false,
+        redirectTo: "/login",
       };
     }
 
-    return {
-      authenticated: false,
-      logout: true,
-      redirectTo: "/login",
-    };
+    try {
+      // Check if token is expired
+      if (isTokenExpired(token)) {
+        // Try to refresh the token
+        if (refreshToken) {
+          const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+          });
+
+          if (refreshResponse.ok) {
+            const data = await refreshResponse.json();
+            localStorage.setItem("token", data.access_token);
+            localStorage.setItem("refresh_token", data.refresh_token);
+          } else {
+            // If refresh fails, logout
+            localStorage.removeItem("token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("user");
+            return {
+              authenticated: false,
+              redirectTo: "/login",
+            };
+          }
+        } else {
+          // No refresh token available, logout
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          return {
+            authenticated: false,
+            redirectTo: "/login",
+          };
+        }
+      }
+
+      const parsedUser = JSON.parse(user);
+      
+      // Check if user is admin
+      if (parsedUser.idRole !== ADMIN_ROLE_ID) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("user");
+        return {
+          authenticated: false,
+          redirectTo: "/login",
+          error: {
+            name: "UnauthorizedError",
+            message: "You don't have permission to access the backoffice",
+          },
+        };
+      }
+
+      // Verify token by making a request to a protected endpoint
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        return {
+          authenticated: true,
+        };
+      }
+
+      // If token is invalid, clear storage and redirect to login
+      localStorage.removeItem("token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("user");
+      return {
+        authenticated: false,
+        redirectTo: "/login",
+      };
+    } catch (error) {
+      return {
+        authenticated: false,
+        redirectTo: "/login",
+      };
+    }
   },
+
   getPermissions: async () => {
-    const auth = Cookies.get("auth");
-    if (auth) {
-      const parsedUser = JSON.parse(auth);
-      return parsedUser.roles;
-    }
-    return null;
+    const user = localStorage.getItem("user");
+    if (!user) return null;
+    const parsedUser = JSON.parse(user);
+    return parsedUser.idRole;
   },
+
   getIdentity: async () => {
-    const auth = Cookies.get("auth");
-    if (auth) {
-      const parsedUser = JSON.parse(auth);
-      return parsedUser;
-    }
-    return null;
+    const user = localStorage.getItem("user");
+    if (!user) return null;
+    return JSON.parse(user);
   },
+
   onError: async (error) => {
     if (error.response?.status === 401) {
+      // Try to refresh token on 401
+      const refreshToken = localStorage.getItem("refresh_token");
+      if (refreshToken) {
+        try {
+          const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+          });
+
+          if (refreshResponse.ok) {
+            const data = await refreshResponse.json();
+            localStorage.setItem("token", data.access_token);
+            localStorage.setItem("refresh_token", data.refresh_token);
+            return { error: null }; // Retry the failed request
+          }
+        } catch {
+          // If refresh fails, logout
+        }
+      }
+
+      // If no refresh token or refresh failed, logout
+      localStorage.removeItem("token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("user");
       return {
         logout: true,
+        redirectTo: "/login",
       };
     }
 
