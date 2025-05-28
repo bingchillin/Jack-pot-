@@ -109,8 +109,6 @@ export class AuthService {
 
         // Update user verification status
         person.isEmailVerified = true;
-        person.verificationCode = null;
-        person.verificationCodeExpires = null;
         await this.personService.update(person.idPerson, person);
 
         return { message: 'Email verified successfully' };
