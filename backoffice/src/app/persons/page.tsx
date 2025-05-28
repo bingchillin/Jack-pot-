@@ -9,12 +9,14 @@ import {
   CreateButton,
 } from "@refinedev/antd";
 import { type BaseRecord } from "@refinedev/core";
-import { Space, Table, Tag, Drawer, Input, Button } from "antd";
+import { Space, Table, Tag, Drawer, Input, Button, Typography } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PersonDetails } from "@components/person/show";
 import { CreatePersonModal } from "@components/person/create";
+
+const { Text } = Typography;
 
 export default function PersonList() {
   const router = useRouter();
@@ -52,6 +54,13 @@ export default function PersonList() {
       total: filteredData.length,
       current: 1, // Reset to first page when filtering
     },
+    footer: () => (
+      <div style={{ textAlign: 'right', padding: '8px 0' }}>
+        <Text type="secondary">
+          <span style={{ color: '#000000' }}>{filteredData.length}</span> {filteredData.length === 1 ? 'person' : 'persons'} in total
+        </Text>
+      </div>
+    ),
   };
 
   // Handle URL-based drawer opening
