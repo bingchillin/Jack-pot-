@@ -49,4 +49,7 @@ export class SignupDto {
     @IsString()
     @IsPhoneNumber()
     numberPhone?: string;
+
+    @IsString()
+    verificationCode: string;
 } 
