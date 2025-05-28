@@ -1,5 +1,5 @@
 import { DateField } from "@refinedev/antd";
-import { type BaseRecord, useApiUrl } from "@refinedev/core";
+import { type BaseRecord } from "@refinedev/core";
 import { Space, Tag, Card, Typography, Button, message } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, UserOutlined, MailOutlined, PhoneOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import React from "react";
@@ -10,11 +10,10 @@ interface PersonDetailsProps {
 
 export const PersonDetails: React.FC<PersonDetailsProps> = ({ record }) => {
   const [messageApi, contextHolder] = message.useMessage();
-  const apiUrl = useApiUrl();
 
   const handleResendVerification = async (email: string) => {
     try {
-      const response = await fetch(`${apiUrl}/auth/resend-verification`, {
+      const response = await fetch('http://localhost:3000/auth/resend-verification', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
