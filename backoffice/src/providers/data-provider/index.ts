@@ -3,6 +3,7 @@
 import { DataProvider } from "@refinedev/core";
 import dataProviderSimpleRest from "@refinedev/simple-rest";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 const getHeaders = () => {
   const token = localStorage.getItem("token");
@@ -12,17 +13,38 @@ const getHeaders = () => {
   };
 };
 
-export const dataProvider = dataProviderSimpleRest(process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api");
+export const dataProvider = dataProviderSimpleRest(API_URL);
 
 export const customDataProvider: DataProvider = {
   ...dataProvider,
 
-  getOne: async ({ resource, id }) => {
+  getList: async ({ resource, pagination, filters, sorters }) => {
     if (resource === "persons") {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/person/${id}`, {
+      const response = await fetch(`${API_URL}/person`, {
         headers: getHeaders(),
       });
-      const data = await response.json();
+      const responseData = await response.json();
+
+      // Handle both array and object response formats
+      const data = Array.isArray(responseData) ? responseData : responseData.data || [];
+      
+      return {
+        data,
+        total: data.length,
+      };
+    }
+    return dataProvider.getList({ resource, pagination, filters, sorters });
+  },
+
+  getOne: async ({ resource, id }) => {
+    if (resource === "persons") {
+      const response = await fetch(`${API_URL}/person/${id}`, {
+        headers: getHeaders(),
+      });
+      const responseData = await response.json();
+      
+      // Handle both direct object and nested data response
+      const data = responseData.data || responseData;
       return { data };
     }
     return dataProvider.getOne({ resource, id });
@@ -30,12 +52,15 @@ export const customDataProvider: DataProvider = {
 
   create: async ({ resource, variables }) => {
     if (resource === "persons") {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/person`, {
+      const response = await fetch(`${API_URL}/person`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify(variables),
       });
-      const data = await response.json();
+      const responseData = await response.json();
+      
+      // Handle both direct object and nested data response
+      const data = responseData.data || responseData;
       return { data };
     }
     return dataProvider.create({ resource, variables });
@@ -43,12 +68,15 @@ export const customDataProvider: DataProvider = {
 
   update: async ({ resource, id, variables }) => {
     if (resource === "persons") {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/person/${id}`, {
+      const response = await fetch(`${API_URL}/person/${id}`, {
         method: "PATCH",
         headers: getHeaders(),
         body: JSON.stringify(variables),
       });
-      const data = await response.json();
+      const responseData = await response.json();
+      
+      // Handle both direct object and nested data response
+      const data = responseData.data || responseData;
       return { data };
     }
     return dataProvider.update({ resource, id, variables });
@@ -56,14 +84,17 @@ export const customDataProvider: DataProvider = {
 
   deleteOne: async ({ resource, id }) => {
     if (resource === "persons") {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/person/${id}`, {
+      const response = await fetch(`${API_URL}/person/${id}`, {
         method: "DELETE",
         headers: getHeaders(),
       });
       if (response.status === 200) {
         return { data: {} };
       }
-      const data = await response.json();
+      const responseData = await response.json();
+      
+      // Handle both direct object and nested data response
+      const data = responseData.data || responseData;
       return { data };
     }
     return dataProvider.deleteOne({ resource, id });
