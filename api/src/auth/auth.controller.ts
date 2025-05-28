@@ -37,6 +37,12 @@ export class AuthController {
         return this.authService.verifyEmail(verifyEmailDto);
     }
 
+    @Post('resend-verification')
+    @AuthDocs.resendVerification()
+    async resendVerification(@Body('email') email: string) {
+        return this.authService.resendVerification(email);
+    }
+
     @Post('request-password-reset')
     @AuthDocs.requestPasswordReset()
     async requestPasswordReset(@Body() requestPasswordResetDto: RequestPasswordResetDto) {

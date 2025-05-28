@@ -24,15 +24,16 @@ export const AuthDocs = {
                     status: 201,
                     description: 'User created successfully',
                     example: {
-                        access_token: "this is a fake access token",
-                        refresh_token: "this is a fake refresh token",
+                        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                        refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
                         expires_in: 3600,
                         user: {
                             idPerson: 1,
-                            email: "john.doe@example.com",
-                            firstname: "John",
-                            surname: "Doe",
-                            numberPhone: "+33612345678"
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe',
+                            numberPhone: '+33612345678',
+                            isEmailVerified: false
                         }
                     }
                 },
@@ -41,13 +42,8 @@ export const AuthDocs = {
                     description: 'Invalid input data',
                     example: {
                         statusCode: 400,
-                        message: [
-                            "email must be an email",
-                            "password must be longer than or equal to 6 characters",
-                            "firstname must be a string",
-                            "surname must be a string"
-                        ],
-                        error: "Bad Request"
+                        message: ['email must be an email', 'password must be longer than or equal to 6 characters'],
+                        error: 'Bad Request'
                     }
                 },
                 {
@@ -55,8 +51,8 @@ export const AuthDocs = {
                     description: 'User already exists',
                     example: {
                         statusCode: 409,
-                        message: "User already exists",
-                        error: "Conflict"
+                        message: 'User already exists',
+                        error: 'Conflict'
                     }
                 }
             ],
@@ -66,7 +62,7 @@ export const AuthDocs = {
         ApiGroup({
             tag: 'Auth',
             summary: 'User login',
-            description: 'Authenticates a user and returns a JWT token for subsequent requests.',
+            description: 'Authenticates a user and returns authentication tokens.',
             bodyType: LoginDto,
             bodyExample: {
                 email: 'john.doe@example.com',
@@ -74,21 +70,28 @@ export const AuthDocs = {
             },
             responses: [
                 {
-                    status: 201,
+                    status: 200,
                     description: 'Login successful',
                     example: {
-                        "access_token": "this is a fake access token",
-                        "refresh_token": "this is a fake refresh token",
-                        "expires_in": 3600
+                        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                        refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                        expires_in: 3600,
+                        user: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe',
+                            numberPhone: '+33612345678'
+                        }
                     }
                 },
                 {
-                    status: 200,
+                    status: 401,
                     description: 'Invalid credentials',
                     example: {
                         statusCode: 401,
-                        message: "No message, just HTML",
-                        error: "Unauthorized"
+                        message: 'Invalid credentials',
+                        error: 'Unauthorized'
                     }
                 }
             ],
@@ -97,30 +100,26 @@ export const AuthDocs = {
     refresh: () =>
         ApiGroup({
             tag: 'Auth',
-            summary: 'Refresh token',
-            description: 'Refreshes an expired JWT token using a refresh token.',
-            bodyType: {
-                type: 'object',
-                properties: {
-                    refresh_token: {
-                        type: 'string',
-                        example: 'this is a fake refresh token',
-                        description: 'The refresh token to use'
-                    }
-                },
-                required: ['refresh_token']
-            },
+            summary: 'Refresh access token',
+            description: 'Refreshes the access token using a valid refresh token.',
             bodyExample: {
-                refresh_token: 'this is a fake refresh token'
+                refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
             },
             responses: [
                 {
                     status: 200,
                     description: 'Token refreshed successfully',
                     example: {
-                        access_token: "this is a fake access token",
-                        token_type: "Bearer",
-                        expires_in: 3600
+                        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                        refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                        expires_in: 3600,
+                        user: {
+                            idPerson: 1,
+                            email: 'john.doe@example.com',
+                            firstname: 'John',
+                            surname: 'Doe',
+                            numberPhone: '+33612345678'
+                        }
                     }
                 },
                 {
@@ -128,8 +127,8 @@ export const AuthDocs = {
                     description: 'Invalid refresh token',
                     example: {
                         statusCode: 401,
-                        message: "Invalid refresh token",
-                        error: "Unauthorized"
+                        message: 'Invalid refresh token',
+                        error: 'Unauthorized'
                     }
                 }
             ],
@@ -219,6 +218,34 @@ export const AuthDocs = {
             ],
         }),
 
+    resendVerification: () =>
+        ApiGroup({
+            tag: 'Auth',
+            summary: 'Resend verification email',
+            description: 'Resends the verification email to an unverified user.',
+            bodyExample: {
+                email: 'john.doe@example.com'
+            },
+            responses: [
+                {
+                    status: 200,
+                    description: 'Verification email sent successfully',
+                    example: {
+                        message: 'Verification email sent successfully'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'User not found or already verified',
+                    example: {
+                        statusCode: 400,
+                        message: 'User not found or already verified',
+                        error: 'Bad Request'
+                    }
+                }
+            ],
+        }),
+
     requestPasswordReset: () =>
         ApiGroup({
             tag: 'Auth',
@@ -231,18 +258,9 @@ export const AuthDocs = {
             responses: [
                 {
                     status: 200,
-                    description: 'If email exists, a reset link will be sent',
+                    description: 'Password reset email sent',
                     example: {
                         message: 'If your email is registered, you will receive a password reset link'
-                    }
-                },
-                {
-                    status: 400,
-                    description: 'Invalid email format',
-                    example: {
-                        statusCode: 400,
-                        message: ['email must be an email'],
-                        error: 'Bad Request'
                     }
                 }
             ],
@@ -252,7 +270,7 @@ export const AuthDocs = {
         ApiGroup({
             tag: 'Auth',
             summary: 'Reset password',
-            description: 'Resets the user\'s password using the token sent to their email.',
+            description: 'Resets the user\'s password using a valid reset token.',
             bodyType: ResetPasswordDto,
             bodyExample: {
                 token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',

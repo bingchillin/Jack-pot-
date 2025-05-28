@@ -8,9 +8,9 @@ import {
   useTable,
   CreateButton,
 } from "@refinedev/antd";
-import { type BaseRecord } from "@refinedev/core";
-import { Space, Table, Tag, Drawer, Input } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
+import { type BaseRecord, useApiUrl } from "@refinedev/core";
+import { Space, Table, Tag, Drawer, Input, Button, message } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined, MailOutlined } from "@ant-design/icons";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PersonDetails } from "@components/person/show";
@@ -24,6 +24,8 @@ export default function PersonList() {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [searchEmail, setSearchEmail] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
+  const apiUrl = useApiUrl();
 
   // Get all data without any server-side filtering
   const { tableProps: originalTableProps, tableQueryResult } = useTable({
@@ -110,8 +112,30 @@ export default function PersonList() {
     tableQueryResult.refetch();
   };
 
+  const handleResendVerification = async (email: string) => {
+    try {
+      const response = await fetch(`${apiUrl}/auth/resend-verification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to resend verification email');
+      }
+
+      messageApi.success('Verification email sent successfully');
+    } catch (error) {
+      messageApi.error(error instanceof Error ? error.message : 'Failed to send verification email');
+    }
+  };
+
   return (
     <>
+      {contextHolder}
       <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <CreateButton
           icon={<PlusCircleOutlined />}
@@ -147,10 +171,22 @@ export default function PersonList() {
           <Table.Column
             dataIndex="isEmailVerified"
             title={"Is Email Verified"}
-            render={(value) => (
-              <Tag color={value ? "success" : "error"} icon={value ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
-                {value ? "Yes" : "No"}
-              </Tag>
+            render={(value, record: any) => (
+              <Space>
+                <Tag color={value ? "success" : "error"} icon={value ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
+                  {value ? "Yes" : "No"}
+                </Tag>
+                {!value && (
+                  <Button
+                    type="link"
+                    icon={<MailOutlined />}
+                    onClick={() => handleResendVerification(record.email)}
+                    size="small"
+                  >
+                    Resend
+                  </Button>
+                )}
+              </Space>
             )}
           />
           <Table.Column
