@@ -4,7 +4,7 @@ import { LocalAuthGuard } from './local-auth.guard';
 import { Request } from 'express';
 import { AuthDocs } from 'src/api/swagger/auth.docs';
 import { SignupDto } from './dto/signup.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
+import { VerifyEmailCodeDto } from './dto/verify-email-code.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
@@ -31,10 +31,10 @@ export class AuthController {
         return this.authService.refreshToken(refreshToken);
     }
 
-    @Post('verify-email')
-    @AuthDocs.verifyEmail()
-    async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-        return this.authService.verifyEmail(verifyEmailDto);
+    @Post('verify-email-code')
+    @AuthDocs.verifyEmailCode()
+    async verifyEmailCode(@Body() verifyEmailCodeDto: VerifyEmailCodeDto) {
+        return this.authService.verifyEmailCode(verifyEmailCodeDto);
     }
 
     @Post('resend-verification')

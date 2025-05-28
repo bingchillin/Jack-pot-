@@ -13,6 +13,7 @@ import "@refinedev/antd/dist/reset.css";
 import { AppIcon } from "@components/app-icon";
 import { ColorModeContextProvider } from "@contexts/color-mode";
 import { authProviderClient } from "@providers/auth-provider/auth-provider.client";
+import { UserOutlined } from "@ant-design/icons";
 
 export const metadata: Metadata = {
   title: "Refine",
@@ -42,7 +43,7 @@ export default function RootLayout({
                 <DevtoolsProvider>
                   <Refine
                     routerProvider={routerProvider}
-                    dataProvider={(customDataProvider)}
+                    dataProvider={customDataProvider}
                     notificationProvider={useNotificationProvider}
                     authProvider={authProviderClient}
                     resources={[
@@ -54,6 +55,7 @@ export default function RootLayout({
                         show: "/persons/show/:id",
                         meta: {
                           canDelete: true,
+                          icon: <UserOutlined />,
                         },
                       },
                     ]}

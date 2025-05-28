@@ -4,18 +4,17 @@ import {
   Head,
   Heading,
   Html,
-  Link,
   Preview,
   Text,
 } from '@react-email/components';
 import * as React from 'react';
 
 interface VerificationEmailProps {
-  verificationUrl: string;
+  verificationCode: string;
 }
 
 export const VerificationEmail: React.FC<VerificationEmailProps> = ({
-  verificationUrl,
+  verificationCode,
 }) => (
   <Html>
     <Head />
@@ -24,11 +23,14 @@ export const VerificationEmail: React.FC<VerificationEmailProps> = ({
       <Container style={container}>
         <Heading style={h1}>Welcome to Jack Pot!</Heading>
         <Text style={text}>
-          Thank you for signing up. Please verify your email address by clicking the button below:
+          Thank you for signing up. Please use the following verification code to verify your email address:
         </Text>
-        <Link href={verificationUrl} style={button}>
-          Verify Email Address
-        </Link>
+        <Text style={code}>
+          {verificationCode}
+        </Text>
+        <Text style={text}>
+          This code will expire in 1 hour.
+        </Text>
         <Text style={text}>
           If you did not create an account, you can safely ignore this email.
         </Text>
@@ -67,15 +69,16 @@ const text = {
   textAlign: 'center' as const,
 };
 
-const button = {
-  backgroundColor: '#5F51E8',
-  borderRadius: '3px',
-  color: '#fff',
-  fontSize: '16px',
-  textDecoration: 'none',
+const code = {
+  backgroundColor: '#f4f4f4',
+  borderRadius: '4px',
+  color: '#333',
+  fontSize: '32px',
+  fontWeight: 'bold',
+  letterSpacing: '4px',
+  lineHeight: '48px',
+  margin: '32px auto',
+  padding: '16px',
   textAlign: 'center' as const,
-  display: 'block',
-  padding: '12px',
-  margin: '20px auto',
   width: '200px',
 }; 

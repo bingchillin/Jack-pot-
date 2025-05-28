@@ -66,5 +66,8 @@ export class CreatePersonDto {
 
     @IsString()
     @IsOptional()
-    emailVerificationToken?: string;
+    verificationCode?: string;
+
+    @IsOptional()
+    verificationCodeExpires?: Date;
 } 
