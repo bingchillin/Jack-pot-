@@ -4,6 +4,7 @@ import { SignupDto } from '../../auth/dto/signup.dto';
 import { VerifyEmailDto } from '../../auth/dto/verify-email.dto';
 import { RequestPasswordResetDto } from '../../auth/dto/request-password-reset.dto';
 import { ResetPasswordDto } from '../../auth/dto/reset-password.dto';
+import { VerifyEmailCodeDto } from '../../auth/dto/verify-email-code.dto';
 
 export const AuthDocs = {
     signup: () =>
@@ -290,6 +291,36 @@ export const AuthDocs = {
                     example: {
                         statusCode: 400,
                         message: 'Invalid or expired reset token',
+                        error: 'Bad Request'
+                    }
+                }
+            ],
+        }),
+
+    verifyEmailCode: () =>
+        ApiGroup({
+            tag: 'Auth',
+            summary: 'Verify user email address with code',
+            description: 'Verifies a user\'s email address using the 6-digit code sent to their email.',
+            bodyType: VerifyEmailCodeDto,
+            bodyExample: {
+                email: 'user@example.com',
+                code: '123456'
+            },
+            responses: [
+                {
+                    status: 200,
+                    description: 'Email verified successfully',
+                    example: {
+                        message: 'Email verified successfully'
+                    }
+                },
+                {
+                    status: 400,
+                    description: 'Invalid verification code or code expired',
+                    example: {
+                        statusCode: 400,
+                        message: 'Invalid verification code',
                         error: 'Bad Request'
                     }
                 }

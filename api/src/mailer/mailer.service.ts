@@ -14,9 +14,8 @@ export class MailerService {
     private readonly configService: ConfigService,
   ) { }
 
-  async sendVerificationEmail(email: string, token: string): Promise<void> {
-    const verificationUrl = `${this.configService.get('FRONTEND_URL')}/verify-email?token=${token}`;
-    const emailComponent = VerificationEmail({ verificationUrl });
+  async sendVerificationEmail(email: string, code: string): Promise<void> {
+    const emailComponent = VerificationEmail({ verificationCode: code });
     const html = await render(emailComponent);
 
     try {

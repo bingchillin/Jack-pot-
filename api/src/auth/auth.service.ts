@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { SignupDto } from './dto/signup.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { VerifyEmailCodeDto } from './dto/verify-email-code.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailerService } from '../mailer/mailer.service';
@@ -18,6 +19,17 @@ export class AuthService {
         private jwtService: JwtService,
         private readonly mailerService: MailerService
     ) {}
+
+    private generateVerificationCode(): string {
+        // Generate a 6-digit code
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    private setVerificationCodeExpiration(): Date {
+        const expires = new Date();
+        expires.setHours(expires.getHours() + 1); // Code expires in 1 hour
+        return expires;
+    }
 
     async validateUser(email: string, password: string): Promise<any> {
         this.logger.debug(`Attempting to validate user: ${email}`);
@@ -46,19 +58,21 @@ export class AuthService {
             throw new UnauthorizedException('User already exists');
         }
 
-        // Generate verification token
-        const verificationToken = crypto.randomBytes(32).toString('hex');
+        // Generate verification code
+        const verificationCode = this.generateVerificationCode();
+        const verificationCodeExpires = this.setVerificationCodeExpiration();
 
-        // Create new user with default role and verification token
+        // Create new user with default role and verification code
         const newUser = await this.personService.create({
             ...signupDto,
             idRole: 2, // Default role for new users
-            emailVerificationToken: verificationToken,
+            verificationCode,
+            verificationCodeExpires,
             isEmailVerified: false
         });
 
         // Send verification email
-        await this.mailerService.sendVerificationEmail(newUser.email, verificationToken);
+        await this.mailerService.sendVerificationEmail(newUser.email, verificationCode);
 
         // Generate tokens
         const tokens = await this.generateTokens(newUser);
@@ -74,6 +88,64 @@ export class AuthService {
                 isEmailVerified: newUser.isEmailVerified
             },
         };
+    }
+
+    async verifyEmailCode(verifyEmailCodeDto: VerifyEmailCodeDto) {
+        const person = await this.personService.findByEmail(verifyEmailCodeDto.email);
+        
+        if (!person) {
+            throw new BadRequestException('User not found');
+        }
+
+        if (person.isEmailVerified) {
+            throw new BadRequestException('Email is already verified');
+        }
+
+        if (!person.verificationCode || !person.verificationCodeExpires) {
+            throw new BadRequestException('No verification code found');
+        }
+
+        if (person.verificationCodeExpires < new Date()) {
+            throw new BadRequestException('Verification code has expired');
+        }
+
+        if (person.verificationCode !== verifyEmailCodeDto.code) {
+            throw new BadRequestException('Invalid verification code');
+        }
+
+        // Update user verification status
+        person.isEmailVerified = true;
+        person.verificationCode = null;
+        person.verificationCodeExpires = null;
+        await this.personService.update(person.idPerson, person);
+
+        return { message: 'Email verified successfully' };
+    }
+
+    async resendVerification(email: string) {
+        const person = await this.personService.findByEmail(email);
+        
+        if (!person) {
+            throw new BadRequestException('User not found');
+        }
+
+        if (person.isEmailVerified) {
+            throw new BadRequestException('Email is already verified');
+        }
+
+        // Generate new verification code
+        const verificationCode = this.generateVerificationCode();
+        const verificationCodeExpires = this.setVerificationCodeExpiration();
+        
+        // Update user with new code
+        person.verificationCode = verificationCode;
+        person.verificationCodeExpires = verificationCodeExpires;
+        await this.personService.update(person.idPerson, person);
+
+        // Send verification email
+        await this.mailerService.sendVerificationEmail(person.email, verificationCode);
+
+        return { message: 'Verification email sent successfully' };
     }
 
     async login(user: any) {
@@ -140,20 +212,6 @@ export class AuthService {
         };
     }
 
-    async verifyEmail(verifyEmailDto: VerifyEmailDto) {
-        const person = await this.personService.findOneByVerificationToken(verifyEmailDto.token);
-        
-        if (!person) {
-            throw new BadRequestException('Invalid verification token');
-        }
-
-        person.isEmailVerified = true;
-        person.emailVerificationToken = null;
-        await this.personService.update(person.idPerson, person);
-
-        return { message: 'Email verified successfully' };
-    }
-
     async requestPasswordReset(requestPasswordResetDto: RequestPasswordResetDto) {
         const person = await this.personService.findOneByEmail(requestPasswordResetDto.email);
         
@@ -188,29 +246,5 @@ export class AuthService {
         await this.personService.update(person.idPerson, person);
 
         return { message: 'Password reset successfully' };
-    }
-
-    async resendVerification(email: string) {
-        const person = await this.personService.findByEmail(email);
-        
-        if (!person) {
-            throw new BadRequestException('User not found');
-        }
-
-        if (person.isEmailVerified) {
-            throw new BadRequestException('Email is already verified');
-        }
-
-        // Generate new verification token
-        const verificationToken = crypto.randomBytes(32).toString('hex');
-        
-        // Update user with new token
-        person.emailVerificationToken = verificationToken;
-        await this.personService.update(person.idPerson, person);
-
-        // Send verification email
-        await this.mailerService.sendVerificationEmail(person.email, verificationToken);
-
-        return { message: 'Verification email sent successfully' };
     }
 }
