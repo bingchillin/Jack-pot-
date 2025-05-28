@@ -189,4 +189,28 @@ export class AuthService {
 
         return { message: 'Password reset successfully' };
     }
+
+    async resendVerification(email: string) {
+        const person = await this.personService.findByEmail(email);
+        
+        if (!person) {
+            throw new BadRequestException('User not found');
+        }
+
+        if (person.isEmailVerified) {
+            throw new BadRequestException('Email is already verified');
+        }
+
+        // Generate new verification token
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        
+        // Update user with new token
+        person.emailVerificationToken = verificationToken;
+        await this.personService.update(person.idPerson, person);
+
+        // Send verification email
+        await this.mailerService.sendVerificationEmail(person.email, verificationToken);
+
+        return { message: 'Verification email sent successfully' };
+    }
 }
