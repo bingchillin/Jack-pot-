@@ -3,6 +3,7 @@ import { type BaseRecord } from "@refinedev/core";
 import { Space, Tag, Card, Typography, Button, message } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, UserOutlined, MailOutlined, PhoneOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import React from "react";
+import { authApi } from "@providers/api/auth";
 
 interface PersonDetailsProps {
   record: BaseRecord;
@@ -13,19 +14,7 @@ export const PersonDetails: React.FC<PersonDetailsProps> = ({ record }) => {
 
   const handleResendVerification = async (email: string) => {
     try {
-      const response = await fetch('http://localhost:3000/auth/resend-verification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to resend verification email');
-      }
-
+      await authApi.resendVerification(email);
       messageApi.success('Verification email sent successfully');
     } catch (error) {
       messageApi.error(error instanceof Error ? error.message : 'Failed to send verification email');
