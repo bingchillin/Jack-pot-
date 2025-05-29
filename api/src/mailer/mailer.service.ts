@@ -31,9 +31,8 @@ export class MailerService {
     }
   }
 
-  async sendPasswordResetEmail(email: string, token: string): Promise<void> {
-    const resetUrl = `${this.configService.get('FRONTEND_URL')}/reset-password?token=${token}`;
-    const emailComponent = ResetPasswordEmail({ resetUrl });
+  async sendPasswordResetEmail(email: string, code: string): Promise<void> {
+    const emailComponent = ResetPasswordEmail({ resetCode: code });
     const html = await render(emailComponent);
 
     try {
