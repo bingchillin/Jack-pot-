@@ -12,7 +12,7 @@ export class VerifyEmailCodeDto {
   @Matches(/^[0-9]{6}$/, {
     message: 'Verification code must be exactly 6 digits',
   })
-  code: string;
+  verificationCode: string;
 
   @ApiProperty({
     description: 'The email address to verify',
