@@ -3,18 +3,17 @@ import { PersonService } from "../person/person.service";
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { SignupDto } from './dto/signup.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
 import { VerifyEmailCodeDto } from './dto/verify-email-code.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailerService } from '../mailer/mailer.service';
-import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
     private readonly logger = new Logger(AuthService.name);
     private readonly RESET_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
+    private readonly VERIFICATION_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
 
     constructor(
         private readonly personService: PersonService,
@@ -45,11 +44,16 @@ export class AuthService {
             throw new UnauthorizedException('User already exists');
         }
 
+        // Verification code expiry (verif code comes from frontend)
+        const verificationCodeExpires = this.setVerificationCodeExpiration();
+
         // Create new user with default role and verification code
         const newUser = await this.personService.create({
             ...signupDto,
             idRole: 2,
-            isEmailVerified: false
+            isEmailVerified: false,
+            verificationCode: signupDto.verificationCode,
+            verificationCodeExpires
         });
 
         // Send verification email
@@ -73,7 +77,7 @@ export class AuthService {
 
     async verifyEmailCode(verifyEmailCodeDto: VerifyEmailCodeDto) {
         const person = await this.personService.findByEmail(verifyEmailCodeDto.email);
-
+        
         if (!person) {
             throw new BadRequestException('User not found');
         }
@@ -90,20 +94,23 @@ export class AuthService {
             throw new BadRequestException('Verification code has expired');
         }
 
-        if (person.verificationCode !== verifyEmailCodeDto.code) {
+        if (person.verificationCode !== verifyEmailCodeDto.verificationCode) {
             throw new BadRequestException('Invalid verification code');
         }
 
-        // Update user verification status
-        person.isEmailVerified = true;
-        await this.personService.update(person.idPerson, person);
+        // Update user verification status and clear verification code
+        await this.personService.update(person.idPerson, {
+            isEmailVerified: true,
+            verificationCode: null,
+            verificationCodeExpires: null
+        });
 
         return { message: 'Email verified successfully' };
     }
 
     async resendVerification(email: string) {
         const person = await this.personService.findByEmail(email);
-
+        
         if (!person) {
             throw new BadRequestException('User not found');
         }
@@ -114,12 +121,13 @@ export class AuthService {
 
         // Generate new verification code
         const verificationCode = this.generateVerificationCode();
-        const verificationCodeExpires = this.setVerificationCodeExpiration();
-
+        const verificationCodeExpires = new Date(Date.now() + this.VERIFICATION_CODE_EXPIRY);
+        
         // Update user with new code
-        person.verificationCode = verificationCode;
-        person.verificationCodeExpires = verificationCodeExpires;
-        await this.personService.update(person.idPerson, person);
+        await this.personService.update(person.idPerson, {
+            verificationCode,
+            verificationCodeExpires
+        });
 
         // Send verification email
         await this.mailerService.sendVerificationEmail(person.email, verificationCode);
@@ -203,11 +211,6 @@ export class AuthService {
         };
     }
 
-    private generateResetCode(): string {
-        // Generate a 6-digit code
-        return Math.floor(100000 + Math.random() * 900000).toString();
-    }
-
     private generateResetToken(email: string): string {
         return this.jwtService.sign(
             { email, type: 'reset' },
@@ -228,7 +231,7 @@ export class AuthService {
 
         try {
             // Generate reset code and expiry
-            const resetCode = this.generateResetCode();
+            const resetCode = requestPasswordResetDto.verificationCode;
             const resetCodeExpires = new Date(Date.now() + this.RESET_CODE_EXPIRY);
 
             // Store the reset code and expiry
