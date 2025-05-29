@@ -18,35 +18,20 @@ export class AuthService {
         private readonly personService: PersonService,
         private jwtService: JwtService,
         private readonly mailerService: MailerService
-    ) {}
-
-    private generateVerificationCode(): string {
-        // Generate a 6-digit code
-        return Math.floor(100000 + Math.random() * 900000).toString();
-    }
-
-    private setVerificationCodeExpiration(): Date {
-        const expires = new Date();
-        expires.setHours(expires.getHours() + 1); // Code expires in 1 hour
-        return expires;
-    }
+    ) { }
 
     async validateUser(email: string, password: string): Promise<any> {
-        this.logger.debug(`Attempting to validate user: ${email}`);
-        
+
         const person = await this.personService.findByEmail(email);
         if (!person) {
-            this.logger.warn(`Login attempt failed for non-existent user: ${email}`);
             throw new UnauthorizedException('Invalid credentials');
         }
 
         const isPasswordMatching = await bcrypt.compare(password, person.password);
         if (!isPasswordMatching) {
-            this.logger.warn(`Login attempt failed for user: ${email} - Invalid password`);
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        this.logger.debug(`User validated successfully: ${email}`);
         const { password: _, ...result } = person;
         return result;
     }
@@ -86,7 +71,7 @@ export class AuthService {
 
     async verifyEmailCode(verifyEmailCodeDto: VerifyEmailCodeDto) {
         const person = await this.personService.findByEmail(verifyEmailCodeDto.email);
-        
+
         if (!person) {
             throw new BadRequestException('User not found');
         }
@@ -116,7 +101,7 @@ export class AuthService {
 
     async resendVerification(email: string) {
         const person = await this.personService.findByEmail(email);
-        
+
         if (!person) {
             throw new BadRequestException('User not found');
         }
@@ -128,7 +113,7 @@ export class AuthService {
         // Generate new verification code
         const verificationCode = this.generateVerificationCode();
         const verificationCodeExpires = this.setVerificationCodeExpiration();
-        
+
         // Update user with new code
         person.verificationCode = verificationCode;
         person.verificationCodeExpires = verificationCodeExpires;
@@ -138,6 +123,17 @@ export class AuthService {
         await this.mailerService.sendVerificationEmail(person.email, verificationCode);
 
         return { message: 'Verification email sent successfully' };
+    }
+
+    private generateVerificationCode(): string {
+        // Generate a 6-digit code
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    private setVerificationCodeExpiration(): Date {
+        const expires = new Date();
+        expires.setHours(expires.getHours() + 1); // Code expires in 1 hour
+        return expires;
     }
 
     async login(user: any) {
@@ -157,7 +153,7 @@ export class AuthService {
 
     async refreshToken(refreshToken: string) {
         this.logger.debug('Attempting to refresh token');
-        
+
         try {
             const payload = await this.jwtService.verify(refreshToken);
             const person = await this.personService.findOne(payload.sub);
@@ -165,7 +161,7 @@ export class AuthService {
                 this.logger.warn(`Token refresh failed - User not found: ${payload.sub}`);
                 throw new UnauthorizedException();
             }
-            
+
             this.logger.debug(`Token refreshed successfully for user: ${person.email}`);
             return this.login(person);
         } catch (e) {
@@ -206,38 +202,63 @@ export class AuthService {
     }
 
     async requestPasswordReset(requestPasswordResetDto: RequestPasswordResetDto) {
-        const person = await this.personService.findOneByEmail(requestPasswordResetDto.email);
-        
+        const person = await this.personService.findByEmail(requestPasswordResetDto.email);
+
         if (!person) {
             // Don't reveal that the email doesn't exist
             return { message: 'If your email is registered, you will receive a password reset link' };
         }
 
-        const resetToken = crypto.randomBytes(32).toString('hex');
-        const resetExpires = new Date();
-        resetExpires.setHours(resetExpires.getHours() + 1); // Token expires in 1 hour
+        try {
+            await this.mailerService.sendPasswordResetEmail(person.email, requestPasswordResetDto.verificationCode);
+            return { message: 'If your email is registered, you will receive a password reset link' };
+        } catch (error) {
+            // Log the error for monitoring
+            this.logger.error('Failed to send password reset email:', error);
 
-        person.passwordResetToken = resetToken;
-        person.passwordResetExpires = resetExpires;
-        await this.personService.update(person.idPerson, person);
-
-        await this.mailerService.sendPasswordResetEmail(person.email, resetToken);
-
-        return { message: 'If your email is registered, you will receive a password reset link' };
+            // Throw a BadRequestException which will result in a 400 status code
+            throw new BadRequestException('Failed to send password reset email. Please try again later.');
+        }
     }
 
     async resetPassword(resetPasswordDto: ResetPasswordDto) {
-        const person = await this.personService.findOneByResetToken(resetPasswordDto.token);
-        
-        if (!person || person.passwordResetExpires < new Date()) {
-            throw new BadRequestException('Invalid or expired reset token');
+        const person = await this.personService.findByEmail(resetPasswordDto.email);
+
+        if (!person) {
+            return { message: 'If your email is registered, you will receive a password reset link' };
         }
 
-        person.password = await this.personService.hashPassword(resetPasswordDto.newPassword);
-        person.passwordResetToken = null;
-        person.passwordResetExpires = null;
-        await this.personService.update(person.idPerson, person);
+        // Verify current password
+        const isPasswordMatching = await bcrypt.compare(resetPasswordDto.currentPassword, person.password);
+        if (!isPasswordMatching) {
+            this.logger.warn(`Password reset attempt failed: Invalid current password for user ${person.idPerson}`);
+            throw new UnauthorizedException({
+                message: 'Current password is incorrect',
+                error: 'INVALID_CURRENT_PASSWORD',
+                statusCode: 401
+            });
+        }
 
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);
+
+        // Update the password
+        await this.personService.update(person.idPerson, {
+            password: hashedPassword
+        });
+
+        this.logger.log(`Password successfully reset for user ${person.idPerson}`);
         return { message: 'Password reset successfully' };
+    } catch(error) {
+        if (error instanceof UnauthorizedException) {
+            throw error; // Re-throw UnauthorizedException as is
+        }
+
+        throw new BadRequestException({
+            message: 'Failed to reset password',
+            error: 'PASSWORD_RESET_FAILED',
+            statusCode: 400,
+            details: error.message
+        });
     }
 }
