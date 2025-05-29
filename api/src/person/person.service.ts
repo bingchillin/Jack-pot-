@@ -104,23 +104,6 @@ export class PersonService {
         await this.personRepository.remove(person);
     }
 
-    async findOneByVerificationToken(token: string): Promise<Person> {
-        return this.personRepository.findOne({ where: { emailVerificationToken: token } });
-    }
-
-    async findOneByEmail(email: string): Promise<Person> {
-        return this.personRepository.findOne({ where: { email } });
-    }
-
-    async findOneByResetToken(token: string): Promise<Person> {
-        return this.personRepository.findOne({ 
-            where: { 
-                passwordResetToken: token,
-                passwordResetExpires: MoreThan(new Date())
-            } 
-        });
-    }
-
     async hashPassword(password: string): Promise<string> {
         const salt = await bcrypt.genSalt();
         return bcrypt.hash(password, salt);
