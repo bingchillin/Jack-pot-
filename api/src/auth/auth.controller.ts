@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Headers, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { Request } from 'express';
@@ -6,6 +6,7 @@ import { AuthDocs } from 'src/api/swagger/auth.docs';
 import { SignupDto } from './dto/signup.dto';
 import { VerifyEmailCodeDto } from './dto/verify-email-code.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
+import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
@@ -49,9 +50,21 @@ export class AuthController {
         return this.authService.requestPasswordReset(requestPasswordResetDto);
     }
 
+    @Post('verify-reset-code')
+    async verifyResetCode(@Body() verifyResetCodeDto: VerifyResetCodeDto) {
+        return this.authService.verifyResetCode(verifyResetCodeDto);
+    }
+
     @Post('reset-password')
     @AuthDocs.resetPassword()
-    async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-        return this.authService.resetPassword(resetPasswordDto);
+    async resetPassword(
+        @Body() resetPasswordDto: ResetPasswordDto,
+        @Headers('authorization') authHeader: string
+    ) {
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            throw new UnauthorizedException('Reset token is required');
+        }
+        const resetToken = authHeader.split(' ')[1];
+        return this.authService.resetPassword(resetPasswordDto, resetToken);
     }
 } 

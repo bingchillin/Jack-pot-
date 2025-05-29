@@ -6,6 +6,7 @@ import { SignupDto } from './dto/signup.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { VerifyEmailCodeDto } from './dto/verify-email-code.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
+import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailerService } from '../mailer/mailer.service';
 import * as crypto from 'crypto';
@@ -13,6 +14,7 @@ import * as crypto from 'crypto';
 @Injectable()
 export class AuthService {
     private readonly logger = new Logger(AuthService.name);
+    private readonly RESET_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
 
     constructor(
         private readonly personService: PersonService,
@@ -201,64 +203,110 @@ export class AuthService {
         };
     }
 
+    private generateResetCode(): string {
+        // Generate a 6-digit code
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    private generateResetToken(email: string): string {
+        return this.jwtService.sign(
+            { email, type: 'reset' },
+            { 
+                secret: process.env.JWT_SECRET,
+                expiresIn: '10m' // 10 minutes
+            }
+        );
+    }
+
     async requestPasswordReset(requestPasswordResetDto: RequestPasswordResetDto) {
         const person = await this.personService.findByEmail(requestPasswordResetDto.email);
-
+        
         if (!person) {
             // Don't reveal that the email doesn't exist
-            return { message: 'If your email is registered, you will receive a password reset link' };
+            return { message: 'Si cet email existe, un code vous a été envoyé.' };
         }
 
         try {
-            await this.mailerService.sendPasswordResetEmail(person.email, requestPasswordResetDto.verificationCode);
-            return { message: 'If your email is registered, you will receive a password reset link' };
-        } catch (error) {
-            // Log the error for monitoring
-            this.logger.error('Failed to send password reset email:', error);
+            // Generate reset code and expiry
+            const resetCode = this.generateResetCode();
+            const resetCodeExpires = new Date(Date.now() + this.RESET_CODE_EXPIRY);
 
-            // Throw a BadRequestException which will result in a 400 status code
-            throw new BadRequestException('Failed to send password reset email. Please try again later.');
+            // Store the reset code and expiry
+            await this.personService.update(person.idPerson, {
+                verificationCode: resetCode,
+                verificationCodeExpires: resetCodeExpires
+            });
+
+            // Send the reset email
+            await this.mailerService.sendPasswordResetEmail(person.email, resetCode);
+            
+            this.logger.log(`Password reset code sent to ${person.email}`);
+            return { message: 'Si cet email existe, un code vous a été envoyé.' };
+        } catch (error) {
+            this.logger.error(`Failed to send password reset email: ${error.message}`);
+            throw new BadRequestException('Failed to process password reset request');
         }
     }
 
-    async resetPassword(resetPasswordDto: ResetPasswordDto) {
-        const person = await this.personService.findByEmail(resetPasswordDto.email);
-
+    async verifyResetCode(verifyResetCodeDto: VerifyResetCodeDto) {
+        const person = await this.personService.findByEmail(verifyResetCodeDto.email);
+        
         if (!person) {
-            return { message: 'If your email is registered, you will receive a password reset link' };
+            throw new BadRequestException('Code invalide ou expiré');
         }
 
-        // Verify current password
-        const isPasswordMatching = await bcrypt.compare(resetPasswordDto.currentPassword, person.password);
-        if (!isPasswordMatching) {
-            this.logger.warn(`Password reset attempt failed: Invalid current password for user ${person.idPerson}`);
-            throw new UnauthorizedException({
-                message: 'Current password is incorrect',
-                error: 'INVALID_CURRENT_PASSWORD',
-                statusCode: 401
+        if (!person.verificationCode || !person.verificationCodeExpires) {
+            throw new BadRequestException('Code invalide ou expiré');
+        }
+
+        if (person.verificationCodeExpires < new Date()) {
+            throw new BadRequestException('Code invalide ou expiré');
+        }
+
+        if (person.verificationCode !== verifyResetCodeDto.code) {
+            throw new BadRequestException('Code invalide ou expiré');
+        }
+
+        // Generate reset token
+        const resetToken = this.generateResetToken(person.email);
+
+        return { resetToken };
+    }
+
+    async resetPassword(resetPasswordDto: ResetPasswordDto, resetToken: string) {
+        try {
+            // Verify the reset token
+            const payload = await this.jwtService.verify(resetToken);
+            
+            if (payload.type !== 'reset') {
+                throw new UnauthorizedException('Invalid reset token');
+            }
+
+            const person = await this.personService.findByEmail(payload.email);
+            if (!person) {
+                throw new UnauthorizedException('Invalid reset token');
+            }
+
+            // Hash the new password
+            const hashedPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);
+
+            // Update password and clear reset code
+            await this.personService.update(person.idPerson, {
+                password: hashedPassword,
+                verificationCode: null,
+                verificationCodeExpires: null
             });
+
+            this.logger.log(`Password successfully reset for user ${person.idPerson}`);
+            return { message: 'Password reset successfully' };
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                throw new UnauthorizedException('Reset token has expired');
+            }
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+            throw new BadRequestException('Failed to reset password');
         }
-
-        // Hash the new password
-        const hashedPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);
-
-        // Update the password
-        await this.personService.update(person.idPerson, {
-            password: hashedPassword
-        });
-
-        this.logger.log(`Password successfully reset for user ${person.idPerson}`);
-        return { message: 'Password reset successfully' };
-    } catch(error) {
-        if (error instanceof UnauthorizedException) {
-            throw error; // Re-throw UnauthorizedException as is
-        }
-
-        throw new BadRequestException({
-            message: 'Failed to reset password',
-            error: 'PASSWORD_RESET_FAILED',
-            statusCode: 400,
-            details: error.message
-        });
     }
 }

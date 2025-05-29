@@ -4,18 +4,17 @@ import {
   Head,
   Heading,
   Html,
-  Link,
   Preview,
   Text,
 } from '@react-email/components';
 import * as React from 'react';
 
 interface ResetPasswordEmailProps {
-  resetUrl: string;
+  resetCode: string;
 }
 
 export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
-  resetUrl,
+  resetCode,
 }) => (
   <Html>
     <Head />
@@ -24,16 +23,16 @@ export const ResetPasswordEmail: React.FC<ResetPasswordEmailProps> = ({
       <Container style={container}>
         <Heading style={h1}>Reset Your Password</Heading>
         <Text style={text}>
-          You requested to reset your password. Click the button below to create a new password:
+          You requested to reset your password. Please use the following code to reset your password:
         </Text>
-        <Link href={resetUrl} style={button}>
-          Reset Password
-        </Link>
+        <Text style={code}>
+          {resetCode}
+        </Text>
+        <Text style={text}>
+          This code will expire in 10 minutes.
+        </Text>
         <Text style={text}>
           If you did not request a password reset, you can safely ignore this email.
-        </Text>
-        <Text style={text}>
-          This link will expire in 1 hour.
         </Text>
       </Container>
     </Body>
@@ -70,15 +69,16 @@ const text = {
   textAlign: 'center' as const,
 };
 
-const button = {
-  backgroundColor: '#5F51E8',
-  borderRadius: '3px',
-  color: '#fff',
-  fontSize: '16px',
-  textDecoration: 'none',
+const code = {
+  backgroundColor: '#f4f4f4',
+  borderRadius: '4px',
+  color: '#333',
+  fontSize: '32px',
+  fontWeight: 'bold',
+  letterSpacing: '4px',
+  lineHeight: '48px',
+  margin: '32px auto',
+  padding: '16px',
   textAlign: 'center' as const,
-  display: 'block',
-  padding: '12px',
-  margin: '20px auto',
   width: '200px',
 }; 
