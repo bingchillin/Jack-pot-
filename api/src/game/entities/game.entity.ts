@@ -8,10 +8,10 @@ export class Game {
     @PrimaryGeneratedColumn({ name: 'id_game' })
     idGame: number;
 
-    @Column({ length: 250 })
+    @Column({ length: 250, nullable: false })
     title: string;
 
-    @Column({ length: 5000 })
+    @Column({ length: 5000, nullable: false })
     description: string;
 
     @Column({ name: 'id_won', nullable: true })

@@ -1,202 +1,445 @@
-create table role
-(
-	id_role serial not null,
-	title varchar(250),
-	description varchar(1000),
-	constraint pk_role primary key(id_role)
-);
-
-create table person
-(
-	id_person serial not null,
-	mail varchar(250) not null,
-	firstname varchar(250) not null,
-	surname varchar(250) not null,
-	password varchar(500) not null,
-	number_phone varchar(50) null,
-	id_role int,
-	constraint pk_person primary key(id_person),
-	constraint fk_role foreign key (id_role) references role (id_role)
-
-);
-
-create table relationship
-(
-	id_relationship serial not null,
-	title varchar(250) not null,
-	description varchar(1000),
-	constraint pk_relationship primary key(id_relationship)
-);
-
-create table contact
-(
-	id_contact serial not null,
-	relation varchar(250),
-	description varchar(1000),
-	is_active bool default (false) not null,
-	value_return varchar(100),
-	id_person int,
-	id_relationship int,
-	constraint pk_contact primary key(id_contact),
-	constraint fk_person foreign key (id_person) references person (id_person),
-	constraint fk_relationship foreign key (id_relationship) references relationship (id_relationship)
-
-);
-
 create table category_type
 (
-	id_category_type serial not null,
-	title varchar(250),
-	description varchar(1000),
-	advise varchar(5000),
-	constraint pk_category_type primary key(id_category_type)
+    id_category_type serial
+        constraint pk_category_type
+            primary key,
+    title            varchar(250),
+    description      varchar(1000),
+    advise           varchar(5000),
+    "createdAt"      timestamp default now() not null,
+    "updatedAt"      timestamp default now() not null
 );
 
-create table object
-(
-	id_object serial not null,
-	title varchar(250),
-	description varchar(1000),
-	is_working bool default (false) not null,
-	is_automatic bool default (false) not null,
-	value_return varchar(100),
-	height varchar(100),
-	weight varchar(100),
-	advise varchar(100),
-	preference_number int,
-	id_person int,
-	id_category_type int,
-	constraint pk_object primary key(id_object),
-	constraint fk_person foreign key (id_person) references person (id_person),
-	constraint fk_category_type foreign key (id_category_type) references category_type (id_category_type)
-);
-
-create table composant
-(
-	id_composant serial not null,
-	title varchar(250),
-	description varchar(1000),
-	is_working bool default (false) not null,
-	int_ret int,
-	string_ret varchar(100),
-	long_ret bigint,
-	id_object int,
-	constraint pk_composant primary key(id_composant),
-	constraint fk_object foreign key (id_object) references object (id_object)
-);
-
-create table plant_type
-(
-	id_plant_type serial not null,
-	title varchar(250),
-	description varchar(1000),
-	height varchar(100),
-	weight varchar(100),
-	advise varchar(5000),
-	category varchar(5000),
-	constraint pk_plant_type primary key(id_plant_type)
-);
-
-create table avatar
-(
-	id_avatar serial not null,
-	title varchar(250),
-	description varchar(1000),
-	picture_path varchar(5000),
-	evolution_number int,
-	id_plant_type int,
-	constraint pk_avatar primary key(id_avatar),
-	constraint fk_plant_type foreign key (id_plant_type) references plant_type (id_plant_type)
-);
-
-create table object_profile
-(
-	id_object_profile serial not null,
-	title varchar(250),
-	description varchar(1000),
-	price varchar(500),
-	height varchar(100),
-	weight varchar(100),
-	advise varchar(100),
-	category varchar(100),
-	strenght varchar(100),
-	speed varchar(100),
-	life varchar(100),
-	id_object int,
-	id_plant_type int,
-	constraint pk_object_profile primary key(id_object_profile),
-	constraint fk_object foreign key (id_object) references object (id_object),
-	constraint fk_plant_type foreign key (id_plant_type) references plant_type (id_plant_type)
-);
-
-create table notification
-(
-	id_notification serial not null,
-	title varchar(250),
-	description varchar(1000),
-	value_custom_01 varchar(500),
-	value_custom_02 varchar(500),
-	id_object int,
-	id_person int,
-	constraint pk_notification primary key(id_notification),
-	constraint fk_person foreign key (id_person) references person (id_person)
-);
+alter table category_type
+    owner to debian;
 
 create table parameter_type
 (
-	id_parameter_type serial not null,
-	title varchar(250),
-	short_description varchar(1000),
-	description varchar(5000),
-	is_display bool default (false) not null,
-	constraint pk_parameter_type primary key(id_parameter_type)
+    id_parameter_type serial
+        constraint pk_parameter_type
+            primary key,
+    title             varchar(250),
+    advise            varchar(5000),
+    "createdAt"       timestamp default now() not null,
+    "updatedAt"       timestamp default now() not null,
+    description       varchar(1000)
 );
+
+alter table parameter_type
+    owner to debian;
+
+create table plant_type
+(
+    id_plant_type                            serial
+        constraint pk_plant_type
+            primary key,
+    title                                    varchar(250),
+    description                              varchar(1000),
+    advise                                   varchar(5000),
+    "createdAt"                              timestamp default now() not null,
+    "updatedAt"                              timestamp default now() not null,
+    scientist_name                           varchar(250),
+    family_name                              varchar(250),
+    type_name                                varchar(250),
+    exposition_type                          varchar(250),
+    ground_type                              varchar(250),
+    saison_first                             varchar(100),
+    saison_second                            varchar(100),
+    saison_third                             varchar(100),
+    saison_last                              varchar(100),
+    number_good_saison                       integer,
+    plantation_saison                        varchar(100),
+    ph_ground_sensor                         numeric(4, 2),
+    ph_min                                   numeric(4, 2),
+    ph_max                                   numeric(4, 2),
+    conductivity_electrique_fertility_sensor numeric(6, 2),
+    conductivity_electrique_fertility_min    numeric(6, 2),
+    conductivity_electrique_fertility_max    numeric(6, 2),
+    light_sensor                             numeric(10, 2),
+    temperature_sensor_ground                numeric(5, 2),
+    temperature_sensor_extern                numeric(5, 2),
+    humidity_air_sensor                      numeric(5, 2),
+    humidity_ground_sensor                   numeric(5, 2),
+    exposition_time_sun                      numeric,
+    height_min                               numeric,
+    height_max                               numeric
+);
+
+alter table plant_type
+    owner to debian;
+
+create table avatar
+(
+    id_avatar     serial
+        constraint pk_avatar
+            primary key,
+    title         varchar(250),
+    description   varchar(1000),
+    id_plant_type integer
+        constraint "FK_eabd4a19cfd30253fbc27d1653a"
+            references plant_type,
+    advise        varchar(5000),
+    "createdAt"   timestamp default now() not null,
+    "updatedAt"   timestamp default now() not null
+);
+
+alter table avatar
+    owner to debian;
+
+create table relationship
+(
+    id_relationship serial
+        constraint pk_relationship
+            primary key,
+    title           varchar(250),
+    description     varchar(1000),
+    "createdAt"     timestamp default now() not null,
+    "updatedAt"     timestamp default now() not null
+);
+
+alter table relationship
+    owner to debian;
+
+create unique index "IDX_00727d8c3a4ef1195db21c2229"
+    on relationship (title);
+
+create table role
+(
+    id_role     serial
+        constraint pk_role
+            primary key,
+    title       varchar(250)            not null
+        constraint "UQ_4a74ca47fe1aa34a28a6db3c722"
+            unique,
+    description varchar(1000),
+    "createdAt" timestamp default now() not null,
+    "updatedAt" timestamp default now() not null
+);
+
+alter table role
+    owner to debian;
+
+create table person
+(
+    id_person                 serial
+        constraint "PK_a39bc9452ab1068b945834c3695"
+            primary key,
+    email                     varchar(250),
+    firstname                 varchar(250),
+    surname                   varchar(250),
+    password                  varchar(500)            not null,
+    number_phone              varchar(50),
+    id_role                   integer
+        constraint "FK_1aaef473a75f730698f56a2b181"
+            references role
+            on delete set null,
+    "createdAt"               timestamp default now() not null,
+    "updatedAt"               timestamp default now() not null,
+    "isEmailVerified"         boolean   default false not null,
+    "emailVerificationToken"  varchar,
+    "passwordResetToken"      varchar,
+    "passwordResetExpires"    timestamp,
+    "verificationCode"        varchar,
+    "verificationCodeExpires" timestamp
+);
+
+alter table person
+    owner to debian;
+
+create table contact
+(
+    id_contact      serial
+        constraint pk_contact
+            primary key,
+    relation        varchar(250),
+    description     varchar(1000),
+    value_return    varchar(100),
+    id_person       integer
+        constraint "FK_5d0a5598bf0d6b386b8d8578a1e"
+            references person
+            on delete cascade,
+    id_relationship integer
+        constraint "FK_339c806fcd91ead7d9ca9eeb541"
+            references relationship
+            on delete set null,
+    "isActive"      boolean   default false not null,
+    "createdAt"     timestamp default now() not null,
+    "updatedAt"     timestamp default now() not null
+);
+
+alter table contact
+    owner to debian;
+
+create index "IDX_05831d37eabeb6150f99c69784"
+    on contact ("isActive");
 
 create table lnk_person_parameter
 (
-	id_lnk_person_parameter serial not null,
-	is_value bool default (false) not null,
-	id_person int,
-	id_parameter_type int,
-	constraint pk_lnk_person_parameter primary key(id_lnk_person_parameter),
-	constraint fk_person foreign key (id_person) references person (id_person),
-	constraint fk_parameter_type foreign key (id_parameter_type) references parameter_type (id_parameter_type)
+    id_lnk_person_parameter serial
+        constraint pk_lnk_person_parameter
+            primary key,
+    id_person               integer
+        constraint "FK_42868ed7a937b787a2054ad8000"
+            references person
+            on delete cascade,
+    id_parameter_type       integer
+        constraint "FK_c49b944dc946db52fd741bdb3be"
+            references parameter_type
+            on delete set null,
+    title                   varchar(250),
+    description             varchar(1000),
+    advise                  varchar(5000),
+    value                   double precision,
+    "createdAt"             timestamp default now() not null,
+    "updatedAt"             timestamp default now() not null
 );
+
+alter table lnk_person_parameter
+    owner to debian;
+
+create table object
+(
+    id_object        serial
+        constraint pk_object
+            primary key,
+    title            varchar(250),
+    description      varchar(1000),
+    id_person        integer
+        constraint "FK_2179475ce3a40ccec889a85cfcd"
+            references person
+            on delete set null,
+    id_category_type integer
+        constraint "FK_d6af7a2dec78d658274f74ab864"
+            references category_type
+            on delete set null,
+    "createdAt"      timestamp default now() not null,
+    "updatedAt"      timestamp default now() not null,
+    advise           varchar(5000),
+    is_reset         boolean   default false
+);
+
+alter table object
+    owner to debian;
+
+create table composant
+(
+    id_composant serial
+        constraint pk_composant
+            primary key,
+    title        varchar(250),
+    description  varchar(1000),
+    id_object    integer
+        constraint "FK_dcccaba764b42754b263e8400bd"
+            references object,
+    advise       varchar(5000),
+    "createdAt"  timestamp default now() not null,
+    "updatedAt"  timestamp default now() not null
+);
+
+alter table composant
+    owner to debian;
 
 create table event_party
 (
-	id_event_party serial not null,
-	title varchar(250),
-	description varchar(5000),
-	is_launch bool default (false) not null,
-	begin_date date,
-	end_date date,
-	rules varchar(5000),
-	constraint pk_id_event_party primary key(id_event_party)
+    id_event_party serial
+        constraint "PK_4a526410be9352d8c1cb27cf952"
+            primary key,
+    title          varchar(250),
+    "createdAt"    timestamp default now() not null,
+    "updatedAt"    timestamp default now() not null,
+    date           date,
+    location       varchar(250),
+    id_person      integer
+        constraint "FK_0de718504873c35c958be235568"
+            references person
+            on delete set null,
+    id_object      integer
+        constraint "FK_bd84a7d00226434dd341337e98e"
+            references object
+            on delete set null,
+    description    varchar(1000)
 );
+
+alter table event_party
+    owner to debian;
+
+create index "IDX_c809f4b1840b9f03872ed0f29d"
+    on event_party (title);
 
 create table game
 (
-	id_game  serial not null,
-	title varchar(250),
-	description varchar(5000),
-	id_won  int,
-	id_lose  int,
-	begin_date date,
-	end_date date,
-	rules varchar(5000),
-	id_event_party int,
-	constraint pk_game primary key(id_game),
-	constraint fk_event_party foreign key (id_event_party) references event_party (id_event_party)
+    id_game        serial
+        constraint "PK_5333d88fc4e0c153f520d73c91c"
+            primary key,
+    title          varchar(250)            not null,
+    description    varchar(5000)           not null,
+    "beginDate"    date,
+    "endDate"      date,
+    rules          varchar(5000),
+    "createdAt"    timestamp default now() not null,
+    "updatedAt"    timestamp default now() not null,
+    id_event_party integer
+        constraint "FK_d55a20116344d227e7cb399ebeb"
+            references event_party
+            on delete cascade,
+    id_won         integer
+        constraint "FK_05f080cc32e1949d22daff9e9c8"
+            references person
+            on delete set null,
+    id_lose        integer
+        constraint "FK_f5d4e568be6c82ee10ede133bae"
+            references person
+            on delete set null
 );
 
+alter table game
+    owner to debian;
+
+create table game_person
+(
+    id_game_person serial
+        constraint "PK_b312039d098152cf66205ecfd05"
+            primary key,
+    "isOwner"      boolean   default false not null,
+    "isPlayer"     boolean   default false not null,
+    "createdAt"    timestamp default now() not null,
+    "updatedAt"    timestamp default now() not null,
+    id_game        integer
+        constraint "FK_28d35ce392153e1c12478eb322c"
+            references game,
+    id_person      integer
+        constraint "FK_d3764174b67b00c34f89f0f215d"
+            references person
+);
+
+alter table game_person
+    owner to debian;
 
 create table lnk_participation_person_event_party
 (
-	id_lnk_participation_person_event_party serial not null,
-	id_person  int,
-	id_event_party int,
-	constraint pk_lnk_participation_person_event_party primary key(id_lnk_participation_person_event_party),
-	constraint fk_person foreign key (id_person) references person (id_person),
-	constraint fk_event_party foreign key (id_event_party) references event_party (id_event_party)
+    id_lnk_participation_person_event_party integer   default nextval('lnk_participation_person_even_id_lnk_participation_person_e_seq'::regclass) not null
+        constraint pk_lnk_participation_person_event_party
+            primary key,
+    id_person                               integer
+        constraint "FK_4f0a1e10b174a6feead861e83b6"
+            references person
+            on delete cascade,
+    id_event_party                          integer
+        constraint "FK_4911468084d02933719de31e512"
+            references event_party
+            on delete cascade,
+    "createdAt"                             timestamp default now()                                                                                not null,
+    "updatedAt"                             timestamp default now()                                                                                not null
 );
+
+alter table lnk_participation_person_event_party
+    owner to debian;
+
+create table notification
+(
+    id_notification serial
+        constraint pk_notification
+            primary key,
+    title           varchar(250),
+    description     varchar(1000),
+    id_object       integer
+        constraint "FK_b3184aa6ded9daf4de0d06a3dd6"
+            references object
+            on delete set null,
+    id_person       integer
+        constraint "FK_20ac5535ca2886f903f3af6aa5f"
+            references person
+            on delete cascade,
+    advise          varchar(5000),
+    "isRead"        boolean   default false not null,
+    "createdAt"     timestamp default now() not null,
+    "updatedAt"     timestamp default now() not null
+);
+
+alter table notification
+    owner to debian;
+
+create index "IDX_080ab397c379af09b9d2169e5b"
+    on notification ("isRead");
+
+create index "IDX_345ea7febd87e3225b3445479d"
+    on object (title);
+
+create table object_profile
+(
+    id_object_profile serial
+        constraint pk_object_profile
+            primary key,
+    title             varchar(250),
+    description       varchar(1000),
+    id_object         integer
+        constraint "FK_fd28754ebe4e52c66099177e1d0"
+            references object,
+    id_plant_type     integer
+        constraint "FK_4ca2822187f836546ff75dd9054"
+            references plant_type,
+    "createdAt"       timestamp default now() not null,
+    "updatedAt"       timestamp default now() not null,
+    advise            varchar(5000)
+);
+
+alter table object_profile
+    owner to debian;
+
+create index "IDX_41e1bec29d74c0cd4ba3126f57"
+    on person (number_phone);
+
+create unique index "IDX_d2d717efd90709ebd3cb26b936"
+    on person (email);
+
+create table plant
+(
+    id_plant      serial
+        constraint "PK_1cc0446eae3b263775ad31b38cb"
+            primary key,
+    name          varchar(100),
+    description   varchar(500),
+    price         numeric(10, 2),
+    category      varchar(50),
+    "isAvailable" boolean   default true  not null,
+    id_person     integer
+        constraint "FK_144bcc6e8001561492c327b590a"
+            references person
+            on delete set null,
+    "createdAt"   timestamp default now() not null,
+    "updatedAt"   timestamp default now() not null,
+    id_object     integer
+        constraint "FK_24da4774bb2b21921c05f2379d6"
+            references object
+            on delete set null
+);
+
+alter table plant
+    owner to debian;
+
+create index "IDX_06daeb1e9d8c4b6ac7e6bd854e"
+    on plant (name);
+
+create index "IDX_f7442926cb2d87c4c22013f84d"
+    on plant (category);
+
+create table plant_person
+(
+    id_plant_person serial
+        constraint "PK_381c865ac8fc7251b305c185653"
+            primary key,
+    "isOwner"       boolean   default false not null,
+    "isSeller"      boolean   default false not null,
+    "createdAt"     timestamp default now() not null,
+    "updatedAt"     timestamp default now() not null,
+    id_plant        integer
+        constraint "FK_8b5a67b59110d437a58a7a90847"
+            references plant,
+    id_person       integer
+        constraint "FK_1d68f1cac787db2a31035cceb91"
+            references person
+);
+
+alter table plant_person
+    owner to debian;
+

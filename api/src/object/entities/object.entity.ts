@@ -17,12 +17,15 @@ export class ObjectEntity {
 
     @Column({ length: 1000, nullable: true })
     description: string;
-
+    
     @Column({ length: 5000, nullable: true })
     advise: string;
 
     @Column({ name: 'id_category_type', nullable: true })
     idCategoryType: number;
+
+    @Column({ type: 'integer', nullable: true })
+    preference_number: number;
 
     @Column({ name: 'id_person', nullable: true })
     idPerson: number;
@@ -46,6 +49,9 @@ export class ObjectEntity {
 
     @OneToMany(() => Composant, composant => composant.object)
     composants: Composant[];
+
+    @Column({ type: 'boolean', default: false, nullable: true })
+    is_reset: boolean;
 
     @CreateDateColumn()
     createdAt: Date;
