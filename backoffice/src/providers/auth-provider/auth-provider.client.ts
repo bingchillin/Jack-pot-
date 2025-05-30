@@ -2,7 +2,7 @@
 
 import type { AuthProvider } from "@refinedev/core";
 
-const ADMIN_ROLE_ID = 1; // Assuming 1 is the admin role ID
+const ADMIN_ROLE_ID = 1;
 
 const isTokenExpired = (token: string): boolean => {
   try {
@@ -13,14 +13,61 @@ const isTokenExpired = (token: string): boolean => {
   }
 };
 
+const clearAuthData = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("refresh_token");
+  localStorage.removeItem("user");
+  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+};
+
+const refreshToken = async (refreshToken: string) => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    if (!response.ok) return false;
+
+    const data = await response.json();
+    localStorage.setItem("token", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
+    document.cookie = `token=${data.access_token}; path=/`;
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+// Check auth state and redirect if needed
+const checkAuth = () => {
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+
+  if (!token || !user || isTokenExpired(token)) {
+    clearAuthData();
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login";
+    }
+    return false;
+  }
+  return true;
+};
+
+// Initialize auth check
+if (typeof window !== "undefined") {
+  checkAuth();
+  setInterval(checkAuth, 60000);
+}
+
 export const authProviderClient: AuthProvider = {
   login: async ({ email, password }) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/user/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
@@ -36,7 +83,6 @@ export const authProviderClient: AuthProvider = {
         };
       }
 
-      // Check if user is admin
       if (data.user.idRole !== ADMIN_ROLE_ID) {
         return {
           success: false,
@@ -47,19 +93,13 @@ export const authProviderClient: AuthProvider = {
         };
       }
 
-      // Store the complete auth data
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("refresh_token", data.refresh_token);
       localStorage.setItem("user", JSON.stringify(data.user));
-
-      // Set cookies for server-side auth
       document.cookie = `token=${data.access_token}; path=/`;
       document.cookie = `user=${JSON.stringify(data.user)}; path=/`;
       
-      return {
-        success: true,
-        redirectTo: "/persons",
-      };
+      return { success: true, redirectTo: "/persons" };
     } catch (error) {
       return {
         success: false,
@@ -72,18 +112,8 @@ export const authProviderClient: AuthProvider = {
   },
 
   logout: async () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user");
-    
-    // Clear cookies
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    
-    return {
-      success: true,
-      redirectTo: "/login",
-    };
+    clearAuthData();
+    return { success: true, redirectTo: "/login" };
   },
 
   check: async () => {
@@ -92,64 +122,21 @@ export const authProviderClient: AuthProvider = {
     const user = localStorage.getItem("user");
 
     if (!token || !user) {
-      return {
-        authenticated: false,
-        redirectTo: "/login",
-      };
+      return { authenticated: false, redirectTo: "/login" };
     }
 
     try {
-      // Check if token is expired
       if (isTokenExpired(token)) {
-        // Try to refresh the token
-        if (refreshToken) {
-          const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ refresh_token: refreshToken }),
-          });
-
-          if (refreshResponse.ok) {
-            const data = await refreshResponse.json();
-            localStorage.setItem("token", data.access_token);
-            localStorage.setItem("refresh_token", data.refresh_token);
-            document.cookie = `token=${data.access_token}; path=/`;
-          } else {
-            // If refresh fails, logout
-            localStorage.removeItem("token");
-            localStorage.removeItem("refresh_token");
-            localStorage.removeItem("user");
-            document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-            document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-            return {
-              authenticated: false,
-              redirectTo: "/login",
-            };
-          }
-        } else {
-          // No refresh token available, logout
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-          document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-          return {
-            authenticated: false,
-            redirectTo: "/login",
-          };
+        if (refreshToken && await refreshToken(refreshToken)) {
+          return { authenticated: true };
         }
+        clearAuthData();
+        return { authenticated: false, redirectTo: "/login" };
       }
 
       const parsedUser = JSON.parse(user);
-      
-      // Check if user is admin
       if (parsedUser.idRole !== ADMIN_ROLE_ID) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("user");
-        document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        clearAuthData();
         return {
           authenticated: false,
           redirectTo: "/login",
@@ -160,22 +147,17 @@ export const authProviderClient: AuthProvider = {
         };
       }
 
-      return {
-        authenticated: true,
-      };
+      return { authenticated: true };
     } catch (error) {
-      return {
-        authenticated: false,
-        redirectTo: "/login",
-      };
+      clearAuthData();
+      return { authenticated: false, redirectTo: "/login" };
     }
   },
 
   getPermissions: async () => {
     const user = localStorage.getItem("user");
     if (!user) return null;
-    const parsedUser = JSON.parse(user);
-    return parsedUser.idRole;
+    return JSON.parse(user).idRole;
   },
 
   getIdentity: async () => {
@@ -186,39 +168,13 @@ export const authProviderClient: AuthProvider = {
 
   onError: async (error) => {
     if (error.response?.status === 401) {
-      // Try to refresh token on 401
       const refreshToken = localStorage.getItem("refresh_token");
-      if (refreshToken) {
-        try {
-          const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ refresh_token: refreshToken }),
-          });
-
-          if (refreshResponse.ok) {
-            const data = await refreshResponse.json();
-            localStorage.setItem("token", data.access_token);
-            localStorage.setItem("refresh_token", data.refresh_token);
-            return { error: null }; // Retry the failed request
-          }
-        } catch {
-          // If refresh fails, logout
-        }
+      if (refreshToken && await refreshToken(refreshToken)) {
+        return { error: null };
       }
-
-      // If no refresh token or refresh failed, logout
-      localStorage.removeItem("token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("user");
-      return {
-        logout: true,
-        redirectTo: "/login",
-      };
+      clearAuthData();
+      return { logout: true, redirectTo: "/login" };
     }
-
     return { error };
   },
 };
