@@ -13,22 +13,22 @@ export class ObjectProfile {
     @Column({ length: 1000, nullable: true })
     description: string;
 
-    @Column({ length: 5000, nullable: true })
-    advise: string;
-
     @Column({ name: 'id_object', nullable: true })
     idObject: number;
+
+    @ManyToOne(() => ObjectEntity, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'id_object' })
+    object: ObjectEntity;
 
     @Column({ name: 'id_plant_type', nullable: true })
     idPlantType: number;
 
-    @ManyToOne(() => ObjectEntity, object => object.objectProfiles)
-    @JoinColumn({ name: 'id_object' })
-    object: ObjectEntity;
-
-    @ManyToOne(() => PlantType, plantType => plantType.objectProfiles)
+    @ManyToOne(() => PlantType, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'id_plant_type' })
     plantType: PlantType;
+
+    @Column({ length: 5000, nullable: true })
+    advise: string;
 
     @CreateDateColumn()
     createdAt: Date;

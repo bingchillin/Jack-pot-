@@ -11,7 +11,7 @@ export class Composant {
 
     @Column({ length: 1000, nullable: true })
     description: string;
-
+    
     @Column({ length: 5000, nullable: true })
     advise: string;
 
