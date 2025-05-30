@@ -21,7 +21,7 @@ const clearAuthData = () => {
   document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 };
 
-const refreshToken = async (refreshToken: string) => {
+const refreshAuthToken = async (refreshToken: string) => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
       method: "POST",
@@ -127,7 +127,7 @@ export const authProviderClient: AuthProvider = {
 
     try {
       if (isTokenExpired(token)) {
-        if (refreshToken && await refreshToken(refreshToken)) {
+        if (refreshToken && await refreshAuthToken(refreshToken)) {
           return { authenticated: true };
         }
         clearAuthData();
@@ -169,7 +169,7 @@ export const authProviderClient: AuthProvider = {
   onError: async (error) => {
     if (error.response?.status === 401) {
       const refreshToken = localStorage.getItem("refresh_token");
-      if (refreshToken && await refreshToken(refreshToken)) {
+      if (refreshToken && await refreshAuthToken(refreshToken)) {
         return { error: null };
       }
       clearAuthData();

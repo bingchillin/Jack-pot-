@@ -53,7 +53,7 @@ const handleResponse = async (response: Response, retry: () => Promise<any>) => 
   }
 
   const data = await response.json();
-  return Array.isArray(data) ? data : data.data || [];
+  return data;
 };
 
 export const dataProvider = dataProviderSimpleRest(API_URL);
@@ -92,7 +92,9 @@ export const customDataProvider: DataProvider = {
       customDataProvider.getOne({ resource, id })
     );
 
-    return { data };
+    // Handle different response structures
+    const result = data.data || data;
+    return { data: result };
   },
 
   create: async ({ resource, variables }) => {
