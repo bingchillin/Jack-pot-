@@ -3,7 +3,7 @@
 import { DataProvider } from "@refinedev/core";
 import dataProviderSimpleRest from "@refinedev/simple-rest";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 const getHeaders = () => {
   const token = localStorage.getItem("token");
@@ -58,11 +58,24 @@ const handleResponse = async (response: Response, retry: () => Promise<any>) => 
 
 export const dataProvider = dataProviderSimpleRest(API_URL);
 
+const getResourceEndpoint = (resource: string): string => {
+  const resourceMappings: { [key: string]: string } = {
+    persons: "person",
+    "plant-types": "plant-type",
+    "event-parties": "event-party",
+    "object-profiles": "object-profile",
+    "parameter-types": "parameter-type",
+    // Add more mappings as needed
+  };
+
+  return resourceMappings[resource] || resource;
+};
+
 export const customDataProvider: DataProvider = {
   ...dataProvider,
 
   getList: async ({ resource, pagination, filters, sorters }) => {
-    const endpoint = resource === "persons" ? "person" : resource;
+    const endpoint = getResourceEndpoint(resource);
     const response = await fetch(`${API_URL}/${endpoint}`, {
       headers: getHeaders(),
     });
@@ -83,7 +96,7 @@ export const customDataProvider: DataProvider = {
   },
 
   getOne: async ({ resource, id }) => {
-    const endpoint = resource === "persons" ? "person" : resource;
+    const endpoint = getResourceEndpoint(resource);
     const response = await fetch(`${API_URL}/${endpoint}/${id}`, {
       headers: getHeaders(),
     });
@@ -98,7 +111,7 @@ export const customDataProvider: DataProvider = {
   },
 
   create: async ({ resource, variables }) => {
-    const endpoint = resource === "persons" ? "person" : resource;
+    const endpoint = getResourceEndpoint(resource);
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: "POST",
       headers: getHeaders(),
@@ -113,7 +126,7 @@ export const customDataProvider: DataProvider = {
   },
 
   update: async ({ resource, id, variables }) => {
-    const endpoint = resource === "persons" ? "person" : resource;
+    const endpoint = getResourceEndpoint(resource);
     const response = await fetch(`${API_URL}/${endpoint}/${id}`, {
       method: "PATCH",
       headers: getHeaders(),
@@ -128,7 +141,7 @@ export const customDataProvider: DataProvider = {
   },
 
   deleteOne: async ({ resource, id }) => {
-    const endpoint = resource === "persons" ? "person" : resource;
+    const endpoint = getResourceEndpoint(resource);
     const response = await fetch(`${API_URL}/${endpoint}/${id}`, {
       method: "DELETE",
       headers: getHeaders(),

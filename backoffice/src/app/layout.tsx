@@ -57,6 +57,16 @@ export default function RootLayout({
                           icon: <UserOutlined />,
                         },
                       },
+                      {
+                        name: "plant-types",
+                        list: "/plant-types",
+                        create: "/plant-types/create",
+                        edit: "/plant-types/edit/:id",
+                        show: "/plant-types/show/:id",
+                        meta: {
+                          canDelete: true,
+                        },
+                      },
                     ]}
                     options={{
                       syncWithLocation: true,
