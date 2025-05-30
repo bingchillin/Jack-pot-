@@ -1,0 +1,33 @@
+export interface PlantType {
+  id: number;
+  title: string;
+  scientist_name: string;
+  family_name: string;
+  type_name: string;
+  description: string;
+  exposition_type: string;
+  ground_type: string;
+  plantation_saison: string;
+  saison_first?: string;
+  saison_second?: string;
+  saison_third?: string;
+  saison_last?: string;
+  number_good_saison: number;
+  ph_ground_sensor?: number;
+  ph_min?: number;
+  ph_max?: number;
+  conductivity_electrique_fertility_sensor?: number;
+  conductivity_electrique_fertility_min?: number;
+  conductivity_electrique_fertility_max?: number;
+  light_sensor?: number;
+  temperature_sensor_ground?: number;
+  temperature_sensor_extern?: number;
+  humidity_air_sensor?: number;
+  humidity_ground_sensor?: number;
+  exposition_time_sun?: number;
+  height_min?: number;
+  height_max?: number;
+  advise: string;
+  created_at: Date;
+  updated_at: Date;
+} 
