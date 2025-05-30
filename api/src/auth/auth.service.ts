@@ -11,7 +11,6 @@ import { MailerService } from '../mailer/mailer.service';
 
 @Injectable()
 export class AuthService {
-    private readonly logger = new Logger(AuthService.name);
     private readonly RESET_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
     private readonly VERIFICATION_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
 
@@ -22,7 +21,6 @@ export class AuthService {
     ) { }
 
     async validateUser(email: string, password: string): Promise<any> {
-
         const person = await this.personService.findByEmail(email);
         if (!person) {
             throw new UnauthorizedException('Invalid credentials');
@@ -31,6 +29,11 @@ export class AuthService {
         const isPasswordMatching = await bcrypt.compare(password, person.password);
         if (!isPasswordMatching) {
             throw new UnauthorizedException('Invalid credentials');
+        }
+
+        // Check if user is admin (role ID 1)
+        if (person.idRole !== 1) {
+            throw new UnauthorizedException('You do not have permission to access the backoffice');
         }
 
         const { password: _, ...result } = person;
@@ -162,20 +165,15 @@ export class AuthService {
     }
 
     async refreshToken(refreshToken: string) {
-        this.logger.debug('Attempting to refresh token');
-
         try {
             const payload = await this.jwtService.verify(refreshToken);
             const person = await this.personService.findOne(payload.sub);
             if (!person) {
-                this.logger.warn(`Token refresh failed - User not found: ${payload.sub}`);
                 throw new UnauthorizedException();
             }
 
-            this.logger.debug(`Token refreshed successfully for user: ${person.email}`);
             return this.login(person);
         } catch (e) {
-            this.logger.warn('Token refresh failed - Invalid refresh token');
             throw new UnauthorizedException('Invalid refresh token');
         }
     }
@@ -243,10 +241,8 @@ export class AuthService {
             // Send the reset email
             await this.mailerService.sendPasswordResetEmail(person.email, resetCode);
             
-            this.logger.log(`Password reset code sent to ${person.email}`);
             return { message: 'Si cet email existe, un code vous a été envoyé.' };
         } catch (error) {
-            this.logger.error(`Failed to send password reset email: ${error.message}`);
             throw new BadRequestException('Failed to process password reset request');
         }
     }
@@ -300,7 +296,6 @@ export class AuthService {
                 verificationCodeExpires: null
             });
 
-            this.logger.log(`Password successfully reset for user ${person.idPerson}`);
             return { message: 'Password reset successfully' };
         } catch (error) {
             if (error.name === 'TokenExpiredError') {

@@ -52,6 +52,10 @@ export const authProviderClient: AuthProvider = {
       localStorage.setItem("refresh_token", data.refresh_token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      // Set cookies for server-side auth
+      document.cookie = `token=${data.access_token}; path=/`;
+      document.cookie = `user=${JSON.stringify(data.user)}; path=/`;
+      
       return {
         success: true,
         redirectTo: "/persons",
@@ -71,6 +75,11 @@ export const authProviderClient: AuthProvider = {
     localStorage.removeItem("token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
+    
+    // Clear cookies
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    
     return {
       success: true,
       redirectTo: "/login",
@@ -106,11 +115,14 @@ export const authProviderClient: AuthProvider = {
             const data = await refreshResponse.json();
             localStorage.setItem("token", data.access_token);
             localStorage.setItem("refresh_token", data.refresh_token);
+            document.cookie = `token=${data.access_token}; path=/`;
           } else {
             // If refresh fails, logout
             localStorage.removeItem("token");
             localStorage.removeItem("refresh_token");
             localStorage.removeItem("user");
+            document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
             return {
               authenticated: false,
               redirectTo: "/login",
@@ -120,6 +132,8 @@ export const authProviderClient: AuthProvider = {
           // No refresh token available, logout
           localStorage.removeItem("token");
           localStorage.removeItem("user");
+          document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
           return {
             authenticated: false,
             redirectTo: "/login",
@@ -134,6 +148,8 @@ export const authProviderClient: AuthProvider = {
         localStorage.removeItem("token");
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("user");
+        document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         return {
           authenticated: false,
           redirectTo: "/login",
@@ -144,26 +160,8 @@ export const authProviderClient: AuthProvider = {
         };
       }
 
-      // Verify token by making a request to a protected endpoint
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        return {
-          authenticated: true,
-        };
-      }
-
-      // If token is invalid, clear storage and redirect to login
-      localStorage.removeItem("token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("user");
       return {
-        authenticated: false,
-        redirectTo: "/login",
+        authenticated: true,
       };
     } catch (error) {
       return {
