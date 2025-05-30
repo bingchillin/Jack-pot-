@@ -13,10 +13,7 @@ import { Space, Table, Tag, Drawer, Input, Typography } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { PersonDetails } from "@components/person/show";
-import { CreatePersonModal } from "@components/person/create";
 import { PlantTypeDetails } from "@components/plant-type/show";
-import { CreatePlantTypeModal } from "@components/plant-type/create";
 
 const { Text } = Typography;
 
@@ -26,7 +23,6 @@ export default function PlantTypeList() {
   const searchParams = useSearchParams();
   const [selectedPlantType, setSelectedPlantType] = useState<BaseRecord | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [createModalVisible, setCreateModalVisible] = useState(false);
   const [searchTitle, setSearchTitle] = useState("");
 
   // Get all data without any server-side filtering
@@ -108,17 +104,7 @@ export default function PlantTypeList() {
   };
 
   const handleCreate = () => {
-    setCreateModalVisible(true);
-  };
-
-  const handleCreateCancel = () => {
-    setCreateModalVisible(false);
-  };
-
-  const handleCreateSuccess = () => {
-    setCreateModalVisible(false);
-    // Refresh the table using tableQueryResult
-    tableQueryResult.refetch();
+    router.push('/plant-types/create');
   };
 
   return (
@@ -181,9 +167,9 @@ export default function PlantTypeList() {
             dataIndex="actions"
             render={(_, record: BaseRecord) => (
               <Space>
-                <EditButton hideText size="small" recordItemId={record.idPerson} />
+                <EditButton hideText size="small" recordItemId={record.idPlantType} />
                 <ShowButton hideText size="small" onClick={() => handleShow(record)} />
-                <DeleteButton hideText size="small" recordItemId={record.idPerson} />
+                <DeleteButton hideText size="small" recordItemId={record.idPlantType} />
               </Space>
             )}
           />
@@ -191,6 +177,7 @@ export default function PlantTypeList() {
       </List>
 
       <Drawer
+        title={`${selectedPlantType?.title} details`}
         placement="right"
         onClose={handleClose}
         open={drawerVisible}
@@ -198,18 +185,11 @@ export default function PlantTypeList() {
         styles={{
           body: {
             background: '#f5f5f5',
-            paddingTop: '48px',
           },
         }}
       >
         {selectedPlantType && <PlantTypeDetails record={selectedPlantType} />}
       </Drawer>
-
-      <CreatePlantTypeModal
-        visible={createModalVisible}
-        onCancel={handleCreateCancel}
-        onSuccess={handleCreateSuccess}
-      />
     </>
   );
 }

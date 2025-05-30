@@ -189,6 +189,7 @@ export default function PersonList() {
       </List>
 
       <Drawer
+        title={`${selectedPerson?.firstname} ${selectedPerson?.surname} details`}
         placement="right"
         onClose={handleClose}
         open={drawerVisible}
@@ -196,7 +197,6 @@ export default function PersonList() {
         styles={{
           body: {
             background: '#f5f5f5',
-            paddingTop: '48px',
           },
         }}
       >
