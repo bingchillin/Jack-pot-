@@ -93,10 +93,12 @@ export const customDataProvider: DataProvider = {
       headers: getHeaders(),
     });
 
-    await handleResponse(response, () => 
-      customDataProvider.deleteOne({ resource, id })
-    );
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
 
-    return { data: { idPerson: id } as any };
+    // For DELETE requests, we don't need to parse the response
+    // Just return the deleted ID
+    return { data: { id } as any };
   },
 };
