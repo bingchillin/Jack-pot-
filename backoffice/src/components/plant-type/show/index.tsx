@@ -1,9 +1,9 @@
 import React from "react";
 import { Typography, Tag, Space } from "antd";
 import { type BaseRecord } from "@refinedev/core";
-import { 
-  EnvironmentOutlined, 
-  FieldTimeOutlined, 
+import {
+  EnvironmentOutlined,
+  FieldTimeOutlined,
   FireOutlined,
   CloudOutlined,
   ExperimentOutlined,
@@ -16,7 +16,7 @@ import {
 } from "@ant-design/icons";
 import { DetailRow } from "@/components/common/DetailRow";
 import { showDetailsStyles } from "@/styles/show-details";
-
+import { seasonColors } from "@/utils/api/enum";
 const { Text } = Typography;
 
 interface PlantTypeDetailsProps {
@@ -24,6 +24,10 @@ interface PlantTypeDetailsProps {
 }
 
 export const PlantTypeDetails: React.FC<PlantTypeDetailsProps> = ({ record }) => {
+  const getSeasonTag = (season: string) => {
+    return <Tag color={seasonColors[season as keyof typeof seasonColors]}>{season}</Tag>;
+  };
+
   return (
     <div style={showDetailsStyles.wrapper}>
       <DetailRow icon={<BookOutlined />} label="Title">
@@ -49,15 +53,15 @@ export const PlantTypeDetails: React.FC<PlantTypeDetailsProps> = ({ record }) =>
       <DetailRow icon={<EnvironmentOutlined />} label="Growing Conditions">
         <Space direction="vertical" size="small">
           <Space>
-            <EnvironmentOutlined /> 
+            <EnvironmentOutlined />
             <Text>Exposition: {record.exposition_type}</Text>
           </Space>
           <Space>
-            <EnvironmentOutlined /> 
+            <EnvironmentOutlined />
             <Text>Ground Type: {record.ground_type}</Text>
           </Space>
           <Space>
-            <FieldTimeOutlined /> 
+            <FieldTimeOutlined />
             <Text>Plantation Season: {record.plantation_saison}</Text>
           </Space>
         </Space>
@@ -65,41 +69,40 @@ export const PlantTypeDetails: React.FC<PlantTypeDetailsProps> = ({ record }) =>
 
       <DetailRow icon={<FieldTimeOutlined />} label="Growing Seasons">
         <Space wrap>
-          {record.saison_first && <Tag color="green">{record.saison_first}</Tag>}
-          {record.saison_second && <Tag color="green">{record.saison_second}</Tag>}
-          {record.saison_third && <Tag color="green">{record.saison_third}</Tag>}
-          {record.saison_last && <Tag color="green">{record.saison_last}</Tag>}
+          {record.saison_first && getSeasonTag(record.saison_first)}
+          {record.saison_second && getSeasonTag(record.saison_second)}
+          {record.saison_third && getSeasonTag(record.saison_third)}
         </Space>
       </DetailRow>
 
       <DetailRow icon={<ExperimentOutlined />} label="Sensor Parameters">
         <Space direction="vertical" size="small">
           <Space>
-            <FireOutlined /> 
+            <FireOutlined />
             <Text>Temperature (Ground): {record.temperature_sensor_ground}°C</Text>
           </Space>
           <Space>
-            <FireOutlined /> 
+            <FireOutlined />
             <Text>Temperature (External): {record.temperature_sensor_extern}°C</Text>
           </Space>
           <Space>
-            <CloudOutlined /> 
+            <CloudOutlined />
             <Text>Air Humidity: {record.humidity_air_sensor}%</Text>
           </Space>
           <Space>
-            <CloudOutlined /> 
+            <CloudOutlined />
             <Text>Ground Humidity: {record.humidity_ground_sensor}%</Text>
           </Space>
           <Space>
-            <ExperimentOutlined /> 
+            <ExperimentOutlined />
             <Text>pH Level: {record.ph_ground_sensor}</Text>
           </Space>
           <Space>
-            <ExperimentOutlined /> 
+            <ExperimentOutlined />
             <Text>Conductivity: {record.conductivity_electrique_fertility_sensor}</Text>
           </Space>
           <Space>
-            <FieldTimeOutlined /> 
+            <FieldTimeOutlined />
             <Text>Sun Exposure: {record.exposition_time_sun} hours</Text>
           </Space>
         </Space>

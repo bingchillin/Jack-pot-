@@ -13,7 +13,7 @@ import "@refinedev/antd/dist/reset.css";
 import { AppIcon } from "@components/app-icon";
 import { ColorModeContextProvider } from "@contexts/color-mode";
 import { authProviderClient } from "@providers/auth-provider/auth-provider.client";
-import { UserOutlined } from "@ant-design/icons";
+import { UserOutlined, AppstoreOutlined, ExperimentOutlined } from "@ant-design/icons";
 
 export const metadata: Metadata = {
   title: "Refine",
@@ -65,6 +65,7 @@ export default function RootLayout({
                         show: "/plant-types/show/:id",
                         meta: {
                           canDelete: true,
+                          icon: <AppstoreOutlined />,
                         },
                       },
                     ]}

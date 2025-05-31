@@ -24,7 +24,12 @@ export const customDataProvider: DataProvider = {
 
     // Sort data by ID if no sorters are provided
     if (!sorters || sorters.length === 0) {
-      data.sort((a: { idPerson: number }, b: { idPerson: number }) => a.idPerson - b.idPerson);
+      data.sort((a: any, b: any) => {
+        // Handle different ID field names
+        const idA = a.idPerson || a.idPlantType || 0;
+        const idB = b.idPerson || b.idPlantType || 0;
+        return idA - idB;
+      });
     }
 
     return {
