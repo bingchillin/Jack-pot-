@@ -25,7 +25,7 @@ export default function PlantList() {
   const [selectedPlant, setSelectedPlant] = useState<BaseRecord | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [searchEmail, setSearchEmail] = useState("");
+  const [searchName, setSearchName] = useState("");
 
   // Get all data without any server-side filtering
   const { tableProps: originalTableProps, tableQueryResult } = useTable({
@@ -36,14 +36,14 @@ export default function PlantList() {
   const filteredData = useMemo(() => {
     if (!originalTableProps?.dataSource) return [];
     
-    if (!searchEmail.trim()) {
+    if (!searchName.trim()) {
       return originalTableProps.dataSource;
     }
 
     return originalTableProps.dataSource.filter((plant: any) => 
-      plant.email?.toLowerCase().includes(searchEmail.toLowerCase())
+      plant.name?.toLowerCase().includes(searchName.toLowerCase())
     );
-  }, [originalTableProps?.dataSource, searchEmail]);
+  }, [originalTableProps?.dataSource, searchName]);
 
   // Create modified tableProps with filtered data
   const tableProps = {
@@ -134,10 +134,10 @@ export default function PlantList() {
           Add new plant
         </CreateButton>
         <Input
-          placeholder="Search by email"
+          placeholder="Search by name"
           prefix={<SearchOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />}
-          value={searchEmail}
-          onChange={(e) => setSearchEmail(e.target.value)}
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
           style={{ width: 300 }}
           size="large"
           allowClear
@@ -150,17 +150,10 @@ export default function PlantList() {
       >
         <Table {...tableProps} rowKey="idPlant">
           <Table.Column dataIndex="idPlant" title={"ID"} />
-          <Table.Column dataIndex="firstname" title={"Firstname"} />
-          <Table.Column dataIndex="surname" title={"Surname"} />
-          <Table.Column dataIndex={"email"} title={"Email"} />
+          <Table.Column dataIndex="name" title={"Name"} />
+          <Table.Column dataIndex="plant_type" title={"Plant Type"} />
           <Table.Column
-            dataIndex="isEmailVerified"
-            title={"Is Email Verified"}
-            render={(value) => (
-              <Tag color={value ? "success" : "error"} icon={value ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
-                {value ? "Yes" : "No"}
-              </Tag>
-            )}
+
           />
           <Table.Column
             dataIndex="role"
@@ -189,7 +182,7 @@ export default function PlantList() {
       </List>
 
       <Drawer
-        title={`${selectedPlant?.firstname} ${selectedPlant?.surname} details`}
+        title={`${selectedPlant?.name} details`}
         placement="right"
         onClose={handleClose}
         open={drawerVisible}

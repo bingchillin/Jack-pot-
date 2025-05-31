@@ -6,7 +6,7 @@ export const getResourceEndpoint = (resource: string): string => {
     "event-parties": "event-party",
     "object-profiles": "object-profile",
     "parameter-types": "parameter-type",
-    "plants": "plant",
+    "plants": "plants",
   };
 
   return resourceMappings[resource] || resource;

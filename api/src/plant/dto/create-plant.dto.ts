@@ -64,4 +64,13 @@ export class CreatePlantDto {
     @IsOptional()
     @IsNumber()
     idPerson?: number;
+
+    @ApiProperty({
+        example: 1,
+        description: 'ID of the object',
+        required: false
+    })
+    @IsOptional()
+    @IsNumber()
+    idObject?: number;
 } 
