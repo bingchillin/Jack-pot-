@@ -25,8 +25,12 @@ export const customDataProvider: DataProvider = {
       customDataProvider.getList({ resource, pagination, filters, sorters })
     );
 
-    // Sort data by ID if no sorters are provided
-    if (!sorters || sorters.length === 0) {
+    // Always sort roles by ID
+    if (resource === 'roles') {
+      data.sort((a: any, b: any) => a.idRole - b.idRole);
+    }
+    // Sort other resources by ID if no sorters are provided
+    else if (!sorters || sorters.length === 0) {
       data.sort((a: any, b: any) => {
         // Handle different ID field names
         const idA = a.idPerson || a.idPlantType || 0;
