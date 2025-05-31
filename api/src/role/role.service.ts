@@ -18,15 +18,12 @@ export class RoleService {
     }
 
     async findAll(): Promise<Role[]> {
-        return await this.roleRepository.find({
-            relations: ['persons']
-        });
+        return await this.roleRepository.find();
     }
 
     async findOne(id: number): Promise<Role> {
         const role = await this.roleRepository.findOne({ 
             where: { idRole: id },
-            relations: ['persons']
         });
         if (!role) {
             throw new NotFoundException(`Role with ID ${id} not found`);
@@ -37,7 +34,6 @@ export class RoleService {
     async findByTitle(title: string): Promise<Role> {
         const role = await this.roleRepository.findOne({
             where: { title },
-            relations: ['persons']
         });
         if (!role) {
             throw new NotFoundException(`Role with title ${title} not found`);

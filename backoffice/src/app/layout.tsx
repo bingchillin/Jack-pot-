@@ -79,7 +79,18 @@ export default function RootLayout({
                           icon: <UserOutlined />,
                         },
                       },
-                    ]}
+                      {
+    name: "roles",
+    list: "/roles",
+    create: "/roles/create",
+    edit: "/roles/edit/:id",
+    show: "/roles/show/:id",
+    meta: {
+      canDelete: true,
+      icon: <UserOutlined />,
+    },
+  },
+]}
                     options={{
                       syncWithLocation: true,
                       warnWhenUnsavedChanges: true,
