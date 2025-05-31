@@ -79,8 +79,8 @@ const createModule = async (pluralInput) => {
     ]);
 
     // === 2. Copy components/person to components/<singular> ===
-    const sourceComponentDir = path.join(__dirname, '..', 'src', 'app', 'components', 'person');
-    const targetComponentDir = path.join(__dirname, '..', 'src', 'app', 'components', singularKebab);
+    const sourceComponentDir = path.join(__dirname, '..', 'src', 'components', 'person');
+    const targetComponentDir = path.join(__dirname, '..', 'src', 'components', singularKebab);
     copyDir(sourceComponentDir, targetComponentDir);
 
     replaceInDirectory(targetComponentDir, [
