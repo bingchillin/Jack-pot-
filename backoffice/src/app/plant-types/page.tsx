@@ -10,10 +10,16 @@ import {
 } from "@refinedev/antd";
 import { type BaseRecord } from "@refinedev/core";
 import { Space, Table, Tag, Drawer, Input, Typography } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
+import { 
+  EnvironmentOutlined, 
+  FieldTimeOutlined, 
+  SearchOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PlantTypeDetails } from "@components/plant-type/show";
+import { seasonColors } from "@/utils/api/enum";
 
 const { Text } = Typography;
 
@@ -76,15 +82,6 @@ export default function PlantTypeList() {
     }
   }, [searchParams, filteredData]);
 
-  const getRoleIcon = (roleTitle: string) => {
-    switch (roleTitle?.toLowerCase()) {
-      case 'admin':
-        return <CrownOutlined style={{ color: '#faad14' }} />;
-      default:
-        return <UserOutlined style={{ color: '#1890ff' }} />;
-    }
-  };
-
   const handleShow = (record: BaseRecord) => {
     setSelectedPlantType(record);
     setDrawerVisible(true);
@@ -105,6 +102,11 @@ export default function PlantTypeList() {
 
   const handleCreate = () => {
     router.push('/plant-types/create');
+  };
+
+  const getSeasonTag = (season: string) => {
+    const color = seasonColors[season as keyof typeof seasonColors] || 'default';
+    return <Tag color={color}>{season}</Tag>;
   };
 
   return (
@@ -138,27 +140,52 @@ export default function PlantTypeList() {
       >
         <Table {...tableProps} rowKey="idPlantType">
           <Table.Column dataIndex="idPlantType" title={"ID"} />
-          <Table.Column dataIndex="title" title={"Title"} />
-          <Table.Column dataIndex="scientist_name" title={"Scientist Name"} />
-          <Table.Column dataIndex={"family_name"} title={"Family Name"} />
-          <Table.Column
-            dataIndex="type_name"
-            title={"Type Name"}
-            render={(value) => (
-              <Tag color={value ? "success" : "error"} icon={value ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
-                {value ? "Yes" : "No"}
-              </Tag>
+          <Table.Column 
+            dataIndex="title" 
+            title={"Name"}
+          />
+          <Table.Column 
+            dataIndex="family_name" 
+            title={"Family"} 
+            render={(text) => (
+              <Text type="secondary" italic>{text}</Text>
             )}
           />
-          <Table.Column
-            dataIndex="role"
-            title={"Role"}
-            render={(value) => (
-              <Space>
-                {getRoleIcon(value?.title)}
-                <Tag color={value?.title?.toLowerCase() === 'admin' ? 'gold' : 'blue'}>
-                  {value?.title || '-'}
-                </Tag>
+          <Table.Column 
+            dataIndex="type_name" 
+            title={"Type"}
+          />
+          <Table.Column 
+            dataIndex="plantation_saison" 
+            title={"Growing Conditions"} 
+            render={(_, record: any) => (
+              <Space direction="horizontal" size="small">
+                {record.exposition_type && (
+                  <Tag color="blue" icon={<EnvironmentOutlined />}>
+                    {record.exposition_type}
+                  </Tag>
+                )}
+                {record.ground_type && (
+                  <Tag color="green" icon={<EnvironmentOutlined />}>
+                    {record.ground_type}
+                  </Tag>
+                )}
+                {record.plantation_saison && (
+                  <Tag color="orange" icon={<FieldTimeOutlined />}>
+                    {record.plantation_saison}
+                  </Tag>
+                )}
+              </Space>
+            )}
+          />
+          <Table.Column 
+            dataIndex="saison_first" 
+            title={"Growing Seasons"} 
+            render={(_, record: any) => (
+              <Space wrap>
+                {record.saison_first && getSeasonTag(record.saison_first)}
+                {record.saison_second && getSeasonTag(record.saison_second)}
+                {record.saison_third && getSeasonTag(record.saison_third)}
               </Space>
             )}
           />

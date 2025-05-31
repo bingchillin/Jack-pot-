@@ -1,22 +1,30 @@
 "use client";
 
-import { Create, useForm } from "@refinedev/antd";
+import { Edit, useForm } from "@refinedev/antd";
 import { Form, Input, InputNumber, Row, Col, Typography, Divider, Button, Space, Select } from "antd";
 import { useRouter } from "next/navigation";
 import { ExperimentOutlined, EnvironmentOutlined, FieldTimeOutlined, InfoCircleOutlined, BarsOutlined, RedoOutlined } from "@ant-design/icons";
 import React from "react";
+import { seasons, seasonColors } from "@/utils/api/enum";
 
 const { Text } = Typography;
 
-export default function PlantTypeCreate() {
+export default function PlantTypeEdit({ params }: { params: { id: string } }) {
     const router = useRouter();
     const { formProps, saveButtonProps } = useForm({
         resource: "plant-types",
-        action: "create",
+        action: "edit",
+        id: params.id,
     });
 
+    const seasonOptions = Object.entries(seasons).map(([key, value]) => ({
+        value,
+        label: value,
+        color: seasonColors[key as keyof typeof seasonColors]
+    }));
+
     return (
-        <Create
+        <Edit
             headerButtons={[
                 <Button
                     key="list"
@@ -128,12 +136,19 @@ export default function PlantTypeCreate() {
                         style={{ marginBottom: 16 }}
                     >
                         <Select
-                            options={[
-                                { value: 'Spring', label: 'Spring' },
-                                { value: 'Summer', label: 'Summer' },
-                                { value: 'Autumn', label: 'Autumn' },
-                                { value: 'Winter', label: 'Winter' },
-                            ]}
+                            options={seasonOptions}
+                            optionRender={(option) => (
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div style={{ 
+                                        width: 12, 
+                                        height: 12, 
+                                        borderRadius: '50%', 
+                                        backgroundColor: option.data.color,
+                                        marginRight: 8 
+                                    }} />
+                                    {option.label}
+                                </div>
+                            )}
                         />
                     </Form.Item>
                 </div>
@@ -153,12 +168,19 @@ export default function PlantTypeCreate() {
                                 style={{ marginBottom: 16 }}
                             >
                                 <Select
-                                    options={[
-                                        { value: 'Spring', label: 'Spring' },
-                                        { value: 'Summer', label: 'Summer' },
-                                        { value: 'Autumn', label: 'Autumn' },
-                                        { value: 'Winter', label: 'Winter' },
-                                    ]}
+                                    options={seasonOptions}
+                                    optionRender={(option) => (
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ 
+                                                width: 12, 
+                                                height: 12, 
+                                                borderRadius: '50%', 
+                                                backgroundColor: option.data.color,
+                                                marginRight: 8 
+                                            }} />
+                                            {option.label}
+                                        </div>
+                                    )}
                                 />
                             </Form.Item>
                         </Col>
@@ -169,12 +191,19 @@ export default function PlantTypeCreate() {
                                 style={{ marginBottom: 16 }}
                             >
                                 <Select
-                                    options={[
-                                        { value: 'Spring', label: 'Spring' },
-                                        { value: 'Summer', label: 'Summer' },
-                                        { value: 'Autumn', label: 'Autumn' },
-                                        { value: 'Winter', label: 'Winter' },
-                                    ]}
+                                    options={seasonOptions}
+                                    optionRender={(option) => (
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ 
+                                                width: 12, 
+                                                height: 12, 
+                                                borderRadius: '50%', 
+                                                backgroundColor: option.data.color,
+                                                marginRight: 8 
+                                            }} />
+                                            {option.label}
+                                        </div>
+                                    )}
                                 />
                             </Form.Item>
                         </Col>
@@ -185,12 +214,19 @@ export default function PlantTypeCreate() {
                                 style={{ marginBottom: 16 }}
                             >
                                 <Select
-                                    options={[
-                                        { value: 'Spring', label: 'Spring' },
-                                        { value: 'Summer', label: 'Summer' },
-                                        { value: 'Autumn', label: 'Autumn' },
-                                        { value: 'Winter', label: 'Winter' },
-                                    ]}
+                                    options={seasonOptions}
+                                    optionRender={(option) => (
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ 
+                                                width: 12, 
+                                                height: 12, 
+                                                borderRadius: '50%', 
+                                                backgroundColor: option.data.color,
+                                                marginRight: 8 
+                                            }} />
+                                            {option.label}
+                                        </div>
+                                    )}
                                 />
                             </Form.Item>
                         </Col>
@@ -372,6 +408,6 @@ export default function PlantTypeCreate() {
                     </Form.Item>
                 </div>
             </Form>
-        </Create>
+        </Edit>
     );
 } 
