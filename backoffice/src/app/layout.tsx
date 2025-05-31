@@ -68,6 +68,17 @@ export default function RootLayout({
                           icon: <AppstoreOutlined />,
                         },
                       },
+                      {
+                        name: "plants",
+                        list: "/plants",
+                        create: "/plants/create",
+                        edit: "/plants/edit/:id",
+                        show: "/plants/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <UserOutlined />,
+                        },
+                      },
                     ]}
                     options={{
                       syncWithLocation: true,
