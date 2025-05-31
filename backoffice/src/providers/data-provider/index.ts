@@ -13,10 +13,13 @@ export const customDataProvider: DataProvider = {
   ...dataProvider,
 
   getList: async ({ resource, pagination, filters, sorters }) => {
+    console.log("getList", resource, pagination, filters, sorters);
     const endpoint = getResourceEndpoint(resource);
+    console.log("endpoint", endpoint);
     const response = await fetch(`${API_URL}/${endpoint}`, {
       headers: getHeaders(),
     });
+    console.log(`${API_URL}/${endpoint}`);
 
     const data = await handleResponse(response, () => 
       customDataProvider.getList({ resource, pagination, filters, sorters })
