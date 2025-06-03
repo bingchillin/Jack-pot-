@@ -13,7 +13,21 @@ import "@refinedev/antd/dist/reset.css";
 import { AppIcon } from "@components/app-icon";
 import { ColorModeContextProvider } from "@contexts/color-mode";
 import { authProviderClient } from "@providers/auth-provider/auth-provider.client";
-import { UserOutlined, AppstoreOutlined, ExperimentOutlined, TeamOutlined, SafetyCertificateOutlined, EnvironmentOutlined } from "@ant-design/icons";
+import { 
+  DashboardOutlined, 
+  UserOutlined, 
+  TeamOutlined, 
+  ShopOutlined, 
+  ShoppingCartOutlined, 
+  GiftOutlined, 
+  FileTextOutlined, 
+  CalendarOutlined, 
+  SettingOutlined, 
+  AppstoreOutlined,
+  ToolOutlined,
+  TagsOutlined,
+  SafetyCertificateOutlined
+} from "@ant-design/icons";
 import { GiPlantRoots, GiPlantSeed, GiFlowerPot } from "react-icons/gi";
 
 export const metadata: Metadata = {
@@ -100,6 +114,30 @@ export default function RootLayout({
                         },
                       },
                       {
+                        name: "objects",
+                        list: "/objects",
+                        create: "/objects/create",
+                        edit: "/objects/edit/:id",
+                        show: "/objects/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <ToolOutlined />,
+                          parent: "plant-management",
+                        },
+                      },
+                      {
+                        name: "category-types",
+                        list: "/category-types",
+                        create: "/category-types/create",
+                        edit: "/category-types/edit/:id",
+                        show: "/category-types/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <TagsOutlined />,
+                          parent: "plant-management",
+                        },
+                      },
+                      {
                         name: "plants",
                         list: "/plants",
                         create: "/plants/create",
@@ -111,18 +149,7 @@ export default function RootLayout({
                           parent: "plant-management",
                         },
                       },
-                      {
-    name: "objects",
-    list: "/objects",
-    create: "/objects/create",
-    edit: "/objects/edit/:id",
-    show: "/objects/show/:id",
-    meta: {
-      canDelete: true,
-      icon: <UserOutlined />,
-    },
-  },
-]}
+                    ]}
                     options={{
                       syncWithLocation: true,
                       warnWhenUnsavedChanges: true,
