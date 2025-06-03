@@ -3,6 +3,7 @@ export const getResourceEndpoint = (resource: string): string => {
 
 
 
+
     persons: "person",
     "plant-types": "plant-type",
     "event-parties": "event-party",
@@ -11,6 +12,7 @@ export const getResourceEndpoint = (resource: string): string => {
     "plants": "plants",
     "roles": "role",
   "objects": "object",
+  "category-types": "category-type",
 };
 
   return resourceMappings[resource] || resource;
