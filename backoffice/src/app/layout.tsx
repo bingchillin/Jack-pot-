@@ -49,7 +49,7 @@ export default function RootLayout({
                     resources={[
                       {
                         name: "user-management",
-                        list: "/persons",
+                        // Remove the list property - this is just a parent group
                         meta: {
                           label: "User Management",
                           icon: <TeamOutlined />,
@@ -81,7 +81,7 @@ export default function RootLayout({
                       },
                       {
                         name: "plant-management",
-                        list: "/plant-types",
+                        // Remove the list property here too - this is just a parent group
                         meta: {
                           label: "Plant Management",
                           icon: <GiPlantRoots />,
@@ -111,7 +111,18 @@ export default function RootLayout({
                           parent: "plant-management",
                         },
                       },
-                    ]}
+                      {
+    name: "objects",
+    list: "/objects",
+    create: "/objects/create",
+    edit: "/objects/edit/:id",
+    show: "/objects/show/:id",
+    meta: {
+      canDelete: true,
+      icon: <UserOutlined />,
+    },
+  },
+]}
                     options={{
                       syncWithLocation: true,
                       warnWhenUnsavedChanges: true,

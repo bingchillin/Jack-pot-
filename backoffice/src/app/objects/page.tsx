@@ -10,22 +10,22 @@ import {
 } from "@refinedev/antd";
 import { type BaseRecord } from "@refinedev/core";
 import { Space, Table, Tag, Drawer, Input, Typography } from "antd";
-import { CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseCircleOutlined, PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { PlantDetails } from "@components/plant/show";
-import { CreatePlantModal } from "@components/plant/create";
+import { ObjectDetails } from "@components/object/show";
+import { CreateObjectModal } from "@components/object/create";
 
 const { Text } = Typography;
 
-export default function PlantList() {
+export default function ObjectList() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [selectedPlant, setSelectedPlant] = useState<BaseRecord | null>(null);
+  const [selectedObject, setSelectedObject] = useState<BaseRecord | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [searchName, setSearchName] = useState("");
+  const [searchTitle, setSearchTitle] = useState("");
 
   // Get all data without any server-side filtering
   const { tableProps: originalTableProps, tableQueryResult } = useTable({
@@ -36,14 +36,14 @@ export default function PlantList() {
   const filteredData = useMemo(() => {
     if (!originalTableProps?.dataSource) return [];
     
-    if (!searchName.trim()) {
+    if (!searchTitle.trim()) {
       return originalTableProps.dataSource;
     }
 
-    return originalTableProps.dataSource.filter((plant: any) => 
-      plant.name?.toLowerCase().includes(searchName.toLowerCase())
+    return originalTableProps.dataSource.filter((object: any) => 
+      object.title?.toLowerCase().includes(searchTitle.toLowerCase())
     );
-  }, [originalTableProps?.dataSource, searchName]);
+  }, [originalTableProps?.dataSource, searchTitle]);
 
   // Create modified tableProps with filtered data
   const tableProps = {
@@ -57,7 +57,7 @@ export default function PlantList() {
     footer: () => (
       <div style={{ textAlign: 'right', padding: '8px 0' }}>
         <Text type="secondary">
-          <span style={{ color: '#000000' }}>{filteredData.length}</span> {filteredData.length === 1 ? 'plant' : 'plants'} in total
+          <span style={{ color: '#000000' }}>{filteredData.length}</span> {filteredData.length === 1 ? 'object' : 'objects'} in total
         </Text>
       </div>
     ),
@@ -67,38 +67,29 @@ export default function PlantList() {
   useEffect(() => {
     const showId = searchParams.get('show');
     if (showId) {
-      const plant = filteredData.find(p => p.idPlant === parseInt(showId));
-      if (plant) {
-        setSelectedPlant(plant);
+      const object = filteredData.find(p => p.idObject === parseInt(showId));
+      if (object) {
+        setSelectedObject(object);
         setDrawerVisible(true);
       }
     } else {
       setDrawerVisible(false);
-      setSelectedPlant(null);
+      setSelectedObject(null);
     }
   }, [searchParams, filteredData]);
 
-  const getRoleIcon = (roleTitle: string) => {
-    switch (roleTitle?.toLowerCase()) {
-      case 'admin':
-        return <CrownOutlined style={{ color: '#faad14' }} />;
-      default:
-        return <UserOutlined style={{ color: '#1890ff' }} />;
-    }
-  };
-
   const handleShow = (record: BaseRecord) => {
-    setSelectedPlant(record);
+    setSelectedObject(record);
     setDrawerVisible(true);
     // Update URL with show parameter
     const params = new URLSearchParams(searchParams.toString());
-    params.set('show', record.idPlant.toString());
+    params.set('show', record.idObject.toString());
     router.push(`${pathname}?${params.toString()}`);
   };
 
   const handleClose = () => {
     setDrawerVisible(false);
-    setSelectedPlant(null);
+    setSelectedObject(null);
     // Remove show parameter from URL
     const params = new URLSearchParams(searchParams.toString());
     params.delete('show');
@@ -131,13 +122,13 @@ export default function PlantList() {
           }}
           onClick={handleCreate}
         >
-          Add new plant
+          Add new object
         </CreateButton>
         <Input
-          placeholder="Search by name"
+          placeholder="Search by title"
           prefix={<SearchOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />}
-          value={searchName}
-          onChange={(e) => setSearchName(e.target.value)}
+          value={searchTitle}
+          onChange={(e) => setSearchTitle(e.target.value)}
           style={{ width: 300 }}
           size="large"
           allowClear
@@ -148,21 +139,20 @@ export default function PlantList() {
         title={false}
         canCreate={false}
       >
-        <Table {...tableProps} rowKey="idPlant">
-          <Table.Column dataIndex="idPlant" title={"ID"} />
-          <Table.Column dataIndex="name" title={"Name"} />
-          <Table.Column dataIndex="plant_type" title={"Plant Type"} />
-          <Table.Column dataIndex="price" title={"Price"} />
-          <Table.Column dataIndex="category" title={"Category"} />
-          <Table.Column dataIndex="image" title={"Image"} />
+        <Table {...tableProps} rowKey="idObject">
+          <Table.Column dataIndex="idObject" title={"ID"} />
+          <Table.Column dataIndex="idObject" title={"Object ID"} />
+          <Table.Column dataIndex="idPerson" title={"Person ID"} />
+          <Table.Column dataIndex="title" title={"Title"} />
+          <Table.Column dataIndex="isReset" title={"Reset ?"} />
           <Table.Column
             title={"Actions"}
             dataIndex="actions"
             render={(_, record: BaseRecord) => (
               <Space>
-                <EditButton hideText size="small" recordItemId={record.idPlant} />
+                <EditButton hideText size="small" recordItemId={record.idObject} />
                 <ShowButton hideText size="small" onClick={() => handleShow(record)} />
-                <DeleteButton hideText size="small" recordItemId={record.idPlant} />
+                <DeleteButton hideText size="small" recordItemId={record.idObject} />
               </Space>
             )}
           />
@@ -170,7 +160,7 @@ export default function PlantList() {
       </List>
 
       <Drawer
-        title={`${selectedPlant?.name} details`}
+        title={`${selectedObject?.title} details`}
         placement="right"
         onClose={handleClose}
         open={drawerVisible}
@@ -181,10 +171,10 @@ export default function PlantList() {
           },
         }}
       >
-        {selectedPlant && <PlantDetails record={selectedPlant} />}
+        {selectedObject && <ObjectDetails record={selectedObject} />}
       </Drawer>
 
-      <CreatePlantModal
+      <CreateObjectModal
         visible={createModalVisible}
         onCancel={handleCreateCancel}
         onSuccess={handleCreateSuccess}
