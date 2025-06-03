@@ -41,12 +41,6 @@ export class Person {
     @Column({ nullable: true })
     verificationCodeExpires: Date;
 
-    @Column({ nullable: true })
-    passwordResetToken: string;
-
-    @Column({ nullable: true })
-    passwordResetExpires: Date;
-
     @Index()
     @Column({ length: 50, nullable: true, name: 'number_phone' })
     numberPhone: string;

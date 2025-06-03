@@ -1,5 +1,6 @@
-import { IsEmail, IsString, IsOptional, MinLength, IsBoolean, Matches } from 'class-validator';
+import { IsEmail, IsString, IsOptional, MinLength, IsBoolean, Matches, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CreatePersonDto {
     @ApiProperty({ 
@@ -52,6 +53,8 @@ export class CreatePersonDto {
     @IsOptional()
     numberPhone?: string;
 
+    @IsNumber()
+    @Transform(({ value }) => value ?? 2)
     @ApiProperty({ 
         example: 1, 
         description: 'Role ID (1: Admin, 2: User)',
