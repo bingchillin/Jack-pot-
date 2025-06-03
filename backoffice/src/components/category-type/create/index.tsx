@@ -45,7 +45,7 @@ export const CreateCategoryTypeModal: React.FC<CreateCategoryTypeModalProps> = (
           border: "none",
           boxShadow: "none",
         }}
-        bodyStyle={{ padding: "16px 24px" }}
+        styles={{ body: { padding: "16px 24px" } }}
       >
         <Form {...formProps} layout="vertical">
           <Col span={24}>

@@ -9,7 +9,7 @@ import {
   CreateButton,
 } from "@refinedev/antd";
 import { type BaseRecord } from "@refinedev/core";
-import { Space, Table, Tag, Drawer, Input, Typography } from "antd";
+import { Space, Table, Tag, Drawer, Input, Typography, Tooltip } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined, PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -35,12 +35,12 @@ export default function ObjectList() {
   // Client-side filtering of the data
   const filteredData = useMemo(() => {
     if (!originalTableProps?.dataSource) return [];
-    
+
     if (!searchTitle.trim()) {
       return originalTableProps.dataSource;
     }
 
-    return originalTableProps.dataSource.filter((object: any) => 
+    return originalTableProps.dataSource.filter((object: any) =>
       object.title?.toLowerCase().includes(searchTitle.toLowerCase())
     );
   }, [originalTableProps?.dataSource, searchTitle]);
@@ -140,11 +140,42 @@ export default function ObjectList() {
         canCreate={false}
       >
         <Table {...tableProps} rowKey="idObject">
-          <Table.Column dataIndex="idObject" title={"ID"} />
-          <Table.Column dataIndex="idObject" title={"Object ID"} />
-          <Table.Column dataIndex="idPerson" title={"Person ID"} />
-          <Table.Column dataIndex="title" title={"Title"} />
-          <Table.Column dataIndex="isReset" title={"Reset ?"} />
+          <Table.Column dataIndex="idObject" title="ID" />
+          <Table.Column
+            title="Category Type"
+            render={(_, record) => (
+              <Tooltip title={`Category Type ID: ${record.categoryType?.idCategoryType || 'N/A'}`}>
+                <span style={{ cursor: 'help' }}>{record.categoryType?.title || '-'}</span>
+              </Tooltip>
+            )}
+          />
+          <Table.Column
+            title="Person"
+            render={(_, record) => (
+              <Tooltip title={`Person ID: ${record.person?.idPerson || 'N/A'}`}>
+                <span style={{ cursor: 'help' }}>{record.person?.email || '-'}</span>
+              </Tooltip>
+            )}
+          />
+          <Table.Column dataIndex="title" title="Title" />
+          <Table.Column
+            dataIndex="is_reset"
+            title="Reset ?"
+            render={(value) => (
+              <Tag color={value ? "success" : "error"} icon={value ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
+                {value ? "Yes" : "No"}
+              </Tag>
+            )}
+          />
+          <Table.Column
+            dataIndex="preference_number"
+            title="Preference Number"
+            render={(value) => (
+              <Tag color={value ? "success" : "default"}>
+                {value ?? "Not specified"}
+              </Tag>
+            )}
+          />
           <Table.Column
             title={"Actions"}
             dataIndex="actions"
