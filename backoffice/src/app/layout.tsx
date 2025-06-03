@@ -13,7 +13,8 @@ import "@refinedev/antd/dist/reset.css";
 import { AppIcon } from "@components/app-icon";
 import { ColorModeContextProvider } from "@contexts/color-mode";
 import { authProviderClient } from "@providers/auth-provider/auth-provider.client";
-import { UserOutlined, AppstoreOutlined, ExperimentOutlined } from "@ant-design/icons";
+import { UserOutlined, AppstoreOutlined, ExperimentOutlined, TeamOutlined, SafetyCertificateOutlined, EnvironmentOutlined } from "@ant-design/icons";
+import { GiPlantRoots, GiPlantSeed, GiFlowerPot } from "react-icons/gi";
 
 export const metadata: Metadata = {
   title: "Refine",
@@ -47,6 +48,14 @@ export default function RootLayout({
                     authProvider={authProviderClient}
                     resources={[
                       {
+                        name: "user-management",
+                        list: "/persons",
+                        meta: {
+                          label: "User Management",
+                          icon: <TeamOutlined />,
+                        },
+                      },
+                      {
                         name: "persons",
                         list: "/persons",
                         create: "/persons/create",
@@ -55,6 +64,27 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           icon: <UserOutlined />,
+                          parent: "user-management",
+                        },
+                      },
+                      {
+                        name: "roles",
+                        list: "/roles",
+                        create: "/roles/create",
+                        edit: "/roles/edit/:id",
+                        show: "/roles/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <SafetyCertificateOutlined />,
+                          parent: "user-management",
+                        },
+                      },
+                      {
+                        name: "plant-management",
+                        list: "/plant-types",
+                        meta: {
+                          label: "Plant Management",
+                          icon: <GiPlantRoots />,
                         },
                       },
                       {
@@ -66,6 +96,7 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           icon: <AppstoreOutlined />,
+                          parent: "plant-management",
                         },
                       },
                       {
@@ -76,21 +107,11 @@ export default function RootLayout({
                         show: "/plants/show/:id",
                         meta: {
                           canDelete: true,
-                          icon: <UserOutlined />,
+                          icon: <GiFlowerPot />,
+                          parent: "plant-management",
                         },
                       },
-                      {
-    name: "roles",
-    list: "/roles",
-    create: "/roles/create",
-    edit: "/roles/edit/:id",
-    show: "/roles/show/:id",
-    meta: {
-      canDelete: true,
-      icon: <UserOutlined />,
-    },
-  },
-]}
+                    ]}
                     options={{
                       syncWithLocation: true,
                       warnWhenUnsavedChanges: true,
