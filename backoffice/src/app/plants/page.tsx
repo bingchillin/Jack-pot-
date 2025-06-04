@@ -9,12 +9,13 @@ import {
   CreateButton,
 } from "@refinedev/antd";
 import { type BaseRecord } from "@refinedev/core";
-import { Space, Table, Tag, Drawer, Input, Typography } from "antd";
-import { CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
+import { Space, Table, Tag, Drawer, Input, Typography, Tooltip } from "antd";
+import { CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PlantDetails } from "@components/plant/show";
 import { CreatePlantModal } from "@components/plant/create";
+import { getHoverableProps } from "@styles/common";
 
 const { Text } = Typography;
 
@@ -150,11 +151,34 @@ export default function PlantList() {
       >
         <Table {...tableProps} rowKey="idPlant">
           <Table.Column dataIndex="idPlant" title={"ID"} />
+          <Table.Column
+            title="Object"
+            render={(_, record) => (
+              <Tooltip title={`Object ID: ${record.object?.idObject || 'N/A'}`}>
+                <span {...getHoverableProps()}>{record.object?.title || '-'}</span>
+              </Tooltip>
+            )}
+          />
+          <Table.Column
+            title="Person"
+            render={(_, record) => (
+              <Tooltip title={`Person ID: ${record.person?.idPerson || 'N/A'}`}>
+                <span {...getHoverableProps()}>{record.person?.email || '-'}</span>
+              </Tooltip>
+            )}
+          />
           <Table.Column dataIndex="name" title={"Name"} />
-          <Table.Column dataIndex="plant_type" title={"Plant Type"} />
-          <Table.Column dataIndex="price" title={"Price"} />
           <Table.Column dataIndex="category" title={"Category"} />
-          <Table.Column dataIndex="image" title={"Image"} />
+          <Table.Column dataIndex="price" title={"Price"} render={(value) => <span>{value} €</span>} />
+          <Table.Column
+            dataIndex="isAvailable"
+            title="Is Available ?"
+            render={(value) => (
+              <Tag color={value ? "success" : "error"} icon={value ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
+                {value ? "Yes" : "No"}
+              </Tag>
+            )}
+          />
           <Table.Column
             title={"Actions"}
             dataIndex="actions"

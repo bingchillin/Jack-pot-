@@ -38,7 +38,7 @@ export default function ObjectEdit({ params }: { params: { id: string } }) {
       <Form {...formProps} layout="vertical">
         {/* Read-only Information Section */}
         <Row gutter={16}>
-          <Col span={6}>
+          <Col span={8}>
             <div style={{ marginBottom: 16 }}>
               <Text type="secondary" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
                 <IdcardOutlined /> ID
@@ -46,7 +46,7 @@ export default function ObjectEdit({ params }: { params: { id: string } }) {
               <div>{object?.idObject}</div>
             </div>
           </Col>
-          <Col span={6}>
+          <Col span={8}>
             <div style={{ marginBottom: 16 }}>
               <Text type="secondary" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
                 <ClockCircleOutlined style={{ color: '#52c41a' }} /> Created
@@ -56,7 +56,7 @@ export default function ObjectEdit({ params }: { params: { id: string } }) {
               </Tag>
             </div>
           </Col>
-          <Col span={6}>
+          <Col span={8}>
             <Text type="secondary" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
               <ClockCircleOutlined style={{ color: '#faad14' }} /> Updated
             </Text>

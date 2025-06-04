@@ -19,14 +19,50 @@ export class PlantService {
 
     async findAll(): Promise<Plant[]> {
         return await this.plantRepository.find({
-            relations: ['person']
+            relations: ['object','person'],
+            select: {
+                idPlant: true,
+                name: true,
+                category: true,
+                description: true,
+                price: true,
+                isAvailable: true,
+                createdAt: true,
+                updatedAt: true,
+                person: {
+                    idPerson: true,
+                    email: true,
+                },
+                object: {
+                    idObject: true,
+                    title: true,
+                }
+            }
         });
     }
 
     async findOne(id: number): Promise<Plant> {
         const plant = await this.plantRepository.findOne({ 
             where: { idPlant: id },
-            relations: ['person']
+            relations: ['object','person'],
+            select: {
+                idPlant: true,
+                name: true,
+                category: true,
+                description: true,
+                price: true,
+                isAvailable: true,
+                createdAt: true,
+                updatedAt: true,
+                person: {
+                    idPerson: true,
+                    email: true,
+                },
+                object: {
+                    idObject: true,
+                    title: true,
+                }
+            }
         });
         if (!plant) {
             throw new NotFoundException(`Plant with ID ${id} not found`);
@@ -48,7 +84,25 @@ export class PlantService {
     async findByPersonId(personId: number): Promise<Plant[]> {
         return await this.plantRepository.find({
             where: { person: { idPerson: personId } },
-            relations: ['person']
+            relations: ['object','person'],
+            select: {
+                idPlant: true,
+                name: true,
+                category: true,
+                description: true,
+                price: true,
+                isAvailable: true,
+                createdAt: true,
+                updatedAt: true,
+                person: {
+                    idPerson: true,
+                    email: true,
+                },
+                object: {
+                    idObject: true,
+                    title: true,
+                }
+            }
         });
     }
 } 
