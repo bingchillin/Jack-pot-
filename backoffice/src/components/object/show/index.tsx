@@ -8,6 +8,7 @@ import { showDetailsStyles } from "@/styles/show-details";
 import { GiPlantWatering } from "react-icons/gi";
 import { CiTextAlignCenter } from "react-icons/ci";
 import { MdNumbers } from "react-icons/md";
+import { getHoverableProps } from "@/styles/common";
 
 interface ObjectDetailsProps {
   record: BaseRecord;
@@ -26,13 +27,13 @@ export const ObjectDetails: React.FC<ObjectDetailsProps> = ({ record }) => {
 
         <DetailRow icon={<TagsOutlined />} label="Category Type">
           <Tooltip title={`Category Type ID: ${record.categoryType?.idCategoryType || 'N/A'}`}>
-            <span style={{ cursor: 'help' }}>{record.categoryType?.title || '-'}</span>
+            <span {...getHoverableProps()}>{record.categoryType?.title || '-'}</span>
           </Tooltip>
         </DetailRow>
 
         <DetailRow icon={<UserOutlined />} label="Person">
           <Tooltip title={`Person ID: ${record.person?.idPerson || 'N/A'}`}>
-            <span style={{ cursor: 'help' }}>{record.person?.email || '-'}</span>
+            <span {...getHoverableProps()}>{record.person?.email || '-'}</span>
           </Tooltip>
         </DetailRow>
 

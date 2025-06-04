@@ -15,6 +15,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { ObjectDetails } from "@components/object/show";
 import { CreateObjectModal } from "@components/object/create";
+import { getHoverableProps } from "@styles/common";
 
 const { Text } = Typography;
 
@@ -145,7 +146,7 @@ export default function ObjectList() {
             title="Category Type"
             render={(_, record) => (
               <Tooltip title={`Category Type ID: ${record.categoryType?.idCategoryType || 'N/A'}`}>
-                <span style={{ cursor: 'help' }}>{record.categoryType?.title || '-'}</span>
+                <span {...getHoverableProps()}>{record.categoryType?.title || '-'}</span>
               </Tooltip>
             )}
           />
@@ -153,7 +154,7 @@ export default function ObjectList() {
             title="Person"
             render={(_, record) => (
               <Tooltip title={`Person ID: ${record.person?.idPerson || 'N/A'}`}>
-                <span style={{ cursor: 'help' }}>{record.person?.email || '-'}</span>
+                <span {...getHoverableProps()}>{record.person?.email || '-'}</span>
               </Tooltip>
             )}
           />

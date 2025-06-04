@@ -1,11 +1,15 @@
 import { DateField } from "@refinedev/antd";
 import { type BaseRecord } from "@refinedev/core";
-import { Space, Tag, Typography, Button, message } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, UserOutlined, MailOutlined, PhoneOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { Col, Row, Tag, Tooltip, message } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined, UserOutlined, ClockCircleOutlined, IdcardOutlined } from "@ant-design/icons";
 import React from "react";
-import { authApi } from "@utils/api/auth";
 import { DetailRow } from "@/components/common/DetailRow";
 import { showDetailsStyles } from "@/styles/show-details";
+import { GiPlantWatering } from "react-icons/gi";
+import { CiTextAlignCenter } from "react-icons/ci";
+import { MdEuro, MdOutlineEventAvailable } from "react-icons/md";
+import { TbCategory } from "react-icons/tb";
+import { getHoverableProps } from "@/styles/common";
 
 interface PlantDetailsProps {
   record: BaseRecord;
@@ -13,24 +17,6 @@ interface PlantDetailsProps {
 
 export const PlantDetails: React.FC<PlantDetailsProps> = ({ record }) => {
   const [messageApi, contextHolder] = message.useMessage();
-
-  const handleResendVerification = async (email: string) => {
-    try {
-      await authApi.resendVerification(email);
-      messageApi.success('Verification email sent successfully');
-    } catch (error) {
-      messageApi.error(error instanceof Error ? error.message : 'Failed to send verification email');
-    }
-  };
-
-  const getRoleIcon = (roleTitle: string) => {
-    switch (roleTitle?.toLowerCase()) {
-      case 'admin':
-        return <CrownOutlined style={{ color: '#faad14' }} />;
-      default:
-        return <UserOutlined style={{ color: '#1890ff' }} />;
-    }
-  };
 
   return (
     <>
@@ -40,48 +26,49 @@ export const PlantDetails: React.FC<PlantDetailsProps> = ({ record }) => {
           {record.idPlant}
         </DetailRow>
 
-        <DetailRow icon={<MailOutlined />} label="Email">
-          {record.email}
+        <DetailRow icon={<GiPlantWatering />} label="Name">
+          {record.name}
         </DetailRow>
 
-        <DetailRow icon={<UserOutlined />} label="Firstname">
-          {record.firstname}
+        <DetailRow icon={<TbCategory />} label="Category">
+          {record.category}
         </DetailRow>
 
-        <DetailRow icon={<UserOutlined />} label="Surname">
-          {record.surname}
+        <DetailRow icon={<MdEuro />} label="Price">
+          {record.price} €
         </DetailRow>
 
-        <DetailRow icon={<PhoneOutlined />} label="Phone Number">
-          {record.numberPhone || '-'}
+        <DetailRow icon={<CiTextAlignCenter />} label="Description">
+          {record.description || '-'}
         </DetailRow>
 
-        <DetailRow icon={<MailOutlined />} label="Email Verification">
-          <Space>
-            <Tag color={record.isEmailVerified ? "success" : "error"} icon={record.isEmailVerified ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
-              {record.isEmailVerified ? "Verified" : "Not Verified"}
-            </Tag>
-            {!record.isEmailVerified && (
-              <Button
-                type="link"
-                icon={<MailOutlined />}
-                onClick={() => handleResendVerification(record.email)}
-                size="small"
-              >
-                Resend
-              </Button>
-            )}
-          </Space>
+        <DetailRow icon={<MdOutlineEventAvailable />} label="Is Available">
+          <Tag color={record.isAvailable ? "success" : "error"} icon={record.isAvailable ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
+            {record.isAvailable ? "Yes" : "No"}
+          </Tag>
         </DetailRow>
 
-        <DetailRow icon={<UserOutlined />} label="Role">
-          <Space>
-            {getRoleIcon(record.role?.title)}
-            <Tag color={record.role?.title?.toLowerCase() === 'admin' ? 'gold' : 'blue'}>
-              {record.role?.title || 'User'}
-            </Tag>
-          </Space>
-        </DetailRow>
+        <Row>
+          <Col span={12}>
+            <DetailRow icon={<IdcardOutlined />} label="Object">
+              <Tooltip title={`Object ID: ${record.object?.idObject || 'N/A'}`}>
+                <span {...getHoverableProps()}>
+                  {record.object?.title || '-'}
+                </span>
+              </Tooltip>
+            </DetailRow>
+          </Col>
+          <Col span={12}>
+            <DetailRow icon={<UserOutlined />} label="Person">
+              <Tooltip title={`Person ID: ${record.person?.idPerson || 'N/A'}`}>
+                <span {...getHoverableProps()}>
+                  {record.person?.email || '-'}
+                </span>
+              </Tooltip>
+            </DetailRow>
+          </Col>
+        </Row>
+          
 
         <DetailRow icon={<ClockCircleOutlined />} label="Created At">
           <Tag color="success" style={{ margin: 0 }}>
