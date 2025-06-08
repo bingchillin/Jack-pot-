@@ -19,14 +19,46 @@ export class ObjectProfileService {
 
     findAll() {
         return this.objectProfileRepository.find({
-            relations: ['object', 'plantType']
+            relations: ['object', 'plantType'],
+            select: {
+                idObjectProfile: true,
+                title: true,
+                description: true,
+                advise: true,
+                createdAt: true,
+                updatedAt: true,
+                object: {
+                    idObject: true,
+                    title: true,
+                },
+                plantType: {
+                    idPlantType: true,
+                    title: true,
+                }
+            }
         });
     }
 
     async findOne(id: number) {
         const objectProfile = await this.objectProfileRepository.findOne({
             where: { idObjectProfile: id },
-            relations: ['object', 'plantType']
+            relations: ['object', 'plantType'],
+            select: {
+                idObjectProfile: true,
+                title: true,
+                description: true,
+                advise: true,
+                createdAt: true,
+                updatedAt: true,
+                object: {
+                    idObject: true,
+                    title: true,
+                },
+                plantType: {
+                    idPlantType: true,
+                    title: true,
+                }
+            }
         });
 
         if (!objectProfile) {
@@ -39,7 +71,19 @@ export class ObjectProfileService {
     async findByTitle(title: string) {
         const objectProfile = await this.objectProfileRepository.findOne({
             where: { title },
-            relations: ['object', 'plantType']
+            relations: ['object', 'plantType'],
+            select: {
+                idObjectProfile: true,
+                title: true,
+                description: true,
+                advise: true,
+                createdAt: true,
+                updatedAt: true,
+                object: {
+                    idObject: true,
+                    title: true,
+                },
+            }
         });
 
         if (!objectProfile) {
@@ -52,7 +96,23 @@ export class ObjectProfileService {
     async findByObject(idObject: number) {
         const objectProfiles = await this.objectProfileRepository.find({
             where: { idObject },
-            relations: ['object', 'plantType']
+            relations: ['object', 'plantType'],
+            select: {
+                idObjectProfile: true,
+                title: true,
+                description: true,
+                advise: true,
+                createdAt: true,
+                updatedAt: true,
+                object: {
+                    idObject: true,
+                    title: true,
+                },
+                plantType: {
+                    idPlantType: true,
+                    title: true,
+                }
+            }
         });
 
         if (!objectProfiles.length) {
@@ -65,7 +125,23 @@ export class ObjectProfileService {
     async findByPlantType(idPlantType: number) {
         const objectProfiles = await this.objectProfileRepository.find({
             where: { idPlantType },
-            relations: ['object', 'plantType']
+            relations: ['object', 'plantType'],
+            select: {
+                idObjectProfile: true,
+                title: true,
+                description: true,
+                advise: true,
+                createdAt: true,
+                updatedAt: true,
+                object: {
+                    idObject: true,
+                    title: true,
+                },
+                plantType: {
+                    idPlantType: true,
+                    title: true,
+                }
+            }
         });
 
         if (!objectProfiles.length) {

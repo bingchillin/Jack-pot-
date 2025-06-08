@@ -13,16 +13,16 @@ import "@refinedev/antd/dist/reset.css";
 import { AppIcon } from "@components/app-icon";
 import { ColorModeContextProvider } from "@contexts/color-mode";
 import { authProviderClient } from "@providers/auth-provider/auth-provider.client";
-import { 
-  DashboardOutlined, 
-  UserOutlined, 
-  TeamOutlined, 
-  ShopOutlined, 
-  ShoppingCartOutlined, 
-  GiftOutlined, 
-  FileTextOutlined, 
-  CalendarOutlined, 
-  SettingOutlined, 
+import {
+  DashboardOutlined,
+  UserOutlined,
+  TeamOutlined,
+  ShopOutlined,
+  ShoppingCartOutlined,
+  GiftOutlined,
+  FileTextOutlined,
+  CalendarOutlined,
+  SettingOutlined,
   AppstoreOutlined,
   ToolOutlined,
   TagsOutlined,
@@ -94,6 +94,14 @@ export default function RootLayout({
                         },
                       },
                       {
+                        name: "object-management",
+                        // Remove the list property here too - this is just a parent group
+                        meta: {
+                          label: "Object Management",
+                          icon: <ToolOutlined />,
+                        },
+                      },
+                      {
                         name: "plant-management",
                         // Remove the list property here too - this is just a parent group
                         meta: {
@@ -122,7 +130,7 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           icon: <ToolOutlined />,
-                          parent: "plant-management",
+                          parent: "object-management",
                         },
                       },
                       {
@@ -134,7 +142,7 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           icon: <TagsOutlined />,
-                          parent: "plant-management",
+                          parent: "object-management",
                         },
                       },
                       {
@@ -147,6 +155,18 @@ export default function RootLayout({
                           canDelete: true,
                           icon: <GiFlowerPot />,
                           parent: "plant-management",
+                        },
+                      },
+                      {
+                        name: "object-profiles",
+                        list: "/object-profiles",
+                        create: "/object-profiles/create",
+                        edit: "/object-profiles/edit/:id",
+                        show: "/object-profiles/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <UserOutlined />,
+                          parent: "object-management",
                         },
                       },
                     ]}
