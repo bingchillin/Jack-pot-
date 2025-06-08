@@ -7,7 +7,7 @@ import { UpdatePersonDto } from './dto/update-person.dto';
 import { CreatePersonResponseDto } from './dto/create-person-response.dto';
 import * as bcrypt from 'bcrypt';
 import { RoleService } from '../role/role.service';
-import { MoreThan } from 'typeorm';
+import { ObjectEntity } from 'src/object/entities/object.entity';
 
 @Injectable()
 export class PersonService {
@@ -64,7 +64,7 @@ export class PersonService {
     async findOne(id: number): Promise<Person> {
         const person = await this.personRepository.findOne({
             where: { idPerson: id },
-            relations: ['role']
+            relations: ['role', 'objects']
         });
 
         if (!person) {
@@ -97,6 +97,15 @@ export class PersonService {
 
         Object.assign(person, updatePersonDto);
         return await this.personRepository.save(person);
+    }
+
+    async findObjectsByPersonId(id: number): Promise<ObjectEntity[]> {
+        const person = await this.personRepository.findOne({
+            where: { idPerson: id },
+            relations: ['objects']
+        });
+
+        return person.objects;
     }
 
     async remove(id: number): Promise<void> {

@@ -139,6 +139,12 @@ export class ApiController {
     return this.personService.findOne(+id);
   }
 
+  @Get('/person/:id/objects')
+  //@PersonDocs.findObjectsByPersonId()
+  findObjectsByPersonId(@Param('id') id: string) {
+    return this.personService.findObjectsByPersonId(+id);
+  }
+
   @Patch('/person/:id')
   @PersonDocs.update()
   updatePerson(@Param('id') id: string, @Body() dto: UpdatePersonDto) {
