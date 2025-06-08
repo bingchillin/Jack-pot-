@@ -8,11 +8,17 @@ import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailerService } from '../mailer/mailer.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
     private readonly RESET_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
     private readonly VERIFICATION_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
+    private readonly RESET_TOKEN_EXPIRY = '10m'; // 10 minutes
+    private readonly logger = new Logger(AuthService.name);
+
+    // Store invalidated tokens
+    private invalidatedTokens: Set<string> = new Set();
 
     constructor(
         private readonly personService: PersonService,
@@ -210,11 +216,21 @@ export class AuthService {
     }
 
     private generateResetToken(email: string): string {
+        // Generate a random component
+        const randomComponent = crypto.randomBytes(32).toString('hex');
+        const timestamp = Date.now();
+
         return this.jwtService.sign(
-            { email, type: 'reset' },
+            { 
+                email, 
+                type: 'reset',
+                random: randomComponent,
+                timestamp,
+                jti: crypto.randomBytes(16).toString('hex') // Unique token ID
+            },
             { 
                 secret: process.env.JWT_SECRET,
-                expiresIn: '10m' // 10 minutes
+                expiresIn: this.RESET_TOKEN_EXPIRY
             }
         );
     }
@@ -235,7 +251,9 @@ export class AuthService {
             // Store the reset code and expiry
             await this.personService.update(person.idPerson, {
                 verificationCode: resetCode,
-                verificationCodeExpires: resetCodeExpires
+                verificationCodeExpires: resetCodeExpires,
+                // Add a reset token version to invalidate old tokens
+                resetTokenVersion: (person.resetTokenVersion || 0) + 1
             });
 
             // Send the reset email
@@ -243,6 +261,7 @@ export class AuthService {
             
             return { message: 'Si cet email existe, un code vous a été envoyé.' };
         } catch (error) {
+            this.logger.error(`Failed to process password reset request: ${error.message}`);
             throw new BadRequestException('Failed to process password reset request');
         }
     }
@@ -266,14 +285,37 @@ export class AuthService {
             throw new BadRequestException('Code invalide ou expiré');
         }
 
-        // Generate reset token
-        const resetToken = this.generateResetToken(person.email);
+        // Generate a new token with version included
+        const tokenPayload = {
+            email: person.email,
+            type: 'reset',
+            random: crypto.randomBytes(32).toString('hex'),
+            timestamp: Date.now(),
+            jti: crypto.randomBytes(16).toString('hex'),
+            version: person.resetTokenVersion || 0
+        };
 
-        return { resetToken };
+        const finalToken = this.jwtService.sign(tokenPayload, {
+            secret: process.env.JWT_SECRET,
+            expiresIn: this.RESET_TOKEN_EXPIRY
+        });
+
+        // Clear the verification code after successful use
+        await this.personService.update(person.idPerson, {
+            verificationCode: null,
+            verificationCodeExpires: null
+        });
+
+        return { resetToken: finalToken };
     }
 
     async resetPassword(resetPasswordDto: ResetPasswordDto, resetToken: string) {
         try {
+            // Check if token was invalidated
+            if (this.invalidatedTokens.has(resetToken)) {
+                throw new UnauthorizedException('Reset token has been invalidated');
+            }
+
             // Verify the reset token
             const payload = await this.jwtService.verify(resetToken);
             
@@ -286,15 +328,26 @@ export class AuthService {
                 throw new UnauthorizedException('Invalid reset token');
             }
 
-            // Hash the new password
-            const hashedPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);
+            // Verify token version matches current version
+            if (payload.version !== person.resetTokenVersion) {
+                throw new UnauthorizedException('Reset token has been invalidated');
+            }
 
             // Update password and clear reset code
             await this.personService.update(person.idPerson, {
-                password: hashedPassword,
+                password: resetPasswordDto.newPassword,
                 verificationCode: null,
                 verificationCodeExpires: null
             });
+
+            // Invalidate the used token
+            this.invalidatedTokens.add(resetToken);
+
+            // Clean up old invalidated tokens (keep last 1000)
+            if (this.invalidatedTokens.size > 1000) {
+                const tokensArray = Array.from(this.invalidatedTokens);
+                this.invalidatedTokens = new Set(tokensArray.slice(-1000));
+            }
 
             return { message: 'Password reset successfully' };
         } catch (error) {
@@ -304,6 +357,7 @@ export class AuthService {
             if (error instanceof UnauthorizedException) {
                 throw error;
             }
+            this.logger.error(`Failed to reset password: ${error.message}`);
             throw new BadRequestException('Failed to reset password');
         }
     }
