@@ -4,11 +4,13 @@ import { PersonService } from './person.service';
 import { PersonController } from './person.controller';
 import { Person } from './entities/person.entity';
 import { RoleModule } from '../role/role.module';
+import { ObjectProfileModule } from '../object-profile/object-profile.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Person]),
-        RoleModule
+        RoleModule,
+        ObjectProfileModule
     ],
     controllers: [PersonController],
     providers: [PersonService],
