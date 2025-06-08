@@ -8,13 +8,15 @@ import { CreatePersonResponseDto } from './dto/create-person-response.dto';
 import * as bcrypt from 'bcrypt';
 import { RoleService } from '../role/role.service';
 import { ObjectEntity } from 'src/object/entities/object.entity';
+import { ObjectProfileService } from 'src/object-profile/object-profile.service';
 
 @Injectable()
 export class PersonService {
     constructor(
         @InjectRepository(Person)
         private personRepository: Repository<Person>,
-        private roleService: RoleService
+        private roleService: RoleService,
+        private objectProfileService: ObjectProfileService
     ) {}
 
     async create(createPersonDto: CreatePersonDto): Promise<CreatePersonResponseDto> {
@@ -105,7 +107,27 @@ export class PersonService {
             relations: ['objects']
         });
 
-        return person.objects;
+        if (!person) {
+            throw new NotFoundException(`Person with ID ${id} not found`);
+        }
+
+        // Get all objects for the person
+        const objects = person.objects;
+
+        // For each object, get its profiles
+        const objectsWithProfiles = await Promise.all(
+            objects.map(async (object) => {
+                const profiles = await this.objectProfileService.findByObject(object.idObject);
+                // Transform profiles to remove the object field
+                const transformedProfiles = profiles.map(({ object: _, ...profile }) => profile);
+                return {
+                    ...object,
+                    profiles: transformedProfiles
+                };
+            })
+        );
+
+        return objectsWithProfiles;
     }
 
     async remove(id: number): Promise<void> {
