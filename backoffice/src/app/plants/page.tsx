@@ -151,6 +151,7 @@ export default function PlantList() {
       >
         <Table {...tableProps} rowKey="idPlant">
           <Table.Column dataIndex="idPlant" title={"ID"} />
+          <Table.Column dataIndex="name" title={"Name"} />
           <Table.Column
             title="Object"
             render={(_, record) => (
@@ -167,7 +168,6 @@ export default function PlantList() {
               </Tooltip>
             )}
           />
-          <Table.Column dataIndex="name" title={"Name"} />
           <Table.Column dataIndex="category" title={"Category"} />
           <Table.Column dataIndex="price" title={"Price"} render={(value) => <span>{value} €</span>} />
           <Table.Column
