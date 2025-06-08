@@ -112,15 +112,15 @@ export const CreatePlantModal: React.FC<CreatePlantModalProps> = ({
           </Form.Item>
 
           <Row gutter={16}>
-          <Col span={12}>
+            <Col span={12}>
               <Form.Item
                 label={"Object"}
                 name={["idObject"]}
                 rules={[{ required: true, message: "Please select a object" }]}
                 style={{ marginBottom: 16 }}
               >
-                <Select 
-                  size="large" 
+                <Select
+                  size="large"
                   {...objectSelectProps}
                   placeholder="Select a object"
                   showSearch
@@ -145,8 +145,8 @@ export const CreatePlantModal: React.FC<CreatePlantModalProps> = ({
                 rules={[{ required: true, message: "Please select a person" }]}
                 style={{ marginBottom: 16 }}
               >
-                <Select 
-                  size="large" 
+                <Select
+                  size="large"
                   {...personSelectProps}
                   placeholder="Select a person"
                   showSearch

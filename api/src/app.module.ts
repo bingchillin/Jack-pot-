@@ -83,7 +83,7 @@ import { MailerModule } from './mailer/mailer.module';
             Relationship,
             PlantType
           ],
-          synchronize: process.env.NODE_ENV !== 'production',
+          synchronize: false,
           autoLoadEntities: true,
         };
         console.log('Database Configuration:', {

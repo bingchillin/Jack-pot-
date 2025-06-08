@@ -94,6 +94,18 @@ export default function RootLayout({
                         },
                       },
                       {
+                        name: "parameter-types",
+                        list: "/parameter-types",
+                        create: "/parameter-types/create",
+                        edit: "/parameter-types/edit/:id",
+                        show: "/parameter-types/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <TagsOutlined />,
+                          parent: "user-management",
+                        },
+                      },
+                      {
                         name: "object-management",
                         // Remove the list property here too - this is just a parent group
                         meta: {
