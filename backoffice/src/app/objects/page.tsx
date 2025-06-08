@@ -142,6 +142,7 @@ export default function ObjectList() {
       >
         <Table {...tableProps} rowKey="idObject">
           <Table.Column dataIndex="idObject" title="ID" />
+          <Table.Column dataIndex="title" title="Title" />
           <Table.Column
             title="Category Type"
             render={(_, record) => (
@@ -158,7 +159,6 @@ export default function ObjectList() {
               </Tooltip>
             )}
           />
-          <Table.Column dataIndex="title" title="Title" />
           <Table.Column
             dataIndex="is_reset"
             title="Reset ?"
