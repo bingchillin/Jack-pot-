@@ -4,39 +4,39 @@ import { ObjectEntity } from '../../object/entities/object.entity';
 
 @Entity('notification')
 export class Notification {
-    @PrimaryGeneratedColumn({ name: 'id_notification' })
-    idNotification: number;
+  @PrimaryGeneratedColumn({ name: 'id_notification' })
+  idNotification: number;
 
-    @Column({ length: 250, nullable: true })
-    title: string;
+  @Column({ length: 250, nullable: true })
+  title: string;
 
-    @Column({ length: 1000, nullable: true })
-    description: string;
+  @Column({ length: 1000, nullable: true })
+  description: string;
 
-    @Column({ length: 5000, nullable: true })
-    advise: string;
+  @Column({ name: 'id_object', nullable: true })
+  idObject: number;
 
-    @Column({ name: 'id_person', nullable: true })
-    idPerson: number;
+  @ManyToOne(() => ObjectEntity, object => object.notifications, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'id_object' })
+  object: ObjectEntity;
 
-    @ManyToOne(() => Person, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'id_person' })
-    person: Person;
+  @Column({ name: 'id_person', nullable: true })
+  idPerson: number;
 
-    @Column({ name: 'id_object', nullable: true })
-    idObject: number;
+  @ManyToOne(() => Person, person => person.notifications, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_person' })
+  person: Person;
 
-    @ManyToOne(() => ObjectEntity, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'id_object' })
-    object: ObjectEntity;
+  @Column({ length: 5000, nullable: true })
+  advise: string;
 
-    @Index()
-    @Column({ default: false })
-    isRead: boolean;
+  @Column({ name: 'isRead', default: false })
+  @Index()
+  isRead: boolean;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
-} 
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

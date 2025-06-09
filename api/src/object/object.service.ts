@@ -19,15 +19,15 @@ export class ObjectService {
 
     findAll() {
         return this.objectRepository.find({
-            relations: ['categoryType', 'person'],
+            relations: ['categoryType'],
             select: {
                 idObject: true,
                 title: true,
                 description: true,
                 advise: true,
                 idCategoryType: true,
-                preference_number: true,
-                is_reset: true,
+                preferenceNumber: true,
+                isReset: true,
                 createdAt: true,
                 updatedAt: true,
 
@@ -36,13 +36,6 @@ export class ObjectService {
                     title: true,
                     description: true,
                     advise: true
-                },
-                person: {
-                    idPerson: true,
-                    email: true,
-                    firstname: true,
-                    surname: true,
-                    idRole: true,
                 }
             }
         });
@@ -51,15 +44,15 @@ export class ObjectService {
     async findOne(id: number) {
         const object = await this.objectRepository.findOne({
             where: { idObject: id },
-            relations: ['categoryType', 'person'],
+            relations: ['categoryType'],
             select: {
                 idObject: true,
                 title: true,
                 description: true,
                 advise: true,
                 idCategoryType: true,
-                preference_number: true,
-                is_reset: true,
+                preferenceNumber: true,
+                isReset: true,
                 createdAt: true,
                 updatedAt: true,
                 
@@ -68,13 +61,6 @@ export class ObjectService {
                     title: true,
                     description: true,
                     advise: true
-                },
-                person: {
-                    idPerson: true,
-                    email: true,
-                    firstname: true,
-                    surname: true,
-                    idRole: true,
                 }
             }
         });
@@ -89,15 +75,15 @@ export class ObjectService {
     async findByTitle(title: string) {
         const object = await this.objectRepository.findOne({
             where: { title },
-            relations: ['categoryType', 'person'],
+            relations: ['categoryType'],
             select: {
                 idObject: true,
                 title: true,
                 description: true,
                 advise: true,
                 idCategoryType: true,
-                preference_number: true,
-                is_reset: true,
+                preferenceNumber: true,
+                isReset: true,
                 createdAt: true,
                 updatedAt: true,
 
@@ -106,13 +92,6 @@ export class ObjectService {
                     title: true,
                     description: true,
                     advise: true
-                },
-                person: {
-                    idPerson: true,
-                    email: true,
-                    firstname: true,
-                    surname: true,
-                    idRole: true,
                 }
             }
         });

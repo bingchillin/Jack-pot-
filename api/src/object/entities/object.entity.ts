@@ -1,42 +1,53 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany, Index } from 'typeorm';
 import { CategoryType } from '../../category-type/entities/category-type.entity';
-import { Person } from '../../person/entities/person.entity';
 import { ObjectProfile } from '../../object-profile/entities/object-profile.entity';
-import { Plant } from '../../plant/entities/plant.entity';
 import { EventParty } from '../../event-party/entities/event-party.entity';
 import { Composant } from '../../composant/entities/composant.entity';
+import { Notification } from '../../notification/entities/notification.entity';
 
 @Entity('object')
 export class ObjectEntity {
-    @PrimaryGeneratedColumn({ name: 'id_object' })
-    idObject: number;
+  @PrimaryGeneratedColumn({ name: 'id_object' })
+  idObject: number;
 
-    @Index()
-    @Column({ length: 250, nullable: true })
-    title: string;
+  @Column({ length: 250, nullable: true })
+  @Index()
+  title: string;
 
-    @Column({ length: 1000, nullable: true })
-    description: string;
-    
-    @Column({ length: 5000, nullable: true })
-    advise: string;
+  @Column({ length: 1000, nullable: true })
+  description: string;
 
-    @Column({ name: 'id_category_type', nullable: true })
-    idCategoryType: number;
+  @Column({ name: 'id_category_type', nullable: true })
+  idCategoryType: number;
 
-    @ManyToOne(() => CategoryType, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'id_category_type' })
-    categoryType: CategoryType;
+  @ManyToOne(() => CategoryType, categoryType => categoryType.objects, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'id_category_type' })
+  categoryType: CategoryType;
 
-    @Column({ type: 'integer', nullable: true })
-    preference_number: number;
+  @Column({ length: 5000, nullable: true })
+  advise: string;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @Column({ name: 'is_reset', default: false })
+  isReset: boolean;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @Column({ name: 'preference_number', nullable: true })
+  preferenceNumber: number;
 
-    @Column({ type: 'boolean', default: false, nullable: true })
-    is_reset: boolean;
-} 
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => EventParty, eventParty => eventParty.object)
+  eventParties: EventParty[];
+
+  @OneToMany(() => Notification, notification => notification.object)
+  notifications: Notification[];
+
+  @OneToMany(() => ObjectProfile, objectProfile => objectProfile.object)
+  objectProfiles: ObjectProfile[];
+
+  @OneToMany(() => Composant, composant => composant.object)
+  composants: Composant[];
+}

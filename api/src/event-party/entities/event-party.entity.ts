@@ -6,45 +6,45 @@ import { EventPartyPerson } from '../../event-party-person/entities/event-party-
 
 @Entity('event_party')
 export class EventParty {
-    @PrimaryGeneratedColumn({ name: 'id_event_party' })
-    idEventParty: number;
+  @PrimaryGeneratedColumn({ name: 'id_event_party' })
+  idEventParty: number;
 
-    @Index()
-    @Column({ length: 250, nullable: true })
-    title: string;
+  @Column({ length: 250, nullable: true })
+  @Index()
+  title: string;
 
-    @Column({ length: 1000, nullable: true })
-    description: string;
+  @Column({ length: 1000, nullable: true })
+  description: string;
 
-    @Column({ type: 'date', nullable: true })
-    date: Date;
+  @Column({ type: 'date', nullable: true })
+  date: Date;
 
-    @Column({ length: 250, nullable: true })
-    location: string;
+  @Column({ length: 250, nullable: true })
+  location: string;
 
-    @Column({ name: 'id_person', nullable: true })
-    idPerson: number;
+  @Column({ name: 'id_person', nullable: true })
+  idPerson: number;
 
-    @ManyToOne(() => Person, person => person.eventParties, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'id_person' })
-    person: Person;
+  @ManyToOne(() => Person, person => person.eventParties, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'id_person' })
+  person: Person;
 
-    @Column({ name: 'id_object', nullable: true })
-    idObject: number;
+  @Column({ name: 'id_object', nullable: true })
+  idObject: number;
 
-    @ManyToOne(() => ObjectEntity, object => object.eventParties, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'id_object' })
-    object: ObjectEntity;
+  @ManyToOne(() => ObjectEntity, object => object.eventParties, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'id_object' })
+  object: ObjectEntity;
 
-    @OneToMany(() => Game, game => game.eventParty, { cascade: true })
-    games: Game[];
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @OneToMany(() => EventPartyPerson, eventPartyPerson => eventPartyPerson.eventParty, { cascade: true })
-    eventPartyPersons: EventPartyPerson[];
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @OneToMany(() => Game, game => game.eventParty)
+  games: Game[];
 
-    @UpdateDateColumn()
-    updatedAt: Date;
-} 
+  @OneToMany(() => EventPartyPerson, participation => participation.eventParty)
+  participations: EventPartyPerson[];
+}

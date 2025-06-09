@@ -1,28 +1,33 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { PlantType } from 'src/plant-type/entities/plant-type.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity('avatar')
 export class Avatar {
-    @PrimaryGeneratedColumn({ name: 'id_avatar' })
-    idAvatar: number;
+  @PrimaryGeneratedColumn({ name: 'id_avatar' })
+  idAvatar: number;
 
-    @Column({ length: 250, nullable: true })
-    title: string;
+  @Column({ length: 250, nullable: true })
+  title: string;
 
-    @Column({ length: 1000, nullable: true })
-    description: string;
+  @Column({ length: 1000, nullable: true })
+  description: string;
 
-    @Column({ name: 'id_plant_type', nullable: true })
-    idPlantType: number;
+  @Column({ name: 'id_plant_type', nullable: true })
+  idPlantType: number;
 
-    @Column({ length: 5000, nullable: true })
-    advise: string;
+  @ManyToOne(() => PlantType, plantType => plantType.avatars)
+  @JoinColumn({ name: 'id_plant_type' })
+  plantType: PlantType;
 
-    @Column({ length: 3000, nullable: true })
-    path_picture: string;
+  @Column({ length: 5000, nullable: true })
+  advise: string;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @Column({ name: 'path_picture', length: 3000, nullable: true })
+  pathPicture: string;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
-} 
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
