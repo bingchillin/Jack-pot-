@@ -69,6 +69,9 @@ export class ObjectProfile {
   @Column({ name: 'is_automatic', nullable: true })
   isAutomatic: boolean;
 
+  @Column({ name: 'is_will_watering', nullable: true })
+  isWillWatering: boolean;
+
   @Column({ default: 0 })
   state: number;
 

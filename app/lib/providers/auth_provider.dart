@@ -7,11 +7,14 @@ class AuthProvider extends ChangeNotifier {
   bool _isAuthenticated = false;
   String? _accessToken;
   String? _userId;
+
   Map<String, dynamic>? _userData;
 
 
   bool get isAuthenticated => _isAuthenticated;
   String? get userId => _userId;
+  String? get accessToken => _accessToken;
+
   Map<String, dynamic>? get userData => _userData;
 
   Map<String, dynamic>? _user;
@@ -51,7 +54,7 @@ class AuthProvider extends ChangeNotifier {
   String? get firstName => _firstName;
 
   Future<bool> login(String email, String password) async {
-    final url = Uri.parse("http://192.168.0.13:3000/auth/user/login");
+    final url = Uri.parse("http://192.168.0.100:3000/auth/user/login");
 
     try {
       final response = await http.post(
@@ -63,6 +66,7 @@ class AuthProvider extends ChangeNotifier {
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
         final prefs = await SharedPreferences.getInstance();
+
 
         _accessToken = data['access_token'];
         _userId = data['user']['idPerson'].toString();
@@ -103,7 +107,7 @@ class AuthProvider extends ChangeNotifier {
     String? surname,
     String? numberPhone,
   }) async {
-    final url = Uri.parse('http://192.168.0.13:3000/auth/user/signup'); // ← change localhost si sur Android emulator
+    final url = Uri.parse('http://192.168.0.100:3000/auth/user/signup'); // ← change localhost si sur Android emulator
 
     final response = await http.post(
       url,
@@ -139,6 +143,41 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> sendResetCodeByEmail(String email, String code) async {
+    final url = Uri.parse("http://192.168.0.100:3000/auth/request-password-reset");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'verificationCode': code}),
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("Erreur envoi mail : $e");
+      return false;
+    }
+  }
+
+  /// Just test for the moment
+  Future<bool> resetPassword(String email, String newPassword) async {
+    final url = Uri.parse("http://192.168.0.100:3000/auth/user/reset_password");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': newPassword}),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("Erreur reset password : $e");
+      return false;
+    }
+  }
+
 
 
 }
