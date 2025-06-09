@@ -24,38 +24,19 @@ export class ObjectEntity {
     @Column({ name: 'id_category_type', nullable: true })
     idCategoryType: number;
 
-    @Column({ type: 'integer', nullable: true })
-    preference_number: number;
-
-    @Column({ name: 'id_person', nullable: true })
-    idPerson: number;
-
-    @ManyToOne(() => CategoryType, categoryType => categoryType.objects, { onDelete: 'SET NULL' })
+    @ManyToOne(() => CategoryType, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'id_category_type' })
     categoryType: CategoryType;
 
-    @ManyToOne(() => Person, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'id_person' })
-    person: Person;
-
-    @OneToMany(() => ObjectProfile, objectProfile => objectProfile.object, { onDelete: 'CASCADE' })
-    objectProfiles: ObjectProfile[];
-
-    @OneToMany(() => Plant, plant => plant.object, { cascade: true })
-    plants: Plant[];
-
-    @OneToMany(() => EventParty, eventParty => eventParty.object)
-    eventParties: EventParty[];
-
-    @OneToMany(() => Composant, composant => composant.object)
-    composants: Composant[];
-
-    @Column({ type: 'boolean', default: false, nullable: true })
-    is_reset: boolean;
+    @Column({ type: 'integer', nullable: true })
+    preference_number: number;
 
     @CreateDateColumn()
     createdAt: Date;
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Column({ type: 'boolean', default: false, nullable: true })
+    is_reset: boolean;
 } 
