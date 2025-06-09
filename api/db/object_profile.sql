@@ -1,0 +1,1 @@
+INSERT INTO public.object_profile (id_object_profile, title, description, id_object, id_plant_type, "createdAt", "updatedAt", advise) VALUES (2, 'Example Object Profile', 'A detailed description of this object profile', 3, 1, '2025-06-08 18:20:27.065058', '2025-06-08 18:20:27.065058', 'Guidelines and advice for using this object profile');
