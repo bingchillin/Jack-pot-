@@ -1,0 +1,1 @@
+INSERT INTO public.event_party (id_event_party, title, "createdAt", "updatedAt", date, location, id_person, id_object, description) VALUES (1, 'Summer Gaming Tournament', '2025-05-07 19:30:59.651469', '2025-05-07 19:30:59.651469', null, null, null, null, null);

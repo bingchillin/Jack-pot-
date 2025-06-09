@@ -1,0 +1,2 @@
+INSERT INTO public.role (id_role, title, description, "createdAt", "updatedAt") VALUES (1, 'Admin', 'Administrator with full system access and management capabilities', '2025-05-18 20:01:25.578185', '2025-05-18 20:01:25.578185');
+INSERT INTO public.role (id_role, title, description, "createdAt", "updatedAt") VALUES (2, 'User', 'Regular user with standard access rights', '2025-05-18 20:01:25.578185', '2025-05-18 20:01:25.578185');

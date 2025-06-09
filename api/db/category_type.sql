@@ -1,0 +1,1 @@
+INSERT INTO public.category_type (id_category_type, title, description, advise, "createdAt", "updatedAt") VALUES (1, 'Garden Tools', 'Tools and equipment for gardening and maintenance', 'Store tools in a dry place and clean them after use', '2024-03-19 11:30:00.000000', '2024-03-19 11:30:00.000000');

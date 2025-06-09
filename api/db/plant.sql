@@ -1,0 +1,1 @@
+INSERT INTO public.plant (id_plant, name, description, price, category, "isAvailable", id_person, "createdAt", "updatedAt", id_object) VALUES (2, 'Tomato Pixel 6', 'A healthy tomato plant with green leaves and small fruits starting to form', 15.99, 'Vegetables', true, 16, '2025-06-04 01:09:41.926830', '2025-06-04 01:09:41.926830', 3);
