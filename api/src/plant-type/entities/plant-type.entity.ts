@@ -1,6 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { ObjectProfile } from '../../object-profile/entities/object-profile.entity';
-import { Avatar } from '../../avatar/entities/avatar.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('plant_type')
 export class PlantType {
@@ -91,11 +89,8 @@ export class PlantType {
     @Column({ type: 'numeric', nullable: true })
     height_max: number;
 
-    @OneToMany(() => ObjectProfile, objectProfile => objectProfile.plantType)
-    objectProfiles: ObjectProfile[];
-
-    @OneToMany(() => Avatar, avatar => avatar.plantType)
-    avatars: Avatar[];
+    @Column({ length: 3000, nullable: true })
+    path_picture: string;
 
     @CreateDateColumn()
     createdAt: Date;

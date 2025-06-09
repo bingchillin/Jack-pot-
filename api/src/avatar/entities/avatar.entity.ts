@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { PlantType } from '../../plant-type/entities/plant-type.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('avatar')
 export class Avatar {
@@ -12,15 +11,14 @@ export class Avatar {
     @Column({ length: 1000, nullable: true })
     description: string;
 
-    @Column({ length: 5000, nullable: true })
-    advise: string;
-
     @Column({ name: 'id_plant_type', nullable: true })
     idPlantType: number;
 
-    @ManyToOne(() => PlantType, plantType => plantType.avatars)
-    @JoinColumn({ name: 'id_plant_type' })
-    plantType: PlantType;
+    @Column({ length: 5000, nullable: true })
+    advise: string;
+
+    @Column({ length: 3000, nullable: true })
+    path_picture: string;
 
     @CreateDateColumn()
     createdAt: Date;

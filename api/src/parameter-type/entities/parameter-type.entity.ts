@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { PersonParameter } from '../../lnk-person-parameter/entities/person-parameter.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('parameter_type')
 export class ParameterType {
@@ -14,9 +13,6 @@ export class ParameterType {
 
     @Column({ length: 5000, nullable: true })
     advise: string;
-
-    @OneToMany(() => PersonParameter, personParameter => personParameter.parameterType)
-    personParameters: PersonParameter[];
 
     @CreateDateColumn()
     createdAt: Date;

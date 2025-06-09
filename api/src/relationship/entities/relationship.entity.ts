@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
-import { Contact } from '../../contact/entities/contact.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 @Entity('relationship')
 export class Relationship {
@@ -12,9 +11,6 @@ export class Relationship {
 
     @Column({ length: 1000, nullable: true })
     description: string;
-
-    @OneToMany(() => Contact, contact => contact.relationship)
-    contacts: Contact[];
 
     @CreateDateColumn()
     createdAt: Date;
