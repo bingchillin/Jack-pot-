@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { RoleService } from '../role/role.service';
 import { ObjectEntity } from 'src/object/entities/object.entity';
 import { ObjectProfileService } from 'src/object-profile/object-profile.service';
+import { ObjectProfile } from 'src/object-profile/entities/object-profile.entity';
 
 @Injectable()
 export class PersonService {
@@ -66,7 +67,7 @@ export class PersonService {
     async findOne(id: number): Promise<Person> {
         const person = await this.personRepository.findOne({
             where: { idPerson: id },
-            relations: ['role', 'objects']
+            relations: ['role', 'objectProfiles', 'objectProfiles.object']
         });
 
         if (!person) {
@@ -138,5 +139,19 @@ export class PersonService {
     async hashPassword(password: string): Promise<string> {
         const salt = await bcrypt.genSalt();
         return bcrypt.hash(password, salt);
+    }
+
+    async findObjectsProfileByPersonId(id: number): Promise<ObjectProfile[]> {
+        const person = await this.personRepository.findOne({
+            where: { idPerson: id },
+            relations: ['objectProfiles', 'objectProfiles.object', 'objectProfiles.plantType']
+        });
+
+        if (!person) {
+            throw new NotFoundException(`Person with ID ${id} not found`);
+        }
+
+        // Return the object profiles with their associated objects and plant types
+        return person.objectProfiles;
     }
 } 
