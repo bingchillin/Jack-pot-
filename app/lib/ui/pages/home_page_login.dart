@@ -1,8 +1,8 @@
+import 'package:app/ui/pages/my_plant_page_login.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/nav_provider.dart';
 import '../../providers/auth_provider.dart';
-import 'my_plant_page.dart';
 import 'event_page.dart';
 import 'advise_page.dart';
 
@@ -11,7 +11,7 @@ class HomePageLogin extends StatelessWidget {
 
   static const List<Widget> _pages = [
     AdvisePage(),
-    MyPlantPage(),
+    MyPlantPageLogin(),
     EventPage(),
   ];
 

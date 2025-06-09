@@ -11,7 +11,7 @@ export class MailerController {
   @ApiOperation({ summary: 'Test email configuration' })
   async testEmail(@Body('email') email: string) {
     try {
-      await this.mailerService.sendVerificationEmail(email, 'test-token');
+      await this.mailerService.sendVerificationEmail(email, '454654');
       return { message: 'Test email sent successfully' };
     } catch (error) {
       throw error;
