@@ -44,6 +44,13 @@ export class PersonController {
         return this.personService.findObjectsByPersonId(+id);
     }
 
+    @Get(':id/object-profiles')
+    @UseGuards(JwtAuthGuard)
+    @ApiExcludeEndpoint()
+    findObjectsProfileByPersonId(@Param('id') id: string) {
+        return this.personService.findObjectsProfileByPersonId(+id);
+    }
+
     @Patch(':id')
     @UseGuards(JwtAuthGuard)
     @ApiExcludeEndpoint()

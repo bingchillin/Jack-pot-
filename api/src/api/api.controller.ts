@@ -140,6 +140,13 @@ export class ApiController {
     return this.personService.findObjectsByPersonId(+id);
   }
 
+  @Get('/person/:id/object-profiles')
+  @UseGuards(JwtAuthGuard)
+  @ApiExcludeEndpoint()
+  findObjectsProfileByPersonId(@Param('id') id: string) {
+      return this.personService.findObjectsProfileByPersonId(+id);
+  }
+
   @Patch('/person/:id')
   @PersonDocs.update()
   updatePerson(@Param('id') id: string, @Body() dto: UpdatePersonDto) {
