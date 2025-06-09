@@ -72,10 +72,6 @@ import { RelationshipService } from '../relationship/relationship.service';
 import { CreateRelationshipDto } from '../relationship/dto/create-relationship.dto';
 import { UpdateRelationshipDto } from '../relationship/dto/update-relationship.dto';
 import { RelationshipDocs } from './swagger/relationship.docs';
-import { ComposantService } from '../composant/composant.service';
-import { CreateComposantDto } from '../composant/dto/create-composant.dto';
-import { UpdateComposantDto } from '../composant/dto/update-composant.dto';
-import { ComposantDocs } from './swagger/composant.docs';
 import { NotificationService } from '../notification/notification.service';
 import { CreateNotificationDto } from '../notification/dto/create-notification.dto';
 import { UpdateNotificationDto } from '../notification/dto/update-notification.dto';
@@ -103,7 +99,6 @@ export class ApiController {
     private readonly parameterTypeService: ParameterTypeService,
     private readonly objectService: ObjectService,
     private readonly relationshipService: RelationshipService,
-    private readonly composantService: ComposantService,
     private readonly notificationService: NotificationService,
   ) {}
 
@@ -756,48 +751,6 @@ export class ApiController {
   @RelationshipDocs.remove()
   removeRelationship(@Param('id') id: string) {
     return this.relationshipService.remove(+id);
-  }
-
-  // =========================================
-  // Composant Management Endpoints
-  // =========================================
-  @Post('/composant')
-  @ComposantDocs.create()
-  createComposant(@Body() dto: CreateComposantDto) {
-    return this.composantService.create(dto);
-  }
-
-  @Get('/composants')
-  @ComposantDocs.findAll()
-  findAllComposants(
-    @Query('title') title?: string,
-    @Query('objectId') objectId?: string
-  ) {
-    if (title) {
-      return this.composantService.findByTitle(title);
-    }
-    if (objectId) {
-      return this.composantService.findByObject(+objectId);
-    }
-    return this.composantService.findAll();
-  }
-
-  @Get('/composant/:id')
-  @ComposantDocs.findOne()
-  findOneComposant(@Param('id') id: string) {
-    return this.composantService.findOne(+id);
-  }
-
-  @Patch('/composant/:id')
-  @ComposantDocs.update()
-  updateComposant(@Param('id') id: string, @Body() dto: UpdateComposantDto) {
-    return this.composantService.update(+id, dto);
-  }
-
-  @Delete('/composant/:id')
-  @ComposantDocs.remove()
-  removeComposant(@Param('id') id: string) {
-    return this.composantService.remove(+id);
   }
 
   // =========================================

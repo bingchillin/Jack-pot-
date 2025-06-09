@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { CategoryType } from '../../category-type/entities/category-type.entity';
 import { ObjectProfile } from '../../object-profile/entities/object-profile.entity';
 import { EventParty } from '../../event-party/entities/event-party.entity';
-import { Composant } from '../../composant/entities/composant.entity';
 import { Notification } from '../../notification/entities/notification.entity';
 
 @Entity('object')
@@ -47,7 +46,4 @@ export class ObjectEntity {
 
   @OneToMany(() => ObjectProfile, objectProfile => objectProfile.object)
   objectProfiles: ObjectProfile[];
-
-  @OneToMany(() => Composant, composant => composant.object)
-  composants: Composant[];
 }

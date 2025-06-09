@@ -12,7 +12,6 @@ import { ObjectEntity } from './object/entities/object.entity';
 import { CategoryType } from './category-type/entities/category-type.entity';
 import { ObjectProfile } from './object-profile/entities/object-profile.entity';
 import { EventParty } from './event-party/entities/event-party.entity';
-import { Composant } from './composant/entities/composant.entity';
 import { Role } from './role/entities/role.entity';
 import { Contact } from './contact/entities/contact.entity';
 import { PersonParameter } from './lnk-person-parameter/entities/person-parameter.entity';
@@ -41,7 +40,6 @@ import { PlantModule } from './plant/plant.module';
 import { CategoryTypeModule } from './category-type/category-type.module';
 import { ObjectProfileModule } from './object-profile/object-profile.module';
 import { EventPartyModule } from './event-party/event-party.module';
-import { ComposantModule } from './composant/composant.module';
 import { PlantTypeModule } from './plant-type/plant-type.module';
 import { MailerModule } from './mailer/mailer.module';
 
@@ -69,7 +67,6 @@ import { MailerModule } from './mailer/mailer.module';
             CategoryType,
             ObjectProfile,
             EventParty,
-            Composant,
             Role,
             Contact,
             PersonParameter,
@@ -113,7 +110,6 @@ import { MailerModule } from './mailer/mailer.module';
     CategoryTypeModule,
     ObjectProfileModule,
     EventPartyModule,
-    ComposantModule,
     PlantTypeModule,
     MailerModule
   ],
