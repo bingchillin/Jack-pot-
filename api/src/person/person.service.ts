@@ -104,15 +104,15 @@ export class PersonService {
     async findObjectsByPersonId(id: number): Promise<ObjectEntity[]> {
         const person = await this.personRepository.findOne({
             where: { idPerson: id },
-            relations: ['objects']
+            relations: ['objectProfiles', 'objectProfiles.object']
         });
 
         if (!person) {
             throw new NotFoundException(`Person with ID ${id} not found`);
         }
 
-        // Get all objects for the person
-        const objects = person.objects;
+        // Get all objects from the person's object profiles
+        const objects = person.objectProfiles.map(profile => profile.object);
 
         // For each object, get its profiles
         const objectsWithProfiles = await Promise.all(

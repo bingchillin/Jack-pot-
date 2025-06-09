@@ -4,34 +4,34 @@ import { Person } from '../../person/entities/person.entity';
 
 @Entity('game_person')
 export class GamePerson {
-    @PrimaryGeneratedColumn({ name: 'id_game_person' })
-    idGamePerson: number;
+  @PrimaryGeneratedColumn({ name: 'id_game_person' })
+  idGamePerson: number;
 
-    @Column({ name: 'id_game', nullable: false })
-    idGame: number;
+  @Column({ name: 'isOwner', default: false })
+  @Index()
+  isOwner: boolean;
 
-    @Column({ name: 'id_person', nullable: false })
-    idPerson: number;
+  @Column({ name: 'isPlayer', default: false })
+  @Index()
+  isPlayer: boolean;
 
-    @ManyToOne(() => Game, game => game.players, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'id_game' })
-    game: Game;
+  @Column({ name: 'id_game' })
+  idGame: number;
 
-    @ManyToOne(() => Person, person => person.gameParticipations, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'id_person' })
-    person: Person;
+  @ManyToOne(() => Game, game => game.participants, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_game' })
+  game: Game;
 
-    @Index()
-    @Column({ default: false })
-    isOwner: boolean;
+  @Column({ name: 'id_person' })
+  idPerson: number;
 
-    @Index()
-    @Column({ default: false })
-    isPlayer: boolean;
+  @ManyToOne(() => Person, person => person.gameParticipations, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_person' })
+  person: Person;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
-} 
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

@@ -25,7 +25,7 @@ export class EventPartyPersonService {
 
     async findOne(id: number): Promise<EventPartyPerson> {
         const eventPartyPerson = await this.eventPartyPersonRepository.findOne({ 
-            where: { idEventPartyPerson: id },
+            where: { idLnkParticipationPersonEventParty: id },
             relations: ['eventParty', 'person']
         });
         if (!eventPartyPerson) {

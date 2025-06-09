@@ -4,33 +4,39 @@ import { Relationship } from '../../relationship/entities/relationship.entity';
 
 @Entity('contact')
 export class Contact {
-    @PrimaryGeneratedColumn({ name: 'id_contact' })
-    idContact: number;
+  @PrimaryGeneratedColumn({ name: 'id_contact' })
+  idContact: number;
 
-    @Column({ length: 250, nullable: true })
-    relation: string;
+  @Column({ length: 250, nullable: true })
+  relation: string;
 
-    @Column({ length: 1000, nullable: true })
-    description: string;
+  @Column({ length: 1000, nullable: true })
+  description: string;
 
-    @Index()
-    @Column({ default: false })
-    isActive: boolean;
+  @Column({ name: 'value_return', length: 100, nullable: true })
+  valueReturn: string;
 
-    @Column({ length: 100, nullable: true, name: 'value_return' })
-    valueReturn: string;
+  @Column({ name: 'id_person', nullable: true })
+  idPerson: number;
 
-    @ManyToOne(() => Person, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'id_person' })
-    person: Person;
+  @ManyToOne(() => Person, person => person.contacts, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_person' })
+  person: Person;
 
-    @ManyToOne(() => Relationship, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'id_relationship' })
-    relationship: Relationship;
+  @Column({ name: 'id_relationship', nullable: true })
+  idRelationship: number;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @ManyToOne(() => Relationship, relationship => relationship.contacts, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'id_relationship' })
+  relationship: Relationship;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
-} 
+  @Column({ name: 'isActive', default: false })
+  @Index()
+  isActive: boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

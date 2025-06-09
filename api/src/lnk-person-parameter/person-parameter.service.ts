@@ -25,7 +25,7 @@ export class PersonParameterService {
 
   async findOne(id: number): Promise<PersonParameter> {
     const personParameter = await this.personParameterRepository.findOne({
-      where: { idPersonParameter: id },
+      where: { idLnkPersonParameter: id },
       relations: ['person', 'parameterType'],
     });
 

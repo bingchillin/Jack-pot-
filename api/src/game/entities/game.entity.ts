@@ -5,51 +5,51 @@ import { Person } from '../../person/entities/person.entity';
 
 @Entity('game')
 export class Game {
-    @PrimaryGeneratedColumn({ name: 'id_game' })
-    idGame: number;
+  @PrimaryGeneratedColumn({ name: 'id_game' })
+  idGame: number;
 
-    @Column({ length: 250, nullable: false })
-    title: string;
+  @Column({ length: 250 })
+  title: string;
 
-    @Column({ length: 5000, nullable: false })
-    description: string;
+  @Column({ length: 5000 })
+  description: string;
 
-    @Column({ name: 'id_won', nullable: true })
-    idWon: number;
+  @Column({ name: 'beginDate', type: 'date', nullable: true })
+  beginDate: Date;
 
-    @Column({ name: 'id_lose', nullable: true })
-    idLose: number;
+  @Column({ name: 'endDate', type: 'date', nullable: true })
+  endDate: Date;
 
-    @Column({ type: 'date', nullable: true })
-    beginDate: Date;
+  @Column({ length: 5000, nullable: true })
+  rules: string;
 
-    @Column({ type: 'date', nullable: true })
-    endDate: Date;
+  @Column({ name: 'id_event_party', nullable: true })
+  idEventParty: number;
 
-    @Column({ length: 5000, nullable: true })
-    rules: string;
+  @ManyToOne(() => EventParty, eventParty => eventParty.games, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_event_party' })
+  eventParty: EventParty;
 
-    @Column({ name: 'id_event_party', nullable: true })
-    idEventParty: number;
+  @Column({ name: 'id_won', nullable: true })
+  idWon: number;
 
-    @ManyToOne(() => EventParty, eventParty => eventParty.games, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'id_event_party' })
-    eventParty: EventParty;
+  @ManyToOne(() => Person, person => person.gamesWon, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'id_won' })
+  winner: Person;
 
-    @ManyToOne(() => Person, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'id_won' })
-    winner: Person;
+  @Column({ name: 'id_lose', nullable: true })
+  idLose: number;
 
-    @ManyToOne(() => Person, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'id_lose' })
-    loser: Person;
+  @ManyToOne(() => Person, person => person.gamesLost, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'id_lose' })
+  loser: Person;
 
-    @OneToMany(() => GamePerson, gamePerson => gamePerson.game)
-    players: GamePerson[];
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
-} 
+  @OneToMany(() => GamePerson, gamePerson => gamePerson.game)
+  participants: GamePerson[];
+}

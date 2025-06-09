@@ -19,7 +19,7 @@ export class PlantService {
 
     async findAll(): Promise<Plant[]> {
         return await this.plantRepository.find({
-            relations: ['object','person'],
+            relations: ['objectProfile', 'person'],
             select: {
                 idPlant: true,
                 name: true,
@@ -33,9 +33,12 @@ export class PlantService {
                     idPerson: true,
                     email: true,
                 },
-                object: {
-                    idObject: true,
-                    title: true,
+                objectProfile: {
+                    idObjectProfile: true,
+                    object: {
+                        idObject: true,
+                        title: true,
+                    }
                 }
             }
         });
@@ -44,7 +47,7 @@ export class PlantService {
     async findOne(id: number): Promise<Plant> {
         const plant = await this.plantRepository.findOne({ 
             where: { idPlant: id },
-            relations: ['object','person'],
+            relations: ['objectProfile', 'person'],
             select: {
                 idPlant: true,
                 name: true,
@@ -58,9 +61,12 @@ export class PlantService {
                     idPerson: true,
                     email: true,
                 },
-                object: {
-                    idObject: true,
-                    title: true,
+                objectProfile: {
+                    idObjectProfile: true,
+                    object: {
+                        idObject: true,
+                        title: true,
+                    }
                 }
             }
         });
@@ -84,7 +90,7 @@ export class PlantService {
     async findByPersonId(personId: number): Promise<Plant[]> {
         return await this.plantRepository.find({
             where: { person: { idPerson: personId } },
-            relations: ['object','person'],
+            relations: ['objectProfile', 'person'],
             select: {
                 idPlant: true,
                 name: true,
@@ -98,9 +104,12 @@ export class PlantService {
                     idPerson: true,
                     email: true,
                 },
-                object: {
-                    idObject: true,
-                    title: true,
+                objectProfile: {
+                    idObjectProfile: true,
+                    object: {
+                        idObject: true,
+                        title: true,
+                    }
                 }
             }
         });
