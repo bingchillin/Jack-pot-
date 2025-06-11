@@ -8,6 +8,7 @@ import 'widget/plant_item_widget.dart';
 class MyPlantPage extends StatefulWidget {
   const MyPlantPage({Key? key}) : super(key: key);
 
+
   @override
   State<MyPlantPage> createState() => _MyPlantPageState();
 }
@@ -19,12 +20,10 @@ class _MyPlantPageState extends State<MyPlantPage> {
   void initState() {
     super.initState();
     bloc = context.read<ObjectProfileBloc>();
-    // Chargement initial est déjà fait par le Bloc maintenant
   }
 
   Future<void> _refresh() async {
     bloc.add(LoadProfiles());
-    // Attendre que la donnée soit rechargée (optionnel, dépend de ta logique)
     await bloc.profilesStream.firstWhere((_) => true);
   }
 
@@ -54,7 +53,7 @@ class _MyPlantPageState extends State<MyPlantPage> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
-                    height: 280,
+                    height: 450,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: plants.length,

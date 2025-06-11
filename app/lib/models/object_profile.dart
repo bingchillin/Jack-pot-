@@ -5,7 +5,7 @@ class ObjectProfile {
   final int idObjectProfile;
   final String title;
   final String description;
-  final int state;
+  final int? state;
   final bool? isAutomatic;
   final bool? isWillWatering;
   final ObjectModel object;
@@ -15,7 +15,7 @@ class ObjectProfile {
     required this.idObjectProfile,
     required this.title,
     required this.description,
-    required this.state,
+    this.state,
     this.isAutomatic,
     this.isWillWatering,
     required this.object,

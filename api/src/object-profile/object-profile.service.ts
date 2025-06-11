@@ -79,6 +79,7 @@ export class ObjectProfileService {
                 advise: true,
                 createdAt: true,
                 updatedAt: true,
+                isAutomatic: true,
                 object: {
                     idObject: true,
                     title: true,

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsNumber, MaxLength, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateObjectProfileDto {
@@ -29,4 +29,9 @@ export class CreateObjectProfileDto {
     @IsNumber()
     @IsOptional()
     idPlantType?: number;
+
+    @ApiProperty({ description: 'For the automatic plant type', required: false })
+    @IsBoolean()
+    @IsOptional()
+    isAutomatic?: boolean;
 } 
