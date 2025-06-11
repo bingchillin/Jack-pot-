@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:app/app_config.dart';
+
 class AuthProvider extends ChangeNotifier {
   bool _isAuthenticated = false;
   String? _accessToken;
@@ -54,7 +56,7 @@ class AuthProvider extends ChangeNotifier {
   String? get firstName => _firstName;
 
   Future<bool> login(String email, String password) async {
-    final url = Uri.parse("http://192.168.0.100:3000/auth/user/login");
+    final url = Uri.parse(AppConfig.loginEndpoint);
 
     try {
       final response = await http.post(
@@ -107,7 +109,7 @@ class AuthProvider extends ChangeNotifier {
     String? surname,
     String? numberPhone,
   }) async {
-    final url = Uri.parse('http://192.168.0.100:3000/auth/user/signup'); // ← change localhost si sur Android emulator
+    final url = Uri.parse(AppConfig.signupEndpoint);
 
     final response = await http.post(
       url,
@@ -145,7 +147,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> sendResetCodeByEmail(String email, String code) async {
-    final url = Uri.parse("http://192.168.0.100:3000/auth/request-password-reset");
+    final url = Uri.parse(AppConfig.requestPasswordResetEndpoint);
 
     try {
       final response = await http.post(
@@ -163,7 +165,7 @@ class AuthProvider extends ChangeNotifier {
 
   /// Just test for the moment
   Future<bool> resetPassword(String email, String newPassword) async {
-    final url = Uri.parse("http://192.168.0.100:3000/auth/user/reset_password");
+    final url = Uri.parse(AppConfig.resetPasswordEndpoint);
 
     try {
       final response = await http.post(

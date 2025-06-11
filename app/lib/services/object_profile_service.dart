@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/object_profile.dart';
-
+import 'package:app/app_config.dart';
 
 class ObjectProfileService {
-  final String baseUrl = 'http://localhost:3000';
+  final String baseUrl =  AppConfig.baseUrl;
 
   Future<List<ObjectProfile>> fetchProfiles(String personId, String token) async {
-    final url = Uri.parse('$baseUrl/person/$personId/object-profiles');
+    final url = Uri.parse(AppConfig.objectProfilesEndpoint(personId));
     final response = await http.get(url, headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
