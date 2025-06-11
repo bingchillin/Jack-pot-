@@ -30,8 +30,13 @@ export class CreateObjectProfileDto {
     @IsOptional()
     idPlantType?: number;
 
-    @ApiProperty({ description: 'For the automatic plant type', required: false })
+    @ApiProperty({ description: 'Whether the profile is automatic', required: false })
     @IsBoolean()
     @IsOptional()
     isAutomatic?: boolean;
+
+    @ApiProperty({ description: 'Whether the profile will be watered', required: false })
+    @IsBoolean()
+    @IsOptional()
+    isWillWatering?: boolean;
 } 

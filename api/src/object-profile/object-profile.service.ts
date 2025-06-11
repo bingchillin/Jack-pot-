@@ -25,6 +25,8 @@ export class ObjectProfileService {
                 title: true,
                 description: true,
                 advise: true,
+                isAutomatic: true,
+                isWillWatering: true,
                 createdAt: true,
                 updatedAt: true,
                 object: {
@@ -48,6 +50,8 @@ export class ObjectProfileService {
                 title: true,
                 description: true,
                 advise: true,
+                isAutomatic: true,
+                isWillWatering: true,
                 createdAt: true,
                 updatedAt: true,
                 object: {
@@ -77,13 +81,18 @@ export class ObjectProfileService {
                 title: true,
                 description: true,
                 advise: true,
+                isAutomatic: true,
+                isWillWatering: true,
                 createdAt: true,
                 updatedAt: true,
-                isAutomatic: true,
                 object: {
                     idObject: true,
                     title: true,
                 },
+                plantType: {
+                    idPlantType: true,
+                    title: true,
+                }
             }
         });
 
@@ -103,6 +112,8 @@ export class ObjectProfileService {
                 title: true,
                 description: true,
                 advise: true,
+                isAutomatic: true,
+                isWillWatering: true,
                 createdAt: true,
                 updatedAt: true,
                 object: {
@@ -132,6 +143,8 @@ export class ObjectProfileService {
                 title: true,
                 description: true,
                 advise: true,
+                isAutomatic: true,
+                isWillWatering: true,
                 createdAt: true,
                 updatedAt: true,
                 object: {
