@@ -67,7 +67,7 @@ export class PersonService {
     async findOne(id: number): Promise<Person> {
         const person = await this.personRepository.findOne({
             where: { idPerson: id },
-            relations: ['role', 'objectProfiles', 'objectProfiles.object']
+            relations: ['role']
         });
 
         if (!person) {
@@ -105,30 +105,49 @@ export class PersonService {
     async findObjectsByPersonId(id: number): Promise<ObjectEntity[]> {
         const person = await this.personRepository.findOne({
             where: { idPerson: id },
-            relations: ['objectProfiles', 'objectProfiles.object']
+            relations: [
+                'objectProfiles', 
+                'objectProfiles.object', 
+                'objectProfiles.plantType'
+            ]
         });
-
+    
         if (!person) {
             throw new NotFoundException(`Person with ID ${id} not found`);
         }
-
-        // Get all objects from the person's object profiles
-        const objects = person.objectProfiles.map(profile => profile.object);
-
-        // For each object, get its profiles
-        const objectsWithProfiles = await Promise.all(
-            objects.map(async (object) => {
-                const profiles = await this.objectProfileService.findByObject(object.idObject);
-                // Transform profiles to remove the object field
-                const transformedProfiles = profiles.map(({ object: _, ...profile }) => profile);
-                return {
-                    ...object,
-                    profiles: transformedProfiles
-                };
-            })
-        );
-
-        return objectsWithProfiles;
+    
+        const objectMap = new Map<number, any>();
+        
+        person.objectProfiles.forEach(profile => {
+            const objectId = profile.object.idObject;
+            
+            if (!objectMap.has(objectId)) {
+                // Initialize object without objectProfiles to avoid duplication
+                const { objectProfiles, ...objectData } = profile.object;
+                objectMap.set(objectId, {
+                    ...objectData,
+                    profiles: []
+                });
+            }
+            
+            // Add cleaned profile to the object
+            const cleanProfile = {
+                idObjectProfile: profile.idObjectProfile,
+                title: profile.title,
+                description: profile.description,
+                advise: profile.advise,
+                createdAt: profile.createdAt,
+                updatedAt: profile.updatedAt,
+                plantType: profile.plantType ? {
+                    idPlantType: profile.plantType.idPlantType,
+                    title: profile.plantType.title
+                } : null
+            };
+            
+            objectMap.get(objectId).profiles.push(cleanProfile);
+        });
+    
+        return Array.from(objectMap.values());
     }
 
     async remove(id: number): Promise<void> {
