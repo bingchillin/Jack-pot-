@@ -12,18 +12,17 @@ export class PlantTypeService {
         private readonly plantTypeRepository: Repository<PlantType>
     ) {}
 
-    create(createPlantTypeDto: CreatePlantTypeDto) {
-        const plantType = this.plantTypeRepository.create(createPlantTypeDto);
-        return this.plantTypeRepository.save(plantType);
+    async create(createPlantTypeDto: CreatePlantTypeDto) {
+        const plantType = await this.plantTypeRepository.create(createPlantTypeDto);
+        return await this.plantTypeRepository.save(plantType);
     }
 
-    findAll() {
-        return this.plantTypeRepository.find({
-            relations: ['objectProfiles', 'avatars']
-        });
+    async findAll() {
+        return await this.plantTypeRepository.find(
+        );
     }
 
-    async findOne(id: number) {
+    async findOne(id: number): Promise<PlantType> {
         const plantType = await this.plantTypeRepository.findOne({
             where: { idPlantType: id },
             relations: ['objectProfiles', 'avatars']
@@ -36,7 +35,7 @@ export class PlantTypeService {
         return plantType;
     }
 
-    async findByTitle(title: string) {
+    async findByTitle(title: string): Promise<PlantType> {
         const plantType = await this.plantTypeRepository.findOne({
             where: { title },
             relations: ['objectProfiles', 'avatars']
@@ -49,14 +48,14 @@ export class PlantTypeService {
         return plantType;
     }
 
-    async update(id: number, updatePlantTypeDto: UpdatePlantTypeDto) {
+    async update(id: number, updatePlantTypeDto: UpdatePlantTypeDto): Promise<PlantType> {
         const plantType = await this.findOne(id);
         Object.assign(plantType, updatePlantTypeDto);
-        return this.plantTypeRepository.save(plantType);
+        return await this.plantTypeRepository.save(plantType);
     }
 
-    async remove(id: number) {
+    async remove(id: number): Promise<void> {
         const plantType = await this.findOne(id);
-        return this.plantTypeRepository.remove(plantType);
+        await this.plantTypeRepository.remove(plantType);
     }
 } 
