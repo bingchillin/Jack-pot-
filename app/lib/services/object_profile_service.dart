@@ -21,4 +21,26 @@ class ObjectProfileService {
       throw Exception('Erreur de chargement: ${response.statusCode}');
     }
   }
+
+  Future<void> updateObjectProfile({
+    required String id,
+    required Map<String, dynamic> body,
+    required String token,
+  }) async {
+    final url = Uri.parse(AppConfig.updateObjectProfileEndpoint(id));
+
+    final response = await http.patch(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Erreur mise à jour : ${response.statusCode}");
+    }
+  }
+
 }

@@ -58,7 +58,14 @@ class _MyPlantPageState extends State<MyPlantPage> {
                       scrollDirection: Axis.horizontal,
                       itemCount: plants.length,
                       itemBuilder: (context, index) {
-                        return PlantItemWidget(plant: plants[index]);
+                        return ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: 280,
+                            maxWidth: 280,
+                            minHeight: 400,
+                          ),
+                          child: PlantItemWidget(plant: plants[index]),
+                        );
                       },
                     ),
                   ),
