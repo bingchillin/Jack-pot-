@@ -1,7 +1,10 @@
+import 'package:app/ui/pages/widget/plant_control_switches_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/object_profile.dart';
 import 'package:app/app_config.dart';
 
+import '../../../services/object_profile_service.dart';
 import '../plant_detail_page.dart';
 
 class PlantItemWidget extends StatelessWidget {
@@ -29,7 +32,7 @@ class PlantItemWidget extends StatelessWidget {
       case 4:
         return "Je me sens moyen";
       case 5:
-        return "Critique ! Regarde ce que j'ai !";
+        return "Critique ! URGENT !";
       default:
         return "État inconnu";
     }
@@ -111,28 +114,8 @@ class PlantItemWidget extends StatelessWidget {
                         fontSize: 18,
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('AUTO', style: TextStyle(fontSize: 16)),
-                        Switch(
-                          value: plant.isAutomatic ?? false,
-                          onChanged: onToggleAutomatic,
-                          activeColor: Colors.green,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('ARROSER', style: TextStyle(fontSize: 16)),
-                        Switch(
-                          value: plant.isWillWatering ?? false,
-                          onChanged: onToggleWillWatering,
-                          activeColor: Colors.blue,
-                        ),
-                      ],
-                    ),
+                    // use switch dynamic
+                    PlantControlSwitches(plant: plant),
                   ],
                 ),
               ),
