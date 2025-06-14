@@ -16,6 +16,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { ObjectProfileDetails } from "@components/objectprofile/show";
 import { CreateObjectprofileModal } from "@components/objectprofile/create";
 import { getHoverableProps } from "@styles/common";
+import { getIcon } from "@/utils/icon-mapping";
 
 const { Text } = Typography;
 
@@ -58,7 +59,7 @@ export default function ObjectProfileList() {
     footer: () => (
       <div style={{ textAlign: 'right', padding: '8px 0' }}>
         <Text type="secondary">
-          <span style={{ color: '#000000' }}>{filteredData.length}</span> {filteredData.length === 1 ? 'objectprofile' : 'objectprofiles'} in total
+          <span style={{ color: '#000000' }}>{filteredData.length}</span> {filteredData.length === 1 ? 'Object Profile' : 'Object Profiles'} in total
         </Text>
       </div>
     ),
@@ -115,7 +116,7 @@ export default function ObjectProfileList() {
     <>
       <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <CreateButton
-          icon={<PlusCircleOutlined />}
+          icon={getIcon("add")}
           size="large"
           style={{
             height: "40px",
@@ -127,7 +128,7 @@ export default function ObjectProfileList() {
         </CreateButton>
         <Input
           placeholder="Search by object"
-          prefix={<SearchOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />}
+          prefix={getIcon("search")}
           value={searchObject}
           onChange={(e) => setSearchObject(e.target.value)}
           style={{ width: 300 }}
@@ -159,6 +160,16 @@ export default function ObjectProfileList() {
               </Tooltip>
             )}
           />
+          <Table.Column
+            title="Person"
+            render={(_, record) => (
+              <Tooltip title={`Person ID: ${record.person?.idPerson || 'N/A'}`}>
+                <span {...getHoverableProps()}>
+                  {record.person?.email || '-'}
+                </span>
+              </Tooltip>
+            )}
+          />
           <Table.Column dataIndex="advise" title={"Advice"} />
           <Table.Column
             title={"Actions"}
@@ -175,7 +186,7 @@ export default function ObjectProfileList() {
       </List>
 
       <Drawer
-        title={`${selectedObjectprofile?.firstname} ${selectedObjectprofile?.surname} details`}
+        title={`${selectedObjectprofile?.title} details`}
         placement="right"
         onClose={handleClose}
         open={drawerVisible}

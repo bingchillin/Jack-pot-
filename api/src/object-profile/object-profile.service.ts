@@ -19,7 +19,7 @@ export class ObjectProfileService {
 
     findAll() {
         return this.objectProfileRepository.find({
-            relations: ['object', 'plantType'],
+            relations: ['object', 'plantType', 'person', 'plants'],
             select: {
                 idObjectProfile: true,
                 title: true,
@@ -27,15 +27,44 @@ export class ObjectProfileService {
                 advise: true,
                 isAutomatic: true,
                 isWillWatering: true,
+                state: true,
+                favoris: true,
+                humidityAirSensor: true,
+                humidityGroundSensor: true,
+                phGroundSensor: true,
+                conductivityElectriqueFertilitySensor: true,
+                lightSensor: true,
+                temperatureSensorGround: true,
+                temperatureSensorExtern: true,
+                expositionTimeSun: true,
                 createdAt: true,
                 updatedAt: true,
                 object: {
                     idObject: true,
                     title: true,
+                    description: true,
+                    advise: true,
+                    preferenceNumber: true,
+                    isReset: true
                 },
                 plantType: {
                     idPlantType: true,
                     title: true,
+                    description: true,
+                    advise: true
+                },
+                person: {
+                    idPerson: true,
+                    email: true,
+                    firstname: true,
+                    surname: true
+                },
+                plants: {
+                    idPlant: true,
+                    name: true,
+                    description: true,
+                    category: true,
+                    isAvailable: true
                 }
             }
         });
@@ -44,7 +73,7 @@ export class ObjectProfileService {
     async findOne(id: number) {
         const objectProfile = await this.objectProfileRepository.findOne({
             where: { idObjectProfile: id },
-            relations: ['object', 'plantType'],
+            relations: ['object', 'plantType', 'person', 'plants'],
             select: {
                 idObjectProfile: true,
                 title: true,
@@ -52,15 +81,44 @@ export class ObjectProfileService {
                 advise: true,
                 isAutomatic: true,
                 isWillWatering: true,
+                state: true,
+                favoris: true,
+                humidityAirSensor: true,
+                humidityGroundSensor: true,
+                phGroundSensor: true,
+                conductivityElectriqueFertilitySensor: true,
+                lightSensor: true,
+                temperatureSensorGround: true,
+                temperatureSensorExtern: true,
+                expositionTimeSun: true,
                 createdAt: true,
                 updatedAt: true,
                 object: {
                     idObject: true,
                     title: true,
+                    description: true,
+                    advise: true,
+                    preferenceNumber: true,
+                    isReset: true
                 },
                 plantType: {
                     idPlantType: true,
                     title: true,
+                    description: true,
+                    advise: true
+                },
+                person: {
+                    idPerson: true,
+                    email: true,
+                    firstname: true,
+                    surname: true
+                },
+                plants: {
+                    idPlant: true,
+                    name: true,
+                    description: true,
+                    category: true,
+                    isAvailable: true
                 }
             }
         });
@@ -75,7 +133,7 @@ export class ObjectProfileService {
     async findByTitle(title: string) {
         const objectProfile = await this.objectProfileRepository.findOne({
             where: { title },
-            relations: ['object', 'plantType'],
+            relations: ['object', 'plantType', 'person', 'plants'],
             select: {
                 idObjectProfile: true,
                 title: true,
@@ -83,15 +141,44 @@ export class ObjectProfileService {
                 advise: true,
                 isAutomatic: true,
                 isWillWatering: true,
+                state: true,
+                favoris: true,
+                humidityAirSensor: true,
+                humidityGroundSensor: true,
+                phGroundSensor: true,
+                conductivityElectriqueFertilitySensor: true,
+                lightSensor: true,
+                temperatureSensorGround: true,
+                temperatureSensorExtern: true,
+                expositionTimeSun: true,
                 createdAt: true,
                 updatedAt: true,
                 object: {
                     idObject: true,
                     title: true,
+                    description: true,
+                    advise: true,
+                    preferenceNumber: true,
+                    isReset: true
                 },
                 plantType: {
                     idPlantType: true,
                     title: true,
+                    description: true,
+                    advise: true
+                },
+                person: {
+                    idPerson: true,
+                    email: true,
+                    firstname: true,
+                    surname: true
+                },
+                plants: {
+                    idPlant: true,
+                    name: true,
+                    description: true,
+                    category: true,
+                    isAvailable: true
                 }
             }
         });
@@ -106,7 +193,7 @@ export class ObjectProfileService {
     async findByObject(idObject: number) {
         const objectProfiles = await this.objectProfileRepository.find({
             where: { idObject },
-            relations: ['object', 'plantType'],
+            relations: ['object', 'plantType', 'person', 'plants'],
             select: {
                 idObjectProfile: true,
                 title: true,
@@ -114,15 +201,44 @@ export class ObjectProfileService {
                 advise: true,
                 isAutomatic: true,
                 isWillWatering: true,
+                state: true,
+                favoris: true,
+                humidityAirSensor: true,
+                humidityGroundSensor: true,
+                phGroundSensor: true,
+                conductivityElectriqueFertilitySensor: true,
+                lightSensor: true,
+                temperatureSensorGround: true,
+                temperatureSensorExtern: true,
+                expositionTimeSun: true,
                 createdAt: true,
                 updatedAt: true,
                 object: {
                     idObject: true,
                     title: true,
+                    description: true,
+                    advise: true,
+                    preferenceNumber: true,
+                    isReset: true
                 },
                 plantType: {
                     idPlantType: true,
                     title: true,
+                    description: true,
+                    advise: true
+                },
+                person: {
+                    idPerson: true,
+                    email: true,
+                    firstname: true,
+                    surname: true
+                },
+                plants: {
+                    idPlant: true,
+                    name: true,
+                    description: true,
+                    category: true,
+                    isAvailable: true
                 }
             }
         });
@@ -137,7 +253,7 @@ export class ObjectProfileService {
     async findByPlantType(idPlantType: number) {
         const objectProfiles = await this.objectProfileRepository.find({
             where: { idPlantType },
-            relations: ['object', 'plantType'],
+            relations: ['object', 'plantType', 'person', 'plants'],
             select: {
                 idObjectProfile: true,
                 title: true,
@@ -145,15 +261,44 @@ export class ObjectProfileService {
                 advise: true,
                 isAutomatic: true,
                 isWillWatering: true,
+                state: true,
+                favoris: true,
+                humidityAirSensor: true,
+                humidityGroundSensor: true,
+                phGroundSensor: true,
+                conductivityElectriqueFertilitySensor: true,
+                lightSensor: true,
+                temperatureSensorGround: true,
+                temperatureSensorExtern: true,
+                expositionTimeSun: true,
                 createdAt: true,
                 updatedAt: true,
                 object: {
                     idObject: true,
                     title: true,
+                    description: true,
+                    advise: true,
+                    preferenceNumber: true,
+                    isReset: true
                 },
                 plantType: {
                     idPlantType: true,
                     title: true,
+                    description: true,
+                    advise: true
+                },
+                person: {
+                    idPerson: true,
+                    email: true,
+                    firstname: true,
+                    surname: true
+                },
+                plants: {
+                    idPlant: true,
+                    name: true,
+                    description: true,
+                    category: true,
+                    isAvailable: true
                 }
             }
         });

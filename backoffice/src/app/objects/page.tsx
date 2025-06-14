@@ -16,6 +16,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { ObjectDetails } from "@components/object/show";
 import { CreateObjectModal } from "@components/object/create";
 import { getHoverableProps } from "@styles/common";
+import { getIcon } from "@/utils/icon-mapping";
 
 const { Text } = Typography;
 
@@ -115,7 +116,7 @@ export default function ObjectList() {
     <>
       <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <CreateButton
-          icon={<PlusCircleOutlined />}
+          icon={getIcon("add")}
           size="large"
           style={{
             height: "40px",
@@ -127,7 +128,7 @@ export default function ObjectList() {
         </CreateButton>
         <Input
           placeholder="Search by title"
-          prefix={<SearchOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />}
+          prefix={getIcon("search")}
           value={searchTitle}
           onChange={(e) => setSearchTitle(e.target.value)}
           style={{ width: 300 }}
@@ -152,18 +153,10 @@ export default function ObjectList() {
             )}
           />
           <Table.Column
-            title="Person"
-            render={(_, record) => (
-              <Tooltip title={`Person ID: ${record.person?.idPerson || 'N/A'}`}>
-                <span {...getHoverableProps()}>{record.person?.email || '-'}</span>
-              </Tooltip>
-            )}
-          />
-          <Table.Column
             dataIndex="is_reset"
             title="Reset ?"
             render={(value) => (
-              <Tag color={value ? "success" : "error"} icon={value ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
+              <Tag color={value ? "success" : "error"} icon={value ? getIcon("active") : getIcon("inactive")}>
                 {value ? "Yes" : "No"}
               </Tag>
             )}

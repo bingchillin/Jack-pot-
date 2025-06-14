@@ -19,7 +19,7 @@ export class ObjectService {
 
     findAll() {
         return this.objectRepository.find({
-            relations: ['categoryType'],
+            relations: ['categoryType', 'objectProfiles', 'objectProfiles.person'],
             select: {
                 idObject: true,
                 title: true,
@@ -36,6 +36,16 @@ export class ObjectService {
                     title: true,
                     description: true,
                     advise: true
+                },
+                objectProfiles: {
+                    idObjectProfile: true,
+                    idPerson: true,
+                    person: {
+                        idPerson: true,
+                        email: true,
+                        firstname: true,
+                        surname: true
+                    }
                 }
             }
         });
@@ -44,7 +54,7 @@ export class ObjectService {
     async findOne(id: number) {
         const object = await this.objectRepository.findOne({
             where: { idObject: id },
-            relations: ['categoryType'],
+            relations: ['categoryType', 'objectProfiles', 'objectProfiles.person'],
             select: {
                 idObject: true,
                 title: true,
@@ -61,6 +71,16 @@ export class ObjectService {
                     title: true,
                     description: true,
                     advise: true
+                },
+                objectProfiles: {
+                    idObjectProfile: true,
+                    idPerson: true,
+                    person: {
+                        idPerson: true,
+                        email: true,
+                        firstname: true,
+                        surname: true
+                    }
                 }
             }
         });

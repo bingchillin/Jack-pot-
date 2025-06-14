@@ -28,12 +28,6 @@ export const CreateObjectModal: React.FC<CreateObjectModalProps> = ({
     optionValue: "idCategoryType",
   });
 
-  const { selectProps: personSelectProps } = useSelect({
-    resource: "persons",
-    optionLabel: "email",
-    optionValue: "idPerson",
-  });
-
   return (
     <Modal
       title="Create object"
@@ -121,32 +115,6 @@ export const CreateObjectModal: React.FC<CreateObjectModalProps> = ({
                   }}
                   optionFilterProp="label"
                   options={categoryTypeSelectProps.options?.map((option: any) => ({
-                    value: option.value,
-                    label: `${option.label} `,
-                    data: option.data
-                  }))}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={24}>
-              <Form.Item
-                label={"Person"}
-                name={["idPerson"]}
-                rules={[{ required: true, message: "Please select a person" }]}
-                style={{ marginBottom: 16 }}
-              >
-                <Select 
-                  size="large" 
-                  {...personSelectProps}
-                  placeholder="Select a person"
-                  showSearch
-                  filterOption={(input, option) => {
-                    const searchStr = input.toLowerCase();
-                    const label = option?.label?.toLowerCase() || '';
-                    return label.includes(searchStr);
-                  }}
-                  optionFilterProp="label"
-                  options={personSelectProps.options?.map((option: any) => ({
                     value: option.value,
                     label: `${option.label} `,
                     data: option.data
