@@ -9,12 +9,10 @@ import {
   CreateButton,
 } from "@refinedev/antd";
 import { type BaseRecord } from "@refinedev/core";
-import { Space, Table, Drawer, Input, Typography, Tooltip } from "antd";
-import { PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
+import { Space, Table, Drawer, Input, Typography, Tooltip, Tag } from "antd";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { ObjectProfileDetails } from "@components/objectprofile/show";
-import { CreateObjectprofileModal } from "@components/objectprofile/create";
 import { getHoverableProps } from "@styles/common";
 import { getIcon } from "@/utils/icon-mapping";
 
@@ -26,7 +24,6 @@ export default function ObjectProfileList() {
   const searchParams = useSearchParams();
   const [selectedObjectprofile, setSelectedObjectprofile] = useState<BaseRecord | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [createModalVisible, setCreateModalVisible] = useState(false);
   const [searchObject, setSearchObject] = useState("");
 
   // Get all data without any server-side filtering
@@ -43,7 +40,7 @@ export default function ObjectProfileList() {
     }
 
     return originalTableProps.dataSource.filter((objectprofile: any) => 
-      objectprofile.object?.title?.toLowerCase().includes(searchObject.toLowerCase())
+      objectprofile.title?.toLowerCase().includes(searchObject.toLowerCase())
     );
   }, [originalTableProps?.dataSource, searchObject]);
 
@@ -98,20 +95,6 @@ export default function ObjectProfileList() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const handleCreate = () => {
-    setCreateModalVisible(true);
-  };
-
-  const handleCreateCancel = () => {
-    setCreateModalVisible(false);
-  };
-
-  const handleCreateSuccess = () => {
-    setCreateModalVisible(false);
-    // Refresh the table using tableQueryResult
-    tableQueryResult.refetch();
-  };
-
   return (
     <>
       <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -122,12 +105,11 @@ export default function ObjectProfileList() {
             height: "40px",
             fontWeight: 500,
           }}
-          onClick={handleCreate}
         >
           Add new object profile
         </CreateButton>
         <Input
-          placeholder="Search by object"
+          placeholder="Search by title"
           prefix={getIcon("search")}
           value={searchObject}
           onChange={(e) => setSearchObject(e.target.value)}
@@ -142,38 +124,55 @@ export default function ObjectProfileList() {
         canCreate={false}
       >
         <Table {...tableProps} rowKey="idObjectProfile">
-          <Table.Column dataIndex="idObjectProfile" title={"ID"} />
-          <Table.Column dataIndex="title" title={"Title"} />
+          <Table.Column 
+            dataIndex="idObjectProfile" 
+            title="ID" 
+            width={60}
+          />
+          <Table.Column 
+            dataIndex="title" 
+            title="Title"
+            width={200}
+          />
           <Table.Column
             title="Object"
-            render={(_, record) => (
-              <Tooltip title={`Object ID: ${record.object?.idObject || 'N/A'}`}>
-                <span {...getHoverableProps()}>{record.object?.title || '-'}</span>
-              </Tooltip>
-            )}
+            width={150}
+            render={(_, record) => record.object?.title || '-'}
           />
           <Table.Column
             title="Plant Type"
-            render={(_, record) => (
-              <Tooltip title={`Plant Type ID: ${record.plantType?.idPlantType || 'N/A'}`}>
-                <span {...getHoverableProps()}>{record.plantType?.title || '-'}</span>
-              </Tooltip>
-            )}
+            width={150}
+            render={(_, record) => record.plantType?.title || '-'}
           />
           <Table.Column
             title="Person"
+            width={200}
             render={(_, record) => (
               <Tooltip title={`Person ID: ${record.person?.idPerson || 'N/A'}`}>
-                <span {...getHoverableProps()}>
-                  {record.person?.email || '-'}
-                </span>
+                <span {...getHoverableProps()}>{record.person?.email || '-'}</span>
               </Tooltip>
             )}
           />
-          <Table.Column dataIndex="advise" title={"Advice"} />
           <Table.Column
-            title={"Actions"}
+            title="Status"
+            width={100}
+            render={(_, record) => (
+              <Tag color={
+                record.state === 0 ? 'default' :
+                record.state === 1 ? 'success' :
+                record.state === 2 ? 'warning' : 'error'
+              }>
+                {record.state === 0 ? 'Default' :
+                 record.state === 1 ? 'Active' :
+                 record.state === 2 ? 'Warning' : 'Error'}
+              </Tag>
+            )}
+          />
+          <Table.Column
+            title="Actions"
             dataIndex="actions"
+            width={100}
+            fixed="right"
             render={(_, record: BaseRecord) => (
               <Space>
                 <EditButton hideText size="small" recordItemId={record.idObjectProfile} />
@@ -199,12 +198,6 @@ export default function ObjectProfileList() {
       >
         {selectedObjectprofile && <ObjectProfileDetails record={selectedObjectprofile} />}
       </Drawer>
-
-      <CreateObjectprofileModal
-        visible={createModalVisible}
-        onCancel={handleCreateCancel}
-        onSuccess={handleCreateSuccess}
-      />
     </>
   );
 }

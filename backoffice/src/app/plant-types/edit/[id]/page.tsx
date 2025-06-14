@@ -57,7 +57,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={12}>
                             <Form.Item
                                 label="Scientific Name"
-                                name="scientist_name"
+                                name="scientistName"
                                 rules={[{ required: true }]}
                                 style={{ marginBottom: 16 }}
                             >
@@ -70,7 +70,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={12}>
                             <Form.Item
                                 label="Family Name"
-                                name="family_name"
+                                name="familyName"
                                 rules={[{ required: true }]}
                                 style={{ marginBottom: 16 }}
                             >
@@ -80,7 +80,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={12}>
                             <Form.Item
                                 label="Type Name"
-                                name="type_name"
+                                name="typeName"
                                 rules={[{ required: true }]}
                                 style={{ marginBottom: 16 }}
                             >
@@ -110,7 +110,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={12}>
                             <Form.Item
                                 label="Exposition Type"
-                                name="exposition_type"
+                                name="expositionType"
                                 rules={[{ required: true }]}
                                 style={{ marginBottom: 16 }}
                             >
@@ -120,7 +120,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={12}>
                             <Form.Item
                                 label="Ground Type"
-                                name="ground_type"
+                                name="groundType"
                                 rules={[{ required: true }]}
                                 style={{ marginBottom: 16 }}
                             >
@@ -131,7 +131,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
 
                     <Form.Item
                         label="Plantation Season"
-                        name="plantation_saison"
+                        name="plantationSaison"
                         rules={[{ required: true }]}
                         style={{ marginBottom: 16 }}
                     >
@@ -164,7 +164,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="First Season"
-                                name="saison_first"
+                                name="saisonFirst"
                                 style={{ marginBottom: 16 }}
                             >
                                 <Select
@@ -187,7 +187,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Second Season"
-                                name="saison_second"
+                                name="saisonSecond"
                                 style={{ marginBottom: 16 }}
                             >
                                 <Select
@@ -210,7 +210,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Third Season"
-                                name="saison_third"
+                                name="saisonThird"
                                 style={{ marginBottom: 16 }}
                             >
                                 <Select
@@ -234,7 +234,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
 
                     <Form.Item
                         label="Number of Good Seasons"
-                        name="number_good_saison"
+                        name="numberGoodSaison"
                         rules={[{ required: true }]}
                         style={{ marginBottom: 16 }}
                     >
@@ -253,7 +253,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="pH Ground"
-                                name="ph_ground_sensor"
+                                name="phGroundSensor"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -262,7 +262,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="pH Min"
-                                name="ph_min"
+                                name="phMin"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -271,7 +271,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="pH Max"
-                                name="ph_max"
+                                name="phMax"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -283,7 +283,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Conductivity"
-                                name="conductivity_electrique_fertility_sensor"
+                                name="conductivityElectriqueFertilitySensor"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -292,7 +292,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Conductivity Min"
-                                name="conductivity_electrique_fertility_min"
+                                name="conductivityElectriqueFertilityMin"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -301,7 +301,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Conductivity Max"
-                                name="conductivity_electrique_fertility_max"
+                                name="conductivityElectriqueFertilityMax"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -313,7 +313,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Light"
-                                name="light_sensor"
+                                name="lightSensor"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -322,7 +322,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Ground Temp"
-                                name="temperature_sensor_ground"
+                                name="temperatureSensorGround"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -331,7 +331,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="External Temp"
-                                name="temperature_sensor_extern"
+                                name="temperatureSensorExtern"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -343,7 +343,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Air Humidity"
-                                name="humidity_air_sensor"
+                                name="humidityAirSensor"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -352,7 +352,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Ground Humidity"
-                                name="humidity_ground_sensor"
+                                name="humidityGroundSensor"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -361,7 +361,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={8}>
                             <Form.Item
                                 label="Sun Exposure"
-                                name="exposition_time_sun"
+                                name="expositionTimeSun"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber step={0.1} size="large" style={{ width: '100%' }} />
@@ -381,7 +381,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={12}>
                             <Form.Item
                                 label="Min Height (cm)"
-                                name="height_min"
+                                name="heightMin"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber min={0} size="large" style={{ width: '100%' }} />
@@ -390,7 +390,7 @@ export default function PlantTypeEdit({ params }: { params: { id: string } }) {
                         <Col span={12}>
                             <Form.Item
                                 label="Max Height (cm)"
-                                name="height_max"
+                                name="heightMax"
                                 style={{ marginBottom: 16 }}
                             >
                                 <InputNumber min={0} size="large" style={{ width: '100%' }} />
