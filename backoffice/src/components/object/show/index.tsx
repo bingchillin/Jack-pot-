@@ -31,12 +31,6 @@ export const ObjectDetails: React.FC<ObjectDetailsProps> = ({ record }) => {
           </Tooltip>
         </DetailRow>
 
-        <DetailRow icon={<UserOutlined />} label="Person">
-          <Tooltip title={`Person ID: ${record.person?.idPerson || 'N/A'}`}>
-            <span {...getHoverableProps()}>{record.person?.email || '-'}</span>
-          </Tooltip>
-        </DetailRow>
-
         <DetailRow icon={<GiPlantWatering />} label="Title">
           {record.title}
         </DetailRow>

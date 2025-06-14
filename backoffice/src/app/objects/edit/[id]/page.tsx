@@ -4,6 +4,7 @@ import { useForm, Edit, useSelect } from "@refinedev/antd";
 import { Form, Input, Select, Row, Col, Typography, Divider, Tag } from "antd";
 import { ClockCircleOutlined, IdcardOutlined } from "@ant-design/icons";
 import React from "react";
+import { getIcon } from "@/utils/icon-mapping";
 
 const { Text } = Typography;
 
@@ -16,19 +17,10 @@ export default function ObjectEdit({ params }: { params: { id: string } }) {
 
   const object = queryResult?.data?.data;
 
-  // Debug: Log the object data to see the actual field names
-  console.log("Object data:", object);
-
   const { selectProps: categoryTypeSelectProps } = useSelect({
     resource: "category-types",
     optionLabel: "title",
     optionValue: "idCategoryType",
-  });
-
-  const { selectProps: personSelectProps } = useSelect({
-    resource: "persons",
-    optionLabel: "email",
-    optionValue: "idPerson",
   });
 
   return (
@@ -41,7 +33,7 @@ export default function ObjectEdit({ params }: { params: { id: string } }) {
           <Col span={8}>
             <div style={{ marginBottom: 16 }}>
               <Text type="secondary" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
-                <IdcardOutlined /> ID
+                {getIcon("id")} ID
               </Text>
               <div>{object?.idObject}</div>
             </div>
@@ -49,7 +41,7 @@ export default function ObjectEdit({ params }: { params: { id: string } }) {
           <Col span={8}>
             <div style={{ marginBottom: 16 }}>
               <Text type="secondary" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
-                <ClockCircleOutlined style={{ color: '#52c41a' }} /> Created
+                {getIcon("createdAt")} Created
               </Text>
               <Tag color="success" style={{ margin: 0 }}>
                 <div>{new Date(object?.createdAt).toLocaleString()}</div>
@@ -58,7 +50,7 @@ export default function ObjectEdit({ params }: { params: { id: string } }) {
           </Col>
           <Col span={8}>
             <Text type="secondary" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
-              <ClockCircleOutlined style={{ color: '#faad14' }} /> Updated
+              {getIcon("updatedAt")} Updated
             </Text>
             <Tag color="warning" style={{ margin: 0 }}>
               <div>{new Date(object?.updatedAt).toLocaleString()}</div>
@@ -119,10 +111,10 @@ export default function ObjectEdit({ params }: { params: { id: string } }) {
         </div>
         <div>
           <Text type="secondary" style={{ fontSize: 14, marginBottom: 16, display: "block" }}>
-            Edit links to Category Type and Person
+            Edit links to Category Type
           </Text>
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 label="Category Type"
                 name="idCategoryType"
@@ -145,37 +137,6 @@ export default function ObjectEdit({ params }: { params: { id: string } }) {
                     label: `${option.label} `,
                     data: option.data
                   }))}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Person"
-                name={["person", "idPerson"]}
-                rules={[{ required: true, message: "Please select a person" }]}
-                style={{ marginBottom: 16 }}
-              >
-                <Select
-                  size="large"
-                  {...personSelectProps}
-                  placeholder="Select a person"
-                  showSearch
-                  filterOption={(input, option) => {
-                    const searchStr = input.toLowerCase();
-                    const label = option?.label?.toLowerCase() || '';
-                    return label.includes(searchStr);
-                  }}
-                  optionFilterProp="label"
-                  options={personSelectProps.options?.map((option: any) => {
-                    const hasName = option.data?.firstname || option.data?.surname;
-                    return {
-                      value: option.value,
-                      label: hasName 
-                        ? `${option.label} (${option.data?.firstname || ''} ${option.data?.surname || ''})`
-                        : option.label,
-                      data: option.data
-                    };
-                  })}
                 />
               </Form.Item>
             </Col>
