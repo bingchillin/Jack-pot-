@@ -36,6 +36,13 @@ export default function PlantTypeList() {
     syncWithLocation: false, // Disable sync since we're doing client-side filtering
   });
 
+  // Add console.log to check data structure
+  useEffect(() => {
+    if (originalTableProps?.dataSource) {
+      console.log('Plant Type Data:', originalTableProps.dataSource);
+    }
+  }, [originalTableProps?.dataSource]);
+
   // Client-side filtering of the data
   const filteredData = useMemo(() => {
     if (!originalTableProps?.dataSource) return [];
@@ -145,47 +152,47 @@ export default function PlantTypeList() {
             title={"Name"}
           />
           <Table.Column 
-            dataIndex="family_name" 
+            dataIndex="familyName" 
             title={"Family"} 
             render={(text) => (
               <Text type="secondary" italic>{text}</Text>
             )}
           />
           <Table.Column 
-            dataIndex="type_name" 
+            dataIndex="typeName" 
             title={"Type"}
           />
           <Table.Column 
-            dataIndex="plantation_saison" 
+            dataIndex="plantationSaison" 
             title={"Growing Conditions"} 
             render={(_, record: any) => (
               <Space direction="horizontal" size="small">
-                {record.exposition_type && (
+                {record.expositionType && (
                   <Tag color="blue" icon={<EnvironmentOutlined />}>
-                    {record.exposition_type}
+                    {record.expositionType}
                   </Tag>
                 )}
-                {record.ground_type && (
+                {record.groundType && (
                   <Tag color="green" icon={<EnvironmentOutlined />}>
-                    {record.ground_type}
+                    {record.groundType}
                   </Tag>
                 )}
-                {record.plantation_saison && (
+                {record.plantationSaison && (
                   <Tag color="orange" icon={<FieldTimeOutlined />}>
-                    {record.plantation_saison}
+                    {record.plantationSaison}
                   </Tag>
                 )}
               </Space>
             )}
           />
           <Table.Column 
-            dataIndex="saison_first" 
+            dataIndex="saisonFirst" 
             title={"Growing Seasons"} 
             render={(_, record: any) => (
               <Space wrap>
-                {record.saison_first && getSeasonTag(record.saison_first)}
-                {record.saison_second && getSeasonTag(record.saison_second)}
-                {record.saison_third && getSeasonTag(record.saison_third)}
+                {record.saisonFirst && getSeasonTag(record.saisonFirst)}
+                {record.saisonSecond && getSeasonTag(record.saisonSecond)}
+                {record.saisonThird && getSeasonTag(record.saisonThird)}
               </Space>
             )}
           />

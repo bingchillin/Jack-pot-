@@ -12,7 +12,6 @@ import {
   TeamOutlined,
   TagOutlined,
   FileTextOutlined,
-  ClockCircleOutlined
 } from "@ant-design/icons";
 import { DetailRow } from "@/components/common/DetailRow";
 import { showDetailsStyles } from "@/styles/show-details";
@@ -35,15 +34,15 @@ export const PlantTypeDetails: React.FC<PlantTypeDetailsProps> = ({ record }) =>
       </DetailRow>
 
       <DetailRow icon={<BookOutlined />} label="Scientific Name">
-        <Text italic>{record.scientist_name}</Text>
+        <Text italic>{record.scientistName}</Text>
       </DetailRow>
 
       <DetailRow icon={<TeamOutlined />} label="Family">
-        {record.family_name}
+        {record.familyName}
       </DetailRow>
 
       <DetailRow icon={<TagOutlined />} label="Type">
-        {record.type_name}
+        {record.typeName}
       </DetailRow>
 
       <DetailRow icon={<FileTextOutlined />} label="Description">
@@ -54,24 +53,24 @@ export const PlantTypeDetails: React.FC<PlantTypeDetailsProps> = ({ record }) =>
         <Space direction="vertical" size="small">
           <Space>
             <EnvironmentOutlined />
-            <Text>Exposition: {record.exposition_type}</Text>
+            <Text>Exposition: {record.expositionType}</Text>
           </Space>
           <Space>
             <EnvironmentOutlined />
-            <Text>Ground Type: {record.ground_type}</Text>
+            <Text>Ground Type: {record.groundType}</Text>
           </Space>
           <Space>
             <FieldTimeOutlined />
-            <Text>Plantation Season: {record.plantation_saison}</Text>
+            <Text>Plantation Season: {record.plantationSaison}</Text>
           </Space>
         </Space>
       </DetailRow>
 
       <DetailRow icon={<FieldTimeOutlined />} label="Growing Seasons">
         <Space wrap>
-          {record.saison_first && getSeasonTag(record.saison_first)}
-          {record.saison_second && getSeasonTag(record.saison_second)}
-          {record.saison_third && getSeasonTag(record.saison_third)}
+          {record.saisonFirst && getSeasonTag(record.saisonFirst)}
+          {record.saisonSecond && getSeasonTag(record.saisonSecond)}
+          {record.saisonThird && getSeasonTag(record.saisonThird)}
         </Space>
       </DetailRow>
 
@@ -79,40 +78,40 @@ export const PlantTypeDetails: React.FC<PlantTypeDetailsProps> = ({ record }) =>
         <Space direction="vertical" size="small">
           <Space>
             <FireOutlined />
-            <Text>Temperature (Ground): {record.temperature_sensor_ground}°C</Text>
+            <Text>Temperature (Ground): {record.temperatureSensorGround}°C</Text>
           </Space>
           <Space>
             <FireOutlined />
-            <Text>Temperature (External): {record.temperature_sensor_extern}°C</Text>
+            <Text>Temperature (External): {record.temperatureSensorExtern}°C</Text>
           </Space>
           <Space>
             <CloudOutlined />
-            <Text>Air Humidity: {record.humidity_air_sensor}%</Text>
+            <Text>Air Humidity: {record.humidityAirSensor}%</Text>
           </Space>
           <Space>
             <CloudOutlined />
-            <Text>Ground Humidity: {record.humidity_ground_sensor}%</Text>
+            <Text>Ground Humidity: {record.humidityGroundSensor}%</Text>
           </Space>
           <Space>
             <ExperimentOutlined />
-            <Text>pH Level: {record.ph_ground_sensor}</Text>
+            <Text>pH Level: {record.phGroundSensor}</Text>
           </Space>
           <Space>
             <ExperimentOutlined />
-            <Text>Conductivity: {record.conductivity_electrique_fertility_sensor}</Text>
+            <Text>Conductivity: {record.conductivityElectriqueFertilitySensor}</Text>
           </Space>
           <Space>
             <FieldTimeOutlined />
-            <Text>Sun Exposure: {record.exposition_time_sun} hours</Text>
+            <Text>Sun Exposure: {record.expositionTimeSun} hours</Text>
           </Space>
         </Space>
       </DetailRow>
 
       <DetailRow icon={<InfoCircleOutlined />} label="Size Range">
         <Space>
-          <Text>Min: {record.height_min}cm</Text>
+          <Text>Min: {record.heightMin}cm</Text>
           <Text>-</Text>
-          <Text>Max: {record.height_max}cm</Text>
+          <Text>Max: {record.heightMax}cm</Text>
         </Space>
       </DetailRow>
 

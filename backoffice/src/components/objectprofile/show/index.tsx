@@ -113,7 +113,7 @@ export const ObjectProfileDetails: React.FC<ObjectProfileDetailsProps> = ({ reco
         </Col>
         <Col span={12}>
           <DetailRow icon={getIcon("sunExposure")} label="Sun Exposure">
-            {record?.expositionTimeSun ? `${record.expositionTimeSun} hours` : '-'}
+            {record?.expositionTimeSun ? `${record.expositionTimeSun} ${record.expositionTimeSun == 1 ? 'hour' : 'hours'}` : '-'}
           </DetailRow>
         </Col>
       </Row>
