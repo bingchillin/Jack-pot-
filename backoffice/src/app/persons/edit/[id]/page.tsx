@@ -1,9 +1,10 @@
 "use client";
 
 import { useForm, Edit } from "@refinedev/antd";
-import { Form, Input, Select, Row, Col, Card, Typography, Space, Divider, Tag } from "antd";
-import { UserOutlined, CrownOutlined, ClockCircleOutlined, IdcardOutlined } from "@ant-design/icons";
+import { Form, Input, Select, Row, Col, Typography, Divider, Tag } from "antd";
+import { ClockCircleOutlined, IdcardOutlined } from "@ant-design/icons";
 import React, { useEffect } from "react";
+import { getRoleIcon } from "@/utils/utils";
 
 const { Text } = Typography;
 
@@ -19,15 +20,6 @@ export default function PersonEdit({ params }: { params: { id: string } }) {
   });
 
   const person = queryResult?.data?.data;
-
-  const getRoleIcon = (roleTitle: string) => {
-    switch (roleTitle?.toLowerCase()) {
-      case 'admin':
-        return <CrownOutlined style={{ color: '#faad14' }} />;
-      default:
-        return <UserOutlined style={{ color: '#1890ff' }} />;
-    }
-  };
 
   useEffect(() => {
     if (formProps.form && person) {
