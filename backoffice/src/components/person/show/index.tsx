@@ -1,13 +1,14 @@
-import { DateField } from "@refinedev/antd";
-import { type BaseRecord } from "@refinedev/core";
-import { Space, Tag, Button, message } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined, UserOutlined, MailOutlined, PhoneOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import React from "react";
+import { DateField, Show } from "@refinedev/antd";
+import { type BaseRecord, useShow } from "@refinedev/core";
+import { Space, Tag, Button, message, Divider } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined, UserOutlined, MailOutlined, PhoneOutlined, ClockCircleOutlined, AppstoreOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
 import { authApi } from "@utils/api/auth";
 import { DetailRow } from "@/components/common/DetailRow";
 import { showDetailsStyles } from "@/styles/show-details";
 import { getRoleIcon } from "@/utils/utils";
 import { fieldIcons } from "@/utils/icon-mapping";
+import { ObjectProfilesModal } from "./ObjectProfilesModal";
 
 interface PersonDetailsProps {
   record: BaseRecord;
@@ -15,6 +16,7 @@ interface PersonDetailsProps {
 
 export const PersonDetails: React.FC<PersonDetailsProps> = ({ record }) => {
   const [messageApi, contextHolder] = message.useMessage();
+  const [objectProfilesModalVisible, setObjectProfilesModalVisible] = useState(false);
 
   const handleResendVerification = async (email: string) => {
     try {
@@ -88,6 +90,23 @@ export const PersonDetails: React.FC<PersonDetailsProps> = ({ record }) => {
           </Tag>
         </DetailRow>
       </div>
+      <div style={{ marginTop: 24 }}>
+      <Button
+        type="primary"
+        icon={<AppstoreOutlined />}
+        onClick={() => setObjectProfilesModalVisible(true)}
+      >
+        View Object Profiles
+      </Button>
+
+      <ObjectProfilesModal
+        visible={objectProfilesModalVisible}
+        onClose={() => setObjectProfilesModalVisible(false)}
+        personId={record.idPerson}
+        personName={`${record.firstname} ${record.surname}`}
+      />
+      </div>
+
     </>
   );
-}; 
+};

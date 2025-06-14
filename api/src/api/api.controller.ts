@@ -141,7 +141,6 @@ export class ApiController {
   }
 
   @Get('/person/:id/object-profiles')
-  @UseGuards(JwtAuthGuard)
   @ApiExcludeEndpoint()
   findObjectsProfileByPersonId(@Param('id') id: string) {
       return this.personService.findObjectsProfileByPersonId(+id);
