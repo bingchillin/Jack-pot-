@@ -1,3 +1,4 @@
+import 'package:app/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/object_profile.dart';
@@ -26,6 +27,7 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
   Future<void> _updateField(String field, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
+
 
     if (token == null) {
       print('Token introuvable');
