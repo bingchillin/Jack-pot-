@@ -26,7 +26,8 @@ import {
   AppstoreOutlined,
   ToolOutlined,
   TagsOutlined,
-  SafetyCertificateOutlined
+  SafetyCertificateOutlined,
+  ContactsOutlined
 } from "@ant-design/icons";
 import { GiPlantRoots, GiPlantSeed, GiFlowerPot } from "react-icons/gi";
 
@@ -63,7 +64,6 @@ export default function RootLayout({
                     resources={[
                       {
                         name: "user-management",
-                        // Remove the list property - this is just a parent group
                         meta: {
                           label: "User Management",
                           icon: <TeamOutlined />,
@@ -82,6 +82,18 @@ export default function RootLayout({
                         },
                       },
                       {
+                        name: "contacts",
+                        list: "/contacts",
+                        create: "/contacts/create",
+                        edit: "/contacts/edit/:id",
+                        show: "/contacts/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <ContactsOutlined />,
+                          parent: "user-management",
+                        },
+                      },
+                      {
                         name: "roles",
                         list: "/roles",
                         create: "/roles/create",
@@ -93,21 +105,20 @@ export default function RootLayout({
                           parent: "user-management",
                         },
                       },
-                      {
-                        name: "parameter-types",
-                        list: "/parameter-types",
-                        create: "/parameter-types/create",
-                        edit: "/parameter-types/edit/:id",
-                        show: "/parameter-types/show/:id",
-                        meta: {
-                          canDelete: true,
-                          icon: <TagsOutlined />,
-                          parent: "user-management",
-                        },
-                      },
+                      /*                       {
+                                              name: "parameter-types",
+                                              list: "/parameter-types",
+                                              create: "/parameter-types/create",
+                                              edit: "/parameter-types/edit/:id",
+                                              show: "/parameter-types/show/:id",
+                                              meta: {
+                                                canDelete: true,
+                                                icon: <TagsOutlined />,
+                                                parent: "user-management",
+                                              },
+                                            }, */
                       {
                         name: "object-management",
-                        // Remove the list property here too - this is just a parent group
                         meta: {
                           label: "Object Management",
                           icon: <ToolOutlined />,
@@ -115,7 +126,6 @@ export default function RootLayout({
                       },
                       {
                         name: "plant-management",
-                        // Remove the list property here too - this is just a parent group
                         meta: {
                           label: "Plant Management",
                           icon: <GiPlantRoots />,
