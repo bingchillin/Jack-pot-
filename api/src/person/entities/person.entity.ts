@@ -62,8 +62,11 @@ export class Person {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Contact, contact => contact.person)
-  contacts: Contact[];
+  @OneToMany(() => Contact, contact => contact.requester)
+  contactsAsRequester: Contact[];
+
+  @OneToMany(() => Contact, contact => contact.receiver)
+  contactsAsReceiver: Contact[];
 
   @OneToMany(() => EventParty, eventParty => eventParty.person)
   eventParties: EventParty[];
