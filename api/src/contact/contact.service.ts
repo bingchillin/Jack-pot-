@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Contact, ContactStatus } from './entities/contact.entity';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { Person } from '../person/entities/person.entity';
+import { ContactResponseDto } from './dto/contact-response.dto';
+import { ContactQueryDto, ContactStatsDto } from './dto/contact-query.dto';
 
 @Injectable()
 export class ContactsService {
@@ -14,7 +16,31 @@ export class ContactsService {
     private personRepository: Repository<Person>,
   ) {}
 
-  async sendContactRequest(requesterId: number, createContactDto: CreateContactDto): Promise<Contact> {
+  private transformContactToResponse(contact: Contact): ContactResponseDto {
+    return {
+      id: contact.id,
+      requesterId: contact.requesterId,
+      receiverId: contact.receiverId,
+      status: contact.status,
+      blockedBy: contact.blockedBy,
+      createdAt: contact.createdAt,
+      updatedAt: contact.updatedAt,
+      requester: contact.requester ? {
+        id: contact.requester.idPerson,
+        email: contact.requester.email,
+        firstname: contact.requester.firstname,
+        surname: contact.requester.surname
+      } : null,
+      receiver: contact.receiver ? {
+        id: contact.receiver.idPerson,
+        email: contact.receiver.email,
+        firstname: contact.receiver.firstname,
+        surname: contact.receiver.surname
+      } : null
+    };
+  }
+
+  async sendContactRequest(requesterId: number, createContactDto: CreateContactDto): Promise<ContactResponseDto> {
     const { receiverId } = createContactDto;
 
     // Check if receiver exists
@@ -33,7 +59,8 @@ export class ContactsService {
       where: [
         { requesterId, receiverId },
         { requesterId: receiverId, receiverId: requesterId }
-      ]
+      ],
+      relations: ['requester', 'receiver']
     });
 
     if (existingContact) {
@@ -51,7 +78,8 @@ export class ContactsService {
         existingContact.status = ContactStatus.PENDING;
         existingContact.requesterId = requesterId;
         existingContact.receiverId = receiverId;
-        return await this.contactRepository.save(existingContact);
+        const savedContact = await this.contactRepository.save(existingContact);
+        return this.transformContactToResponse(savedContact);
       }
     }
 
@@ -60,10 +88,15 @@ export class ContactsService {
     contact.receiverId = receiverId;
     contact.status = ContactStatus.PENDING;
 
-    return await this.contactRepository.save(contact);
+    const savedContact = await this.contactRepository.save(contact);
+    const contactWithRelations = await this.contactRepository.findOne({
+      where: { id: savedContact.id },
+      relations: ['requester', 'receiver']
+    });
+    return this.transformContactToResponse(contactWithRelations);
   }
 
-  async respondToContactRequest(userId: number, contactId: number, status: ContactStatus): Promise<Contact> {
+  async respondToContactRequest(userId: number, contactId: number, status: ContactStatus): Promise<ContactResponseDto> {
     const contact = await this.contactRepository.findOne({
       where: { id: contactId },
       relations: ['requester', 'receiver']
@@ -89,10 +122,11 @@ export class ContactsService {
       contact.blockedBy = userId;
     }
 
-    return await this.contactRepository.save(contact);
+    const savedContact = await this.contactRepository.save(contact);
+    return this.transformContactToResponse(savedContact);
   }
 
-  async blockContact(userId: number, contactId: number): Promise<Contact> {
+  async blockContact(userId: number, contactId: number): Promise<ContactResponseDto> {
     const contact = await this.contactRepository.findOne({
       where: { id: contactId },
       relations: ['requester', 'receiver']
@@ -110,7 +144,8 @@ export class ContactsService {
     contact.status = ContactStatus.BLOCKED;
     contact.blockedBy = userId;
 
-    return await this.contactRepository.save(contact);
+    const savedContact = await this.contactRepository.save(contact);
+    return this.transformContactToResponse(savedContact);
   }
 
   async removeContact(userId: number, contactId: number): Promise<void> {
@@ -130,8 +165,8 @@ export class ContactsService {
     await this.contactRepository.delete(contactId);
   }
 
-  async getMyContacts(userId: number): Promise<Contact[]> {
-    return await this.contactRepository.find({
+  async getMyContacts(userId: number): Promise<ContactResponseDto[]> {
+    const contacts = await this.contactRepository.find({
       where: [
         { requesterId: userId, status: ContactStatus.ACCEPTED },
         { receiverId: userId, status: ContactStatus.ACCEPTED }
@@ -139,26 +174,32 @@ export class ContactsService {
       relations: ['requester', 'receiver'],
       order: { updatedAt: 'DESC' }
     });
+
+    return contacts.map(contact => this.transformContactToResponse(contact));
   }
 
-  async getPendingRequests(userId: number): Promise<Contact[]> {
-    return await this.contactRepository.find({
+  async getPendingRequests(userId: number): Promise<ContactResponseDto[]> {
+    const contacts = await this.contactRepository.find({
       where: { receiverId: userId, status: ContactStatus.PENDING },
       relations: ['requester', 'receiver'],
       order: { createdAt: 'DESC' }
     });
+
+    return contacts.map(contact => this.transformContactToResponse(contact));
   }
 
-  async getSentRequests(userId: number): Promise<Contact[]> {
-    return await this.contactRepository.find({
+  async getSentRequests(userId: number): Promise<ContactResponseDto[]> {
+    const contacts = await this.contactRepository.find({
       where: { requesterId: userId, status: ContactStatus.PENDING },
       relations: ['requester', 'receiver'],
       order: { createdAt: 'DESC' }
     });
+
+    return contacts.map(contact => this.transformContactToResponse(contact));
   }
 
-  async getBlockedContacts(userId: number): Promise<Contact[]> {
-    return await this.contactRepository.find({
+  async getBlockedContacts(userId: number): Promise<ContactResponseDto[]> {
+    const contacts = await this.contactRepository.find({
       where: [
         { requesterId: userId, status: ContactStatus.BLOCKED },
         { receiverId: userId, status: ContactStatus.BLOCKED }
@@ -166,6 +207,8 @@ export class ContactsService {
       relations: ['requester', 'receiver'],
       order: { updatedAt: 'DESC' }
     });
+
+    return contacts.map(contact => this.transformContactToResponse(contact));
   }
 
   async unblockContact(userId: number, contactId: number): Promise<void> {
@@ -214,5 +257,60 @@ export class ContactsService {
       .select(['person.idPerson', 'person.username', 'person.email'])
       .limit(20)
       .getMany();
+  }
+
+  async getAllContacts(query: ContactQueryDto): Promise<{ data: ContactResponseDto[]; total: number }> {
+    const { status, search, page = 1, limit = 20 } = query;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.contactRepository.createQueryBuilder('contact')
+      .leftJoinAndSelect('contact.requester', 'requester')
+      .leftJoinAndSelect('contact.receiver', 'receiver');
+
+    if (status) {
+      queryBuilder.andWhere('contact.status = :status', { status });
+    }
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(requester.email ILIKE :search OR requester.firstname ILIKE :search OR requester.surname ILIKE :search OR receiver.email ILIKE :search OR receiver.firstname ILIKE :search OR receiver.surname ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    const [contacts, total] = await queryBuilder
+      .skip(skip)
+      .take(limit)
+      .orderBy('contact.updatedAt', 'DESC')
+      .getManyAndCount();
+
+    return {
+      data: contacts.map(contact => this.transformContactToResponse(contact)),
+      total
+    };
+  }
+
+  async getContactStats(): Promise<ContactStatsDto> {
+    const [
+      totalContacts,
+      pendingRequests,
+      acceptedContacts,
+      blockedContacts,
+      rejectedContacts
+    ] = await Promise.all([
+      this.contactRepository.count(),
+      this.contactRepository.count({ where: { status: ContactStatus.PENDING } }),
+      this.contactRepository.count({ where: { status: ContactStatus.ACCEPTED } }),
+      this.contactRepository.count({ where: { status: ContactStatus.BLOCKED } }),
+      this.contactRepository.count({ where: { status: ContactStatus.REJECTED } })
+    ]);
+
+    return {
+      totalContacts,
+      pendingRequests,
+      acceptedContacts,
+      blockedContacts,
+      rejectedContacts
+    };
   }
 }

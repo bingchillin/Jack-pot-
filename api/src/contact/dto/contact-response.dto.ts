@@ -9,13 +9,15 @@ export class ContactResponseDto {
     createdAt: Date;
     updatedAt: Date;
     requester: {
-      id: number;
-      username: string;
-      email: string;
-    };
+        id: number;
+        email: string;
+        firstname: string;
+        surname: string;
+    } | null;
     receiver: {
-      id: number;
-      username: string;
-      email: string;
-    };
-  }
+        id: number;
+        email: string;
+        firstname: string;
+        surname: string;
+    } | null;
+}
