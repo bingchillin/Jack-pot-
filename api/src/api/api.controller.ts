@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Query, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Query, Request, NotFoundException, BadRequestException, ParseIntPipe } from '@nestjs/common';
 import { PersonService } from '../person/person.service';
 import { PersonDocs } from './swagger/person.docs';
 import { CreatePersonDto } from '../person/dto/create-person.dto';
@@ -47,7 +47,7 @@ import { ObjectProfileService } from 'src/object-profile/object-profile.service'
 import { CreateObjectProfileDto } from 'src/object-profile/dto/create-object-profile.dto';
 import { UpdateObjectProfileDto } from 'src/object-profile/dto/update-object-profile.dto';
 import { ObjectProfileDocs } from './swagger/object-profile.docs';
-import { ContactService } from 'src/contact/contact.service';
+import { ContactsService } from 'src/contact/contact.service';
 import { CreateContactDto } from 'src/contact/dto/create-contact.dto';
 import { UpdateContactDto } from 'src/contact/dto/update-contact.dto';
 import { ContactDocs } from './swagger/contact.docs';
@@ -68,14 +68,11 @@ import { ObjectService } from '../object/object.service';
 import { CreateObjectDto } from '../object/dto/create-object.dto';
 import { UpdateObjectDto } from '../object/dto/update-object.dto';
 import { ObjectDocs } from './swagger/object.docs';
-import { RelationshipService } from '../relationship/relationship.service';
-import { CreateRelationshipDto } from '../relationship/dto/create-relationship.dto';
-import { UpdateRelationshipDto } from '../relationship/dto/update-relationship.dto';
-import { RelationshipDocs } from './swagger/relationship.docs';
 import { NotificationService } from '../notification/notification.service';
 import { CreateNotificationDto } from '../notification/dto/create-notification.dto';
 import { UpdateNotificationDto } from '../notification/dto/update-notification.dto';
 import { NotificationDocs } from './swagger/notification.docs';
+import { ContactStatus } from '../contact/entities/contact.entity';
 
 @ApiTags('z-API')
 @Controller('api')
@@ -93,12 +90,11 @@ export class ApiController {
     private readonly categoryTypeService: CategoryTypeService,
     private readonly plantTypeService: PlantTypeService,
     private readonly objectProfileService: ObjectProfileService,
-    private readonly contactService: ContactService,
+    private readonly contactsService: ContactsService,
     private readonly avatarService: AvatarService,
     private readonly personParameterService: PersonParameterService,
     private readonly parameterTypeService: ParameterTypeService,
     private readonly objectService: ObjectService,
-    private readonly relationshipService: RelationshipService,
     private readonly notificationService: NotificationService,
   ) {}
 
@@ -528,43 +524,51 @@ export class ApiController {
   // =========================================
   // Contact Management Endpoints
   // =========================================
+  @UseGuards(JwtAuthGuard)
   @Post('/contact')
   @ContactDocs.create()
-  createContact(@Body() dto: CreateContactDto) {
-    return this.contactService.create(dto);
+  async createContact(@Request() req, @Body() createContactDto: CreateContactDto) {
+    return await this.contactsService.sendContactRequest(req.user.idPerson, createContactDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/contacts')
   @ContactDocs.findAll()
-  findAllContacts(
-    @Query('personId') personId?: string,
-    @Query('relationshipId') relationshipId?: string
-  ) {
-    if (personId) {
-      return this.contactService.findByPerson(+personId);
-    }
-    if (relationshipId) {
-      return this.contactService.findByRelationship(+relationshipId);
-    }
-    return this.contactService.findAll();
+  async findAllContacts(@Request() req) {
+    return await this.contactsService.getMyContacts(req.user.idPerson);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/contact/:id')
   @ContactDocs.findOne()
-  findOneContact(@Param('id') id: string) {
-    return this.contactService.findOne(+id);
+  async findOneContact(@Request() req, @Param('id', ParseIntPipe) id: number) {
+    const contacts = await this.contactsService.getMyContacts(req.user.idPerson);
+    const contact = contacts.find(c => c.id === id);
+    if (!contact) {
+      throw new NotFoundException('Contact not found');
+    }
+    return contact;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/contact/:id')
   @ContactDocs.update()
-  updateContact(@Param('id') id: string, @Body() dto: UpdateContactDto) {
-    return this.contactService.update(+id, dto);
+  async updateContact(@Request() req, @Param('id', ParseIntPipe) id: number, @Body() updateContactDto: UpdateContactDto) {
+    if (updateContactDto.status === ContactStatus.ACCEPTED) {
+      return await this.contactsService.respondToContactRequest(req.user.idPerson, id, ContactStatus.ACCEPTED);
+    } else if (updateContactDto.status === ContactStatus.REJECTED) {
+      return await this.contactsService.respondToContactRequest(req.user.idPerson, id, ContactStatus.REJECTED);
+    } else if (updateContactDto.status === ContactStatus.BLOCKED) {
+      return await this.contactsService.blockContact(req.user.idPerson, id);
+    }
+    throw new BadRequestException('Invalid status update');
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('/contact/:id')
   @ContactDocs.remove()
-  removeContact(@Param('id') id: string) {
-    return this.contactService.remove(+id);
+  async removeContact(@Request() req, @Param('id', ParseIntPipe) id: number) {
+    return await this.contactsService.removeContact(req.user.idPerson, id);
   }
 
   // =========================================
@@ -721,42 +725,6 @@ export class ApiController {
   @ObjectDocs.remove()
   removeObject(@Param('id') id: string) {
     return this.objectService.remove(+id);
-  }
-
-  // =========================================
-  // Relationship Management Endpoints
-  // =========================================
-  @Post('/relationship')
-  @RelationshipDocs.create()
-  createRelationship(@Body() dto: CreateRelationshipDto) {
-    return this.relationshipService.create(dto);
-  }
-
-  @Get('/relationships')
-  @RelationshipDocs.findAll()
-  findAllRelationships(@Query('title') title?: string) {
-    if (title) {
-      return this.relationshipService.findByTitle(title);
-    }
-    return this.relationshipService.findAll();
-  }
-
-  @Get('/relationship/:id')
-  @RelationshipDocs.findOne()
-  findOneRelationship(@Param('id') id: string) {
-    return this.relationshipService.findOne(+id);
-  }
-
-  @Patch('/relationship/:id')
-  @RelationshipDocs.update()
-  updateRelationship(@Param('id') id: string, @Body() dto: UpdateRelationshipDto) {
-    return this.relationshipService.update(+id, dto);
-  }
-
-  @Delete('/relationship/:id')
-  @RelationshipDocs.remove()
-  removeRelationship(@Param('id') id: string) {
-    return this.relationshipService.remove(+id);
   }
 
   // =========================================

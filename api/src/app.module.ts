@@ -22,7 +22,6 @@ import { Game } from './game/entities/game.entity';
 import { ParameterType } from './parameter-type/entities/parameter-type.entity';
 import { Avatar } from './avatar/entities/avatar.entity';
 import { PlantPerson } from './plant-person/entities/plant-person.entity';
-import { Relationship } from './relationship/entities/relationship.entity';
 import { PlantType } from './plant-type/entities/plant-type.entity';
 
 // Module imports
@@ -34,7 +33,6 @@ import { EventPartyPersonModule } from './event-party-person/event-party-person.
 import { GameModule } from './game/game.module';
 import { AvatarModule } from './avatar/avatar.module';
 import { PlantPersonModule } from './plant-person/plant-person.module';
-import { RelationshipModule } from './relationship/relationship.module';
 import { ObjectModule } from './object/object.module';
 import { PlantModule } from './plant/plant.module';
 import { CategoryTypeModule } from './category-type/category-type.module';
@@ -77,10 +75,9 @@ import { MailerModule } from './mailer/mailer.module';
             ParameterType,
             Avatar,
             PlantPerson,
-            Relationship,
             PlantType
           ],
-          synchronize: false,
+          synchronize: true,
           autoLoadEntities: true,
         };
         console.log('Database Configuration:', {
@@ -104,7 +101,6 @@ import { MailerModule } from './mailer/mailer.module';
     GameModule,
     AvatarModule,
     PlantPersonModule,
-    RelationshipModule,
     ObjectModule,
     PlantModule,
     CategoryTypeModule,

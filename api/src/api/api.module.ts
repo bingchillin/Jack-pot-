@@ -18,7 +18,6 @@ import { AvatarModule } from '../avatar/avatar.module';
 import { PersonParameterModule } from '../lnk-person-parameter/person-parameter.module';
 import { ParameterTypeModule } from '../parameter-type/parameter-type.module';
 import { ObjectModule } from '../object/object.module';
-import { RelationshipModule } from '../relationship/relationship.module';
 import { NotificationModule } from '../notification/notification.module';
 
 @Module({
@@ -29,7 +28,7 @@ import { NotificationModule } from '../notification/notification.module';
     PlantPersonModule, GamePersonModule, EventPartyPersonModule, RoleModule,
     CategoryTypeModule, PlantTypeModule, ObjectProfileModule, ContactModule,
     AvatarModule, PersonParameterModule, ParameterTypeModule, ObjectModule,
-    RelationshipModule, NotificationModule
+    NotificationModule
   ]
 })
 export class ApiModule { }
