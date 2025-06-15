@@ -4,10 +4,14 @@ import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {jwtConstants} from './constants';
 import {Request as RequestType} from 'express';
 import {ConfigService} from '@nestjs/config';
+import { PersonService } from '../person/person.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor(private readonly configService: ConfigService) {
+    constructor(
+        private readonly configService: ConfigService,
+        private readonly personService: PersonService
+    ) {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
                 JwtStrategy.extractJWT,
@@ -29,10 +33,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             throw new UnauthorizedException('Invalid token payload');
         }
 
+        // Get the full user object from the database
+        const user = await this.personService.findOne(payload.sub);
+        if (!user) {
+            throw new UnauthorizedException('User not found');
+        }
+
         return {
-            id: payload.sub,
-            email: payload.email,
-            name: payload.name
+            idPerson: user.idPerson,
+            email: user.email,
+            firstname: user.firstname,
+            surname: user.surname,
+            idRole: user.idRole
         };
     }
 
