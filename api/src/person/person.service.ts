@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsWhere, FindManyOptions } from 'typeorm';
 import { Person } from './entities/person.entity';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
@@ -172,5 +172,9 @@ export class PersonService {
 
         // Return the object profiles with their associated objects and plant types
         return person.objectProfiles;
+    }
+
+    async count(options?: FindManyOptions<Person>): Promise<number> {
+        return await this.personRepository.count(options);
     }
 } 

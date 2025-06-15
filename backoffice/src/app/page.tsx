@@ -1,15 +1,23 @@
 "use client";
 
 import { Suspense } from "react";
-
-import { NavigateToResource } from "@refinedev/nextjs-router";
 import { Authenticated } from "@refinedev/core";
+import { ThemedLayoutV2 } from "@refinedev/antd";
+import { Header } from "@components/header";
+import dynamic from "next/dynamic";
 
-export default function IndexPage() {
+// Create a client-side only dashboard component
+const DashboardContent = dynamic(() => import("@/components/dashboard"), {
+  ssr: false,
+});
+
+export default function DashboardPage() {
   return (
     <Suspense>
-      <Authenticated key="home-page">
-        <NavigateToResource />
+      <Authenticated key="dashboard-page">
+        <ThemedLayoutV2 Header={Header}>
+          <DashboardContent />
+        </ThemedLayoutV2>
       </Authenticated>
     </Suspense>
   );

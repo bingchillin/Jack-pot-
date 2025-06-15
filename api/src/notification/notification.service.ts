@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindManyOptions } from 'typeorm';
 import { Notification } from './entities/notification.entity';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
@@ -92,5 +92,9 @@ export class NotificationService {
   async remove(id: number): Promise<void> {
     const notification = await this.findOne(id);
     await this.notificationRepository.remove(notification);
+  }
+
+  async count(options?: FindManyOptions<Notification>): Promise<number> {
+    return await this.notificationRepository.count(options);
   }
 } 

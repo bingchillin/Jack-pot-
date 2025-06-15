@@ -36,11 +36,11 @@ export class Contact {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => Person, { eager: true })
+  @ManyToOne(() => Person)
   @JoinColumn({ name: 'requester_id', referencedColumnName: 'idPerson' })
   requester: Person;
 
-  @ManyToOne(() => Person, { eager: true })
+  @ManyToOne(() => Person)
   @JoinColumn({ name: 'receiver_id', referencedColumnName: 'idPerson' })
   receiver: Person;
 }

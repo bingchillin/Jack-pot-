@@ -6,7 +6,7 @@ import { UpdatePersonDto } from '../person/dto/update-person.dto';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthDocs } from './swagger/auth.docs';
-import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiTags, ApiExcludeEndpoint, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { PlantService } from 'src/plant/plant.service';
 import { PlantDocs } from './swagger/plant.docs';
 import { CreatePlantDto } from 'src/plant/dto/create-plant.dto';
@@ -73,6 +73,8 @@ import { CreateNotificationDto } from '../notification/dto/create-notification.d
 import { UpdateNotificationDto } from '../notification/dto/update-notification.dto';
 import { NotificationDocs } from './swagger/notification.docs';
 import { ContactStatus } from '../contact/entities/contact.entity';
+import { ContactQueryDto } from '../contact/dto/contact-query.dto';
+import { MoreThan } from 'typeorm';
 
 @ApiTags('z-API')
 @Controller('api')
@@ -571,6 +573,21 @@ export class ApiController {
     return await this.contactsService.removeContact(req.user.idPerson, id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/contacts/all')
+  @ApiOperation({ summary: 'Get all contacts with filtering and pagination' })
+  @ApiQuery({ type: ContactQueryDto })
+  async getAllContacts(@Query() query: ContactQueryDto) {
+    return await this.contactsService.getAllContacts(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/contacts/stats')
+  @ApiOperation({ summary: 'Get contact statistics' })
+  async getContactStats() {
+    return await this.contactsService.getContactStats();
+  }
+
   // =========================================
   // Avatar Management Endpoints
   // =========================================
@@ -761,5 +778,45 @@ export class ApiController {
   @NotificationDocs.remove()
   removeNotification(@Param('id') id: string) {
     return this.notificationService.remove(+id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/stats')
+  @ApiOperation({ summary: 'Get overall system statistics' })
+  async getSystemStats() {
+    const [
+      contactStats,
+      totalUsers,
+      totalPlants,
+      totalObjectProfiles,
+      totalNotifications,
+      unreadNotifications
+    ] = await Promise.all([
+      this.contactsService.getContactStats(),
+      this.personService.count(),
+      this.plantService.count(),
+      this.objectProfileService.count(),
+      this.notificationService.count(),
+      this.notificationService.count({ where: { isRead: false } })
+    ]);
+
+    return {
+      contacts: contactStats,
+      users: {
+        total: totalUsers
+      },
+      plants: {
+        total: totalPlants,
+        available: await this.plantService.count({ where: { isAvailable: true } })
+      },
+      objects: {
+        total: totalObjectProfiles,
+        automatic: await this.objectProfileService.count({ where: { isAutomatic: true } })
+      },
+      notifications: {
+        total: totalNotifications,
+        unread: unreadNotifications
+      }
+    };
   }
 }
