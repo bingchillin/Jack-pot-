@@ -6,7 +6,7 @@ import { UpdatePersonDto } from '../person/dto/update-person.dto';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthDocs } from './swagger/auth.docs';
-import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiTags, ApiExcludeEndpoint, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { PlantService } from 'src/plant/plant.service';
 import { PlantDocs } from './swagger/plant.docs';
 import { CreatePlantDto } from 'src/plant/dto/create-plant.dto';
@@ -73,6 +73,7 @@ import { CreateNotificationDto } from '../notification/dto/create-notification.d
 import { UpdateNotificationDto } from '../notification/dto/update-notification.dto';
 import { NotificationDocs } from './swagger/notification.docs';
 import { ContactStatus } from '../contact/entities/contact.entity';
+import { ContactQueryDto } from '../contact/dto/contact-query.dto';
 
 @ApiTags('z-API')
 @Controller('api')
@@ -569,6 +570,21 @@ export class ApiController {
   @ContactDocs.remove()
   async removeContact(@Request() req, @Param('id', ParseIntPipe) id: number) {
     return await this.contactsService.removeContact(req.user.idPerson, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/contacts/all')
+  @ApiOperation({ summary: 'Get all contacts with filtering and pagination' })
+  @ApiQuery({ type: ContactQueryDto })
+  async getAllContacts(@Query() query: ContactQueryDto) {
+    return await this.contactsService.getAllContacts(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/contacts/stats')
+  @ApiOperation({ summary: 'Get contact statistics' })
+  async getContactStats() {
+    return await this.contactsService.getContactStats();
   }
 
   // =========================================
