@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindManyOptions } from 'typeorm';
 import { ObjectProfile } from './entities/object-profile.entity';
 import { CreateObjectProfileDto } from './dto/create-object-profile.dto';
 import { UpdateObjectProfileDto } from './dto/update-object-profile.dto';
@@ -319,5 +319,9 @@ export class ObjectProfileService {
     async remove(id: number) {
         const objectProfile = await this.findOne(id);
         return this.objectProfileRepository.remove(objectProfile);
+    }
+
+    async count(options?: FindManyOptions<ObjectProfile>): Promise<number> {
+        return await this.objectProfileRepository.count(options);
     }
 } 

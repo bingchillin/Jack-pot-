@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindManyOptions } from 'typeorm';
 import { EventParty } from './entities/event-party.entity';
 import { CreateEventPartyDto } from './dto/create-event-party.dto';
 import { UpdateEventPartyDto } from './dto/update-event-party.dto';
@@ -68,5 +68,9 @@ export class EventPartyService {
             throw new NotFoundException(`Event party with ID ${id} not found`);
         }
         return eventParty;
+    }
+
+    async count(options?: FindManyOptions<EventParty>): Promise<number> {
+        return await this.eventPartyRepository.count(options);
     }
 } 

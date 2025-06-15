@@ -74,6 +74,7 @@ import { UpdateNotificationDto } from '../notification/dto/update-notification.d
 import { NotificationDocs } from './swagger/notification.docs';
 import { ContactStatus } from '../contact/entities/contact.entity';
 import { ContactQueryDto } from '../contact/dto/contact-query.dto';
+import { MoreThan } from 'typeorm';
 
 @ApiTags('z-API')
 @Controller('api')
@@ -777,5 +778,45 @@ export class ApiController {
   @NotificationDocs.remove()
   removeNotification(@Param('id') id: string) {
     return this.notificationService.remove(+id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/stats')
+  @ApiOperation({ summary: 'Get overall system statistics' })
+  async getSystemStats() {
+    const [
+      contactStats,
+      totalUsers,
+      totalPlants,
+      totalObjectProfiles,
+      totalNotifications,
+      unreadNotifications
+    ] = await Promise.all([
+      this.contactsService.getContactStats(),
+      this.personService.count(),
+      this.plantService.count(),
+      this.objectProfileService.count(),
+      this.notificationService.count(),
+      this.notificationService.count({ where: { isRead: false } })
+    ]);
+
+    return {
+      contacts: contactStats,
+      users: {
+        total: totalUsers
+      },
+      plants: {
+        total: totalPlants,
+        available: await this.plantService.count({ where: { isAvailable: true } })
+      },
+      objects: {
+        total: totalObjectProfiles,
+        automatic: await this.objectProfileService.count({ where: { isAutomatic: true } })
+      },
+      notifications: {
+        total: totalNotifications,
+        unread: unreadNotifications
+      }
+    };
   }
 }
