@@ -106,8 +106,17 @@ export class ContactsService {
       throw new NotFoundException('Contact request not found');
     }
 
-    // Only the receiver can respond to the request
-    if (contact.receiverId !== userId) {
+    // Get the user to check if they are an admin
+    const user = await this.personRepository.findOne({
+      where: { idPerson: userId }
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Allow admins (idRole === 1) to respond to any request
+    if (user.idRole !== 1 && contact.receiverId !== userId) {
       throw new ForbiddenException('You can only respond to requests sent to you');
     }
 
@@ -211,9 +220,10 @@ export class ContactsService {
     return contacts.map(contact => this.transformContactToResponse(contact));
   }
 
-  async unblockContact(userId: number, contactId: number): Promise<void> {
+  async unblockContact(userId: number, contactId: number): Promise<ContactResponseDto> {
     const contact = await this.contactRepository.findOne({
-      where: { id: contactId }
+      where: { id: contactId },
+      relations: ['requester', 'receiver']
     });
 
     if (!contact) {
@@ -224,12 +234,25 @@ export class ContactsService {
       throw new BadRequestException('Contact is not blocked');
     }
 
-    // Only the user who blocked can unblock
-    if (contact.blockedBy !== userId) {
+    // Get the user to check if they are an admin
+    const user = await this.personRepository.findOne({
+      where: { idPerson: userId }
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Allow admins (idRole === 1) to unblock any contact
+    if (user.idRole !== 1 && contact.blockedBy !== userId) {
       throw new ForbiddenException('You can only unblock contacts you blocked');
     }
 
-    await this.contactRepository.delete(contactId);
+    contact.status = ContactStatus.ACCEPTED;
+    contact.blockedBy = null;
+
+    const savedContact = await this.contactRepository.save(contact);
+    return this.transformContactToResponse(savedContact);
   }
 
   async searchUsers(userId: number, query: string): Promise<Person[]> {
