@@ -1,35 +1,16 @@
-import { IsString, IsOptional, IsBoolean, MaxLength, IsNumber } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsNotEmpty } from 'class-validator';
 
 export class CreateContactDto {
-    @ApiProperty({ description: 'The relation type', maxLength: 250, required: false })
-    @IsString()
-    @IsOptional()
-    @MaxLength(250)
-    relation?: string;
+  @IsNumber()
+  @IsNotEmpty()
+  receiverId: number;
+}
 
-    @ApiProperty({ description: 'The description of the contact', maxLength: 1000, required: false })
-    @IsString()
-    @IsOptional()
-    @MaxLength(1000)
-    description?: string;
+// dto/update-contact.dto.ts
+import { IsEnum } from 'class-validator';
+import { ContactStatus } from '../entities/contact.entity';
 
-    @ApiProperty({ description: 'Whether the contact is active', default: false })
-    @IsBoolean()
-    @IsOptional()
-    isActive?: boolean;
-
-    @ApiProperty({ description: 'The return value', maxLength: 100, required: false })
-    @IsString()
-    @IsOptional()
-    @MaxLength(100)
-    valueReturn?: string;
-
-    @ApiProperty({ description: 'The ID of the person', required: true })
-    @IsNumber()
-    idPerson: number;
-
-    @ApiProperty({ description: 'The ID of the relationship', required: true })
-    @IsNumber()
-    idRelationship: number;
-} 
+export class UpdateContactDto {
+  @IsEnum(ContactStatus)
+  status: ContactStatus;
+}

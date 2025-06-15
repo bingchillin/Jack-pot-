@@ -1,42 +1,46 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, Index, JoinColumn } from 'typeorm';
 import { Person } from '../../person/entities/person.entity';
-import { Relationship } from '../../relationship/entities/relationship.entity';
 
-@Entity('contact')
+export enum ContactStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
+  BLOCKED = 'blocked'
+}
+
+@Entity('contacts')
+@Index(['requesterId', 'receiverId'], { unique: true })
 export class Contact {
-  @PrimaryGeneratedColumn({ name: 'id_contact' })
-  idContact: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column({ length: 250, nullable: true })
-  relation: string;
+  @Column({ name: 'requester_id' })
+  requesterId: number;
 
-  @Column({ length: 1000, nullable: true })
-  description: string;
+  @Column({ name: 'receiver_id' })
+  receiverId: number;
 
-  @Column({ name: 'value_return', length: 100, nullable: true })
-  valueReturn: string;
+  @Column({
+    type: 'enum',
+    enum: ContactStatus,
+    default: ContactStatus.PENDING
+  })
+  status: ContactStatus;
 
-  @Column({ name: 'id_person', nullable: true })
-  idPerson: number;
+  @Column({ name: 'blocked_by', nullable: true })
+  blockedBy: number;
 
-  @ManyToOne(() => Person, person => person.contacts, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'id_person' })
-  person: Person;
-
-  @Column({ name: 'id_relationship', nullable: true })
-  idRelationship: number;
-
-  @ManyToOne(() => Relationship, relationship => relationship.contacts, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'id_relationship' })
-  relationship: Relationship;
-
-  @Column({ name: 'isActive', default: false })
-  @Index()
-  isActive: boolean;
-
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @ManyToOne(() => Person, { eager: true })
+  @JoinColumn({ name: 'requester_id', referencedColumnName: 'idPerson' })
+  requester: Person;
+
+  @ManyToOne(() => Person, { eager: true })
+  @JoinColumn({ name: 'receiver_id', referencedColumnName: 'idPerson' })
+  receiver: Person;
 }
