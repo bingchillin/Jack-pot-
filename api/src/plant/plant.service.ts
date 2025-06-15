@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindManyOptions } from 'typeorm';
 import { Plant } from './entities/plant.entity';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
@@ -113,5 +113,9 @@ export class PlantService {
                 }
             }
         });
+    }
+
+    async count(options?: FindManyOptions<Plant>): Promise<number> {
+        return await this.plantRepository.count(options);
     }
 } 

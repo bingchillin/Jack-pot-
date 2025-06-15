@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import React, { Suspense } from "react";
-import { Refine, GitHubBanner } from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import { DevtoolsProvider } from "@providers/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { useNotificationProvider } from "@refinedev/antd";
@@ -14,22 +14,16 @@ import { AppIcon } from "@components/app-icon";
 import { ColorModeContextProvider } from "@contexts/color-mode";
 import { authProviderClient } from "@providers/auth-provider/auth-provider.client";
 import {
-  DashboardOutlined,
   UserOutlined,
   TeamOutlined,
-  ShopOutlined,
-  ShoppingCartOutlined,
-  GiftOutlined,
-  FileTextOutlined,
-  CalendarOutlined,
-  SettingOutlined,
   AppstoreOutlined,
   ToolOutlined,
   TagsOutlined,
   SafetyCertificateOutlined,
-  ContactsOutlined
+  ContactsOutlined,
+  DashboardOutlined
 } from "@ant-design/icons";
-import { GiPlantRoots, GiPlantSeed, GiFlowerPot } from "react-icons/gi";
+import { GiPlantRoots, GiFlowerPot } from "react-icons/gi";
 
 export const metadata: Metadata = {
   title: "Refine",
@@ -62,6 +56,13 @@ export default function RootLayout({
                     notificationProvider={useNotificationProvider}
                     authProvider={authProviderClient}
                     resources={[
+                      {
+                        name: "dashboard",
+                        list: "/",
+                        meta: {
+                          icon: <DashboardOutlined />,
+                        },
+                      },
                       {
                         name: "user-management",
                         meta: {

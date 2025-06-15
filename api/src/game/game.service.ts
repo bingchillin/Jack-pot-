@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindManyOptions } from 'typeorm';
 import { Game } from './entities/game.entity';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
@@ -43,5 +43,9 @@ export class GameService {
     async remove(id: number): Promise<void> {
         const game = await this.findOne(id);
         await this.gameRepository.remove(game);
+    }
+
+    async count(options?: FindManyOptions<Game>): Promise<number> {
+        return await this.gameRepository.count(options);
     }
 } 
