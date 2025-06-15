@@ -57,3 +57,15 @@ class ObjectProfile {
   }
 
 }
+
+String getStateText(int? state) {
+  switch (state) {
+    case 0: return "Parfait pour moi";
+    case 1: return "Je vais très bien";
+    case 2: return "Je vais bien";
+    case 3: return "Je suis ok";
+    case 4: return "Je me sens moyen";
+    case 5: return "Critique ! URGENT !";
+    default: return "État inconnu";
+  }
+}

@@ -105,7 +105,8 @@ export class ObjectProfileService {
                     idPlantType: true,
                     title: true,
                     description: true,
-                    advise: true
+                    advise: true,
+                    pathPicture: true
                 },
                 person: {
                     idPerson: true,
