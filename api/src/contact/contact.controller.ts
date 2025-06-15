@@ -15,11 +15,17 @@ import {
   import { CreateContactDto } from './dto/create-contact.dto';
   import { ContactStatus } from './entities/contact.entity';
   import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ContactQueryDto } from './dto/contact-query.dto';
   
   @Controller('contacts')
   @UseGuards(JwtAuthGuard)
   export class ContactController {
     constructor(private readonly contactsService: ContactsService) {}
+
+    @Get()
+    async getAllContacts(@Query() query: ContactQueryDto) {
+      return await this.contactsService.getAllContacts(query);
+    }
   
     @Post('send-request')
     async sendContactRequest(@Request() req, @Body() createContactDto: CreateContactDto) {
@@ -41,7 +47,7 @@ import {
       return await this.contactsService.blockContact(req.user.idPerson, id);
     }
   
-    @Delete(':id/unblock')
+    @Patch(':id/unblock')
     async unblockContact(@Request() req, @Param('id', ParseIntPipe) id: number) {
       return await this.contactsService.unblockContact(req.user.idPerson, id);
     }
