@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app_config.dart';
 import '../../../bloc/plant_detail/plant_detail_bloc.dart';
 import '../../../bloc/plant_detail/plant_detail_state.dart';
-import '../widget/plant_control_switches_widget.dart';
+import '../widget/plant_card_favorite/plant_control_switches_widget.dart';
 
 class PlantDetailContent extends StatelessWidget {
   const PlantDetailContent({super.key});
