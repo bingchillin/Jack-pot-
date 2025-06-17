@@ -26,8 +26,7 @@ class PlantDetailBloc extends Bloc<PlantDetailEvent, PlantDetailState> {
     // Load initial
     add(LoadPlantDetail(plantId, token));
 
-    // Poll toutes les 30 sec
-    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 15), (_) {
       add(LoadPlantDetail(plantId, token));
     });
   }
@@ -54,16 +53,25 @@ class PlantDetailBloc extends Bloc<PlantDetailEvent, PlantDetailState> {
     }
   }
 
-  /// Compare les champs importants uniquement
   bool _diffAndUpdate(ObjectProfile oldP, ObjectProfile newP) {
     return oldP.title != newP.title ||
         oldP.description != newP.description ||
+        oldP.advise != newP.advise ||
+        oldP.recipe != newP.recipe ||
         oldP.isAutomatic != newP.isAutomatic ||
         oldP.isWillWatering != newP.isWillWatering ||
         oldP.state != newP.state ||
+        oldP.humidityAirSensor != newP.humidityAirSensor ||
+        oldP.humidityGroundSensor != newP.humidityGroundSensor ||
+        oldP.phGroundSensor != newP.phGroundSensor ||
+        oldP.conductivityElectriqueFertilitySensor != newP.conductivityElectriqueFertilitySensor ||
+        oldP.lightSensor != newP.lightSensor ||
+        oldP.temperatureSensorGround != newP.temperatureSensorGround ||
+        oldP.temperatureSensorExtern != newP.temperatureSensorExtern ||
+        oldP.expositionTimeSun != newP.expositionTimeSun ||
         oldP.plantType.pathPicture != newP.plantType.pathPicture;
-    // Tu peux ajouter d'autres comparaisons ici si besoin
   }
+
 
   @override
   Future<void> close() {
