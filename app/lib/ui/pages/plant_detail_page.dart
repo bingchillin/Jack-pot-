@@ -1,3 +1,4 @@
+import 'package:app/ui/pages/plant_detail/sensor_value.dart';
 import 'package:app/ui/pages/widget/plant_card_favorite/plant_control_switches_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,7 +32,6 @@ class PlantDetailPage extends StatelessWidget {
         token: token,
       ),
       child: Builder(
-        // Ce Builder crée un nouveau contexte qui voit le BlocProvider
         builder: (context) {
           final bloc = context.read<PlantDetailBloc>();
 
@@ -131,6 +131,41 @@ class PlantDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       PlantControlSwitches(plant: plant),
+
+                      Text(
+                        "Conseil de la plante",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        plant.advise ?? "Aucun conseil",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Recette d'entretien",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        plant.recipe ?? "Aucune recette disponible",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 24),
+
+                      Text(
+                        "Capteurs",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      SensorValue(label: "Humidité de l'air", value: plant.humidityAirSensor),
+                      SensorValue(label: "Humidité du sol", value: plant.humidityGroundSensor),
+                      SensorValue(label: "pH du sol", value: plant.phGroundSensor),
+                      SensorValue(label: "Conductivité/Fertilité", value: plant.conductivityElectriqueFertilitySensor),
+                      SensorValue(label: "Luminosité", value: plant.lightSensor),
+                      SensorValue(label: "Température du sol", value: plant.temperatureSensorGround),
+                      SensorValue(label: "Température externe", value: plant.temperatureSensorExtern),
+                      SensorValue(label: "Temps d’exposition au soleil", value: plant.expositionTimeSun),
                     ],
                   ),
                 );
