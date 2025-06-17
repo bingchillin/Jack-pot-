@@ -118,6 +118,28 @@ class _MyPlantPageState extends State<MyPlantPage> {
           ),
         ),
       ),
+      // Button
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 30.0, right: 10.0),
+        child: SizedBox(
+          width: 70,
+          height: 70,
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/add_my_object');
+            },
+            backgroundColor: const Color(0xFF4CAF50),
+            shape: const CircleBorder(),
+            child: const Icon(
+              Icons.add,
+              size: 40,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+
   }
 }

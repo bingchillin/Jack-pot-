@@ -174,6 +174,23 @@ export class PersonService {
         return person.objectProfiles;
     }
 
+    async findObjectsProfileByPersonIdFavoris(id: number): Promise<ObjectProfile[]> {
+        const person = await this.personRepository.findOne({
+            where: { idPerson: id },
+            relations: ['objectProfiles', 'objectProfiles.object', 'objectProfiles.plantType']
+        });
+
+        if (!person) {
+            throw new NotFoundException(`Person with ID ${id} not found`);
+        }
+
+        const filteredProfiles = person.objectProfiles.filter(profile => profile.favoris !== null).sort((a, b) => a.favoris - b.favoris);;
+
+        return filteredProfiles;
+    }
+
+    
+
     async count(options?: FindManyOptions<Person>): Promise<number> {
         return await this.personRepository.count(options);
     }
