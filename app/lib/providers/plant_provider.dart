@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:app/app_config.dart';
 import 'package:http/http.dart' as http;
 import '../models/object_profile.dart';
 
@@ -9,7 +10,7 @@ class PlantProvider {
   PlantProvider({required this.baseUrl, required this.token});
 
   Future<List<ObjectProfile>> fetchProfiles(int personId) async {
-    final url = Uri.parse('$baseUrl/person/$personId/object-profiles');
+    final url = Uri.parse(AppConfig.objectProfilesFavorisEndpoint(personId.toString()));
     final resp = await http.get(url, headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',

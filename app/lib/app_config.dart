@@ -1,5 +1,5 @@
 class AppConfig {
-  static const String url = "http://192.168.0.13";
+  static const String url = "http://192.168.0.100";
   static const String url_s = "http://51.222.110.241";
   static const String port = "3000";
 
@@ -12,4 +12,5 @@ class AppConfig {
   static String get resetPasswordEndpoint => "$baseUrl/auth/user/reset_password";
   static String objectProfilesEndpoint(String personId) => "$baseUrl/person/$personId/object-profiles";
   static String updateObjectProfileEndpoint(String id) => "$baseUrl/api/object-profile/$id";
+  static String objectProfilesFavorisEndpoint(String personId) => "$baseUrl/person/$personId/object-profiles/favoris";
 }
