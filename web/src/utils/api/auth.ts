@@ -39,7 +39,7 @@ export const handleResponse = async (response: Response, retry: () => Promise<an
     localStorage.removeItem("token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
-    window.location.href = "/login";
+    window.location.href = "/back/login";
     throw new Error("Authentication required");
   }
 

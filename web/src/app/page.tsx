@@ -1,24 +1,24 @@
 "use client";
 
-import { Suspense } from "react";
-import { Authenticated } from "@refinedev/core";
-import { ThemedLayoutV2 } from "@refinedev/antd";
-import { Header } from "@components/header";
-import dynamic from "next/dynamic";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Spin } from "antd";
 
-// Create a client-side only dashboard component
-const DashboardContent = dynamic(() => import("@/components/dashboard"), {
-  ssr: false,
-});
+export default function HomePage() {
+  const router = useRouter();
 
-export default function DashboardPage() {
+  useEffect(() => {
+    router.push("/back");
+  }, [router]);
+
   return (
-    <Suspense>
-      <Authenticated key="dashboard-page">
-        <ThemedLayoutV2 Header={Header}>
-          <DashboardContent />
-        </ThemedLayoutV2>
-      </Authenticated>
-    </Suspense>
+    <div style={{ 
+      display: "flex", 
+      justifyContent: "center", 
+      alignItems: "center", 
+      height: "100vh" 
+    }}>
+      <Spin size="large" />
+    </div>
   );
 }
