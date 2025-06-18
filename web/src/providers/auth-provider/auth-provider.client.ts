@@ -48,8 +48,8 @@ const checkAuth = () => {
 
   if (!token || !user || isTokenExpired(token)) {
     clearAuthData();
-    if (window.location.pathname !== "/login") {
-      window.location.href = "/login";
+    if (window.location.pathname !== "/back/login") {
+      window.location.href = "/back/login";
     }
     return false;
   }
@@ -99,7 +99,7 @@ export const authProviderClient: AuthProvider = {
       document.cookie = `token=${data.access_token}; path=/`;
       document.cookie = `user=${JSON.stringify(data.user)}; path=/`;
       
-      return { success: true, redirectTo: "/persons" };
+      return { success: true, redirectTo: "/back/persons" };
     } catch (error) {
       return {
         success: false,
@@ -113,7 +113,7 @@ export const authProviderClient: AuthProvider = {
 
   logout: async () => {
     clearAuthData();
-    return { success: true, redirectTo: "/login" };
+    return { success: true, redirectTo: "/back/login" };
   },
 
   check: async () => {
@@ -122,7 +122,7 @@ export const authProviderClient: AuthProvider = {
     const user = localStorage.getItem("user");
 
     if (!token || !user) {
-      return { authenticated: false, redirectTo: "/login" };
+      return { authenticated: false, redirectTo: "/back/login" };
     }
 
     try {
@@ -131,7 +131,7 @@ export const authProviderClient: AuthProvider = {
           return { authenticated: true };
         }
         clearAuthData();
-        return { authenticated: false, redirectTo: "/login" };
+        return { authenticated: false, redirectTo: "/back/login" };
       }
 
       const parsedUser = JSON.parse(user);
@@ -139,7 +139,7 @@ export const authProviderClient: AuthProvider = {
         clearAuthData();
         return {
           authenticated: false,
-          redirectTo: "/login",
+          redirectTo: "/back/login",
           error: {
             name: "UnauthorizedError",
             message: "You don't have permission to access the backoffice",
@@ -150,7 +150,7 @@ export const authProviderClient: AuthProvider = {
       return { authenticated: true };
     } catch (error) {
       clearAuthData();
-      return { authenticated: false, redirectTo: "/login" };
+      return { authenticated: false, redirectTo: "/back/login" };
     }
   },
 
@@ -173,7 +173,7 @@ export const authProviderClient: AuthProvider = {
         return { error: null };
       }
       clearAuthData();
-      return { logout: true, redirectTo: "/login" };
+      return { logout: true, redirectTo: "/back/login" };
     }
     return { error };
   },

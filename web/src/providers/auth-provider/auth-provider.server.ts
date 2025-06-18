@@ -19,7 +19,7 @@ export const authProviderServer: Pick<AuthProvider, "check"> = {
     if (!token || !user) {
       return {
         authenticated: false,
-        redirectTo: "/login",
+        redirectTo: "/back/login",
       };
     }
 
@@ -28,7 +28,7 @@ export const authProviderServer: Pick<AuthProvider, "check"> = {
       if (isTokenExpired(token)) {
         return {
           authenticated: false,
-          redirectTo: "/login",
+          redirectTo: "/back/login",
         };
       }
 
@@ -38,7 +38,7 @@ export const authProviderServer: Pick<AuthProvider, "check"> = {
       if (parsedUser.idRole !== 1) {
         return {
           authenticated: false,
-          redirectTo: "/login",
+          redirectTo: "/back/login",
           error: {
             name: "UnauthorizedError",
             message: "You don't have permission to access the backoffice",
@@ -52,7 +52,7 @@ export const authProviderServer: Pick<AuthProvider, "check"> = {
     } catch (error) {
       return {
         authenticated: false,
-        redirectTo: "/login",
+        redirectTo: "/back/login",
       };
     }
   },

@@ -61,6 +61,7 @@ export default function RootLayout({
                         list: "/back",
                         meta: {
                           icon: <DashboardOutlined />,
+                          label: "Dashboard"
                         },
                       },
                       {
