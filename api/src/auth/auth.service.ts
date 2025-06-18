@@ -9,6 +9,9 @@ import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailerService } from '../mailer/mailer.service';
 import * as crypto from 'crypto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { RefreshToken } from './entities/refresh-token.entity';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +26,9 @@ export class AuthService {
     constructor(
         private readonly personService: PersonService,
         private jwtService: JwtService,
-        private readonly mailerService: MailerService
+        private readonly mailerService: MailerService,
+        @InjectRepository(RefreshToken)
+        private readonly refreshTokenRepository: Repository<RefreshToken>,
     ) { }
 
     async validateUser(email: string, password: string): Promise<any> {
@@ -155,8 +160,10 @@ export class AuthService {
         return expires;
     }
 
-    async login(user: any) {
-        const tokens = await this.generateTokens(user);
+    async login(user: any, client: string = 'mobile') {
+        const tokens = await this.generateTokens(user, client);
+        // Save refresh token in DB
+        await this.saveRefreshToken(user.idPerson, tokens.refresh_token, tokens.expires_in);
         return {
             ...tokens,
             user: {
@@ -170,21 +177,25 @@ export class AuthService {
         };
     }
 
-    async refreshToken(refreshToken: string) {
-        try {
-            const payload = await this.jwtService.verify(refreshToken);
-            const person = await this.personService.findOne(payload.sub);
-            if (!person) {
-                throw new UnauthorizedException();
-            }
-
-            return this.login(person);
-        } catch (e) {
+    async refreshToken(refreshToken: string, client: string = 'mobile') {
+        // Validate refresh token in DB
+        const tokenEntity = await this.refreshTokenRepository.findOne({ where: { token: refreshToken }, relations: ['user'] });
+        if (!tokenEntity) {
             throw new UnauthorizedException('Invalid refresh token');
         }
+        // Check expiry
+        if (tokenEntity.expiresAt < new Date()) {
+            await this.refreshTokenRepository.delete({ token: refreshToken });
+            throw new UnauthorizedException('Refresh token expired');
+        }
+        // Rotate: delete old, issue new
+        await this.refreshTokenRepository.delete({ token: refreshToken });
+        return this.login(tokenEntity.user, client);
     }
 
-    private async generateTokens(user: any) {
+    private async generateTokens(user: any, client: string = 'mobile') {
+        const accessTokenExpiresIn = client === 'backoffice' ? '15m' : '1h';
+        const refreshTokenExpiresIn = client === 'backoffice' ? '2h' : '7d';
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(
                 {
@@ -193,7 +204,7 @@ export class AuthService {
                 },
                 {
                     secret: process.env.JWT_SECRET,
-                    expiresIn: '1h',
+                    expiresIn: accessTokenExpiresIn,
                 },
             ),
             this.jwtService.signAsync(
@@ -203,15 +214,18 @@ export class AuthService {
                 },
                 {
                     secret: process.env.JWT_REFRESH_SECRET,
-                    expiresIn: '7d',
+                    expiresIn: refreshTokenExpiresIn,
                 },
             ),
         ]);
 
+        // Calculate expires_in in seconds
+        const expiresInSeconds = client === 'backoffice' ? 15 * 60 : 3600;
+
         return {
             access_token: accessToken,
             refresh_token: refreshToken,
-            expires_in: 3600,
+            expires_in: expiresInSeconds,
         };
     }
 
@@ -361,4 +375,18 @@ export class AuthService {
             throw new BadRequestException('Failed to reset password');
         }
     }
+
+    async saveRefreshToken(userId: number, token: string, expiresIn: number) {
+        const expiresAt = new Date(Date.now() + expiresIn * 1000 * 24 * 7); // 7 days
+        await this.refreshTokenRepository.save({
+            token,
+            user: { idPerson: userId },
+            expiresAt,
+        });
+    }
+
+    async revokeAllRefreshTokensForUser(userId: number) {
+        await this.refreshTokenRepository.delete({ user: { idPerson: userId } });
+    }
 }
+

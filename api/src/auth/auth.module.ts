@@ -8,6 +8,8 @@ import {JwtStrategy} from "./jwt.strategy";
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { MailerModule } from '../mailer/mailer.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RefreshToken } from './entities/refresh-token.entity';
 
 @Module({
     imports: [
@@ -25,6 +27,7 @@ import { MailerModule } from '../mailer/mailer.module';
             }),
             inject: [ConfigService],
         }),
+        TypeOrmModule.forFeature([RefreshToken]),
     ],
     controllers: [AuthController],
     providers: [AuthService, LocalStrategy, JwtStrategy],

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req, Headers, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Headers, UnauthorizedException, Query, DefaultValuePipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { Request } from 'express';
@@ -22,14 +22,14 @@ export class AuthController {
     @Post('login')
     @UseGuards(LocalAuthGuard)
     @AuthDocs.login()
-    async login(@Req() req: Request) {
-        return this.authService.login(req.user);
+    async login(@Req() req: Request, @Body('client') client: string = 'mobile') {
+        return this.authService.login(req.user, client || 'mobile');
     }
 
     @Post('refresh')
     @AuthDocs.refresh()
-    async refreshToken(@Body('refresh_token') refreshToken: string) {
-        return this.authService.refreshToken(refreshToken);
+    async refreshToken(@Body('refresh_token') refreshToken: string, @Body('client') client: string = 'mobile') {
+        return this.authService.refreshToken(refreshToken, client || 'mobile');
     }
 
     @Post('verify-email-code')
