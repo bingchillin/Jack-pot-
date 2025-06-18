@@ -68,7 +68,7 @@ export const authProviderClient: AuthProvider = {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, client: "backoffice" }),
       });
 
       const data = await response.json();
