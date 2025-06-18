@@ -1,7 +1,8 @@
+import 'package:app/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../models/object_profile.dart';
-import '../../../services/object_profile_service.dart';
+import '../../../../models/object_profile.dart';
+import '../../../../services/object_profile_service.dart';
 
 class PlantControlSwitches extends StatefulWidget {
   final ObjectProfile plant;
@@ -23,6 +24,21 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
     isWillWatering = widget.plant.isWillWatering ?? false;
   }
 
+  @override
+  void didUpdateWidget(covariant PlantControlSwitches oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.plant.isAutomatic != widget.plant.isAutomatic) {
+      setState(() {
+        isAutomatic = widget.plant.isAutomatic ?? false;
+      });
+    }
+    if (oldWidget.plant.isWillWatering != widget.plant.isWillWatering) {
+      setState(() {
+        isWillWatering = widget.plant.isWillWatering ?? false;
+      });
+    }
+  }
+
   Future<void> _updateField(String field, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
@@ -40,7 +56,6 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
       );
     } catch (e) {
       print('Erreur lors de la mise à jour $field: $e');
-      // Optionnel : revert le switch si l’appel échoue
       setState(() {
         if (field == "isAutomatic") isAutomatic = !value;
         if (field == "isWillWatering") isWillWatering = !value;
@@ -52,7 +67,6 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Switch AUTO
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -67,7 +81,6 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
             ),
           ],
         ),
-        // Switch ARROSER
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

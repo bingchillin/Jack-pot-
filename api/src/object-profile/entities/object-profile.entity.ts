@@ -39,6 +39,9 @@ export class ObjectProfile {
   @Column({ length: 5000, nullable: true })
   advise: string;
 
+  @Column({ length: 5000, nullable: true })
+  recipe: string;
+
   @Column({ name: 'humidity_air_sensor', type: 'decimal', nullable: true })
   humidityAirSensor: number;
 

@@ -1,12 +1,18 @@
+import 'package:app/app_config.dart';
+import 'package:app/providers/plant_provider_my_List.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import 'bloc/object_profile/object_profile_event.dart';
 import 'routes/app_routes.dart';
 import 'core/theme.dart';
 import 'providers/nav_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/plant_provider.dart';
 import 'bloc/object_profile/object_profile_bloc.dart';
+import 'bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
+import 'bloc/object_profile_my_list/object_profile_my_list_event.dart';
 
 void main() {
   runApp(
@@ -27,9 +33,9 @@ class RootApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final token = authProvider.accessToken;
+    final personIdStr = authProvider.userId;
 
-    if (token == null || token.isEmpty) {
-      // Si pas de token, on va sur la page login ou autre
+    if (token == null || token.isEmpty || personIdStr == null) {
       return MaterialApp(
         title: 'Jackpot App',
         theme: appTheme,
@@ -38,12 +44,23 @@ class RootApp extends StatelessWidget {
       );
     }
 
-    return Provider<ObjectProfileBloc>(
-      create: (_) => ObjectProfileBloc(
-        provider: PlantProvider(baseUrl: 'http://192.168.0.100:3000', token: token),
-        personId: 1,
-      ),
-      dispose: (_, bloc) => bloc.close(),
+    final personId = int.parse(personIdStr);
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ObjectProfileBloc>(
+          create: (_) => ObjectProfileBloc(
+            provider: PlantProvider(baseUrl: AppConfig.baseUrl, token: token),
+            personId: personId,
+          )..add(LoadProfiles()),
+        ),
+        BlocProvider<ObjectProfileMyListBloc>(
+          create: (_) => ObjectProfileMyListBloc(
+            provider: PlantProviderMyList(baseUrl: AppConfig.baseUrl, token: token),
+            personId: personId,
+          )..add(LoadProfilesMyList()),
+        ),
+      ],
       child: MaterialApp(
         title: 'Jackpot App',
         theme: appTheme,

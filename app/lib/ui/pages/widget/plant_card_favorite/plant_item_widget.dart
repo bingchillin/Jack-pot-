@@ -1,11 +1,9 @@
-import 'package:app/ui/pages/widget/plant_control_switches_widget.dart';
+import 'package:app/ui/pages/widget/plant_card_favorite/plant_control_switches_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../models/object_profile.dart';
+import '../../../../models/object_profile.dart';
 import 'package:app/app_config.dart';
 
-import '../../../services/object_profile_service.dart';
-import '../plant_detail_page.dart';
+import '../../plant_detail_page.dart';
 
 class PlantItemWidget extends StatelessWidget {
   final ObjectProfile plant;
@@ -19,28 +17,11 @@ class PlantItemWidget extends StatelessWidget {
     this.onToggleWillWatering,
   }) : super(key: ValueKey(plant.idObjectProfile));
 
-  String getStateText(int? state) {
-    switch (state) {
-      case 0:
-        return "Parfait pour moi";
-      case 1:
-        return "Je vais très bien";
-      case 2:
-        return "Je vais bien";
-      case 3:
-        return "Je suis ok";
-      case 4:
-        return "Je me sens moyen";
-      case 5:
-        return "Critique ! URGENT !";
-      default:
-        return "État inconnu";
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
-    final picturePath = plant.plantType.pathPicture;
+    final pathPicture = plant.plantType.pathPicture;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -86,7 +67,7 @@ class PlantItemWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     // Image centrée et crop intelligente
-                    if (picturePath != null)
+                    if (pathPicture != null)
                       Center(
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
@@ -95,7 +76,7 @@ class PlantItemWidget extends StatelessWidget {
                             width: 180,
                             color: Colors.grey[200],
                             child: Image.network(
-                              Uri.parse(AppConfig.baseUrlS).resolve(picturePath).toString(),
+                              Uri.parse(AppConfig.baseUrlS).resolve(pathPicture).toString(),
                               fit: BoxFit.cover,
                               alignment: Alignment.center,
                               errorBuilder: (context, error, stackTrace) =>
