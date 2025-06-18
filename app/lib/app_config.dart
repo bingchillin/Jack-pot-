@@ -12,4 +12,5 @@ class AppConfig {
   static String get resetPasswordEndpoint => "$baseUrl/auth/user/reset_password";
   static String objectProfilesEndpoint(String personId) => "$baseUrl/person/$personId/object-profiles";
   static String updateObjectProfileEndpoint(String id) => "$baseUrl/api/object-profile/$id";
+  static String objectProfilesFavorisEndpoint(String personId) => "$baseUrl/person/$personId/object-profiles/favoris";
 }

@@ -43,4 +43,20 @@ class ObjectProfileService {
     }
   }
 
+  Future<ObjectProfile> fetchObjectProfileDetails(int plantId, String token) async {
+    final url = Uri.parse("${AppConfig.baseUrl}/api/object-profile/$plantId");
+
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      return ObjectProfile.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Échec du chargement du profil de la plante');
+    }
+  }
+
+
 }

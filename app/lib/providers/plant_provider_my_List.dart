@@ -1,16 +1,16 @@
 import 'dart:convert';
-import 'package:app/app_config.dart';
 import 'package:http/http.dart' as http;
+import '../app_config.dart';
 import '../models/object_profile.dart';
 
-class PlantProvider {
+class PlantProviderMyList {
   final String baseUrl;
   final String token;
 
-  PlantProvider({required this.baseUrl, required this.token});
+  PlantProviderMyList({required this.baseUrl, required this.token});
 
-  Future<List<ObjectProfile>> fetchProfiles(int personId) async {
-    final url = Uri.parse(AppConfig.objectProfilesFavorisEndpoint(personId.toString()));
+  Future<List<ObjectProfile>> fetchProfilesMyList(int personId) async {
+    final url = Uri.parse(AppConfig.objectProfilesEndpoint(personId.toString()));
     final resp = await http.get(url, headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',

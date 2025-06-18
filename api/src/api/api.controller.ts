@@ -144,6 +144,12 @@ export class ApiController {
       return this.personService.findObjectsProfileByPersonId(+id);
   }
 
+  @Get('/person/:id/object-profiles/favoris')
+  @ApiExcludeEndpoint()
+  findObjectsProfileByPersonIdFavoris(@Param('id') id: string) {
+      return this.personService.findObjectsProfileByPersonIdFavoris(+id);
+  }
+
   @Patch('/person/:id')
   @PersonDocs.update()
   updatePerson(@Param('id') id: string, @Body() dto: UpdatePersonDto) {
