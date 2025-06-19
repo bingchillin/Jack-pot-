@@ -1,0 +1,38 @@
+Retour capteur:
+
+Water sensor (water_sensor):
+
+0 -700
+
+0: sec
+400: mid
+700: rempli
+
+Humidity sensor (humidity_ground_sensor) Capacitive soil moisture sensor V2.0.0:
+
+Capteur d’humidité du sol qui utilise une méthode capacitive pour mesurer le taux d’humidité du sol ou d’un substrat.
+
+Tension élevée (~3V) ===> sol sec
+Tension faible (~1V ou moins) ===> sol humide
+
+Sur ESP32, analogRead() retourne une valeur entre 0 et 4095 (12 bits) :
+
+~3000 ===> Sol sec
+~2000 ===> Sol moyennement humide
+~1000-1300 ou moins ===> Sol bien humide
+
+
+Temperature sensor + Humidity (same sensor) (temperature_sensor_extern && humidity_air_sensor):
+
+installer la lib DHT11 de Adafruit
+simple affichage témpérature et humidité 
+
+uv sensor (light_sensor) : 
+
+Lire la valeur brute (0–4095)
+Convertir en volts
+Estimer un indice UV simplifié (ex. UV = voltage * 10.0)
+Définir des seuils d’alerte plus c'est haut plus ca tape... donc en fonction de la plante, on informe de la dangerosité
+
+
+
