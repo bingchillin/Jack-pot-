@@ -62,5 +62,67 @@
       "terms": "Terms of Service",
       "support": "Support"
     }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "last_updated": "Last updated: June 2025",
+    "intro": "At Jack Pot, we respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our smart pot and mobile application.",
+    "sections": {
+      "data_collection": {
+        "title": "Information We Collect",
+        "content": "We collect plant health data from your Jack smart pot (soil moisture, temperature, humidity, light levels), your account information, and app usage data to provide you with the best plant care experience."
+      },
+      "data_use": {
+        "title": "How We Use Your Information",
+        "content": "Your data helps us provide real-time plant monitoring, send smart notifications, generate plant health analytics, and improve our services. We never sell your personal information to third parties."
+      },
+      "data_sharing": {
+        "title": "Data Sharing",
+        "content": "We only share your data with trusted service providers who help us operate our services. Your plant data is encrypted and stored securely in the cloud."
+      },
+      "your_rights": {
+        "title": "Your Rights",
+        "content": "You have the right to access, modify, or delete your personal data at any time through the Jack Pot app settings or by contacting our support team."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "content": "If you have questions about this privacy policy, please contact us at privacy@jackpot.com"
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "last_updated": "Last updated: June 2025",
+    "intro": "Welcome to Jack Pot! These terms of service govern your use of our smart pot and mobile application. By using our services, you agree to these terms.",
+    "sections": {
+      "service_description": {
+        "title": "Service Description",
+        "content": "Jack Pot provides smart plant monitoring through our IoT-enabled pot and mobile application. Our service includes real-time plant health tracking, notifications, and analytics."
+      },
+      "user_responsibilities": {
+        "title": "User Responsibilities",
+        "content": "You are responsible for properly setting up and maintaining your Jack smart pot, providing accurate information, and using our services in compliance with applicable laws."
+      },
+      "intellectual_property": {
+        "title": "Intellectual Property",
+        "content": "All content, features, and functionality of Jack Pot are owned by us and protected by copyright, trademark, and other intellectual property laws."
+      },
+      "limitation_liability": {
+        "title": "Limitation of Liability",
+        "content": "Jack Pot is provided 'as is' without warranties. We are not liable for any damages arising from the use of our services, including plant health issues."
+      },
+      "termination": {
+        "title": "Termination",
+        "content": "We may terminate or suspend your access to our services at any time for violations of these terms or for any other reason at our discretion."
+      },
+      "changes": {
+        "title": "Changes to Terms",
+        "content": "We may update these terms from time to time. We will notify you of any material changes through the app or email."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "content": "If you have questions about these terms, please contact us at legal@jackpot.com"
+      }
+    }
   }
 } 

@@ -16,13 +16,13 @@ export default function Footer({ t }: FooterProps) {
             <span className="text-xl font-bold">{t('footer.company')}</span>
           </div>
           <div className="flex space-x-6 text-sm text-gray-400">
-            <a href="#" className="hover:text-white transition-colors">{t('footer.links.privacy')}</a>
-            <a href="#" className="hover:text-white transition-colors">{t('footer.links.terms')}</a>
-            <a href="#" className="hover:text-white transition-colors">{t('footer.links.support')}</a>
+            <a href="/privacy" className="hover:text-white transition-colors">{t('footer.links.privacy')}</a>
+            <a href="/terms" className="hover:text-white transition-colors">{t('footer.links.terms')}</a>
+            <a href="/support" className="hover:text-white transition-colors">{t('footer.links.support')}</a>
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-          © 2024 {t('footer.company')}. {t('footer.rights')}
+          © 2025 {t('footer.company')}. {t('footer.rights')}
         </div>
       </div>
     </footer>
