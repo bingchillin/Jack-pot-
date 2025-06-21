@@ -58,5 +58,67 @@
       "terms": "Términos de servicio",
       "support": "Soporte"
     }
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "last_updated": "Última actualización: Junio 2025",
+    "intro": "En Jack Pot, respetamos tu privacidad y nos comprometemos a proteger tus datos personales. Esta política de privacidad explica cómo recopilamos, usamos y protegemos tu información cuando utilizas nuestra maceta inteligente y aplicación móvil.",
+    "sections": {
+      "data_collection": {
+        "title": "Información que recopilamos",
+        "content": "Recopilamos datos de salud de plantas de tu maceta inteligente Jack (humedad del suelo, temperatura, humedad, niveles de luz), información de tu cuenta y datos de uso de la aplicación para brindarte la mejor experiencia de cuidado de plantas."
+      },
+      "data_use": {
+        "title": "Cómo usamos tu información",
+        "content": "Tus datos nos ayudan a proporcionar monitoreo de plantas en tiempo real, enviar notificaciones inteligentes, generar análisis de salud de plantas y mejorar nuestros servicios. Nunca vendemos tu información personal a terceros."
+      },
+      "data_sharing": {
+        "title": "Compartir datos",
+        "content": "Solo compartimos tus datos con proveedores de servicios de confianza que nos ayudan a operar nuestros servicios. Tus datos de plantas están encriptados y almacenados de forma segura en la nube."
+      },
+      "your_rights": {
+        "title": "Tus derechos",
+        "content": "Tienes derecho a acceder, modificar o eliminar tus datos personales en cualquier momento a través de la configuración de la aplicación Jack Pot o contactando a nuestro equipo de soporte."
+      },
+      "contact": {
+        "title": "Contáctanos",
+        "content": "Si tienes preguntas sobre esta política de privacidad, contáctanos en privacy@jackpot.com"
+      }
+    }
+  },
+  "terms": {
+    "title": "Términos de Servicio",
+    "last_updated": "Última actualización: Junio 2025",
+    "intro": "¡Bienvenido a Jack Pot! Estos términos de servicio rigen tu uso de nuestra maceta inteligente y aplicación móvil. Al usar nuestros servicios, aceptas estos términos.",
+    "sections": {
+      "service_description": {
+        "title": "Descripción del servicio",
+        "content": "Jack Pot proporciona monitoreo inteligente de plantas a través de nuestra maceta conectada IoT y aplicación móvil. Nuestro servicio incluye seguimiento de salud de plantas en tiempo real, notificaciones y análisis."
+      },
+      "user_responsibilities": {
+        "title": "Responsabilidades del usuario",
+        "content": "Eres responsable de configurar y mantener adecuadamente tu maceta inteligente Jack, proporcionar información precisa y usar nuestros servicios en cumplimiento con las leyes aplicables."
+      },
+      "intellectual_property": {
+        "title": "Propiedad intelectual",
+        "content": "Todo el contenido, características y funcionalidad de Jack Pot nos pertenecen y están protegidos por leyes de derechos de autor, marcas comerciales y otras leyes de propiedad intelectual."
+      },
+      "limitation_liability": {
+        "title": "Limitación de responsabilidad",
+        "content": "Jack Pot se proporciona 'tal como está' sin garantías. No somos responsables por ningún daño que surja del uso de nuestros servicios, incluyendo problemas de salud de plantas."
+      },
+      "termination": {
+        "title": "Terminación",
+        "content": "Podemos terminar o suspender tu acceso a nuestros servicios en cualquier momento por violaciones de estos términos o por cualquier otra razón a nuestra discreción."
+      },
+      "changes": {
+        "title": "Cambios en los términos",
+        "content": "Podemos actualizar estos términos de vez en cuando. Te notificaremos sobre cualquier cambio material a través de la aplicación o por correo electrónico."
+      },
+      "contact": {
+        "title": "Contáctanos",
+        "content": "Si tienes preguntas sobre estos términos, contáctanos en legal@jackpot.com"
+      }
+    }
   }
 } 
