@@ -6,57 +6,52 @@
     "contact": "Contacto"
   },
   "hero": {
-    "title": "Cuidado Inteligente de Plantas",
-    "subtitle": "Soluciones IoT Avanzadas",
-    "description": "Transforma tu experiencia de jardinería con sensores inteligentes que monitorean, analizan y optimizan automáticamente la salud de tus plantas.",
-    "cta": "Comenzar",
+    "title": "Descubre a Jack, Tu Compañero de Jardinería Inteligente",
+    "subtitle": "Maceta Inteligente",
+    "description": "Transforma tu experiencia de cuidado de plantas con Jack, la maceta conectada que monitorea la salud de tus plantas y hace la jardinería divertida.",
+    "cta": "Obtener Jack",
     "learn_more": "Saber más"
   },
   "features": {
-    "title": "¿Por qué elegir PlantCare?",
-    "subtitle": "La tecnología avanzada se encuentra con el cuidado natural",
+    "title": "¿Qué hace nuestro amigo Jack?",
+    "subtitle": "La maceta funciona en tándem con la aplicación Jack Pot, y su dúo pone a disposición en tu teléfono:",
     "monitoring": {
-      "title": "Monitoreo en tiempo real",
-      "description": "Seguimiento 24/7 de humedad del suelo, temperatura, humedad y niveles de luz"
+      "title": "Monitoreo Planta en Tiempo Real",
+      "description": "Seguimiento 24/7 de humedad del suelo, temperatura, humedad y niveles de luz con los sensores avanzados de Jack"
     },
     "smart": {
-      "title": "Notificaciones inteligentes",
-      "description": "Recibe alertas inteligentes en tu teléfono cuando tus plantas necesiten atención"
+      "title": "Notificaciones Inteligentes",
+      "description": "Recibe alertas inteligentes en tu teléfono cuando Jack detecta que tus plantas necesitan atención"
     },
     "analytics": {
-      "title": "Análisis de crecimiento",
-      "description": "Información detallada y tendencias para optimizar tu rutina de cuidado de plantas"
+      "title": "Análisis de Salud de Plantas",
+      "description": "Información detallada y estadísticas para rastrear el crecimiento y salud de tus plantas a lo largo del tiempo"
     }
   },
   "products": {
-    "title": "Nuestros Productos",
-    "subtitle": "Soluciones IoT completas para cada padre de planta",
-    "sensor": {
-      "title": "PlantSensor Pro",
-      "description": "Dispositivo multi-sensor avanzado con conectividad inalámbrica",
-      "features": ["Detección de humedad del suelo", "Temperatura y humedad", "Intensidad de luz", "Batería: 6 meses"],
-      "price": "$89"
-    },
-    "hub": {
-      "title": "PlantHub Central",
-      "description": "Hub central que conecta todos tus sensores de plantas",
-      "features": ["Conecta hasta 50 sensores", "Wi-Fi y Bluetooth", "Sincronización en la nube", "App móvil incluida"],
-      "price": "$149"
+    "title": "Hazte amigo de Jack",
+    "subtitle": "Jack Pot te pide estos dos elementos para funcionar:",
+    "most_popular": "El más popular",
+    "jack": {
+      "title": "Jack, la maceta inteligente",
+      "description": "Maceta conectada con sensores integrados",
+      "features": ["Detección de humedad del suelo", "Monitoreo de temperatura y humedad", "Seguimiento del nivel de luz", "Conectar a toma de corriente"],
+      "price": "39€"
     },
     "app": {
-      "title": "App PlantCare",
-      "description": "Aplicación móvil completa para gestión de plantas",
-      "features": ["Monitoreo en tiempo real", "Recordatorios de cuidado", "Base de datos de plantas", "Funciones comunitarias"],
+      "title": "Jack Pot, la aplicación móvil",
+      "description": "Aplicación móvil para gestión de plantas y gamificación",
+      "features": ["Estadísticas plantas tiempo real", "Notificaciones de salud", "Recordatorios de cuidado"],
       "price": "Gratis"
     }
   },
   "cta": {
-    "title": "¿Listo para transformar el cuidado de tus plantas?",
-    "subtitle": "Únete a miles de padres de plantas felices usando PlantCare",
-    "button": "Comienza tu viaje"
+    "title": "¿Listo para hacerte amigo de Jack?",
+    "subtitle": "Únete a la comunidad Jack Pot y nunca más te preocupes por tus plantas",
+    "button": "Ir a la tienda"
   },
   "footer": {
-    "company": "PlantCare",
+    "company": "Jack Pot",
     "rights": "Todos los derechos reservados.",
     "links": {
       "privacy": "Política de privacidad",

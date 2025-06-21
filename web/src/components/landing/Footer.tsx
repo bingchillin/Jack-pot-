@@ -1,9 +1,9 @@
 "use client";
 
-import { Leaf } from 'lucide-react';
+import { Flower } from 'lucide-react';
 
 interface FooterProps {
-  t: any; // Translation object
+  t: any;
 }
 
 export default function Footer({ t }: FooterProps) {
@@ -12,7 +12,7 @@ export default function Footer({ t }: FooterProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center space-x-2 mb-4 md:mb-0">
-            <Leaf className="h-6 w-6 text-green-400" />
+          <Flower className="h-8 w-8 text-green-600" />
             <span className="text-xl font-bold">{t('footer.company')}</span>
           </div>
           <div className="flex space-x-6 text-sm text-gray-400">

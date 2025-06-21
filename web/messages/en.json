@@ -10,57 +10,52 @@
     "contact": "Contact"
   },
   "hero": {
-    "title": "Smart Plant Care",
-    "subtitle": "IoT-Powered Solutions",
-    "description": "Transform your gardening experience with intelligent sensors that monitor, analyze, and optimize your plants' health automatically.",
-    "cta": "Get Started",
+    "title": "Discover Jack, Your Smart Gardening Companion",
+    "subtitle": "Smart Pot",
+    "description": "Transform your plant care experience with Jack, the connected pot that monitors your plants' health and makes gardening fun.",
+    "cta": "Get Jack",
     "learn_more": "Learn More"
   },
   "features": {
-    "title": "Why Choose PlantCare?",
-    "subtitle": "Advanced technology meets natural care",
+    "title": "What does our friend Jack do?",
+    "subtitle": "The pot works in tandem with the Jack Pot app, and their duo provides on your phone:",
     "monitoring": {
-      "title": "Real-time Monitoring",
-      "description": "24/7 tracking of soil moisture, temperature, humidity, and light levels"
+      "title": "Real-time Plant Monitoring",
+      "description": "24/7 tracking of soil moisture, temperature, humidity, and light levels with Jack's advanced sensors"
     },
     "smart": {
       "title": "Smart Notifications",
-      "description": "Receive intelligent alerts on your phone when your plants need attention"
+      "description": "Receive intelligent alerts on your phone when Jack detects your plants need attention"
     },
     "analytics": {
-      "title": "Growth Analytics",
-      "description": "Detailed insights and trends to optimize your plant care routine"
+      "title": "Plant Health Analytics",
+      "description": "Detailed insights and stats to track your plants' growth and health over time"
     }
   },
   "products": {
-    "title": "Our Products",
-    "subtitle": "Comprehensive IoT solutions for every plant parent",
-    "sensor": {
-      "title": "PlantSensor Pro",
-      "description": "Advanced multi-sensor device with wireless connectivity",
-      "features": ["Soil moisture detection", "Temperature & humidity", "Light intensity", "Battery life: 6 months"],
-      "price": "$89"
-    },
-    "hub": {
-      "title": "PlantHub Central",
-      "description": "Central hub connecting all your plant sensors",
-      "features": ["Connects up to 50 sensors", "Wi-Fi & Bluetooth", "Cloud sync", "Mobile app included"],
-      "price": "$149"
+    "title": "Become friends with Jack",
+    "subtitle": "Jack Pot asks you for these two elements to work:",
+    "most_popular": "Most Popular",
+    "jack": {
+      "title": "Jack, the smart pot",
+      "description": "Connected pot with integrated sensors",
+      "features": ["Soil moisture detection", "Temperature and humidity monitoring", "Light level tracking", "Plug into power outlet"],
+      "price": "$39"
     },
     "app": {
-      "title": "PlantCare App",
-      "description": "Complete mobile application for plant management",
-      "features": ["Real-time monitoring", "Care reminders", "Plant database", "Community features"],
+      "title": "Jack Pot, the mobile app",
+      "description": "Mobile app for plant management and gamification",
+      "features": ["Real-time plant statistics", "Health notifications", "Care reminders"],
       "price": "Free"
     }
   },
   "cta": {
-    "title": "Ready to Transform Your Plant Care?",
-    "subtitle": "Join thousands of happy plant parents using PlantCare",
-    "button": "Start Your Journey"
+    "title": "Ready to become friends with Jack?",
+    "subtitle": "Join the Jack Pot community and never worry about your plants again",
+    "button": "Go to shop"
   },
   "footer": {
-    "company": "PlantCare",
+    "company": "Jack Pot",
     "rights": "All rights reserved.",
     "links": {
       "privacy": "Privacy Policy",

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
-import { Leaf, Globe, Menu, X } from 'lucide-react';
+import { Flower, Globe, Menu, X } from 'lucide-react';
 
 interface NavigationProps {
   scrolled: boolean;
@@ -44,8 +44,8 @@ export default function Navigation({ scrolled }: NavigationProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2">
-            <Leaf className="h-8 w-8 text-green-600" />
-            <span className="text-xl font-bold text-gray-900">PlantCare</span>
+            <Flower className="h-8 w-8 text-green-600" />
+            <span className="text-xl font-bold text-gray-900">Jack Pot</span>
           </div>
           
           {/* Desktop Navigation */}
