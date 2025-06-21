@@ -69,6 +69,9 @@ export class ObjectProfile {
   @Column({ nullable: true })
   favoris: number;
 
+  @Column({ nullable: true })
+  water_sensor: number;
+
   @Column({ name: 'is_automatic', nullable: true })
   isAutomatic: boolean;
 
