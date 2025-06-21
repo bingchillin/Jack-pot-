@@ -2,5 +2,70 @@
   "HomePage": {
     "title": "bonjour!",
     "about": "Go to the about page"
+  },
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "products": "Produits",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Soin Intelligent des Plantes",
+    "subtitle": "Solutions IoT Avancées",
+    "description": "Transformez votre expérience de jardinage avec des capteurs intelligents qui surveillent, analysent et optimisent automatiquement la santé de vos plantes.",
+    "cta": "Commencer",
+    "learn_more": "En savoir plus"
+  },
+  "features": {
+    "title": "Pourquoi choisir PlantCare ?",
+    "subtitle": "La technologie avancée rencontre le soin naturel",
+    "monitoring": {
+      "title": "Surveillance en temps réel",
+      "description": "Suivi 24h/24 de l'humidité du sol, température, humidité et niveaux de lumière"
+    },
+    "smart": {
+      "title": "Notifications intelligentes",
+      "description": "Recevez des alertes intelligentes sur votre téléphone quand vos plantes ont besoin d'attention"
+    },
+    "analytics": {
+      "title": "Analyses de croissance",
+      "description": "Insights détaillés et tendances pour optimiser votre routine de soin des plantes"
+    }
+  },
+  "products": {
+    "title": "Nos Produits",
+    "subtitle": "Solutions IoT complètes pour chaque parent de plante",
+    "sensor": {
+      "title": "PlantSensor Pro",
+      "description": "Dispositif multi-capteurs avancé avec connectivité sans fil",
+      "features": ["Détection d'humidité du sol", "Température et humidité", "Intensité lumineuse", "Autonomie: 6 mois"],
+      "price": "89€"
+    },
+    "hub": {
+      "title": "PlantHub Central",
+      "description": "Hub central connectant tous vos capteurs de plantes",
+      "features": ["Connecte jusqu'à 50 capteurs", "Wi-Fi et Bluetooth", "Synchronisation cloud", "App mobile incluse"],
+      "price": "149€"
+    },
+    "app": {
+      "title": "App PlantCare",
+      "description": "Application mobile complète pour la gestion des plantes",
+      "features": ["Surveillance temps réel", "Rappels de soins", "Base de données plantes", "Fonctionnalités communauté"],
+      "price": "Gratuit"
+    }
+  },
+  "cta": {
+    "title": "Prêt à transformer le soin de vos plantes ?",
+    "subtitle": "Rejoignez des milliers de parents de plantes heureux utilisant PlantCare",
+    "button": "Commencez votre voyage"
+  },
+  "footer": {
+    "company": "PlantCare",
+    "rights": "Tous droits réservés.",
+    "links": {
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation",
+      "support": "Support"
+    }
   }
 } 

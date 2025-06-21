@@ -2,5 +2,70 @@
   "HomePage": {
     "title": "Hello world!",
     "about": "Go to the about page"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "products": "Products",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Smart Plant Care",
+    "subtitle": "IoT-Powered Solutions",
+    "description": "Transform your gardening experience with intelligent sensors that monitor, analyze, and optimize your plants' health automatically.",
+    "cta": "Get Started",
+    "learn_more": "Learn More"
+  },
+  "features": {
+    "title": "Why Choose PlantCare?",
+    "subtitle": "Advanced technology meets natural care",
+    "monitoring": {
+      "title": "Real-time Monitoring",
+      "description": "24/7 tracking of soil moisture, temperature, humidity, and light levels"
+    },
+    "smart": {
+      "title": "Smart Notifications",
+      "description": "Receive intelligent alerts on your phone when your plants need attention"
+    },
+    "analytics": {
+      "title": "Growth Analytics",
+      "description": "Detailed insights and trends to optimize your plant care routine"
+    }
+  },
+  "products": {
+    "title": "Our Products",
+    "subtitle": "Comprehensive IoT solutions for every plant parent",
+    "sensor": {
+      "title": "PlantSensor Pro",
+      "description": "Advanced multi-sensor device with wireless connectivity",
+      "features": ["Soil moisture detection", "Temperature & humidity", "Light intensity", "Battery life: 6 months"],
+      "price": "$89"
+    },
+    "hub": {
+      "title": "PlantHub Central",
+      "description": "Central hub connecting all your plant sensors",
+      "features": ["Connects up to 50 sensors", "Wi-Fi & Bluetooth", "Cloud sync", "Mobile app included"],
+      "price": "$149"
+    },
+    "app": {
+      "title": "PlantCare App",
+      "description": "Complete mobile application for plant management",
+      "features": ["Real-time monitoring", "Care reminders", "Plant database", "Community features"],
+      "price": "Free"
+    }
+  },
+  "cta": {
+    "title": "Ready to Transform Your Plant Care?",
+    "subtitle": "Join thousands of happy plant parents using PlantCare",
+    "button": "Start Your Journey"
+  },
+  "footer": {
+    "company": "PlantCare",
+    "rights": "All rights reserved.",
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "support": "Support"
+    }
   }
 } 
