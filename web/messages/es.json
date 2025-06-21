@@ -1,0 +1,67 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "products": "Productos",
+    "contact": "Contacto"
+  },
+  "hero": {
+    "title": "Cuidado Inteligente de Plantas",
+    "subtitle": "Soluciones IoT Avanzadas",
+    "description": "Transforma tu experiencia de jardinería con sensores inteligentes que monitorean, analizan y optimizan automáticamente la salud de tus plantas.",
+    "cta": "Comenzar",
+    "learn_more": "Saber más"
+  },
+  "features": {
+    "title": "¿Por qué elegir PlantCare?",
+    "subtitle": "La tecnología avanzada se encuentra con el cuidado natural",
+    "monitoring": {
+      "title": "Monitoreo en tiempo real",
+      "description": "Seguimiento 24/7 de humedad del suelo, temperatura, humedad y niveles de luz"
+    },
+    "smart": {
+      "title": "Notificaciones inteligentes",
+      "description": "Recibe alertas inteligentes en tu teléfono cuando tus plantas necesiten atención"
+    },
+    "analytics": {
+      "title": "Análisis de crecimiento",
+      "description": "Información detallada y tendencias para optimizar tu rutina de cuidado de plantas"
+    }
+  },
+  "products": {
+    "title": "Nuestros Productos",
+    "subtitle": "Soluciones IoT completas para cada padre de planta",
+    "sensor": {
+      "title": "PlantSensor Pro",
+      "description": "Dispositivo multi-sensor avanzado con conectividad inalámbrica",
+      "features": ["Detección de humedad del suelo", "Temperatura y humedad", "Intensidad de luz", "Batería: 6 meses"],
+      "price": "$89"
+    },
+    "hub": {
+      "title": "PlantHub Central",
+      "description": "Hub central que conecta todos tus sensores de plantas",
+      "features": ["Conecta hasta 50 sensores", "Wi-Fi y Bluetooth", "Sincronización en la nube", "App móvil incluida"],
+      "price": "$149"
+    },
+    "app": {
+      "title": "App PlantCare",
+      "description": "Aplicación móvil completa para gestión de plantas",
+      "features": ["Monitoreo en tiempo real", "Recordatorios de cuidado", "Base de datos de plantas", "Funciones comunitarias"],
+      "price": "Gratis"
+    }
+  },
+  "cta": {
+    "title": "¿Listo para transformar el cuidado de tus plantas?",
+    "subtitle": "Únete a miles de padres de plantas felices usando PlantCare",
+    "button": "Comienza tu viaje"
+  },
+  "footer": {
+    "company": "PlantCare",
+    "rights": "Todos los derechos reservados.",
+    "links": {
+      "privacy": "Política de privacidad",
+      "terms": "Términos de servicio",
+      "support": "Soporte"
+    }
+  }
+} 
