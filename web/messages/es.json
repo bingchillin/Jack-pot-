@@ -59,6 +59,43 @@
       "support": "Soporte"
     }
   },
+  "contact": {
+    "title": "Contáctanos",
+    "subtitle": "Ponte en contacto con nuestro equipo de soporte",
+    "description": "¿Tienes preguntas sobre Jack Pot? ¿Necesitas ayuda con tu maceta inteligente? ¡Estamos aquí para ayudarte! Completa el formulario de abajo y te responderemos lo antes posible.",
+    "response_badge": "Normalmente respondemos en 24 horas",
+    "form": {
+      "title": "Envíanos un mensaje",
+      "subtitle": "Completa el formulario de abajo y te responderemos lo antes posible.",
+      "name": "Nombre completo",
+      "name_placeholder": "Ingresa tu nombre completo",
+      "email": "Dirección de correo electrónico",
+      "email_placeholder": "tu@email.com",
+      "subject": "Asunto",
+      "subject_placeholder": "Selecciona un tema",
+      "message": "Tu mensaje",
+      "message_placeholder": "Dinos cómo podemos ayudarte...",
+      "submit": "Enviar mensaje",
+      "sending": "Enviando...",
+      "success": "¡Mensaje enviado con éxito!",
+      "error": "Error al enviar el mensaje. Por favor, inténtalo de nuevo."
+    },
+    "info": {
+      "title": "Ponte en contacto",
+      "email": "jackpotproject2025@gmail.com",
+      "response_time": "Normalmente respondemos en 24 horas",
+      "support_hours": "Soporte disponible lunes-viernes, 9AM-6PM",
+      "support_hours_title": "Horas de soporte",
+      "support_hours_description": "Disponible para asistencia"
+    },
+    "topics": {
+      "title": "Temas comunes",
+      "technical": "Soporte técnico",
+      "product": "Información del producto",
+      "order": "Estado del pedido",
+      "general": "Consulta general"
+    }
+  },
   "privacy": {
     "title": "Política de Privacidad",
     "last_updated": "Última actualización: Junio 2025",
