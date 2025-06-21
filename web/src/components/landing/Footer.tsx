@@ -1,12 +1,16 @@
 "use client";
 
 import { Flower } from 'lucide-react';
+import { useParams } from 'next/navigation';
 
 interface FooterProps {
   t: any;
 }
 
 export default function Footer({ t }: FooterProps) {
+  const params = useParams();
+  const locale = params.locale as string;
+
   return (
     <footer id="contact" className="bg-gray-900 text-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,9 +20,9 @@ export default function Footer({ t }: FooterProps) {
             <span className="text-xl font-bold">{t('footer.company')}</span>
           </div>
           <div className="flex space-x-6 text-sm text-gray-400">
-            <a href="/privacy" className="hover:text-white transition-colors">{t('footer.links.privacy')}</a>
-            <a href="/terms" className="hover:text-white transition-colors">{t('footer.links.terms')}</a>
-            <a href="/support" className="hover:text-white transition-colors">{t('footer.links.support')}</a>
+            <a href={`/${locale}/privacy`} className="hover:text-white transition-colors">{t('footer.links.privacy')}</a>
+            <a href={`/${locale}/terms`} className="hover:text-white transition-colors">{t('footer.links.terms')}</a>
+            <a href={`/${locale}/contact`} className="hover:text-white transition-colors">{t('footer.links.support')}</a>
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">

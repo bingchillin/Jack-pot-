@@ -63,6 +63,43 @@
       "support": "Support"
     }
   },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with our support team",
+    "description": "Have questions about Jack Pot? Need help with your smart pot? We're here to help! Fill out the form below and we'll get back to you as soon as possible.",
+    "response_badge": "We typically respond within 24 hours",
+    "form": {
+      "title": "Send us a message",
+      "subtitle": "Fill out the form below and we'll get back to you as soon as possible.",
+      "name": "Full Name",
+      "name_placeholder": "Enter your full name",
+      "email": "Email Address",
+      "email_placeholder": "your@email.com",
+      "subject": "Subject",
+      "subject_placeholder": "Select a topic",
+      "message": "Your Message",
+      "message_placeholder": "Tell us how we can help you...",
+      "submit": "Send Message",
+      "sending": "Sending...",
+      "success": "Message sent successfully!",
+      "error": "Error sending message. Please try again."
+    },
+    "info": {
+      "title": "Get in Touch",
+      "email": "jackpotproject2025@gmail.com",
+      "response_time": "We typically respond within 24 hours",
+      "support_hours": "Support available Monday-Friday, 9AM-6PM",
+      "support_hours_title": "Support Hours",
+      "support_hours_description": "Available for assistance"
+    },
+    "topics": {
+      "title": "Common Topics",
+      "technical": "Technical Support",
+      "product": "Product Information",
+      "order": "Order Status",
+      "general": "General Inquiry"
+    }
+  },
   "privacy": {
     "title": "Privacy Policy",
     "last_updated": "Last updated: June 2025",
