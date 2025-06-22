@@ -36,6 +36,9 @@ export class Product {
   @Column({ name: 'stock_quantity', default: 0 })
   stockQuantity: number;
 
+  @Column({ name: 'reserved_quantity', default: 0 })
+  reservedQuantity: number;
+
   @Column({ name: 'sku', length: 100, nullable: true })
   @Index()
   sku: string;

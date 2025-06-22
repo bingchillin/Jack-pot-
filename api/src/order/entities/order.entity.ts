@@ -4,7 +4,9 @@ import { OrderItem } from './order-item.entity';
 
 export enum OrderStatus {
   PENDING = 'pending',
+  PAYMENT_PROCESSING = 'payment_processing',
   PAID = 'paid',
+  PAYMENT_FAILED = 'payment_failed',
   SHIPPED = 'shipped',
   DELIVERED = 'delivered',
   CANCELLED = 'cancelled',
@@ -88,6 +90,15 @@ export class Order {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @Column({ name: 'paid_at', type: 'timestamp', nullable: true })
+  paidAt?: Date;
+
+  @Column({ name: 'payment_method', length: 50, nullable: true })
+  paymentMethod?: string;
+
+  @Column({ name: 'stripe_payment_method_id', length: 255, nullable: true })
+  stripePaymentMethodId?: string;
 
   @OneToMany(() => OrderItem, orderItem => orderItem.order, { cascade: true })
   orderItems: OrderItem[];

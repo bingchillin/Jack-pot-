@@ -198,6 +198,76 @@ export class StripeService implements OnModuleInit {
     return this.stripe !== null;
   }
 
+  async confirmPaymentIntent(paymentIntentId: string): Promise<Stripe.PaymentIntent> {
+    this.checkStripeInitialized();
+    
+    try {
+      const paymentIntent = await this.stripe!.paymentIntents.confirm(paymentIntentId);
+      this.logger.log(`Confirmed payment intent ${paymentIntentId}`);
+      return paymentIntent;
+    } catch (error) {
+      this.logger.error(`Failed to confirm payment intent ${paymentIntentId}:`, error);
+      throw error;
+    }
+  }
+
+  async cancelPaymentIntent(paymentIntentId: string): Promise<Stripe.PaymentIntent> {
+    this.checkStripeInitialized();
+    
+    try {
+      const paymentIntent = await this.stripe!.paymentIntents.cancel(paymentIntentId);
+      this.logger.log(`Cancelled payment intent ${paymentIntentId}`);
+      return paymentIntent;
+    } catch (error) {
+      this.logger.error(`Failed to cancel payment intent ${paymentIntentId}:`, error);
+      throw error;
+    }
+  }
+
+  async updatePaymentIntent(paymentIntentId: string, params: Stripe.PaymentIntentUpdateParams): Promise<Stripe.PaymentIntent> {
+    this.checkStripeInitialized();
+    
+    try {
+      const paymentIntent = await this.stripe!.paymentIntents.update(paymentIntentId, params);
+      this.logger.log(`Updated payment intent ${paymentIntentId}`);
+      return paymentIntent;
+    } catch (error) {
+      this.logger.error(`Failed to update payment intent ${paymentIntentId}:`, error);
+      throw error;
+    }
+  }
+
+  async getPaymentMethod(paymentMethodId: string): Promise<Stripe.PaymentMethod> {
+    this.checkStripeInitialized();
+    
+    try {
+      return await this.stripe!.paymentMethods.retrieve(paymentMethodId);
+    } catch (error) {
+      this.logger.error(`Failed to retrieve payment method ${paymentMethodId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Maps Stripe error codes to our custom error types
+   */
+  handleStripeError(error: any): Error {
+    switch (error.code) {
+      case 'card_declined':
+      case 'insufficient_funds':
+        return new Error('Payment declined: insufficient funds');
+      case 'expired_card':
+      case 'incorrect_cvc':
+      case 'processing_error':
+        return new Error('Payment method error: ' + error.message);
+      case 'amount_too_large':
+      case 'amount_too_small':
+        return new Error('Invalid payment amount');
+      default:
+        return new Error('Payment processing failed: ' + error.message);
+    }
+  }
+
   getStripeStatus(): { initialized: boolean; hasKey: boolean; keyType?: string } {
     const hasKey = !!process.env.STRIPE_SECRET_KEY;
     const keyType = process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_') ? 'test' : 
