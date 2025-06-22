@@ -8,6 +8,7 @@ import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailerService } from '../mailer/mailer.service';
+import { StripeService } from '../stripe/stripe.service';
 import * as crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,8 +16,8 @@ import { RefreshToken } from './entities/refresh-token.entity';
 
 @Injectable()
 export class AuthService {
-    private readonly RESET_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
-    private readonly VERIFICATION_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
+    private readonly RESET_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes
+    private readonly VERIFICATION_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes
     private readonly RESET_TOKEN_EXPIRY = '10m'; // 10 minutes
     private readonly logger = new Logger(AuthService.name);
 
@@ -27,6 +28,7 @@ export class AuthService {
         private readonly personService: PersonService,
         private jwtService: JwtService,
         private readonly mailerService: MailerService,
+        private readonly stripeService: StripeService,
         @InjectRepository(RefreshToken)
         private readonly refreshTokenRepository: Repository<RefreshToken>,
     ) { }
@@ -52,6 +54,8 @@ export class AuthService {
     }
 
     async signup(signupDto: SignupDto) {
+        this.logger.log(`Starting signup process for email: ${signupDto.email}`);
+        
         // Check if user already exists
         const existingUser = await this.personService.findByEmail(signupDto.email);
         if (existingUser) {
@@ -62,6 +66,7 @@ export class AuthService {
         const verificationCodeExpires = this.setVerificationCodeExpiration();
 
         // Create new user with default role and verification code
+        this.logger.log('Creating new user in database...');
         const newUser = await this.personService.create({
             ...signupDto,
             idRole: 2,
@@ -69,22 +74,60 @@ export class AuthService {
             verificationCode: signupDto.verificationCode,
             verificationCodeExpires
         });
+        this.logger.log(`✅ User created with ID: ${newUser.idPerson}`);
+
+        // Get the full person object for Stripe customer creation
+        this.logger.log('Fetching full person object for Stripe customer creation...');
+        const fullPerson = await this.personService.findOne(newUser.idPerson);
+        this.logger.log(`✅ Full person object retrieved: ${fullPerson.email}`);
+
+        // Create Stripe customer for the new user
+        this.logger.log('Starting Stripe customer creation...');
+        let updatedPerson = fullPerson;
+        try {
+            const stripeCustomer = await this.stripeService.createCustomer(fullPerson);
+            
+            this.logger.log(`✅ Stripe customer created: ${stripeCustomer.id}`);
+            
+            // Update user with Stripe customer ID
+            this.logger.log('Updating person with Stripe customer ID...');
+            updatedPerson = await this.personService.updateStripeCustomerId(newUser.idPerson, stripeCustomer.id);
+            
+            this.logger.log(`✅ Person updated with Stripe customer ID: ${stripeCustomer.id}`);
+        } catch (error) {
+            this.logger.error(`❌ Failed to create Stripe customer for user ${newUser.idPerson}:`, error);
+            this.logger.error('Error details:', {
+                message: error.message,
+                type: error.type,
+                code: error.code,
+                statusCode: error.statusCode
+            });
+            // Don't fail the registration if Stripe fails, but log the error
+            // The user can still use the app, and we can retry Stripe customer creation later
+        }
 
         // Send verification email
+        this.logger.log('Sending verification email...');
         await this.mailerService.sendVerificationEmail(newUser.email, signupDto.verificationCode);
+        this.logger.log('✅ Verification email sent');
 
         // Generate tokens
+        this.logger.log('Generating JWT tokens...');
         const tokens = await this.generateTokens(newUser);
+        this.logger.log('✅ JWT tokens generated');
+
+        this.logger.log(`🎉 Signup process completed for user ${newUser.idPerson}`);
 
         return {
             ...tokens,
             user: {
-                idPerson: newUser.idPerson,
-                email: newUser.email,
-                firstname: newUser.firstname,
-                surname: newUser.surname,
-                numberPhone: newUser.numberPhone,
-                isEmailVerified: newUser.isEmailVerified
+                idPerson: updatedPerson.idPerson,
+                email: updatedPerson.email,
+                firstname: updatedPerson.firstname,
+                surname: updatedPerson.surname,
+                numberPhone: updatedPerson.numberPhone,
+                isEmailVerified: updatedPerson.isEmailVerified,
+                stripeCustomerId: updatedPerson.stripeCustomerId
             },
         };
     }
@@ -388,5 +431,7 @@ export class AuthService {
     async revokeAllRefreshTokensForUser(userId: number) {
         await this.refreshTokenRepository.delete({ user: { idPerson: userId } });
     }
+
+
 }
 

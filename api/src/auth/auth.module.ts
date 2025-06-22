@@ -8,6 +8,7 @@ import {JwtStrategy} from "./jwt.strategy";
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { MailerModule } from '../mailer/mailer.module';
+import { StripeModule } from '../stripe/stripe.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
 
@@ -17,6 +18,7 @@ import { RefreshToken } from './entities/refresh-token.entity';
         PassportModule,
         ConfigModule,
         MailerModule,
+        StripeModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             useFactory: async (configService: ConfigService) => ({
