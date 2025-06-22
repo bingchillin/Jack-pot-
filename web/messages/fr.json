@@ -1,0 +1,165 @@
+{
+  "HomePage": {
+    "title": "bonjour!",
+    "about": "Go to the about page"
+  },
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "products": "Produits",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Découvrez Jack, Votre Compagnon de Jardinage Intelligent",
+    "subtitle": "Pot Intelligent",
+    "description": "Transformez votre expérience de soin des plantes avec Jack, le pot connecté qui surveille la santé de vos plantes et rend le jardinage amusant.",
+    "cta": "Obtenir Jack",
+    "learn_more": "En savoir plus"
+  },
+  "features": {
+    "title": "Que fais notre ami Jack ?",
+    "subtitle": "Le pot fonctionne en tandem avec l'application Jack Pot, et leur duo met à disposition sur votre téléphone :",
+    "monitoring": {
+      "title": "Surveillance Plante en Temps Réel",
+      "description": "Suivi 24h/24 de l'humidité du sol, température, humidité et niveaux de lumière avec les capteurs avancés de Jack"
+    },
+    "smart": {
+      "title": "Notifications Intelligentes",
+      "description": "Recevez des alertes intelligentes sur votre téléphone quand Jack détecte que vos plantes ont besoin d'attention"
+    },
+    "analytics": {
+      "title": "Analyses de Santé des Plantes",
+      "description": "Insights détaillés et statistiques pour suivre la croissance et la santé de vos plantes dans le temps"
+    }
+  },
+  "products": {
+    "title": "Devenez ami avec Jack",
+    "subtitle": "Jack Pot vous demande ces deux éléments pour fonctionner :",
+    "most_popular": "Le plus populaire",
+    "jack": {
+      "title": "Jack, le pot intelligent",
+      "description": "Pot connecté avec capteurs intégrés",
+      "features": ["Détection d'humidité du sol", "Surveillance température et humidité", "Suivi du niveau de lumière", "À brancher sur secteur"],
+      "price": "39€"
+    },
+    "app": {
+      "title": "Jack Pot, l'application mobile",
+      "description": "Application mobile pour la gestion des plantes et la gamification",
+      "features": ["Statistiques plantes temps réel", "Notifications de santé", "Rappels de soins"],
+      "price": "Gratuit"
+    }
+  },
+  "cta": {
+    "title": "Prêt à devenir ami avec Jack ?",
+    "subtitle": "Rejoignez la communauté Jack Pot et ne vous inquiétez plus jamais pour vos plantes",
+    "button": "Aller sur la boutique"
+  },
+  "footer": {
+    "company": "Jack Pot",
+    "rights": "Tous droits réservés.",
+    "links": {
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation",
+      "support": "Contact"
+    }
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Contactez notre équipe de support",
+    "description": "Des questions sur Jack Pot ? Besoin d'aide avec votre pot intelligent ? Nous sommes là pour vous aider ! Remplissez le formulaire ci-dessous et nous vous répondrons dès que possible.",
+    "response_badge": "Nous répondons généralement sous 24 heures",
+    "form": {
+      "title": "Envoyez-nous un message",
+      "subtitle": "Remplissez le formulaire ci-dessous et nous vous répondrons dès que possible.",
+      "name": "Nom complet",
+      "name_placeholder": "Entrez votre nom complet",
+      "email": "Adresse e-mail",
+      "email_placeholder": "votre@email.com",
+      "subject": "Sujet",
+      "subject_placeholder": "Sélectionnez un sujet",
+      "message": "Votre message",
+      "message_placeholder": "Dites-nous comment nous pouvons vous aider...",
+      "submit": "Envoyer le message",
+      "sending": "Envoi en cours...",
+      "success": "Message envoyé avec succès !",
+      "error": "Erreur lors de l'envoi du message. Veuillez réessayer."
+    },
+    "info": {
+      "title": "Nous contacter",
+      "email": "jackpotproject2025@gmail.com",
+      "response_time": "Nous répondons généralement sous 24 heures",
+      "support_hours": "Support disponible lundi-vendredi, 9h-18h",
+      "support_hours_title": "Heures de support",
+      "support_hours_description": "Disponible pour assistance"
+    },
+    "topics": {
+      "title": "Sujets courants",
+      "technical": "Support technique",
+      "product": "Informations produit",
+      "order": "Statut de commande",
+      "general": "Demande générale"
+    }
+  },
+  "privacy": {
+    "title": "Politique de Confidentialité",
+    "last_updated": "Dernière mise à jour : Juin 2025",
+    "intro": "Chez Jack Pot, nous respectons votre vie privée et nous nous engageons à protéger vos données personnelles. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos informations lorsque vous utilisez notre pot intelligent et notre application mobile.",
+    "sections": {
+      "data_collection": {
+        "title": "Informations que nous collectons",
+        "content": "Nous collectons les données de santé des plantes de votre pot intelligent Jack (humidité du sol, température, humidité, niveaux de lumière), vos informations de compte et les données d'utilisation de l'application pour vous offrir la meilleure expérience de soin des plantes."
+      },
+      "data_use": {
+        "title": "Comment nous utilisons vos informations",
+        "content": "Vos données nous aident à fournir une surveillance des plantes en temps réel, envoyer des notifications intelligentes, générer des analyses de santé des plantes et améliorer nos services. Nous ne vendons jamais vos informations personnelles à des tiers."
+      },
+      "data_sharing": {
+        "title": "Partage de données",
+        "content": "Nous ne partageons vos données qu'avec des fournisseurs de services de confiance qui nous aident à exploiter nos services. Vos données de plantes sont chiffrées et stockées en toute sécurité dans le cloud."
+      },
+      "your_rights": {
+        "title": "Vos droits",
+        "content": "Vous avez le droit d'accéder, de modifier ou de supprimer vos données personnelles à tout moment via les paramètres de l'application Jack Pot ou en contactant notre équipe de support."
+      },
+      "contact": {
+        "title": "Nous contacter",
+        "content": "Si vous avez des questions sur cette politique de confidentialité, veuillez nous contacter à privacy@jackpot.com"
+      }
+    }
+  },
+  "terms": {
+    "title": "Conditions d'Utilisation",
+    "last_updated": "Dernière mise à jour : Juin 2025",
+    "intro": "Bienvenue chez Jack Pot ! Ces conditions d'utilisation régissent votre utilisation de notre pot intelligent et de notre application mobile. En utilisant nos services, vous acceptez ces conditions.",
+    "sections": {
+      "service_description": {
+        "title": "Description du service",
+        "content": "Jack Pot fournit une surveillance intelligente des plantes via notre pot connecté IoT et notre application mobile. Notre service inclut le suivi de la santé des plantes en temps réel, les notifications et les analyses."
+      },
+      "user_responsibilities": {
+        "title": "Responsabilités de l'utilisateur",
+        "content": "Vous êtes responsable de la configuration et de la maintenance appropriées de votre pot intelligent Jack, de la fourniture d'informations précises et de l'utilisation de nos services conformément aux lois applicables."
+      },
+      "intellectual_property": {
+        "title": "Propriété intellectuelle",
+        "content": "Tout le contenu, les fonctionnalités et les fonctionnalités de Jack Pot nous appartiennent et sont protégés par les lois sur les droits d'auteur, les marques de commerce et autres lois sur la propriété intellectuelle."
+      },
+      "limitation_liability": {
+        "title": "Limitation de responsabilité",
+        "content": "Jack Pot est fourni 'tel quel' sans garanties. Nous ne sommes pas responsables des dommages résultant de l'utilisation de nos services, y compris les problèmes de santé des plantes."
+      },
+      "termination": {
+        "title": "Résiliation",
+        "content": "Nous pouvons résilier ou suspendre votre accès à nos services à tout moment pour violation de ces conditions ou pour toute autre raison à notre discrétion."
+      },
+      "changes": {
+        "title": "Modifications des conditions",
+        "content": "Nous pouvons mettre à jour ces conditions de temps à autre. Nous vous informerons de tout changement important via l'application ou par email."
+      },
+      "contact": {
+        "title": "Nous contacter",
+        "content": "Si vous avez des questions sur ces conditions, veuillez nous contacter à legal@jackpot.com"
+      }
+    }
+  }
+} 

@@ -11,6 +11,7 @@ import { GamePerson } from 'src/game-person/entities/game-person.entity';
 import { EventPartyPerson } from 'src/event-party-person/entities/event-party-person.entity';
 import { PersonParameter } from 'src/lnk-person-parameter/entities/person-parameter.entity';
 import { Notification } from 'src/notification/entities/notification.entity';
+import { RefreshToken } from '../../auth/entities/refresh-token.entity';
 
 @Entity('person')
 export class Person {
@@ -97,4 +98,7 @@ export class Person {
 
   @OneToMany(() => PlantPerson, plantPerson => plantPerson.person)
   plantRelations: PlantPerson[];
+
+  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
+  refreshTokens: RefreshToken[];
 }
