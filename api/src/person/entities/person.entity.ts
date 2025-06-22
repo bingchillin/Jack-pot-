@@ -12,6 +12,7 @@ import { EventPartyPerson } from 'src/event-party-person/entities/event-party-pe
 import { PersonParameter } from 'src/lnk-person-parameter/entities/person-parameter.entity';
 import { Notification } from 'src/notification/entities/notification.entity';
 import { RefreshToken } from '../../auth/entities/refresh-token.entity';
+import { Order } from '../../order/entities/order.entity';
 
 @Entity('person')
 export class Person {
@@ -57,6 +58,10 @@ export class Person {
   @Column({ name: 'resetTokenVersion', default: 0 })
   resetTokenVersion: number;
 
+  @Column({ name: 'stripe_customer_id', length: 255, nullable: true })
+  @Index()
+  stripeCustomerId: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -101,4 +106,7 @@ export class Person {
 
   @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
   refreshTokens: RefreshToken[];
+
+  @OneToMany(() => Order, order => order.person)
+  orders: Order[];
 }

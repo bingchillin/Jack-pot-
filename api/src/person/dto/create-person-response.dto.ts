@@ -21,4 +21,7 @@ export class CreatePersonResponseDto {
 
     @ApiProperty({ example: false })
     isEmailVerified: boolean;
+
+    @ApiProperty({ example: 'cus_1234567890', required: false })
+    stripeCustomerId?: string;
 } 
