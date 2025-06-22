@@ -27,13 +27,13 @@ DallasTemperature sensors(&sensor_temprature_ground_p);
 DHT dht(SENSOR_TEMPERATURE_HUMIDITY_EXTERN, DHTTYPE);
 
 //variable sensor
-float sensor_ground_temperature = 0;
 float sensor_water_level = 0;
 float sensor_ground_humidity = 0;
 float sensor_extern_temperature = 0;
 float sensor_extern_humidity = 0;
 float sensor_uv_voltage = 0;
 float sensor_uv_intensity = 0;
+// there is sensor_temprature_ground_p;
 
 
 void setup() {
@@ -44,6 +44,7 @@ void setup() {
   pinMode(SENSOR_WATER_P, INPUT);
   pinMode(SENSOR_HUMIDITY_GROUND, INPUT);
   pinMode(SENSOR_TEMPERATURE_HUMIDITY_EXTERN, INPUT);
+  pinMode(SENSOR_UV, INPUT);
 
   // Création sensor temperature humidity extern
   dht.begin();
@@ -144,8 +145,8 @@ void taskGetSensorTemperatureHumidityExtern(void * parameter) {
 
 
 void handleGetSensorTemperatureHumidityExtern() {
-  float sensor_extern_temperature = dht.readTemperature();
-  float sensor_extern_humidity = dht.readHumidity();
+  sensor_extern_temperature = dht.readTemperature();
+  sensor_extern_humidity = dht.readHumidity();
   
 
   if (isnan(sensor_extern_temperature) || isnan(sensor_extern_humidity)) {
