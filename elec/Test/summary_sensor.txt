@@ -35,4 +35,6 @@ Estimer un indice UV simplifié (ex. UV = voltage * 10.0)
 Définir des seuils d’alerte plus c'est haut plus ca tape... donc en fonction de la plante, on informe de la dangerosité
 
 
+Temperature ground sensor (temperature_sensor_ground):
 
+lis la temparature en °C
