@@ -1,6 +1,6 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, FindManyOptions } from 'typeorm';
+import { Repository, FindManyOptions } from 'typeorm';
 import { Person } from './entities/person.entity';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
@@ -8,16 +8,19 @@ import { CreatePersonResponseDto } from './dto/create-person-response.dto';
 import * as bcrypt from 'bcrypt';
 import { RoleService } from '../role/role.service';
 import { ObjectEntity } from 'src/object/entities/object.entity';
-import { ObjectProfileService } from 'src/object-profile/object-profile.service';
 import { ObjectProfile } from 'src/object-profile/entities/object-profile.entity';
+import { StripeService } from '../stripe/stripe.service';
 
 @Injectable()
 export class PersonService {
+    private readonly logger = new Logger(PersonService.name);
+
     constructor(
         @InjectRepository(Person)
         private personRepository: Repository<Person>,
         private roleService: RoleService,
-        private objectProfileService: ObjectProfileService
+        @Inject(forwardRef(() => StripeService))
+        private stripeService: StripeService,
     ) {}
 
     async create(createPersonDto: CreatePersonDto): Promise<CreatePersonResponseDto> {
@@ -43,6 +46,24 @@ export class PersonService {
         }
 
         const savedPerson = await this.personRepository.save(person);
+        this.logger.log(`✅ Person created with ID: ${savedPerson.idPerson}`);
+
+        // Create Stripe customer
+        let stripeCustomerId = null;
+        try {
+            this.logger.log('Creating Stripe customer...');
+            const stripeCustomer = await this.stripeService.createCustomer(savedPerson);
+            stripeCustomerId = stripeCustomer.id;
+            
+            // Update person with Stripe customer ID
+            savedPerson.stripeCustomerId = stripeCustomerId;
+            await this.personRepository.save(savedPerson);
+            
+            this.logger.log(`✅ Stripe customer created: ${stripeCustomerId}`);
+        } catch (error) {
+            this.logger.error(`❌ Failed to create Stripe customer for person ${savedPerson.idPerson}:`, error);
+            // Don't fail the person creation if Stripe fails
+        }
         
         // Map to response DTO
         const response: CreatePersonResponseDto = {
@@ -52,7 +73,8 @@ export class PersonService {
             surname: savedPerson.surname,
             numberPhone: savedPerson.numberPhone,
             idRole: savedPerson.idRole,
-            isEmailVerified: savedPerson.isEmailVerified
+            isEmailVerified: savedPerson.isEmailVerified,
+            stripeCustomerId: stripeCustomerId
         };
 
         return response;
@@ -189,9 +211,80 @@ export class PersonService {
         return filteredProfiles;
     }
 
-    
-
     async count(options?: FindManyOptions<Person>): Promise<number> {
         return await this.personRepository.count(options);
+    }
+
+    async updateStripeCustomerId(id: number, stripeCustomerId: string): Promise<Person> {
+        const person = await this.findOne(id);
+        person.stripeCustomerId = stripeCustomerId;
+        return await this.personRepository.save(person);
+    }
+
+    async findByStripeCustomerId(stripeCustomerId: string): Promise<Person | null> {
+        return await this.personRepository.findOne({
+            where: { stripeCustomerId },
+            relations: ['role']
+        });
+    }
+
+    async ensureStripeCustomer(personId: number): Promise<string> {
+        const person = await this.findOne(personId);
+        
+        // If they already have a Stripe customer ID, return it
+        if (person.stripeCustomerId) {
+            this.logger.log(`Person ${personId} already has Stripe customer: ${person.stripeCustomerId}`);
+            return person.stripeCustomerId;
+        }
+
+        // Create a new Stripe customer
+        try {
+            this.logger.log(`Creating Stripe customer for existing person ${personId}`);
+            const stripeCustomer = await this.stripeService.createCustomer(person);
+            
+            // Update the person with the new Stripe customer ID
+            person.stripeCustomerId = stripeCustomer.id;
+            await this.personRepository.save(person);
+            
+            this.logger.log(`✅ Created Stripe customer ${stripeCustomer.id} for existing person ${personId}`);
+            return stripeCustomer.id;
+        } catch (error) {
+            this.logger.error(`❌ Failed to create Stripe customer for person ${personId}:`, error);
+            throw new Error(`Failed to create Stripe customer: ${error.message}`);
+        }
+    }
+
+    async findPersonsWithoutStripeCustomer(): Promise<Person[]> {
+        return await this.personRepository.find({
+            where: { stripeCustomerId: null },
+            relations: ['role']
+        });
+    }
+
+    async createMissingStripeCustomers(): Promise<{ success: number; failed: number; errors: any[] }> {
+        const personsWithoutStripe = await this.findPersonsWithoutStripeCustomer();
+        let success = 0;
+        let failed = 0;
+        const errors = [];
+
+        this.logger.log(`Found ${personsWithoutStripe.length} persons without Stripe customers. Starting batch creation...`);
+
+        for (const person of personsWithoutStripe) {
+            try {
+                await this.ensureStripeCustomer(person.idPerson);
+                success++;
+            } catch (error) {
+                failed++;
+                errors.push({
+                    personId: person.idPerson,
+                    email: person.email,
+                    error: error.message
+                });
+                this.logger.error(`Failed to create Stripe customer for person ${person.idPerson}: ${error.message}`);
+            }
+        }
+
+        this.logger.log(`Batch Stripe customer creation completed: ${success} success, ${failed} failed`);
+        return { success, failed, errors };
     }
 } 

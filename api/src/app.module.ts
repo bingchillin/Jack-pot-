@@ -23,6 +23,9 @@ import { ParameterType } from './parameter-type/entities/parameter-type.entity';
 import { Avatar } from './avatar/entities/avatar.entity';
 import { PlantPerson } from './plant-person/entities/plant-person.entity';
 import { PlantType } from './plant-type/entities/plant-type.entity';
+import { Product } from './product/entities/product.entity';
+import { Order } from './order/entities/order.entity';
+import { OrderItem } from './order/entities/order-item.entity';
 
 // Module imports
 import { RoleModule } from './role/role.module';
@@ -40,6 +43,9 @@ import { ObjectProfileModule } from './object-profile/object-profile.module';
 import { EventPartyModule } from './event-party/event-party.module';
 import { PlantTypeModule } from './plant-type/plant-type.module';
 import { MailerModule } from './mailer/mailer.module';
+import { ProductModule } from './product/product.module';
+import { OrderModule } from './order/order.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -75,7 +81,10 @@ import { MailerModule } from './mailer/mailer.module';
             ParameterType,
             Avatar,
             PlantPerson,
-            PlantType
+            PlantType,
+            Product,
+            Order,
+            OrderItem
           ],
           synchronize: true,
           autoLoadEntities: true,
@@ -107,7 +116,10 @@ import { MailerModule } from './mailer/mailer.module';
     ObjectProfileModule,
     EventPartyModule,
     PlantTypeModule,
-    MailerModule
+    MailerModule,
+    ProductModule,
+    OrderModule,
+    StripeModule
   ],
   controllers: [AppController],
   providers: [AppService],
