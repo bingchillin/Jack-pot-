@@ -3,6 +3,9 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateOrderResponseDto } from './dto/create-order-response.dto';
+import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
+import { PaymentStatusResponseDto } from './dto/payment-status-response.dto';
 import { Order } from './entities/order.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -15,8 +18,8 @@ export class OrderController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new order' })
-  @ApiResponse({ status: 201, description: 'Order created successfully', type: Order })
-  create(@Body() createOrderDto: CreateOrderDto, @Request() req): Promise<Order> {
+  @ApiResponse({ status: 201, description: 'Order created successfully', type: CreateOrderResponseDto })
+  create(@Body() createOrderDto: CreateOrderDto, @Request() req): Promise<CreateOrderResponseDto> {
     // Set the person ID from the authenticated user
     createOrderDto.personId = req.user.idPerson;
     return this.orderService.create(createOrderDto);
@@ -63,5 +66,29 @@ export class OrderController {
   @ApiResponse({ status: 200, description: 'Order deleted successfully' })
   remove(@Param('id') id: string): Promise<void> {
     return this.orderService.remove(+id);
+  }
+
+  @Post('confirm-payment')
+  @ApiOperation({ summary: 'Confirm payment for an order' })
+  @ApiResponse({ status: 200, description: 'Payment confirmation result', type: PaymentStatusResponseDto })
+  @ApiResponse({ status: 400, description: 'Payment processing failed' })
+  confirmPayment(@Body() confirmPaymentDto: ConfirmPaymentDto): Promise<PaymentStatusResponseDto> {
+    return this.orderService.confirmPayment(confirmPaymentDto);
+  }
+
+  @Get('payment-status/:paymentIntentId')
+  @ApiOperation({ summary: 'Get payment status by payment intent ID' })
+  @ApiResponse({ status: 200, description: 'Payment status retrieved', type: PaymentStatusResponseDto })
+  @ApiResponse({ status: 404, description: 'Payment intent not found' })
+  getPaymentStatus(@Param('paymentIntentId') paymentIntentId: string): Promise<PaymentStatusResponseDto> {
+    return this.orderService.getPaymentStatus(paymentIntentId);
+  }
+
+  @Patch(':id/cancel')
+  @ApiOperation({ summary: 'Cancel an order' })
+  @ApiResponse({ status: 200, description: 'Order cancelled successfully', type: Order })
+  @ApiResponse({ status: 400, description: 'Cannot cancel this order' })
+  cancelOrder(@Param('id') id: string): Promise<Order> {
+    return this.orderService.cancelOrder(+id);
   }
 } 
