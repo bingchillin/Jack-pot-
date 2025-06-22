@@ -83,6 +83,25 @@ export class OrderService {
           throw new InsufficientStockError(product.name, item.quantity, product.stockQuantity);
         }
 
+        // Ensure product has Stripe product/price IDs
+        if (!product.stripeProductId || !product.stripePriceId) {
+          this.logger.log(`Creating Stripe product for ${product.name}...`);
+          try {
+            const { stripeProduct, stripePrice } = await this.stripeService.createProduct(product);
+            
+            // Update product with Stripe IDs
+            await this.productRepository.update(product.idProduct, {
+              stripeProductId: stripeProduct.id,
+              stripePriceId: stripePrice.id,
+            });
+            
+            this.logger.log(`✅ Created Stripe product ${stripeProduct.id} for ${product.name}`);
+          } catch (error) {
+            this.logger.error(`❌ Failed to create Stripe product for ${product.name}:`, error);
+            // Continue with order creation even if Stripe product creation fails
+          }
+        }
+
         const itemTotal = product.price * item.quantity;
         totalAmount += itemTotal;
 
