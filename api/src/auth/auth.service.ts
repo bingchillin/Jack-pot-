@@ -54,8 +54,6 @@ export class AuthService {
     }
 
     async signup(signupDto: SignupDto) {
-        this.logger.log(`Starting signup process for email: ${signupDto.email}`);
-        
         // Check if user already exists
         const existingUser = await this.personService.findByEmail(signupDto.email);
         if (existingUser) {
@@ -66,7 +64,6 @@ export class AuthService {
         const verificationCodeExpires = this.setVerificationCodeExpiration();
 
         // Create new user with default role and verification code
-        this.logger.log('Creating new user in database...');
         const newUser = await this.personService.create({
             ...signupDto,
             idRole: 2,
@@ -74,26 +71,13 @@ export class AuthService {
             verificationCode: signupDto.verificationCode,
             verificationCodeExpires
         });
-        this.logger.log(`✅ User created with ID: ${newUser.idPerson}`);
 
-        // Get the full person object for Stripe customer creation
-        this.logger.log('Fetching full person object for Stripe customer creation...');
         const fullPerson = await this.personService.findOne(newUser.idPerson);
-        this.logger.log(`✅ Full person object retrieved: ${fullPerson.email}`);
 
-        // Create Stripe customer for the new user
-        this.logger.log('Starting Stripe customer creation...');
         let updatedPerson = fullPerson;
         try {
             const stripeCustomer = await this.stripeService.createCustomer(fullPerson);
-            
-            this.logger.log(`✅ Stripe customer created: ${stripeCustomer.id}`);
-            
-            // Update user with Stripe customer ID
-            this.logger.log('Updating person with Stripe customer ID...');
             updatedPerson = await this.personService.updateStripeCustomerId(newUser.idPerson, stripeCustomer.id);
-            
-            this.logger.log(`✅ Person updated with Stripe customer ID: ${stripeCustomer.id}`);
         } catch (error) {
             this.logger.error(`❌ Failed to create Stripe customer for user ${newUser.idPerson}:`, error);
             this.logger.error('Error details:', {
@@ -107,16 +91,10 @@ export class AuthService {
         }
 
         // Send verification email
-        this.logger.log('Sending verification email...');
         await this.mailerService.sendVerificationEmail(newUser.email, signupDto.verificationCode);
-        this.logger.log('✅ Verification email sent');
 
         // Generate tokens
-        this.logger.log('Generating JWT tokens...');
         const tokens = await this.generateTokens(newUser);
-        this.logger.log('✅ JWT tokens generated');
-
-        this.logger.log(`🎉 Signup process completed for user ${newUser.idPerson}`);
 
         return {
             ...tokens,
