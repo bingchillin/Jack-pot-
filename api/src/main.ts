@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
-import { json } from 'express';
+import { json, raw } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,20 +11,17 @@ async function bootstrap() {
   // Enable CORS
   app.enableCors({
     origin: [
-      process.env.FRONTEND_URL || 'http://localhost:3000',
+      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
       'http://localhost:3001'
     ],
     credentials: true,
   });
 
-  // Configure raw body parsing for Stripe webhooks
-  app.use('/stripe/webhook', json({ type: 'application/json' }));
-  app.use('/stripe/webhook', (req, res, next) => {
-    if (req.originalUrl === '/stripe/webhook') {
-      req.body = Buffer.from(JSON.stringify(req.body));
-    }
-    next();
-  });
+  // Configure raw body parsing for Stripe webhooks only
+  app.use('/stripe/webhook', raw({ type: 'application/json' }));
+  
+  // Use JSON parsing for all other routes
+  app.use(json());
 
   // Use cookie parser
   app.use(cookieParser());
