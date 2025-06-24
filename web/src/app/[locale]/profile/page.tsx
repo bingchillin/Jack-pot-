@@ -35,7 +35,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center">
         <div className="flex items-center justify-center">
           <div className="w-8 h-8 border-2 border-green-600/30 border-t-green-600 rounded-full animate-spin mr-3"></div>
-          <span className="text-slate-600">Loading...</span>
+          <span className="text-slate-600">{t('auth.common.loading')}</span>
         </div>
       </div>
     );
@@ -62,7 +62,7 @@ export default function ProfilePage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 text-sm font-medium shadow-sm border border-slate-200/50">
               <User className="w-4 h-4 mr-2 text-green-500" />
-              Welcome back, {user.firstname}
+              {t('auth.profile.welcome_back')}, {user.firstname}
             </div>
           </div>
         </div>
@@ -88,12 +88,12 @@ export default function ProfilePage() {
                     {user.isEmailVerified ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        <span className="text-sm text-green-600 font-medium">Verified</span>
+                        <span className="text-sm text-green-600 font-medium">{t('auth.profile.verified')}</span>
                       </>
                     ) : (
                       <>
                         <AlertCircle className="h-4 w-4 text-yellow-500" />
-                        <span className="text-sm text-yellow-600 font-medium">Pending Verification</span>
+                        <span className="text-sm text-yellow-600 font-medium">{t('auth.profile.pending_verification')}</span>
                       </>
                     )}
                   </div>
@@ -111,19 +111,12 @@ export default function ProfilePage() {
                       <span className="text-sm">{user.numberPhone}</span>
                     </div>
                   )}
-
-                  <div className="flex items-center space-x-3 text-slate-600">
-                    <Shield className="h-4 w-4" />
-                    <span className="text-sm">
-                      {user.idRole === 1 ? 'Administrator' : 'Customer'}
-                    </span>
-                  </div>
                 </div>
 
                 {!user.isEmailVerified && (
                   <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
                     <p className="text-yellow-700 text-sm text-center">
-                      Please check your email to verify your account
+                      {t('auth.profile.email_verification_notice')}
                     </p>
                   </div>
                 )}
@@ -139,23 +132,23 @@ export default function ProfilePage() {
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-100 to-blue-100 rounded-full translate-y-12 -translate-x-12 opacity-60"></div>
                 
                 <div className="relative">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h3>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6">{t('auth.profile.quick_actions')}</h3>
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     <button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-green-600/25 hover:shadow-green-700/30 transform hover:translate-y-[-1px]">
-                      Browse Products
+                      {t('auth.profile.browse_products')}
                     </button>
                     
                     <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px]">
-                      My Orders
+                      {t('auth.profile.my_orders')}
                     </button>
                     
                     <button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-purple-600/25 hover:shadow-purple-700/30 transform hover:translate-y-[-1px]">
-                      Plant Care Guide
+                      {t('auth.profile.plant_care_guide')}
                     </button>
                     
                     <button className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-orange-600/25 hover:shadow-orange-700/30 transform hover:translate-y-[-1px]">
-                      Settings
+                      {t('auth.profile.settings')}
                     </button>
                   </div>
                 </div>
@@ -166,13 +159,13 @@ export default function ProfilePage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-16 translate-x-16 opacity-60"></div>
                 
                 <div className="relative">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-6">Recent Activity</h3>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6">{t('auth.profile.recent_activity')}</h3>
                   
                   <div className="text-center py-12">
                     <Calendar className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                    <p className="text-slate-500">No recent activity to show</p>
+                    <p className="text-slate-500">{t('auth.profile.no_recent_activity')}</p>
                     <p className="text-sm text-slate-400 mt-2">
-                      Start browsing products to see your activity here
+                      {t('auth.profile.no_activity_description')}
                     </p>
                   </div>
                 </div>

@@ -56,24 +56,24 @@ export default function RegisterPage() {
 
   const validateForm = () => {
     if (!formData.email || !formData.password || !formData.firstname || !formData.surname) {
-      setError('Please fill in all required fields');
+      setError(t('auth.register.error.fill_required_fields'));
       return false;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError(t('auth.register.error.password_min_length'));
       return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.register.error.passwords_no_match'));
       return false;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setError('Please enter a valid email address');
+      setError(t('auth.register.error.invalid_email'));
       return false;
     }
 
@@ -99,14 +99,14 @@ export default function RegisterPage() {
       };
 
       await register(registerData);
-      setSuccess('Account created successfully! Please check your email for verification.');
+      setSuccess(t('auth.register.success'));
       
       // Redirect after a short delay
       setTimeout(() => {
         router.push('/verify-email');
       }, 2000);
     } catch (error: any) {
-      setError(error.message || 'Registration failed. Please try again.');
+      setError(error.message || t('auth.register.error.registration_failed'));
     }
   };
 
@@ -126,15 +126,15 @@ export default function RegisterPage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 text-sm font-medium mb-8 shadow-sm border border-slate-200/50">
               <UserPlus className="w-4 h-4 mr-2 text-green-500" />
-              Join Jack Pot
+              {t('auth.register.join_jack_pot')}
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-6 leading-tight">
-              Create Account
+              {t('auth.register.title')}
             </h1>
             
             <p className="text-xl md:text-2xl text-slate-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Start your plant care journey with Jack Pot and grow your garden with confidence
+              {t('auth.register.description')}
             </p>
           </div>
         </div>
@@ -149,11 +149,11 @@ export default function RegisterPage() {
           
           <div className="relative">
             <div className="mb-10 text-center">
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Create your account</h2>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('auth.register.subtitle')}</h2>
               <p className="text-slate-600">
-                Already have an account?{' '}
+                {t('auth.register.already_have_account')}{' '}
                 <Link href="/login" className="text-green-600 hover:text-green-700 font-medium transition-colors">
-                  Sign in here
+                  {t('auth.register.sign_in_here')}
                 </Link>
               </p>
             </div>
@@ -183,7 +183,7 @@ export default function RegisterPage() {
                       focusedField === 'firstname' ? 'text-slate-900' : 'text-slate-700'
                     }`}
                   >
-                    First Name *
+                    {t('auth.register.first_name')} *
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -199,7 +199,7 @@ export default function RegisterPage() {
                       onFocus={() => setFocusedField('firstname')}
                       onBlur={() => setFocusedField(null)}
                       className="w-full pl-12 pr-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                      placeholder="John"
+                      placeholder={t('auth.register.first_name_placeholder')}
                     />
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default function RegisterPage() {
                       focusedField === 'surname' ? 'text-slate-900' : 'text-slate-700'
                     }`}
                   >
-                    Last Name *
+                    {t('auth.register.last_name')} *
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -227,7 +227,7 @@ export default function RegisterPage() {
                       onFocus={() => setFocusedField('surname')}
                       onBlur={() => setFocusedField(null)}
                       className="w-full pl-12 pr-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                      placeholder="Doe"
+                      placeholder={t('auth.register.last_name_placeholder')}
                     />
                   </div>
                 </div>
@@ -241,7 +241,7 @@ export default function RegisterPage() {
                     focusedField === 'email' ? 'text-slate-900' : 'text-slate-700'
                   }`}
                 >
-                  Email Address *
+                  {t('auth.register.email')} *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -257,7 +257,7 @@ export default function RegisterPage() {
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
                     className="w-full pl-12 pr-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                    placeholder="your.email@example.com"
+                    placeholder={t('auth.register.email_placeholder')}
                   />
                 </div>
               </div>
@@ -270,7 +270,7 @@ export default function RegisterPage() {
                     focusedField === 'numberPhone' ? 'text-slate-900' : 'text-slate-700'
                   }`}
                 >
-                  Phone Number (Optional)
+                  {t('auth.register.phone')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -285,7 +285,7 @@ export default function RegisterPage() {
                     onFocus={() => setFocusedField('numberPhone')}
                     onBlur={() => setFocusedField(null)}
                     className="w-full pl-12 pr-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                    placeholder="+33 6 12 34 56 78"
+                    placeholder={t('auth.register.phone_placeholder')}
                   />
                 </div>
               </div>
@@ -299,7 +299,7 @@ export default function RegisterPage() {
                       focusedField === 'password' ? 'text-slate-900' : 'text-slate-700'
                     }`}
                   >
-                    Password *
+                    {t('auth.register.password')} *
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -315,7 +315,7 @@ export default function RegisterPage() {
                       onFocus={() => setFocusedField('password')}
                       onBlur={() => setFocusedField(null)}
                       className="w-full pl-12 pr-12 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                      placeholder="Min 6 characters"
+                      placeholder={t('auth.register.password_placeholder')}
                     />
                     <button
                       type="button"
@@ -338,7 +338,7 @@ export default function RegisterPage() {
                       focusedField === 'confirmPassword' ? 'text-slate-900' : 'text-slate-700'
                     }`}
                   >
-                    Confirm Password *
+                    {t('auth.register.confirm_password')} *
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -354,7 +354,7 @@ export default function RegisterPage() {
                       onFocus={() => setFocusedField('confirmPassword')}
                       onBlur={() => setFocusedField(null)}
                       className="w-full pl-12 pr-12 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                      placeholder="Repeat password"
+                      placeholder={t('auth.register.confirm_password_placeholder')}
                     />
                     <button
                       type="button"
@@ -380,10 +380,10 @@ export default function RegisterPage() {
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3"></div>
-                    Creating account...
+                    {t('auth.register.creating_account')}
                   </div>
                 ) : (
-                  'Create Account'
+                  t('auth.register.create_account')
                 )}
               </button>
             </form>
@@ -391,13 +391,13 @@ export default function RegisterPage() {
             {/* Additional Links */}
             <div className="mt-8 pt-8 border-t border-slate-200/50 text-center">
               <p className="text-slate-600 text-sm">
-                By creating an account, you agree to our{' '}
+                {t('auth.register.terms_agreement')}{' '}
                 <Link href="/terms" className="text-green-600 hover:text-green-700 font-medium transition-colors">
-                  Terms of Service
+                  {t('auth.register.terms_of_service')}
                 </Link>{' '}
-                and{' '}
+                {t('auth.register.and')}{' '}
                 <Link href="/privacy" className="text-green-600 hover:text-green-700 font-medium transition-colors">
-                  Privacy Policy
+                  {t('auth.register.privacy_policy')}
                 </Link>
               </p>
             </div>

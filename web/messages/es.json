@@ -1,22 +1,107 @@
 {
+  "HomePage": {
+    "title": "¡Hola mundo!",
+    "about": "Ir a la página acerca de"
+  },
   "nav": {
     "home": "Inicio",
     "about": "Acerca de",
     "products": "Productos",
     "contact": "Contacto"
   },
+  "auth": {
+    "login": {
+      "title": "Iniciar Sesión",
+      "subtitle": "Inicia sesión en tu cuenta",
+      "welcome_back": "Bienvenido de vuelta",
+      "description": "Accede a tu cuenta para gestionar tus plantas y seguir el progreso de tu jardín",
+      "email": "Dirección de correo electrónico",
+      "email_placeholder": "tu.email@ejemplo.com",
+      "password": "Contraseña",
+      "password_placeholder": "Ingresa tu contraseña",
+      "forgot_password": "¿Olvidaste tu contraseña?",
+      "sign_in": "Iniciar Sesión",
+      "signing_in": "Iniciando sesión...",
+      "no_account": "¿No tienes una cuenta?",
+      "sign_up_here": "Regístrate aquí",
+      "new_to_jack_pot": "¿Nuevo en Jack Pot?",
+      "create_account": "Crear una cuenta",
+      "success": "¡Inicio de sesión exitoso! Redirigiendo...",
+      "error": {
+        "fill_fields": "Por favor completa todos los campos",
+        "login_failed": "Error en el inicio de sesión. Por favor inténtalo de nuevo."
+      }
+    },
+    "register": {
+      "title": "Crear Cuenta",
+      "subtitle": "Crea tu cuenta",
+      "join_jack_pot": "Únete a Jack Pot",
+      "description": "Comienza tu viaje de cuidado de plantas con Jack Pot y haz crecer tu jardín con confianza",
+      "first_name": "Nombre",
+      "first_name_placeholder": "Juan",
+      "last_name": "Apellido",
+      "last_name_placeholder": "Pérez",
+      "email": "Dirección de correo electrónico",
+      "email_placeholder": "tu.email@ejemplo.com",
+      "phone": "Número de teléfono (Opcional)",
+      "phone_placeholder": "+34 6 12 34 56 78",
+      "password": "Contraseña",
+      "password_placeholder": "Mín 6 caracteres",
+      "confirm_password": "Confirmar Contraseña",
+      "confirm_password_placeholder": "Repite la contraseña",
+      "create_account": "Crear Cuenta",
+      "creating_account": "Creando cuenta...",
+      "already_have_account": "¿Ya tienes una cuenta?",
+      "sign_in_here": "Inicia sesión aquí",
+      "terms_agreement": "Al crear una cuenta, aceptas nuestros",
+      "terms_of_service": "Términos de Servicio",
+      "and": "y",
+      "privacy_policy": "Política de Privacidad",
+      "success": "¡Cuenta creada exitosamente! Por favor revisa tu correo electrónico para la verificación.",
+      "error": {
+        "fill_required_fields": "Por favor completa todos los campos obligatorios",
+        "password_min_length": "La contraseña debe tener al menos 6 caracteres",
+        "passwords_no_match": "Las contraseñas no coinciden",
+        "invalid_email": "Por favor ingresa una dirección de correo electrónico válida",
+        "registration_failed": "Error en el registro. Por favor inténtalo de nuevo."
+      }
+    },
+    "profile": {
+      "title": "Perfil",
+      "welcome_back": "Bienvenido de vuelta",
+      "description": "Gestiona tu cuenta y sigue tu viaje de cuidado de plantas",
+      "verified": "Verificado",
+      "pending_verification": "Verificación pendiente",
+      "administrator": "Administrador",
+      "customer": "Cliente",
+      "email_verification_notice": "Por favor revisa tu correo electrónico para verificar tu cuenta",
+      "quick_actions": "Acciones rápidas",
+      "browse_products": "Explorar productos",
+      "my_orders": "Mis pedidos",
+      "plant_care_guide": "Guía de cuidado de plantas",
+      "settings": "Configuración",
+      "recent_activity": "Actividad reciente",
+      "no_recent_activity": "No hay actividad reciente que mostrar",
+      "no_activity_description": "Comienza a explorar productos para ver tu actividad aquí"
+    },
+    "common": {
+      "loading": "Cargando...",
+      "sign_out": "Cerrar Sesión",
+      "profile": "Perfil"
+    }
+  },
   "hero": {
-    "title": "Descubre a Jack, Tu Compañero de Jardinería Inteligente",
+    "title": "Descubre Jack, Tu Compañero de Jardinería Inteligente",
     "subtitle": "Maceta Inteligente",
-    "description": "Transforma tu experiencia de cuidado de plantas con Jack, la maceta conectada que monitorea la salud de tus plantas y hace la jardinería divertida.",
+    "description": "Transforma tu experiencia de cuidado de plantas con Jack, la maceta conectada que monitorea la salud de tus plantas y hace que la jardinería sea divertida.",
     "cta": "Obtener Jack",
     "learn_more": "Saber más"
   },
   "features": {
     "title": "¿Qué hace nuestro amigo Jack?",
-    "subtitle": "La maceta funciona en tándem con la aplicación Jack Pot, y su dúo pone a disposición en tu teléfono:",
+    "subtitle": "La maceta funciona en conjunto con la aplicación Jack Pot, y su dúo proporciona en tu teléfono:",
     "monitoring": {
-      "title": "Monitoreo Planta en Tiempo Real",
+      "title": "Monitoreo de Plantas en Tiempo Real",
       "description": "Seguimiento 24/7 de humedad del suelo, temperatura, humedad y niveles de luz con los sensores avanzados de Jack"
     },
     "smart": {
@@ -25,13 +110,13 @@
     },
     "analytics": {
       "title": "Análisis de Salud de Plantas",
-      "description": "Información detallada y estadísticas para rastrear el crecimiento y salud de tus plantas a lo largo del tiempo"
+      "description": "Perspectivas detalladas y estadísticas para seguir el crecimiento y la salud de tus plantas a lo largo del tiempo"
     }
   },
   "products": {
     "title": "Hazte amigo de Jack",
     "subtitle": "Jack Pot te pide estos dos elementos para funcionar:",
-    "most_popular": "El más popular",
+    "most_popular": "Más Popular",
     "jack": {
       "title": "Jack, la maceta inteligente",
       "description": "Maceta conectada con sensores integrados",
@@ -41,7 +126,7 @@
     "app": {
       "title": "Jack Pot, la aplicación móvil",
       "description": "Aplicación móvil para gestión de plantas y gamificación",
-      "features": ["Estadísticas plantas tiempo real", "Notificaciones de salud", "Recordatorios de cuidado"],
+      "features": ["Estadísticas de plantas en tiempo real", "Notificaciones de salud", "Recordatorios de cuidado"],
       "price": "Gratis"
     }
   },
@@ -54,72 +139,72 @@
     "company": "Jack Pot",
     "rights": "Todos los derechos reservados.",
     "links": {
-      "privacy": "Política de privacidad",
-      "terms": "Términos de servicio",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio",
       "support": "Contacto"
     }
   },
   "contact": {
     "title": "Contáctanos",
     "subtitle": "Ponte en contacto con nuestro equipo de soporte",
-    "description": "¿Tienes preguntas sobre Jack Pot? ¿Necesitas ayuda con tu maceta inteligente? ¡Estamos aquí para ayudarte! Completa el formulario de abajo y te responderemos lo antes posible.",
+    "description": "¿Tienes preguntas sobre Jack Pot? ¿Necesitas ayuda con tu maceta inteligente? ¡Estamos aquí para ayudarte! Completa el formulario a continuación y te responderemos lo antes posible.",
     "response_badge": "Normalmente respondemos en 24 horas",
     "form": {
       "title": "Envíanos un mensaje",
-      "subtitle": "Completa el formulario de abajo y te responderemos lo antes posible.",
-      "name": "Nombre completo",
+      "subtitle": "Completa el formulario a continuación y te responderemos lo antes posible.",
+      "name": "Nombre Completo",
       "name_placeholder": "Ingresa tu nombre completo",
-      "email": "Dirección de correo electrónico",
+      "email": "Dirección de Correo Electrónico",
       "email_placeholder": "tu@email.com",
       "subject": "Asunto",
       "subject_placeholder": "Selecciona un tema",
-      "message": "Tu mensaje",
-      "message_placeholder": "Dinos cómo podemos ayudarte...",
-      "submit": "Enviar mensaje",
+      "message": "Tu Mensaje",
+      "message_placeholder": "Cuéntanos cómo podemos ayudarte...",
+      "submit": "Enviar Mensaje",
       "sending": "Enviando...",
-      "success": "¡Mensaje enviado con éxito!",
-      "error": "Error al enviar el mensaje. Por favor, inténtalo de nuevo."
+      "success": "¡Mensaje enviado exitosamente!",
+      "error": "Error al enviar el mensaje. Por favor inténtalo de nuevo."
     },
     "info": {
-      "title": "Ponte en contacto",
+      "title": "Ponte en Contacto",
       "email": "jackpotproject2025@gmail.com",
       "response_time": "Normalmente respondemos en 24 horas",
       "support_hours": "Soporte disponible lunes-viernes, 9AM-6PM",
-      "support_hours_title": "Horas de soporte",
+      "support_hours_title": "Horarios de Soporte",
       "support_hours_description": "Disponible para asistencia"
     },
     "topics": {
-      "title": "Temas comunes",
-      "technical": "Soporte técnico",
-      "product": "Información del producto",
-      "order": "Estado del pedido",
-      "general": "Consulta general"
+      "title": "Temas Comunes",
+      "technical": "Soporte Técnico",
+      "product": "Información del Producto",
+      "order": "Estado del Pedido",
+      "general": "Consulta General"
     }
   },
   "privacy": {
     "title": "Política de Privacidad",
     "last_updated": "Última actualización: Junio 2025",
-    "intro": "En Jack Pot, respetamos tu privacidad y nos comprometemos a proteger tus datos personales. Esta política de privacidad explica cómo recopilamos, usamos y protegemos tu información cuando utilizas nuestra maceta inteligente y aplicación móvil.",
+    "intro": "En Jack Pot, respetamos tu privacidad y nos comprometemos a proteger tus datos personales. Esta política de privacidad explica cómo recopilamos, usamos y protegemos tu información cuando usas nuestra maceta inteligente y aplicación móvil.",
     "sections": {
       "data_collection": {
-        "title": "Información que recopilamos",
+        "title": "Información que Recopilamos",
         "content": "Recopilamos datos de salud de plantas de tu maceta inteligente Jack (humedad del suelo, temperatura, humedad, niveles de luz), información de tu cuenta y datos de uso de la aplicación para brindarte la mejor experiencia de cuidado de plantas."
       },
       "data_use": {
-        "title": "Cómo usamos tu información",
+        "title": "Cómo Usamos tu Información",
         "content": "Tus datos nos ayudan a proporcionar monitoreo de plantas en tiempo real, enviar notificaciones inteligentes, generar análisis de salud de plantas y mejorar nuestros servicios. Nunca vendemos tu información personal a terceros."
       },
       "data_sharing": {
-        "title": "Compartir datos",
+        "title": "Compartir Datos",
         "content": "Solo compartimos tus datos con proveedores de servicios de confianza que nos ayudan a operar nuestros servicios. Tus datos de plantas están encriptados y almacenados de forma segura en la nube."
       },
       "your_rights": {
-        "title": "Tus derechos",
-        "content": "Tienes derecho a acceder, modificar o eliminar tus datos personales en cualquier momento a través de la configuración de la aplicación Jack Pot o contactando a nuestro equipo de soporte."
+        "title": "Tus Derechos",
+        "content": "Tienes el derecho de acceder, modificar o eliminar tus datos personales en cualquier momento a través de la configuración de la aplicación Jack Pot o contactando a nuestro equipo de soporte."
       },
       "contact": {
         "title": "Contáctanos",
-        "content": "Si tienes preguntas sobre esta política de privacidad, contáctanos en privacy@jackpot.com"
+        "content": "Si tienes preguntas sobre esta política de privacidad, por favor contáctanos en privacy@jackpot.com"
       }
     }
   },
@@ -129,32 +214,32 @@
     "intro": "¡Bienvenido a Jack Pot! Estos términos de servicio rigen tu uso de nuestra maceta inteligente y aplicación móvil. Al usar nuestros servicios, aceptas estos términos.",
     "sections": {
       "service_description": {
-        "title": "Descripción del servicio",
-        "content": "Jack Pot proporciona monitoreo inteligente de plantas a través de nuestra maceta conectada IoT y aplicación móvil. Nuestro servicio incluye seguimiento de salud de plantas en tiempo real, notificaciones y análisis."
+        "title": "Descripción del Servicio",
+        "content": "Jack Pot proporciona monitoreo inteligente de plantas a través de nuestra maceta habilitada para IoT y aplicación móvil. Nuestro servicio incluye seguimiento de salud de plantas en tiempo real, notificaciones y análisis."
       },
       "user_responsibilities": {
-        "title": "Responsabilidades del usuario",
+        "title": "Responsabilidades del Usuario",
         "content": "Eres responsable de configurar y mantener adecuadamente tu maceta inteligente Jack, proporcionar información precisa y usar nuestros servicios en cumplimiento con las leyes aplicables."
       },
       "intellectual_property": {
-        "title": "Propiedad intelectual",
-        "content": "Todo el contenido, características y funcionalidad de Jack Pot nos pertenecen y están protegidos por leyes de derechos de autor, marcas comerciales y otras leyes de propiedad intelectual."
+        "title": "Propiedad Intelectual",
+        "content": "Todo el contenido, características y funcionalidad de Jack Pot nos pertenece y está protegido por leyes de derechos de autor, marcas comerciales y otras leyes de propiedad intelectual."
       },
       "limitation_liability": {
-        "title": "Limitación de responsabilidad",
-        "content": "Jack Pot se proporciona 'tal como está' sin garantías. No somos responsables por ningún daño que surja del uso de nuestros servicios, incluyendo problemas de salud de plantas."
+        "title": "Limitación de Responsabilidad",
+        "content": "Jack Pot se proporciona 'tal como está' sin garantías. No somos responsables de cualquier daño que surja del uso de nuestros servicios, incluyendo problemas de salud de plantas."
       },
       "termination": {
         "title": "Terminación",
         "content": "Podemos terminar o suspender tu acceso a nuestros servicios en cualquier momento por violaciones de estos términos o por cualquier otra razón a nuestra discreción."
       },
       "changes": {
-        "title": "Cambios en los términos",
-        "content": "Podemos actualizar estos términos de vez en cuando. Te notificaremos sobre cualquier cambio material a través de la aplicación o por correo electrónico."
+        "title": "Cambios en los Términos",
+        "content": "Podemos actualizar estos términos de vez en cuando. Te notificaremos de cualquier cambio material a través de la aplicación o por correo electrónico."
       },
       "contact": {
         "title": "Contáctanos",
-        "content": "Si tienes preguntas sobre estos términos, contáctanos en legal@jackpot.com"
+        "content": "Si tienes preguntas sobre estos términos, por favor contáctanos en legal@jackpot.com"
       }
     }
   }
