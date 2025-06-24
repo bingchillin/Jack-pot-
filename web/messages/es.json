@@ -1,13 +1,13 @@
 {
-  "HomePage": {
-    "title": "¡Hola mundo!",
-    "about": "Ir a la página acerca de"
-  },
   "nav": {
     "home": "Inicio",
     "about": "Acerca de",
     "products": "Productos",
-    "contact": "Contacto"
+    "contact": "Contacto",
+    "auth": {
+      "profile": "Perfil",
+      "sign_out": "Cerrar Sesión"
+    }
   },
   "auth": {
     "login": {
@@ -75,6 +75,37 @@
       "administrator": "Administrador",
       "customer": "Cliente",
       "email_verification_notice": "Por favor revisa tu correo electrónico para verificar tu cuenta",
+      "edit_information": "Editar información",
+      "edit": {
+        "title": "Editar perfil",
+        "subtitle": "Actualiza tu información personal",
+        "first_name": "Nombre",
+        "last_name": "Apellido",
+        "email_address": "Dirección de correo electrónico (No modificable)",
+        "phone": "Número de teléfono",
+        "phone_placeholder": "1234567890",
+        "phone_help_text": "El número de teléfono debe tener exactamente 10 dígitos",
+        "current_password": "Contraseña actual",
+        "current_password_placeholder": "Ingresa tu contraseña actual",
+        "new_password": "Nueva contraseña (Opcional)",
+        "new_password_placeholder": "Ingresa nueva contraseña",
+        "confirm_new_password": "Confirmar nueva contraseña",
+        "confirm_new_password_placeholder": "Confirma la nueva contraseña",
+        "save_changes": "Guardar",
+        "saving": "Guardando...",
+        "cancel": "Cancelar",
+        "success": "¡Perfil actualizado exitosamente!",
+        "password_changed": "¡Perfil y contraseña actualizados exitosamente!",
+        "error": {
+          "fill_required_fields": "Por favor completa todos los campos obligatorios",
+          "current_password_required": "La contraseña actual es requerida para actualizar el perfil",
+          "current_password_incorrect": "La contraseña actual es incorrecta",
+          "phone_invalid": "El número de teléfono debe tener exactamente 10 dígitos",
+          "new_passwords_no_match": "Las nuevas contraseñas no coinciden",
+          "new_password_min_length": "La nueva contraseña debe tener al menos 6 caracteres",
+          "update_failed": "Error al actualizar el perfil. Por favor inténtalo de nuevo."
+        }
+      },
       "quick_actions": "Acciones rápidas",
       "browse_products": "Explorar productos",
       "my_orders": "Mis pedidos",

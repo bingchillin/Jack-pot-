@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
 import { useAuthStore } from '@/stores/authStore';
-import { User, Mail, Phone, Calendar, Shield, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, CheckCircle2, AlertCircle, Edit3, X } from 'lucide-react';
 
 export default function ProfilePage() {
   const [scrolled, setScrolled] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
   const t = useTranslations();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isAuthenticated, isLoading, isHydrated } = useAuthStore();
 
   useEffect(() => {
@@ -21,6 +25,26 @@ export default function ProfilePage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Handle success message from URL parameters
+  useEffect(() => {
+    const success = searchParams.get('success');
+    if (success) {
+      setSuccessMessage(success);
+      setShowToast(true);
+      
+      // Clear the URL parameter
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      
+      // Auto-hide toast after 5 seconds
+      const timer = setTimeout(() => {
+        setShowToast(false);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   // Only redirect after hydration is complete and we're not loading
   useEffect(() => {
@@ -49,6 +73,26 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation scrolled={scrolled} />
+      
+      {/* Success Toast */}
+      {showToast && successMessage && (
+        <div className="fixed top-20 right-4 z-50 max-w-md">
+          <div className="bg-white border-l-4 border-green-500 rounded-lg shadow-lg p-4 flex items-center space-x-3 animate-slide-in-right">
+            <div className="flex-shrink-0">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900">{successMessage}</p>
+            </div>
+            <button
+              onClick={() => setShowToast(false)}
+              className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Hero Section */}
       <div className="relative pt-16 pb-8 overflow-hidden">
@@ -99,7 +143,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 mb-6">
                   <div className="flex items-center space-x-3 text-slate-600">
                     <Mail className="h-4 w-4" />
                     <span className="text-sm">{user.email}</span>
@@ -112,6 +156,15 @@ export default function ProfilePage() {
                     </div>
                   )}
                 </div>
+
+                {/* Modify Information Button */}
+                <Link
+                  href={`/profile/edit`}
+                  className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-slate-600/25 hover:shadow-slate-700/30 transform hover:translate-y-[-1px] flex items-center justify-center space-x-2"
+                >
+                  <Edit3 className="h-4 w-4" />
+                  <span>{t('auth.profile.edit_information')}</span>
+                </Link>
 
                 {!user.isEmailVerified && (
                   <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
@@ -135,38 +188,9 @@ export default function ProfilePage() {
                   <h3 className="text-2xl font-bold text-slate-900 mb-6">{t('auth.profile.quick_actions')}</h3>
                   
                   <div className="grid md:grid-cols-2 gap-4">
-                    <button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-green-600/25 hover:shadow-green-700/30 transform hover:translate-y-[-1px]">
-                      {t('auth.profile.browse_products')}
-                    </button>
-                    
                     <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px]">
                       {t('auth.profile.my_orders')}
                     </button>
-                    
-                    <button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-purple-600/25 hover:shadow-purple-700/30 transform hover:translate-y-[-1px]">
-                      {t('auth.profile.plant_care_guide')}
-                    </button>
-                    
-                    <button className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-orange-600/25 hover:shadow-orange-700/30 transform hover:translate-y-[-1px]">
-                      {t('auth.profile.settings')}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Activity */}
-              <div className="bg-white/80 backdrop-blur-sm shadow-2xl shadow-slate-200/50 border border-slate-200/50 rounded-3xl p-8 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-16 translate-x-16 opacity-60"></div>
-                
-                <div className="relative">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-6">{t('auth.profile.recent_activity')}</h3>
-                  
-                  <div className="text-center py-12">
-                    <Calendar className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                    <p className="text-slate-500">{t('auth.profile.no_recent_activity')}</p>
-                    <p className="text-sm text-slate-400 mt-2">
-                      {t('auth.profile.no_activity_description')}
-                    </p>
                   </div>
                 </div>
               </div>

@@ -10,6 +10,13 @@ interface AuthStore extends AuthState {
   // Actions
   login: (loginData: LoginRequest) => Promise<void>;
   register: (registerData: Omit<RegisterRequest, 'verificationCode'>) => Promise<void>;
+  updateProfile: (updateData: {
+    firstname?: string;
+    surname?: string;
+    numberPhone?: string;
+    currentPassword: string;
+    newPassword?: string;
+  }) => Promise<void>;
   logout: () => void;
   refreshAuth: () => Promise<void>;
   initializeAuth: () => void;
@@ -75,6 +82,33 @@ export const useAuthStore = create<AuthStore>()(
             token: response.access_token,
             refreshToken: response.refresh_token,
             isAuthenticated: true,
+            isLoading: false
+          });
+        } catch (error) {
+          set({ isLoading: false });
+          throw error;
+        }
+      },
+
+      updateProfile: async (updateData: {
+        firstname?: string;
+        surname?: string;
+        numberPhone?: string;
+        currentPassword: string;
+        newPassword?: string;
+      }) => {
+        try {
+          set({ isLoading: true });
+          const updatedUser = await authService.updateProfile(get().user!, updateData);
+          
+          // Update localStorage with new user data
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+          
+          // Update store
+          set({
+            user: updatedUser,
             isLoading: false
           });
         } catch (error) {
