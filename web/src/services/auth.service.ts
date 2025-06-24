@@ -128,6 +128,21 @@ class AuthService {
     return this.handleResponse<User>(response);
   }
 
+  async updateProfile(user: User, updateData: {
+    firstname?: string;
+    surname?: string;
+    numberPhone?: string;
+    currentPassword: string;
+    newPassword?: string;
+  }): Promise<User> {
+    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+      method: 'PATCH',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(updateData),
+    });
+    return this.handleResponse<User>(response);
+  }
+
   // Local storage helpers
   saveAuthData(data: LoginResponse): void {
     if (typeof window !== 'undefined') {

@@ -132,7 +132,7 @@ export default function Navigation({ scrolled }: NavigationProps) {
                 className="flex items-center space-x-2 text-gray-700 hover:text-red-600 transition-colors text-sm"
               >
                 <LogOut className="h-4 w-4" />
-                <span>{t('auth.common.sign_out')}</span>
+                <span>{t('auth.sign_out')}</span>
               </button>
             </div>
           ) : (
@@ -159,13 +159,13 @@ export default function Navigation({ scrolled }: NavigationProps) {
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     onClick={() => setIsUserMenuOpen(false)}
                   >
-                    {t('auth.common.profile')}
+                    {t('auth.profile')}
                   </Link>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                   >
-                    {t('auth.common.sign_out')}
+                    {t('auth.sign_out')}
                   </button>
                 </div>
               )}

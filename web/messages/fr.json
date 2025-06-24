@@ -1,13 +1,13 @@
 {
-  "HomePage": {
-    "title": "bonjour!",
-    "about": "Go to the about page"
-  },
   "nav": {
     "home": "Accueil",
     "about": "À propos",
     "products": "Produits",
-    "contact": "Contact"
+    "contact": "Contact",
+    "auth": {
+      "profile": "Profil",
+      "sign_out": "Se déconnecter"
+    }
   },
   "auth": {
     "login": {
@@ -75,6 +75,37 @@
       "administrator": "Administrateur",
       "customer": "Client",
       "email_verification_notice": "Veuillez vérifier votre e-mail pour vérifier votre compte",
+      "edit_information": "Modifier les informations",
+      "edit": {
+        "title": "Modifier le profil",
+        "subtitle": "Mettre à jour vos informations personnelles",
+        "first_name": "Prénom",
+        "last_name": "Nom de famille",
+        "email_address": "Adresse e-mail (Non modifiable)",
+        "phone": "Numéro de téléphone",
+        "phone_placeholder": "1234567890",
+        "phone_help_text": "Le numéro de téléphone doit contenir exactement 10 chiffres",
+        "current_password": "Mot de passe actuel",
+        "current_password_placeholder": "Entrez votre mot de passe actuel",
+        "new_password": "Nouveau mot de passe (Optionnel)",
+        "new_password_placeholder": "Entrez le nouveau mot de passe",
+        "confirm_new_password": "Confirmer le nouveau mot de passe",
+        "confirm_new_password_placeholder": "Confirmez le nouveau mot de passe",
+        "save_changes": "Enregistrer",
+        "saving": "Enregistrement...",
+        "cancel": "Annuler",
+        "success": "Profil mis à jour avec succès !",
+        "password_changed": "Profil et mot de passe mis à jour avec succès !",
+        "error": {
+          "fill_required_fields": "Veuillez remplir tous les champs obligatoires",
+          "current_password_required": "Le mot de passe actuel est requis pour mettre à jour le profil",
+          "current_password_incorrect": "Le mot de passe actuel est incorrect",
+          "phone_invalid": "Le numéro de téléphone doit contenir exactement 10 chiffres",
+          "new_passwords_no_match": "Les nouveaux mots de passe ne correspondent pas",
+          "new_password_min_length": "Le nouveau mot de passe doit contenir au moins 6 caractères",
+          "update_failed": "Échec de la mise à jour du profil. Veuillez réessayer."
+        }
+      },
       "quick_actions": "Actions rapides",
       "browse_products": "Parcourir les produits",
       "my_orders": "Mes commandes",

@@ -1,13 +1,13 @@
 {
-  "HomePage": {
-    "title": "Hello world!",
-    "about": "Go to the about page"
-  },
   "nav": {
     "home": "Home",
     "about": "About",
     "products": "Products",
-    "contact": "Contact"
+    "contact": "Contact",
+    "auth": {
+      "profile": "Profile",
+      "sign_out": "Sign Out"
+    }
   },
   "auth": {
     "login": {
@@ -75,6 +75,37 @@
       "administrator": "Administrator",
       "customer": "Customer",
       "email_verification_notice": "Please check your email to verify your account",
+      "edit_information": "Edit Information",
+      "edit": {
+        "title": "Edit Profile",
+        "subtitle": "Update your personal information",
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "email_address": "Email Address (Cannot be changed)",
+        "phone": "Phone Number",
+        "phone_placeholder": "1234567890",
+        "phone_help_text": "The phone number must be exactly 10 digits",
+        "current_password": "Current Password",
+        "current_password_placeholder": "Enter your current password",
+        "new_password": "New Password (Optional)",
+        "new_password_placeholder": "Enter new password",
+        "confirm_new_password": "Confirm New Password",
+        "confirm_new_password_placeholder": "Confirm new password",
+        "save_changes": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "success": "Profile updated successfully!",
+        "password_changed": "Profile and password updated successfully!",
+        "error": {
+          "fill_required_fields": "Please fill in all required fields",
+          "current_password_required": "Current password is required to update profile",
+          "current_password_incorrect": "Current password is incorrect",
+          "phone_invalid": "Phone number must be exactly 10 digits",
+          "new_passwords_no_match": "New passwords do not match",
+          "new_password_min_length": "New password must be at least 6 characters long",
+          "update_failed": "Failed to update profile. Please try again."
+        }
+      },
       "quick_actions": "Quick Actions",
       "browse_products": "Browse Products",
       "my_orders": "My Orders",
