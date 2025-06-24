@@ -55,17 +55,17 @@ export default function LoginPage() {
     setSuccess(null);
 
     if (!formData.email || !formData.password) {
-      setError('Please fill in all fields');
+      setError(t('auth.login.error.fill_fields'));
       return;
     }
 
     try {
       await login(formData);
-      setSuccess('Login successful! Redirecting...');
+      setSuccess(t('auth.login.success'));
       
         router.push('/profile');
     } catch (error: any) {
-      setError(error.message || 'Login failed. Please try again.');
+      setError(error.message || t('auth.login.error.login_failed'));
     }
   };
 
@@ -85,7 +85,7 @@ export default function LoginPage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 text-sm font-medium shadow-sm border border-slate-200/50">
               <User className="w-4 h-4 mr-2 text-green-500" />
-              Welcome Back
+              {t('auth.login.welcome_back')}
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function LoginPage() {
           
           <div className="relative">
             <div className="mb-10 text-center">
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Sign in to your account</h2>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('auth.login.subtitle')}</h2>
             </div>
 
             {/* Error/Success Messages */}
@@ -127,7 +127,7 @@ export default function LoginPage() {
                     focusedField === 'email' ? 'text-slate-900' : 'text-slate-700'
                   }`}
                 >
-                  Email Address *
+                  {t('auth.login.email')} *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -143,7 +143,7 @@ export default function LoginPage() {
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
                     className="w-full pl-12 pr-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                    placeholder="your.email@example.com"
+                    placeholder={t('auth.login.email_placeholder')}
                   />
                 </div>
               </div>
@@ -156,7 +156,7 @@ export default function LoginPage() {
                     focusedField === 'password' ? 'text-slate-900' : 'text-slate-700'
                   }`}
                 >
-                  Password *
+                  {t('auth.login.password')} *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -172,7 +172,7 @@ export default function LoginPage() {
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
                     className="w-full pl-12 pr-12 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                    placeholder="Enter your password"
+                    placeholder={t('auth.login.password_placeholder')}
                   />
                   <button
                     type="button"
@@ -194,7 +194,7 @@ export default function LoginPage() {
                   href="/forgot-password" 
                   className="text-sm text-green-600 hover:text-green-700 font-medium transition-colors"
                 >
-                  Forgot your password?
+                  {t('auth.login.forgot_password')}
                 </Link>
               </div>
 
@@ -207,10 +207,10 @@ export default function LoginPage() {
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3"></div>
-                    Signing in...
+                    {t('auth.login.signing_in')}
                   </div>
                 ) : (
-                  'Sign In'
+                  t('auth.login.sign_in')
                 )}
               </button>
             </form>
@@ -218,9 +218,9 @@ export default function LoginPage() {
             {/* Additional Links */}
             <div className="mt-8 pt-8 border-t border-slate-200/50 text-center">
               <p className="text-slate-600 text-sm">
-                New to Jack Pot?{' '}
+                {t('auth.login.new_to_jack_pot')}{' '}
                 <Link href="/register" className="text-green-600 hover:text-green-700 font-medium transition-colors">
-                  Create an account
+                  {t('auth.login.create_account')}
                 </Link>
               </p>
             </div>
