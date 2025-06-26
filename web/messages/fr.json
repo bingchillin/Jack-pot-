@@ -6,9 +6,9 @@
     "contact": "Contact",
     "auth": {
       "profile": "Profil",
-      "sign_in": "Se connecter",
-      "create_account": "Créer un compte",
-      "sign_out": "Se déconnecter"
+      "sign_in": "Se Connecter",
+      "create_account": "Créer un Compte",
+      "sign_out": "Se Déconnecter"
     }
   },
   "auth": {
@@ -371,7 +371,9 @@
         "added_to_cart": "{name} ajouté au panier !"
       },
       "add_to_cart": "Ajouter au Panier",
-      "out_of_stock": "Rupture de Stock"
+      "out_of_stock": "Rupture de Stock",
+      "add_more": "Ajouter Plus",
+      "max_reached": "Maximum Atteint"
     }
   }
 } 

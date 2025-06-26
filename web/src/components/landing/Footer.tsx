@@ -3,14 +3,12 @@
 import { Flower } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
-interface FooterProps {
-  t: any;
-}
-
-export default function Footer({ t }: FooterProps) {
+export default function Footer() {
   const params = useParams();
   const locale = params.locale as string;
+  const t = useTranslations('footer');
 
   return (
     <footer id="contact" className="bg-gray-900 text-white py-12">
@@ -18,16 +16,16 @@ export default function Footer({ t }: FooterProps) {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center space-x-2 mb-4 md:mb-0">
           <Flower className="h-8 w-8 text-green-600" />
-            <span className="text-xl font-bold">{t('footer.company')}</span>
+            <span className="text-xl font-bold">{t('company')}</span>
           </div>
           <div className="flex space-x-6 text-sm text-gray-400">
-            <Link href={`/${locale}/privacy`} className="hover:text-white transition-colors">{t('footer.links.privacy')}</Link>
-            <Link href={`/${locale}/terms`} className="hover:text-white transition-colors">{t('footer.links.terms')}</Link>
-            <Link href={`/${locale}/contact`} className="hover:text-white transition-colors">{t('footer.links.support')}</Link>
+            <Link href={`/${locale}/privacy`} className="hover:text-white transition-colors">{t('links.privacy')}</Link>
+            <Link href={`/${locale}/terms`} className="hover:text-white transition-colors">{t('links.terms')}</Link>
+            <Link href={`/${locale}/contact`} className="hover:text-white transition-colors">{t('links.support')}</Link>
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-          © 2025 {t('footer.company')}. {t('footer.rights')}
+          © 2025 {t('company')}. {t('rights')}
         </div>
       </div>
     </footer>
