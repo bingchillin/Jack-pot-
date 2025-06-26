@@ -80,8 +80,8 @@ export default function EditProfilePage() {
     
     // Special handling for phone number field
     if (name === 'numberPhone') {
-      // Only allow digits and limit to 10 characters
-      const numericValue = value.replace(/\D/g, '').slice(0, 10);
+      // Only allow digits and limit to 15 characters
+      const numericValue = value.replace(/\D/g, '').slice(0, 15);
       setFormData(prev => ({
         ...prev,
         [name]: numericValue
@@ -110,7 +110,7 @@ export default function EditProfilePage() {
 
     // Validate phone number if provided
     if (formData.numberPhone && formData.numberPhone.trim() !== '') {
-      if (formData.numberPhone.length !== 10 || !/^\d{10}$/.test(formData.numberPhone)) {
+      if (formData.numberPhone.length < 9 || formData.numberPhone.length > 15 || !/^\d{9,15}$/.test(formData.numberPhone)) {
         setError(t('auth.profile.edit.error.phone_invalid'));
         return false;
       }
@@ -315,24 +315,24 @@ export default function EditProfilePage() {
                     onBlur={() => setFocusedField(null)}
                     className={`w-full pl-12 pr-16 py-4 border rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300 ${
                       formData.numberPhone && formData.numberPhone.length > 0
-                        ? formData.numberPhone.length === 10
+                        ? formData.numberPhone.length >= 9 && formData.numberPhone.length <= 15
                           ? 'border-green-300 focus:ring-green-500/20 focus:border-green-400'
                           : 'border-yellow-300 focus:ring-yellow-500/20 focus:border-yellow-400'
                         : 'border-slate-200 focus:ring-blue-500/20 focus:border-blue-400'
                     }`}
                     placeholder="1234567890"
-                    maxLength={10}
+                    maxLength={15}
                   />
                   {/* Character Counter */}
                   <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                     <span className={`text-xs font-medium ${
                       formData.numberPhone && formData.numberPhone.length > 0
-                        ? formData.numberPhone.length === 10
+                        ? formData.numberPhone.length >= 9 && formData.numberPhone.length <= 15
                           ? 'text-green-600'
                           : 'text-yellow-600'
                         : 'text-slate-400'
                     }`}>
-                      {formData.numberPhone.length}/10
+                      {formData.numberPhone.length}/15
                     </span>
                   </div>
                 </div>

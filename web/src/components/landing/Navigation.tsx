@@ -185,7 +185,7 @@ export default function Navigation({ scrolled }: NavigationProps) {
           onClick={isMobile ? () => setIsMenuOpen(false) : undefined}
         >
           <LogIn className="h-4 w-4" />
-          <span>{t('auth.login.sign_in')}</span>
+          <span>{t('auth.sign_in')}</span>
         </Link>
         <Link
           href={`/${locale}/register`}
@@ -194,7 +194,7 @@ export default function Navigation({ scrolled }: NavigationProps) {
           }`}
           onClick={isMobile ? () => setIsMenuOpen(false) : undefined}
         >
-          {t('auth.register.create_account')}
+          {t('auth.create_account')}
         </Link>
       </div>
     );
@@ -227,8 +227,8 @@ export default function Navigation({ scrolled }: NavigationProps) {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <NavLinks />
-            <LanguageSwitcher />
             <AuthSection />
+            <LanguageSwitcher />
           </div>
 
           {/* Mobile menu button */}

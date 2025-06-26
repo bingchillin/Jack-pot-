@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MinLength, IsPhoneNumber, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsPhoneNumber, IsNotEmpty, IsOptional, Matches } from 'class-validator';
 
 export class SignupDto {
     @ApiProperty({
@@ -44,13 +44,15 @@ export class SignupDto {
     surname: string;
 
     @ApiProperty({
-        example: '+33612345678',
-        description: 'Phone number in international format',
-        required: false,
-        pattern: '^\\+[1-9]\\d{1,14}$'
+        example: '1234567890',
+        description: 'Phone number (9-15 digits)',
+        required: false
     })
     @IsString()
-    @IsPhoneNumber()
+    @Matches(/^[0-9]{9,15}$/, {
+        message: 'Phone number must be between 9 and 15 digits'
+    })
+    @IsOptional()
     numberPhone?: string;
 
     @IsString()

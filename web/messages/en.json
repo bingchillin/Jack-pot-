@@ -43,8 +43,9 @@
       "last_name_placeholder": "Doe",
       "email": "Email Address",
       "email_placeholder": "your.email@example.com",
-      "phone": "Phone Number (Optional)",
-      "phone_placeholder": "+33 6 12 34 56 78",
+      "phone": "Phone Number",
+      "phone_placeholder": "1234567890",
+      "phone_help_text": "The phone number must be between 9 and 15 digits",
       "password": "Password",
       "password_placeholder": "Min 6 characters",
       "confirm_password": "Confirm Password",
@@ -63,6 +64,7 @@
         "password_min_length": "Password must be at least 6 characters long",
         "passwords_no_match": "Passwords do not match",
         "invalid_email": "Please enter a valid email address",
+        "phone_invalid": "Phone number must be between 9 and 15 digits",
         "registration_failed": "Registration failed. Please try again."
       }
     },
@@ -76,6 +78,13 @@
       "customer": "Customer",
       "email_verification_notice": "Please check your email to verify your account",
       "edit_information": "Edit Information",
+      "verification_modal": {
+        "title": "Email Verification Required",
+        "message": "Your account has been created successfully! To access all features and complete your registration, please verify your email address.",
+        "check_email": "Please check your email:",
+        "got_it": "Got it!",
+        "close": "Close"
+      },
       "edit": {
         "title": "Edit Profile",
         "subtitle": "Update your personal information",
@@ -84,7 +93,7 @@
         "email_address": "Email Address (Cannot be changed)",
         "phone": "Phone Number",
         "phone_placeholder": "1234567890",
-        "phone_help_text": "The phone number must be exactly 10 digits",
+        "phone_help_text": "The phone number must be between 9 and 15 digits",
         "current_password": "Current Password",
         "current_password_placeholder": "Enter your current password",
         "new_password": "New Password (Optional)",
@@ -100,7 +109,7 @@
           "fill_required_fields": "Please fill in all required fields",
           "current_password_required": "Current password is required to update profile",
           "current_password_incorrect": "Current password is incorrect",
-          "phone_invalid": "Phone number must be exactly 10 digits",
+          "phone_invalid": "Phone number must be between 9 and 15 digits",
           "new_passwords_no_match": "New passwords do not match",
           "new_password_min_length": "New password must be at least 6 characters long",
           "update_failed": "Failed to update profile. Please try again."

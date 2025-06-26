@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
@@ -28,6 +28,8 @@ export default function RegisterPage() {
   const t = useTranslations();
   const router = useRouter();
   const { register, isLoading, isAuthenticated } = useAuthStore();
+  const params = useParams();
+  const locale = params.locale as string;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,16 +42,28 @@ export default function RegisterPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/dashboard');
+      router.push(`/${locale}/profile`);
     }
   }, [isAuthenticated, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Special handling for phone number field
+    if (name === 'numberPhone') {
+      // Only allow digits and limit to 15 characters
+      const numericValue = value.replace(/\D/g, '').slice(0, 15);
+      setFormData(prev => ({
+        ...prev,
+        [name]: numericValue
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+    
     // Clear error when user starts typing
     if (error) setError(null);
   };
@@ -77,6 +91,14 @@ export default function RegisterPage() {
       return false;
     }
 
+    // Validate phone number if provided
+    if (formData.numberPhone && formData.numberPhone.trim() !== '') {
+      if (formData.numberPhone.length < 9 || formData.numberPhone.length > 15 || !/^\d{9,15}$/.test(formData.numberPhone)) {
+        setError(t('auth.register.error.phone_invalid'));
+        return false;
+      }
+    }
+
     return true;
   };
 
@@ -101,9 +123,9 @@ export default function RegisterPage() {
       await register(registerData);
       setSuccess(t('auth.register.success'));
       
-      // Redirect after a short delay
+      // Redirect to profile page after successful registration
       setTimeout(() => {
-        router.push('/verify-email');
+        router.push(`/${locale}/profile`);
       }, 2000);
     } catch (error: any) {
       setError(error.message || t('auth.register.error.registration_failed'));
@@ -115,7 +137,7 @@ export default function RegisterPage() {
       <Navigation scrolled={scrolled} />
       
       {/* Hero Section */}
-      <div className="relative pt-32 pb-20 overflow-hidden">
+      <div className="relative pt-16 pb-8 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
@@ -124,25 +146,17 @@ export default function RegisterPage() {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 text-sm font-medium mb-8 shadow-sm border border-slate-200/50">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 text-sm font-medium shadow-sm border border-slate-200/50">
               <UserPlus className="w-4 h-4 mr-2 text-green-500" />
               {t('auth.register.join_jack_pot')}
             </div>
-            
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-6 leading-tight">
-              {t('auth.register.title')}
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-slate-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              {t('auth.register.description')}
-            </p>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="bg-white/80 backdrop-blur-sm shadow-2xl shadow-slate-200/50 border border-slate-200/50 rounded-3xl p-8 md:p-12 relative overflow-hidden">
+        <div className="bg-white/80 backdrop-blur-sm shadow-2xl shadow-slate-200/50 border border-slate-200/50 rounded-3xl p-8 relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-16 translate-x-16 opacity-60"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-100 to-blue-100 rounded-full translate-y-12 -translate-x-12 opacity-60"></div>
@@ -152,7 +166,7 @@ export default function RegisterPage() {
               <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('auth.register.subtitle')}</h2>
               <p className="text-slate-600">
                 {t('auth.register.already_have_account')}{' '}
-                <Link href="/login" className="text-green-600 hover:text-green-700 font-medium transition-colors">
+                <Link href={`/${locale}/login`} className="text-green-600 hover:text-green-700 font-medium transition-colors">
                   {t('auth.register.sign_in_here')}
                 </Link>
               </p>
@@ -284,10 +298,33 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     onFocus={() => setFocusedField('numberPhone')}
                     onBlur={() => setFocusedField(null)}
-                    className="w-full pl-12 pr-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                    placeholder={t('auth.register.phone_placeholder')}
+                    className={`w-full pl-12 pr-16 py-4 border rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300 ${
+                      formData.numberPhone && formData.numberPhone.length > 0
+                        ? formData.numberPhone.length >= 9 && formData.numberPhone.length <= 15
+                          ? 'border-green-300 focus:ring-green-500/20 focus:border-green-400'
+                          : 'border-yellow-300 focus:ring-yellow-500/20 focus:border-yellow-400'
+                        : 'border-slate-200 focus:ring-blue-500/20 focus:border-blue-400'
+                    }`}
+                    placeholder="1234567890"
+                    maxLength={15}
                   />
+                  {/* Character Counter */}
+                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                    <span className={`text-xs font-medium ${
+                      formData.numberPhone && formData.numberPhone.length > 0
+                        ? formData.numberPhone.length >= 9 && formData.numberPhone.length <= 15
+                          ? 'text-green-600'
+                          : 'text-yellow-600'
+                        : 'text-slate-400'
+                    }`}>
+                      {formData.numberPhone.length}/15
+                    </span>
+                  </div>
                 </div>
+                {/* Helpful text */}
+                <p className="mt-2 text-xs text-slate-500">
+                  {t('auth.register.phone_help_text')}
+                </p>
               </div>
 
               {/* Password Fields */}
@@ -392,11 +429,11 @@ export default function RegisterPage() {
             <div className="mt-8 pt-8 border-t border-slate-200/50 text-center">
               <p className="text-slate-600 text-sm">
                 {t('auth.register.terms_agreement')}{' '}
-                <Link href="/terms" className="text-green-600 hover:text-green-700 font-medium transition-colors">
+                <Link href={`/${locale}/terms`} className="text-green-600 hover:text-green-700 font-medium transition-colors">
                   {t('auth.register.terms_of_service')}
                 </Link>{' '}
                 {t('auth.register.and')}{' '}
-                <Link href="/privacy" className="text-green-600 hover:text-green-700 font-medium transition-colors">
+                <Link href={`/${locale}/privacy`} className="text-green-600 hover:text-green-700 font-medium transition-colors">
                   {t('auth.register.privacy_policy')}
                 </Link>
               </p>
