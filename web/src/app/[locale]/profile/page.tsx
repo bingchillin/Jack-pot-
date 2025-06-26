@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
 import { useAuthStore } from '@/stores/authStore';
+import { useVerificationCheck } from '@/hooks/useVerificationCheck';
 import { User, Mail, Phone, CheckCircle2, AlertCircle, Edit3, X } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export default function ProfilePage() {
   const [scrolled, setScrolled] = useState(false);
@@ -18,6 +19,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isAuthenticated, isLoading, isHydrated } = useAuthStore();
+  const { checkVerification } = useVerificationCheck();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -241,13 +243,17 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Modify Information Button */}
-                <Link
-                  href={`/profile/edit`}
+                <button
+                  onClick={() => {
+                    if (checkVerification()) {
+                      router.push('/profile/edit');
+                    }
+                  }}
                   className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-slate-600/25 hover:shadow-slate-700/30 transform hover:translate-y-[-1px] flex items-center justify-center space-x-2"
                 >
                   <Edit3 className="h-4 w-4" />
                   <span>{t('auth.profile.edit_information')}</span>
-                </Link>
+                </button>
 
                 {!user.isEmailVerified && (
                   <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
@@ -271,7 +277,15 @@ export default function ProfilePage() {
                   <h3 className="text-2xl font-bold text-slate-900 mb-6">{t('auth.profile.quick_actions')}</h3>
                   
                   <div className="grid md:grid-cols-2 gap-4">
-                    <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px]">
+                    <button 
+                      onClick={() => {
+                        if (checkVerification()) {
+                          // Navigate to orders page or show orders
+                          toast.success('Orders feature coming soon!');
+                        }
+                      }}
+                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px]"
+                    >
                       {t('auth.profile.my_orders')}
                     </button>
                   </div>

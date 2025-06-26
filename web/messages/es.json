@@ -128,6 +128,14 @@
       "loading": "Cargando...",
       "sign_out": "Cerrar Sesión",
       "profile": "Perfil"
+    },
+    "errors": {
+      "invalid_credentials": "Email o contraseña inválidos",
+      "email_already_exists": "El email ya existe",
+      "phone_already_exists": "El número de teléfono ya existe",
+      "invalid_current_password": "La contraseña actual es incorrecta",
+      "not_authenticated": "Debes estar conectado para realizar esta acción",
+      "verification_required": "Por favor verifica tu dirección de email para realizar esta acción"
     }
   },
   "hero": {
