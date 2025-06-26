@@ -57,7 +57,7 @@ export default function Navigation({ scrolled }: NavigationProps) {
   // Single navigation items array
   const navItems = [
     { href: `/${locale}`, label: t('home') },
-    { href: `/${locale}#products`, label: t('products') },
+    { href: `/${locale}/products`, label: t('products') },
     { href: `/${locale}/contact`, label: t('contact') }
   ];
 
