@@ -87,6 +87,9 @@ export class ObjectProfile {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column({ nullable: true })
+  updated_watering: Date;
+
   @OneToMany(() => Plant, plant => plant.objectProfile)
   plants: Plant[];
 }

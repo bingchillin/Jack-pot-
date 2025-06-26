@@ -1,4 +1,9 @@
 
+// WIFI communication
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+
 //sensor temperature ground
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -29,6 +34,7 @@ DallasTemperature sensors(&sensor_temprature_ground_p);
 DHT dht(SENSOR_TEMPERATURE_HUMIDITY_EXTERN, DHTTYPE);
 
 //variable sensor
+float sensor_temprature_ground = 0;
 float sensor_water_level = 0;
 float sensor_ground_humidity = 0;
 float sensor_extern_temperature = 0;
@@ -37,6 +43,9 @@ float sensor_uv_voltage = 0;
 float sensor_uv_intensity = 0;
 bool motor = false;
 bool uv_led = false;
+int exposition_time_sun = 0;
+float conductivity_electrolyte = 0;
+float ph_ground_sensor = 0;
 
 
 void setup() {
@@ -55,6 +64,12 @@ void setup() {
   dht.begin();
 
   sensors.begin();
+
+  // for wifi communication
+  WiFi.begin("C42", "56025602");
+
+  // Démarre la tâche réseau après les autres
+  xTaskCreate(taskNetworkSender, "HTTP Sender", 8192, NULL, 1, NULL);
 
   //get variable sensor temperature ground
   xTaskCreate(taskGetSensorTemperatureGround, "Temperature ground sensor", 4096, NULL, 1, NULL);
@@ -76,8 +91,66 @@ void setup() {
 
   // function UV Led 
   xTaskCreate(taskGetUVLed, "UV Led", 4096, NULL, 1, NULL);
+
     
 }
+
+
+
+////////////// For communication WIFI ///////////////////////////////////
+void taskNetworkSender(void * parameter) {
+  while (1) {
+    Serial.println("🔁 Vérification réseau...");
+
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("✅ WiFi connecté, envoi des données...");
+
+      HTTPClient http;
+
+      // Remplace :id par l'identifiant réel
+      String url = "http://192.168.94.165:3000/object-profile-elec/1";
+      http.begin(url);
+      http.addHeader("Content-Type", "application/json");
+      
+
+      // Construction du JSON
+      String payload = "{";
+      payload += "\"humidityAirSensor\":" + String(sensor_extern_humidity, 2) + ",";
+      payload += "\"humidityGroundSensor\":" + String(sensor_ground_humidity, 2) + ",";
+      payload += "\"phGroundSensor\":" + String(ph_ground_sensor, 2) + ",";
+      payload += "\"conductivityElectriqueFertilitySensor\":" + String(conductivity_electrolyte, 2) + ",";
+      payload += "\"lightSensor\":" + String(uv_led ? 1 : 0) + ",";
+      payload += "\"temperatureSensorGround\":" + String(sensor_temprature_ground, 2) + ",";
+      payload += "\"temperatureSensorExtern\":" + String(sensor_extern_temperature, 2) + ",";
+      payload += "\"expositionTimeSun\":" + String(exposition_time_sun) + ",";
+      payload += "\"water_sensor\":" + String(sensor_water_level, 2);
+      payload += "}";
+
+      Serial.println("📤 Payload JSON :");
+      Serial.println(payload);
+
+      int httpResponseCode = http.sendRequest("PATCH", payload);
+
+      if (httpResponseCode > 0) {
+        Serial.print("📡 HTTP code: ");
+        Serial.println(httpResponseCode);
+        String response = http.getString();
+        Serial.println("📝 Réponse serveur : " + response);
+      } else {
+        Serial.print("❌ Erreur HTTP : ");
+        Serial.println(httpResponseCode);
+      }
+
+      http.end();
+    } else {
+      Serial.println("📴 Pas de connexion WiFi. Pas d'envoi.");
+    }
+
+    // Re-vérifie toutes les 30 secondes
+    vTaskDelay(30000 / portTICK_PERIOD_MS);
+  }
+}
+
 
 ////////////// Get variable sensor ///////////////////////////////////
 
@@ -98,6 +171,7 @@ void handleGetSensorTemperatureGround() {
     sensor_temprature_ground_p = 0;
     Serial.println("❌ Capteur non détecté !");
   } else {
+    sensor_temprature_ground = sensor_temprature_ground_p;
     Serial.print("🌡️ Température du sol : ");
     Serial.print(sensor_temprature_ground_p);
     Serial.println(" °C");
@@ -138,7 +212,7 @@ void taskGetSensorHumidityGround(void * parameter) {
 
 
 void handleGetSensorHumidityGround() {
-  int sensor_ground_humidity = analogRead(SENSOR_HUMIDITY_GROUND);
+  sensor_ground_humidity = analogRead(SENSOR_HUMIDITY_GROUND);
 
     // Affichage des résultats
     Serial.print(" %, Sol (capacitif): ");
