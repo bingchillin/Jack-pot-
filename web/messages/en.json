@@ -5,7 +5,9 @@
     "products": "Products",
     "contact": "Contact",
     "auth": {
-      "profile": "Profile",
+      "profile": "Profil",
+      "sign_in": "Sign In",
+      "create_account": "Create Account",
       "sign_out": "Sign Out"
     }
   },
@@ -270,7 +272,9 @@
         "added_to_cart": "{name} added to cart!"
       },
       "add_to_cart": "Add to Cart",
-      "out_of_stock": "Out of Stock"
+      "out_of_stock": "Out of Stock",
+      "add_more": "Add More",
+      "max_reached": "Max Reached"
     }
   },
   "contact": {

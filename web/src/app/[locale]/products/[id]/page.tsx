@@ -200,7 +200,7 @@ export default function ProductDetailPage() {
             {/* Price */}
             <div className="border-b border-gray-200 pb-4">
               <div className="flex items-baseline space-x-2">
-                <span className="text-4xl font-bold text-gray-900">${price.toFixed(2)}</span>
+                <span className="text-4xl font-bold text-gray-900">{price.toFixed(2)} €</span>
               </div>
             </div>
 
@@ -250,10 +250,12 @@ export default function ProductDetailPage() {
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
-              disabled={product.stockQuantity <= 0}
+              disabled={product.stockQuantity <= 0 || (isInCart && currentQuantity >= product.stockQuantity)}
               className={`w-full py-4 px-6 rounded-lg font-medium text-lg transition-all duration-200 flex items-center justify-center space-x-2 ${
                 isInCart
-                  ? 'bg-green-100 text-green-700 border-2 border-green-200'
+                  ? currentQuantity >= product.stockQuantity
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl'
                   : product.stockQuantity > 0
                   ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -262,11 +264,18 @@ export default function ProductDetailPage() {
               <ShoppingCart className="w-5 h-5" />
               <span>
                 {isInCart 
-                  ? `${t('in_cart')} (${currentQuantity})` 
+                  ? currentQuantity >= product.stockQuantity
+                    ? t('max_reached')
+                    : t('add_more')
                   : product.stockQuantity > 0 
                   ? t('add_to_cart') 
                   : t('out_of_stock')
                 }
+                {isInCart && currentQuantity > 0 && (
+                  <span className="ml-1 text-sm opacity-75">
+                    ({currentQuantity} {t('in_cart')})
+                  </span>
+                )}
               </span>
             </button>
 
@@ -353,7 +362,7 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      <Footer t={t} />
+      <Footer />
     </div>
   );
 } 

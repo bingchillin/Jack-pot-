@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { Product, getProductPrice } from '@/interfaces/product.interface';
 import { useCartStore } from '@/stores/cartStore';
-import { ShoppingCart, Star, Truck } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 interface ProductCardProps {
   product: Product;
-  showQuantity?: boolean;
 }
 
-export const ProductCard = ({ product, showQuantity = false }: ProductCardProps) => {
+export const ProductCard = ({ product }: ProductCardProps) => {
   const [quantity, setQuantity] = useState(1);
   const { addItem, getItemQuantity, hasItem } = useCartStore();
   const t = useTranslations('shop.products');
@@ -22,6 +20,21 @@ export const ProductCard = ({ product, showQuantity = false }: ProductCardProps)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation if this is inside a link
+    
+    const currentCartQuantity = getItemQuantity(product.idProduct);
+    const availableStock = product.stockQuantity - currentCartQuantity;
+    
+    if (availableStock <= 0) {
+      toast.error(t('stock_validation.max_quantity', { quantity: product.stockQuantity }));
+      return;
+    }
+    
+    addItem(product, quantity);
+    toast.success(t('stock_validation.added_to_cart', { name: product.name }));
+  };
+
+  const handleUpdateQuantity = (e: React.MouseEvent) => {
+    e.preventDefault();
     
     const currentCartQuantity = getItemQuantity(product.idProduct);
     const availableStock = product.stockQuantity - currentCartQuantity;
@@ -92,14 +105,8 @@ export const ProductCard = ({ product, showQuantity = false }: ProductCardProps)
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-baseline">
             <span className="text-lg font-bold text-gray-900">
-              ${price.toFixed(2)}
+              {price.toFixed(2)} €
             </span>
-            {product.stockQuantity > 0 && (
-              <span className="text-xs text-green-600 ml-2 flex items-center">
-                <Truck className="w-3 h-3 mr-1" />
-                {t('free_shipping')}
-              </span>
-            )}
           </div>
         </div>
 
@@ -114,22 +121,31 @@ export const ProductCard = ({ product, showQuantity = false }: ProductCardProps)
 
         {/* Add to Cart Button */}
         <button
-          onClick={handleAddToCart}
-          disabled={product.stockQuantity <= 0}
+          onClick={isInCart ? handleUpdateQuantity : handleAddToCart}
+          disabled={product.stockQuantity <= 0 || (isInCart && currentQuantity >= product.stockQuantity)}
           className={`w-full py-2 px-3 rounded text-sm font-medium transition-all duration-200 ${
             isInCart
-              ? 'bg-green-100 text-green-700 border border-green-200'
+              ? currentQuantity >= product.stockQuantity
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700'
               : product.stockQuantity > 0
               ? 'bg-blue-600 text-white hover:bg-blue-700'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
         >
           {isInCart 
-            ? `${t('in_cart')} (${currentQuantity})` 
+            ? currentQuantity >= product.stockQuantity
+              ? t('max_reached')
+              : t('add_more')
             : product.stockQuantity > 0 
             ? t('add_to_cart') 
             : t('out_of_stock')
           }
+          {isInCart && currentQuantity > 0 && (
+            <span className="ml-1 text-xs opacity-75">
+              ({currentQuantity} {t('in_cart')})
+            </span>
+          )}
         </button>
       </div>
     </div>
