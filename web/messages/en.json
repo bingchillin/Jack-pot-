@@ -128,6 +128,14 @@
       "loading": "Loading...",
       "sign_out": "Sign Out",
       "profile": "Profile"
+    },
+    "errors": {
+      "invalid_credentials": "Invalid email or password",
+      "email_already_exists": "Email already exists",
+      "phone_already_exists": "Phone number already exists",
+      "invalid_current_password": "Current password is incorrect",
+      "not_authenticated": "You must be logged in to perform this action",
+      "verification_required": "Please verify your email address to perform this action"
     }
   },
   "hero": {
