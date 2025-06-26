@@ -1,5 +1,5 @@
 class AppConfig {
-  static const String url = "http://192.168.0.100";
+  static const String url = "http://192.168.94.165";
   static const String url_s = "http://51.222.110.241";
   static const String port = "3000";
 
