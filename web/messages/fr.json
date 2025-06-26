@@ -6,6 +6,8 @@
     "contact": "Contact",
     "auth": {
       "profile": "Profil",
+      "sign_in": "Se connecter",
+      "create_account": "Créer un compte",
       "sign_out": "Se déconnecter"
     }
   },
@@ -43,8 +45,9 @@
       "last_name_placeholder": "Dupont",
       "email": "Adresse e-mail",
       "email_placeholder": "votre.email@exemple.com",
-      "phone": "Numéro de téléphone (Optionnel)",
-      "phone_placeholder": "+33 6 12 34 56 78",
+      "phone": "Numéro de téléphone",
+      "phone_placeholder": "1234567890",
+      "phone_help_text": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
       "password": "Mot de passe",
       "password_placeholder": "Min 6 caractères",
       "confirm_password": "Confirmer le mot de passe",
@@ -63,7 +66,8 @@
         "password_min_length": "Le mot de passe doit contenir au moins 6 caractères",
         "passwords_no_match": "Les mots de passe ne correspondent pas",
         "invalid_email": "Veuillez entrer une adresse e-mail valide",
-        "registration_failed": "Échec de l'inscription. Veuillez réessayer."
+        "phone_invalid": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
+        "registration_failed": "L'inscription a échoué. Veuillez réessayer."
       }
     },
     "profile": {
@@ -76,6 +80,13 @@
       "customer": "Client",
       "email_verification_notice": "Veuillez vérifier votre e-mail pour vérifier votre compte",
       "edit_information": "Modifier les informations",
+      "verification_modal": {
+        "title": "Vérification d'e-mail requise",
+        "message": "Votre compte a été créé avec succès ! Pour accéder à toutes les fonctionnalités et finaliser votre inscription, veuillez vérifier votre adresse e-mail.",
+        "check_email": "Veuillez vérifier votre e-mail :",
+        "got_it": "Compris !",
+        "close": "Fermer"
+      },
       "edit": {
         "title": "Modifier le profil",
         "subtitle": "Mettre à jour vos informations personnelles",
@@ -84,7 +95,7 @@
         "email_address": "Adresse e-mail (Non modifiable)",
         "phone": "Numéro de téléphone",
         "phone_placeholder": "1234567890",
-        "phone_help_text": "Le numéro de téléphone doit contenir exactement 10 chiffres",
+        "phone_help_text": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
         "current_password": "Mot de passe actuel",
         "current_password_placeholder": "Entrez votre mot de passe actuel",
         "new_password": "Nouveau mot de passe (Optionnel)",
@@ -100,7 +111,7 @@
           "fill_required_fields": "Veuillez remplir tous les champs obligatoires",
           "current_password_required": "Le mot de passe actuel est requis pour mettre à jour le profil",
           "current_password_incorrect": "Le mot de passe actuel est incorrect",
-          "phone_invalid": "Le numéro de téléphone doit contenir exactement 10 chiffres",
+          "phone_invalid": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
           "new_passwords_no_match": "Les nouveaux mots de passe ne correspondent pas",
           "new_password_min_length": "Le nouveau mot de passe doit contenir au moins 6 caractères",
           "update_failed": "Échec de la mise à jour du profil. Veuillez réessayer."

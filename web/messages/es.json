@@ -43,8 +43,9 @@
       "last_name_placeholder": "Pérez",
       "email": "Dirección de correo electrónico",
       "email_placeholder": "tu.email@ejemplo.com",
-      "phone": "Número de teléfono (Opcional)",
-      "phone_placeholder": "+34 6 12 34 56 78",
+      "phone": "Número de teléfono",
+      "phone_placeholder": "1234567890",
+      "phone_help_text": "El número de teléfono debe tener entre 9 y 15 dígitos",
       "password": "Contraseña",
       "password_placeholder": "Mín 6 caracteres",
       "confirm_password": "Confirmar Contraseña",
@@ -63,6 +64,7 @@
         "password_min_length": "La contraseña debe tener al menos 6 caracteres",
         "passwords_no_match": "Las contraseñas no coinciden",
         "invalid_email": "Por favor ingresa una dirección de correo electrónico válida",
+        "phone_invalid": "El número de teléfono debe tener entre 9 y 15 dígitos",
         "registration_failed": "Error en el registro. Por favor inténtalo de nuevo."
       }
     },
@@ -76,6 +78,13 @@
       "customer": "Cliente",
       "email_verification_notice": "Por favor revisa tu correo electrónico para verificar tu cuenta",
       "edit_information": "Editar información",
+      "verification_modal": {
+        "title": "Verificación de correo electrónico requerida",
+        "message": "¡Tu cuenta ha sido creada exitosamente! Para acceder a todas las funciones y completar tu registro, por favor verifica tu dirección de correo electrónico.",
+        "check_email": "Por favor revisa tu correo electrónico:",
+        "got_it": "¡Entendido!",
+        "close": "Cerrar"
+      },
       "edit": {
         "title": "Editar perfil",
         "subtitle": "Actualiza tu información personal",
@@ -84,7 +93,7 @@
         "email_address": "Dirección de correo electrónico (No modificable)",
         "phone": "Número de teléfono",
         "phone_placeholder": "1234567890",
-        "phone_help_text": "El número de teléfono debe tener exactamente 10 dígitos",
+        "phone_help_text": "El número de teléfono debe tener entre 9 y 15 dígitos",
         "current_password": "Contraseña actual",
         "current_password_placeholder": "Ingresa tu contraseña actual",
         "new_password": "Nueva contraseña (Opcional)",
@@ -100,7 +109,7 @@
           "fill_required_fields": "Por favor completa todos los campos obligatorios",
           "current_password_required": "La contraseña actual es requerida para actualizar el perfil",
           "current_password_incorrect": "La contraseña actual es incorrecta",
-          "phone_invalid": "El número de teléfono debe tener exactamente 10 dígitos",
+          "phone_invalid": "El número de teléfono debe tener entre 9 y 15 dígitos",
           "new_passwords_no_match": "Las nuevas contraseñas no coinciden",
           "new_password_min_length": "La nueva contraseña debe tener al menos 6 caracteres",
           "update_failed": "Error al actualizar el perfil. Por favor inténtalo de nuevo."

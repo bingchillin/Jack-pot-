@@ -13,6 +13,7 @@ export default function ProfilePage() {
   const [scrolled, setScrolled] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -45,6 +46,17 @@ export default function ProfilePage() {
       return () => clearTimeout(timer);
     }
   }, [searchParams]);
+
+  // Check if we should show verification modal
+  useEffect(() => {
+    if (user && !user.isEmailVerified && isHydrated) {
+      // Check if user has already dismissed the modal
+      const hasDismissedVerification = localStorage.getItem('verificationModalDismissed');
+      if (!hasDismissedVerification) {
+        setShowVerificationModal(true);
+      }
+    }
+  }, [user, isHydrated]);
 
   // Only redirect after hydration is complete and we're not loading
   useEffect(() => {
@@ -90,6 +102,77 @@ export default function ProfilePage() {
             >
               <X className="h-5 w-5" />
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Email Verification Modal */}
+      {showVerificationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
+            onClick={() => {
+              setShowVerificationModal(false);
+              localStorage.setItem('verificationModalDismissed', 'true');
+            }}
+          />
+          
+          {/* Modal */}
+          <div className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 animate-modal-slide-in">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full -translate-y-12 translate-x-12 opacity-60"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-blue-100 to-purple-100 rounded-full translate-y-10 -translate-x-10 opacity-60"></div>
+            
+            <div className="relative p-8 text-center">
+              {/* Warning Icon */}
+              <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                <AlertCircle className="h-10 w-10 text-yellow-600" />
+              </div>
+              
+              {/* Title */}
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">
+                {t('auth.profile.verification_modal.title')}
+              </h3>
+              
+              {/* Message */}
+              <p className="text-slate-600 mb-6 leading-relaxed">
+                {t('auth.profile.verification_modal.message')}
+              </p>
+              
+              {/* Email reminder */}
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
+                <p className="text-sm text-blue-700 font-medium">
+                  {t('auth.profile.verification_modal.check_email')}
+                </p>
+                <p className="text-sm text-blue-600 mt-1">
+                  {user?.email}
+                </p>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    setShowVerificationModal(false);
+                    localStorage.setItem('verificationModalDismissed', 'true');
+                  }}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px]"
+                >
+                  {t('auth.profile.verification_modal.got_it')}
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setShowVerificationModal(false);
+                    localStorage.setItem('verificationModalDismissed', 'true');
+                  }}
+                  className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-6 rounded-2xl transition-all duration-200"
+                >
+                  {t('auth.profile.verification_modal.close')}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

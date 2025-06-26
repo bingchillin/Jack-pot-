@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
@@ -23,6 +23,8 @@ export default function LoginPage() {
   const t = useTranslations();
   const router = useRouter();
   const { login, isLoading, isAuthenticated } = useAuthStore();
+  const params = useParams();
+  const locale = params.locale as string;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,7 +37,7 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/profile');
+      router.push(`/${locale}/profile`);
     }
   }, [isAuthenticated, router]);
 
@@ -63,7 +65,7 @@ export default function LoginPage() {
       await login(formData);
       setSuccess(t('auth.login.success'));
       
-        router.push('/profile');
+        router.push(`/${locale}/profile`);
     } catch (error: any) {
       setError(error.message || t('auth.login.error.login_failed'));
     }
@@ -191,7 +193,7 @@ export default function LoginPage() {
               {/* Forgot Password Link */}
               <div className="text-right">
                 <Link 
-                  href="/forgot-password" 
+                  href={`/${locale}/forgot-password`} 
                   className="text-sm text-green-600 hover:text-green-700 font-medium transition-colors"
                 >
                   {t('auth.login.forgot_password')}
@@ -219,7 +221,7 @@ export default function LoginPage() {
             <div className="mt-8 pt-8 border-t border-slate-200/50 text-center">
               <p className="text-slate-600 text-sm">
                 {t('auth.login.new_to_jack_pot')}{' '}
-                <Link href="/register" className="text-green-600 hover:text-green-700 font-medium transition-colors">
+                <Link href={`/${locale}/register`} className="text-green-600 hover:text-green-700 font-medium transition-colors">
                   {t('auth.login.create_account')}
                 </Link>
               </p>
