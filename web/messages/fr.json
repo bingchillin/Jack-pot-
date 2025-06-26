@@ -189,8 +189,8 @@
     "company": "Jack Pot",
     "rights": "Tous droits réservés.",
     "links": {
-      "privacy": "Politique de confidentialité",
-      "terms": "Conditions d'utilisation",
+      "privacy": "Politique de Confidentialité",
+      "terms": "Conditions d'Utilisation",
       "support": "Contact"
     }
   },
@@ -291,6 +291,87 @@
         "title": "Nous contacter",
         "content": "Si vous avez des questions sur ces conditions, veuillez nous contacter à legal@jackpot.com"
       }
+    }
+  },
+  "shop": {
+    "products": {
+      "title": "Nos Produits",
+      "subtitle": "Découvrez nos solutions de jardinage intelligentes",
+      "search_placeholder": "Rechercher des produits...",
+      "quantity_selector": "Sélecteur de Quantité",
+      "loading": "Chargement des produits...",
+      "error": "Échec du chargement des produits. Veuillez réessayer.",
+      "try_again": "Réessayer",
+      "no_products": "Aucun produit disponible.",
+      "no_search_results": "Aucun produit trouvé correspondant à votre recherche.",
+      "showing_results": "Affichage de {count} sur {total} produits",
+      "out_of_stock": "Rupture de Stock",
+      "in_stock": "En Stock",
+      "available": "disponible",
+      "free_shipping": "Livraison gratuite",
+      "quick_add": "Ajout Rapide",
+      "add_to_cart": "Ajouter au Panier",
+      "in_cart": "Dans le Panier",
+      "stock_status": {
+        "in_stock": "En Stock ({quantity} disponible)",
+        "out_of_stock": "Rupture de Stock"
+      },
+      "stock_validation": {
+        "max_quantity": "Vous avez déjà la quantité maximale disponible ({quantity}) dans votre panier !",
+        "only_available": "Seulement {quantity} de plus disponible. Veuillez réduire la quantité.",
+        "added_to_cart": "{name} ajouté au panier !"
+      }
+    },
+    "product_detail": {
+      "breadcrumb": {
+        "home": "Accueil",
+        "products": "Produits"
+      },
+      "loading": "Chargement du produit...",
+      "not_found": "Produit Non Trouvé",
+      "not_found_message": "Produit non trouvé ou échec du chargement.",
+      "back_to_products": "Retour aux Produits",
+      "quantity": "Quantité :",
+      "available": "disponible",
+      "in_cart": "Dans le panier",
+      "trust_badges": {
+        "secure_payment": "Paiement Sécurisé",
+        "free_shipping": "Livraison gratuite"
+      },
+      "tabs": {
+        "description": "Description",
+        "specifications": "Spécifications",
+        "shipping": "Livraison et Retours"
+      },
+      "description": {
+        "title": "Description du Produit",
+        "no_description": "Aucune description disponible pour ce produit."
+      },
+      "specifications": {
+        "title": "Spécifications du Produit",
+        "sku": "Référence",
+        "stock": "Stock",
+        "status": "Statut",
+        "units": "unités",
+        "active": "Actif",
+        "inactive": "Inactif"
+      },
+      "shipping": {
+        "title": "Livraison et Retours",
+        "return_policy": "Politique de Retour",
+        "return_policy_text": "Politique de retour de 30 jours. Les articles doivent être dans leur état d'origine."
+      },
+      "stock_status": {
+        "in_stock": "En Stock ({quantity} disponible)",
+        "out_of_stock": "Rupture de Stock"
+      },
+      "stock_validation": {
+        "max_quantity": "Vous avez déjà la quantité maximale disponible ({quantity}) dans votre panier !",
+        "only_available": "Seulement {quantity} de plus disponible. Veuillez réduire la quantité.",
+        "added_to_cart": "{name} ajouté au panier !"
+      },
+      "add_to_cart": "Ajouter au Panier",
+      "out_of_stock": "Rupture de Stock"
     }
   }
 } 

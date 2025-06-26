@@ -192,6 +192,87 @@
       "support": "Contact"
     }
   },
+  "shop": {
+    "products": {
+      "title": "Our Products",
+      "subtitle": "Discover our smart gardening solutions",
+      "search_placeholder": "Search products...",
+      "quantity_selector": "Quantity Selector",
+      "loading": "Loading products...",
+      "error": "Failed to load products. Please try again.",
+      "try_again": "Try Again",
+      "no_products": "No products available.",
+      "no_search_results": "No products found matching your search.",
+      "showing_results": "Showing {count} of {total} products",
+      "out_of_stock": "Out of Stock",
+      "in_stock": "In Stock",
+      "available": "available",
+      "free_shipping": "Free shipping",
+      "quick_add": "Quick Add",
+      "add_to_cart": "Add to Cart",
+      "in_cart": "In Cart",
+      "stock_status": {
+        "in_stock": "In Stock ({quantity} available)",
+        "out_of_stock": "Out of Stock"
+      },
+      "stock_validation": {
+        "max_quantity": "You already have the maximum available quantity ({quantity}) in your cart!",
+        "only_available": "Only {quantity} more available. Please reduce quantity.",
+        "added_to_cart": "{name} added to cart!"
+      }
+    },
+    "product_detail": {
+      "breadcrumb": {
+        "home": "Home",
+        "products": "Products"
+      },
+      "loading": "Loading product...",
+      "not_found": "Product Not Found",
+      "not_found_message": "Product not found or failed to load.",
+      "back_to_products": "Back to Products",
+      "quantity": "Quantity:",
+      "available": "available",
+      "in_cart": "in cart",
+      "trust_badges": {
+        "secure_payment": "Secure Payment",
+        "free_shipping": "Free shipping"
+      },
+      "tabs": {
+        "description": "Description",
+        "specifications": "Specifications",
+        "shipping": "Shipping & Returns"
+      },
+      "description": {
+        "title": "Product Description",
+        "no_description": "No description available for this product."
+      },
+      "specifications": {
+        "title": "Product Specifications",
+        "sku": "SKU",
+        "stock": "Stock",
+        "status": "Status",
+        "units": "units",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "shipping": {
+        "title": "Shipping & Returns",
+        "return_policy": "Return Policy",
+        "return_policy_text": "30-day return policy. Items must be in original condition."
+      },
+      "stock_status": {
+        "in_stock": "In Stock ({quantity} available)",
+        "out_of_stock": "Out of Stock"
+      },
+      "stock_validation": {
+        "max_quantity": "You already have the maximum available quantity ({quantity}) in your cart!",
+        "only_available": "Only {quantity} more available. Please reduce quantity.",
+        "added_to_cart": "{name} added to cart!"
+      },
+      "add_to_cart": "Add to Cart",
+      "out_of_stock": "Out of Stock"
+    }
+  },
   "contact": {
     "title": "Contact Us",
     "subtitle": "Get in touch with our support team",
