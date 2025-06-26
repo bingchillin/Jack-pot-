@@ -12,6 +12,8 @@
 #define SENSOR_HUMIDITY_GROUND  35
 #define SENSOR_TEMPERATURE_HUMIDITY_EXTERN 14
 #define SENSOR_UV 32
+#define MOTOR 16
+#define UVLED 18
 
 // sensor temperature humidity extern
 #define DHTTYPE DHT11   
@@ -33,7 +35,8 @@ float sensor_extern_temperature = 0;
 float sensor_extern_humidity = 0;
 float sensor_uv_voltage = 0;
 float sensor_uv_intensity = 0;
-// there is sensor_temprature_ground_p;
+bool motor = false;
+bool uv_led = false;
 
 
 void setup() {
@@ -45,6 +48,8 @@ void setup() {
   pinMode(SENSOR_HUMIDITY_GROUND, INPUT);
   pinMode(SENSOR_TEMPERATURE_HUMIDITY_EXTERN, INPUT);
   pinMode(SENSOR_UV, INPUT);
+  pinMode(MOTOR, OUTPUT);
+  pinMode(UVLED, OUTPUT);
 
   // Création sensor temperature humidity extern
   dht.begin();
@@ -65,6 +70,12 @@ void setup() {
 
   //get variable uv sensor and voltage
   xTaskCreate(taskGetSensorUVVoltage, "UV and voltage sensor", 4096, NULL, 1, NULL);
+
+  // function motor 
+  xTaskCreate(taskGetMotor, "Pression motor", 4096, NULL, 1, NULL);
+
+  // function UV Led 
+  xTaskCreate(taskGetUVLed, "UV Led", 4096, NULL, 1, NULL);
     
 }
 
@@ -186,6 +197,45 @@ void handleGetSensorUVVoltage() {
   Serial.print(sensor_uv_voltage, 2);
   Serial.print(" V | Indice UV approx. : ");
   Serial.println(sensor_uv_intensity, 1);
+
+}
+
+
+///// Get Motor /////
+void taskGetMotor(void * parameter) {
+  while (1) {
+    handleGetMotor();
+    vTaskDelay(5000 / portTICK_PERIOD_MS); // Delay 1 second
+  }
+}
+
+
+void handleGetMotor() {
+  
+  digitalWrite(MOTOR, motor); 
+
+  Serial.print("Motor : ");
+  Serial.println(motor);
+
+}
+
+
+///// Get UV Led /////
+
+void taskGetUVLed(void * parameter) {
+  while (1) {
+    handleGetUVLed();
+    vTaskDelay(5000 / portTICK_PERIOD_MS); // Delay 1 second
+  }
+}
+
+
+void handleGetUVLed() {
+  
+  digitalWrite(UVLED, uv_led); 
+
+  Serial.print("UV Led : ");
+  Serial.println(uv_led);
 
 }
 
