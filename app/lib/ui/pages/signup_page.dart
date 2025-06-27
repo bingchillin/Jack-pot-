@@ -44,7 +44,7 @@ class _SignupPageState extends State<SignupPage> {
     setState(() => _isLoading = false);
 
     if (success && mounted) {
-      Navigator.pushReplacementNamed(context, '/profile');
+      Navigator.pushReplacementNamed(context, '/');
     } else if (mounted) {
       showDialog(
         context: context,
