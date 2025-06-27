@@ -77,18 +77,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               {t('out_of_stock')}
             </div>
           )}
-          
-          {/* Quick Add to Cart on Hover */}
-          {product.stockQuantity > 0 && !isInCart && (
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-              <button
-                onClick={handleAddToCart}
-                className="bg-white text-gray-900 px-3 py-2 rounded-lg shadow-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-              >
-                {t('quick_add')}
-              </button>
-            </div>
-          )}
         </div>
       </Link>
 

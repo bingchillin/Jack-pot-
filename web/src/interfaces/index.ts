@@ -1,3 +1,15 @@
+// Auth interfaces
+export * from './auth.interface';
+
+// Product interfaces
+export * from './product.interface';
+
+// Order interfaces
+export * from './order.interface';
+
+// Cart interfaces
+export * from './cart.interface';
+
 export interface PlantType {
   id: number;
   title: string;

@@ -1,14 +1,13 @@
 {
   "nav": {
-    "home": "Accueil",
-    "about": "À propos",
     "products": "Produits",
     "contact": "Contact",
+    "cart": "Panier",
     "auth": {
+      "sign_in": "Se connecter",
+      "create_account": "Créer un compte",
       "profile": "Profil",
-      "sign_in": "Se Connecter",
-      "create_account": "Créer un Compte",
-      "sign_out": "Se Déconnecter"
+      "sign_out": "Se déconnecter"
     }
   },
   "auth": {
@@ -309,9 +308,9 @@
       "in_stock": "En Stock",
       "available": "disponible",
       "free_shipping": "Livraison gratuite",
-      "quick_add": "Ajout Rapide",
-      "add_to_cart": "Ajouter au Panier",
+      "add_to_cart": "Ajouter au panier",
       "in_cart": "Dans le Panier",
+      "add_more": "Ajouter plus",
       "stock_status": {
         "in_stock": "En Stock ({quantity} disponible)",
         "out_of_stock": "Rupture de Stock"
@@ -370,10 +369,29 @@
         "only_available": "Seulement {quantity} de plus disponible. Veuillez réduire la quantité.",
         "added_to_cart": "{name} ajouté au panier !"
       },
-      "add_to_cart": "Ajouter au Panier",
-      "out_of_stock": "Rupture de Stock",
-      "add_more": "Ajouter Plus",
-      "max_reached": "Maximum Atteint"
+      "add_to_cart": "Ajouter au panier",
+      "out_of_stock": "Rupture de stock",
+      "add_more": "Ajouter plus",
+      "max_reached": "Maximum atteint"
+    },
+    "cart": {
+      "title": "Panier d'achat",
+      "empty_title": "Votre panier est vide",
+      "empty_message": "Il semble que vous n'ayez pas encore ajouté d'articles à votre panier.",
+      "continue_shopping": "Continuer les achats",
+      "cart_items": "Articles du panier",
+      "clear_cart": "Vider le panier",
+      "order_summary": "Résumé de la commande",
+      "subtotal": "Sous-total ({items} articles)",
+      "shipping": "Livraison",
+      "free_shipping": "Gratuit",
+      "total": "Total",
+      "proceed_to_checkout": "Procéder au paiement",
+      "item_removed": "Article retiré du panier",
+      "cart_cleared": "Panier vidé",
+      "stock_available": "Stock : {quantity} disponible",
+      "each": "l'unité",
+      "in_your_cart": "dans votre panier"
     }
   }
 } 

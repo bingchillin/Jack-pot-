@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Flower, Globe, Menu, X, User, LogOut, LogIn } from 'lucide-react';
+import { Flower, Globe, Menu, X, User, LogOut, LogIn, ShoppingCart } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { useCartStore } from '@/stores/cartStore';
+import { useCartHydration } from '@/hooks/useCartHydration';
 
 interface NavigationProps {
   scrolled: boolean;
@@ -14,6 +16,7 @@ interface NavigationProps {
 export default function Navigation({ scrolled }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const t = useTranslations('nav');
   const router = useRouter();
   const pathname = usePathname();
@@ -23,9 +26,17 @@ export default function Navigation({ scrolled }: NavigationProps) {
 
   // Auth state
   const { user, isAuthenticated, logout, isHydrated } = useAuthStore();
+  
+  // Cart state
+  const { getSummary } = useCartStore();
+  const cartSummary = getSummary();
+  const { isHydrated: isCartHydrated } = useCartHydration();
 
   // Only show auth-related UI after hydration to prevent mismatches
   const shouldShowAuth = isHydrated;
+  
+  // Only show cart badge after hydration to prevent mismatches
+  const shouldShowCartBadge = isCartHydrated;
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
@@ -39,11 +50,20 @@ export default function Navigation({ scrolled }: NavigationProps) {
     setIsMenuOpen(false);
   };
 
+  const getFlag = (locale: string) => {
+    const flags: Record<string, string> = {
+      en: '🇺🇸',
+      fr: '🇫🇷',
+      es: '🇪🇸'
+    };
+    return flags[locale] || '🌐';
+  };
+
   const getLanguageName = (locale: string) => {
     const languageNames: Record<string, string> = {
-      en: 'EN',
-      fr: 'FR',
-      es: 'ES'
+      en: 'English',
+      fr: 'Français',
+      es: 'Español'
     };
     return languageNames[locale] || locale;
   };
@@ -54,9 +74,8 @@ export default function Navigation({ scrolled }: NavigationProps) {
     router.push(`/${locale}`);
   };
 
-  // Single navigation items array
+  // Navigation items (removed home since logo links to home)
   const navItems = [
-    { href: `/${locale}`, label: t('home') },
     { href: `/${locale}/products`, label: t('products') },
     { href: `/${locale}/contact`, label: t('contact') }
   ];
@@ -78,63 +97,101 @@ export default function Navigation({ scrolled }: NavigationProps) {
     </>
   );
 
-  const LanguageSwitcher = ({ isMobile = false }) => (
-    <div className={`flex items-center space-x-2 ${isMobile ? 'py-2' : ''}`}>
-      <Globe className="h-4 w-4 text-gray-500" />
-      {isMobile ? (
-        // Mobile: Show as buttons
-        locales.map((loc) => (
-          <button 
-            key={loc}
-            onClick={() => switchLocale(loc)} 
-            className={`px-2 py-1 text-sm ${
-              pathname.split('/')[1] === loc ? 'text-green-600 font-medium' : 'text-gray-700'
-            }`}
-          >
-            {getLanguageName(loc)}
-          </button>
-        ))
-      ) : (
-        // Desktop: Show as select
-        <select 
-          value={pathname.split('/')[1] || 'en'} 
-          onChange={(e) => switchLocale(e.target.value)}
-          className="bg-transparent border-none text-sm text-gray-700 focus:outline-none cursor-pointer"
-        >
-          {locales.map((loc) => (
-            <option key={loc} value={loc}>
-              {getLanguageName(loc)}
-            </option>
-          ))}
-        </select>
-      )}
-    </div>
-  );
+  const LanguageSwitcher = ({ isMobile = false }) => {
+    return (
+      <div className={`relative ${isMobile ? 'py-2' : ''}`}>
+        {isMobile ? (
+          // Mobile: Show as buttons
+          <div className="flex items-center space-x-2">
+            {locales.map((lang) => (
+              <button
+                key={lang}
+                onClick={() => switchLocale(lang)}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                  locale === lang
+                    ? 'bg-green-100 text-green-700 border border-green-200'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                } w-full justify-start`}
+              >
+                <span className="text-lg">{getFlag(lang)}</span>
+                <span className="text-sm">{getLanguageName(lang)}</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          // Desktop: Dropdown
+          <div className="relative">
+            <button
+              onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+              className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
+            >
+              <span className="text-lg">{getFlag(locale)}</span>
+              <span className="text-sm font-medium">{getLanguageName(locale)}</span>
+              <svg 
+                className={`w-4 h-4 transition-transform duration-200 ${isLanguageOpen ? 'rotate-180' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {isLanguageOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                {locales.map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => {
+                      switchLocale(lang);
+                      setIsLanguageOpen(false);
+                    }}
+                    className={`w-full flex items-center space-x-3 px-4 py-2 text-sm transition-colors ${
+                      locale === lang
+                        ? 'bg-green-50 text-green-700'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="text-lg">{getFlag(lang)}</span>
+                    <span>{getLanguageName(lang)}</span>
+                    {locale === lang && (
+                      <svg className="w-4 h-4 ml-auto text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const AuthSection = ({ isMobile = false }) => {
-    // Don't show anything until hydrated to prevent UI flash
-    if (!shouldShowAuth) {
-      return null;
-    }
+    if (!shouldShowAuth) return null;
 
     if (isAuthenticated && user) {
       return (
         <div className={`relative ${isMobile ? 'py-2' : ''}`}>
           {isMobile ? (
-            // Mobile: Show user info and logout button
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2 text-gray-700">
-                <User className="h-4 w-4" />
-                <span className="text-sm">{user.firstname} {user.surname}</span>
-              </div>
+            // Mobile: Simple list
+            <>
+              <Link
+                href={`/${locale}/profile`}
+                className="block py-2 text-gray-700 hover:text-green-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {t('auth.profile')}
+              </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 text-gray-700 hover:text-red-600 transition-colors text-sm"
+                className="w-full text-left py-2 text-red-600 hover:text-red-700 transition-colors"
               >
-                <LogOut className="h-4 w-4" />
-                <span>{t('auth.sign_out')}</span>
+                {t('auth.sign_out')}
               </button>
-            </div>
+            </>
           ) : (
             // Desktop: Dropdown menu
             <>
@@ -212,6 +269,18 @@ export default function Navigation({ scrolled }: NavigationProps) {
     }
   }, [isUserMenuOpen]);
 
+  // Close language dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setIsLanguageOpen(false);
+    };
+
+    if (isLanguageOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [isLanguageOpen]);
+
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${
       scrolled ? 'bg-white/95 backdrop-blur-sm shadow-sm' : 'bg-transparent'
@@ -227,8 +296,24 @@ export default function Navigation({ scrolled }: NavigationProps) {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <NavLinks />
-            <AuthSection />
             <LanguageSwitcher />
+            
+            {/* Cart Icon - only show when hydrated */}
+            {shouldShowCartBadge && (
+              <Link 
+                href={`/${locale}/cart`}
+                className="relative flex items-center text-gray-700 hover:text-green-600 transition-colors"
+              >
+                <ShoppingCart className="h-6 w-6" />
+                {cartSummary.totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                    {cartSummary.totalItems > 99 ? '99+' : cartSummary.totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
+            
+            <AuthSection />
           </div>
 
           {/* Mobile menu button */}
@@ -243,6 +328,26 @@ export default function Navigation({ scrolled }: NavigationProps) {
         <div className="md:hidden bg-white border-t">
           <div className="px-4 py-2 space-y-2">
             <NavLinks isMobile />
+            
+            {/* Mobile Cart Link - only show when hydrated */}
+            {shouldShowCartBadge && (
+              <Link 
+                href={`/${locale}/cart`}
+                className="flex items-center justify-between py-2 text-gray-700 hover:text-green-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="flex items-center space-x-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  <span>{t('cart')}</span>
+                </div>
+                {cartSummary.totalItems > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                    {cartSummary.totalItems > 99 ? '99+' : cartSummary.totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
+            
             <div className="border-t border-gray-200 pt-2">
               <LanguageSwitcher isMobile />
             </div>
