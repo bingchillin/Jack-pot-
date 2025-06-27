@@ -34,7 +34,7 @@ export class AuthService {
         private readonly refreshTokenRepository: Repository<RefreshToken>,
     ) { }
 
-    async validateUser(email: string, password: string): Promise<any> {
+    async validateUser(email: string, password: string, client?: string): Promise<any> {
         const person = await this.personService.findByEmail(email);
         if (!person) {
             throw new UnauthorizedException('Invalid credentials');
@@ -45,8 +45,8 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        // Check if user is admin (role ID 1)
-        if (person.idRole !== 1) {
+        // Check if user is admin (role ID 1) only for backoffice
+        if (client === 'backoffice' && person.idRole !== 1) {
             throw new UnauthorizedException('You do not have permission to access the backoffice');
         }
 
@@ -61,7 +61,8 @@ export class AuthService {
             throw new UnauthorizedException('User already exists');
         }
 
-        // Verification code expiry (verif code comes from frontend)
+        // Generate verification code on the backend
+        const verificationCode = this.generateVerificationCode();
         const verificationCodeExpires = this.setVerificationCodeExpiration();
 
         // Create new user with default role and verification code
@@ -69,7 +70,7 @@ export class AuthService {
             ...signupDto,
             idRole: 2,
             isEmailVerified: false,
-            verificationCode: signupDto.verificationCode,
+            verificationCode,
             verificationCodeExpires
         });
 
@@ -92,7 +93,7 @@ export class AuthService {
         }
 
         // Send verification email
-        await this.mailerService.sendVerificationEmail(newUser.email, signupDto.verificationCode);
+        await this.mailerService.sendVerificationEmail(newUser.email, verificationCode);
 
         // Generate tokens
         const tokens = await this.generateTokens(newUser);

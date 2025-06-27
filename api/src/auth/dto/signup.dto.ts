@@ -54,7 +54,4 @@ export class SignupDto {
     })
     @IsOptional()
     numberPhone?: string;
-
-    @IsString()
-    verificationCode: string;
 } 
