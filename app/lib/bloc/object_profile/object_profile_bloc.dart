@@ -36,15 +36,24 @@ class ObjectProfileBloc extends Bloc<ObjectProfileEvent, ObjectProfileState> {
   Future<void> _onLoad(LoadProfiles event, Emitter<ObjectProfileState> emit) async {
     try {
       final profiles = await provider.fetchProfiles(personId);
-      if (!listEquals(profiles, _currentProfiles)) {
+
+      // Toujours émettre si c'est le premier chargement
+      final shouldEmit = _currentProfiles.isEmpty && profiles.isEmpty
+          || !listEquals(profiles, _currentProfiles);
+
+      if (shouldEmit) {
         _currentProfiles = profiles;
         _profilesController.add(_currentProfiles);
+        emit(ProfileLoaded(_currentProfiles));
+      } else if (state is! ProfileLoaded) {
+        // Cas de premier affichage même si pas de changement
         emit(ProfileLoaded(_currentProfiles));
       }
     } catch (e) {
       emit(ProfileError("Erreur de chargement : $e"));
     }
   }
+
 
   void _onToggleAutomatic(ToggleAutomatic event, Emitter<ObjectProfileState> emit) {
     if (state is! ProfileLoaded) return;
