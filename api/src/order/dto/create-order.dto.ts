@@ -52,10 +52,11 @@ export class OrderItemDto {
 }
 
 export class CreateOrderDto {
-  @ApiProperty({ description: 'Person ID' })
+  @ApiPropertyOptional({ description: 'Person ID (automatically set from authenticated user)' })
+  @IsOptional()
   @IsNumber()
   @IsPositive()
-  personId: number;
+  personId?: number;
 
   @ApiPropertyOptional({ description: 'Shipping address' })
   @IsOptional()

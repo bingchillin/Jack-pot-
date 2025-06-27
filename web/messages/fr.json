@@ -393,5 +393,54 @@
       "each": "l'unité",
       "in_your_cart": "dans votre panier"
     }
+  },
+  "checkout": {
+    "title": "Paiement",
+    "subtitle": "Finalisez votre achat en toute sécurité",
+    "payment_details": "Détails du paiement",
+    "order_summary": "Résumé de la commande",
+    "subtotal": "Sous-total",
+    "shipping": "Livraison",
+    "total": "Total",
+    "free": "Gratuit",
+    "pay_now": "Payer maintenant",
+    "processing": "Traitement...",
+    "card_number": "Numéro de carte",
+    "secure_payment": "Paiement sécurisé",
+    "encrypted": "Chiffré",
+    "creating_order": "Création de votre commande...",
+    "order_error": "Échec de la création de la commande",
+    "try_again": "Réessayer",
+    "back_to_cart": "Retour au panier",
+    "payment_success": "Paiement réussi !",
+    "redirect_to_stripe": "Vous serez redirigé vers la page de paiement sécurisée de Stripe",
+    "proceed_to_payment": "Procéder au paiement",
+    "redirecting": "Redirection...",
+    "security_notice": {
+      "title": "Paiement sécurisé",
+      "description": "Vos informations de paiement sont chiffrées et sécurisées. Nous ne stockons jamais vos détails de carte."
+    }
+  },
+  "order_success": {
+    "title": "Commande confirmée !",
+    "subtitle": "Merci pour votre achat. Votre commande a été placée avec succès.",
+    "order_details": "Détails de la commande",
+    "order_info": "Informations de commande",
+    "order_number": "Numéro de commande",
+    "order_date": "Date de commande",
+    "total_amount": "Montant total",
+    "status": "Statut",
+    "paid": "Payé",
+    "next_steps": "Que se passe-t-il ensuite ?",
+    "email_confirmation": "Vous recevrez un email de confirmation sous peu",
+    "shipping_preparation": "Nous préparerons votre commande pour l'expédition",
+    "order_processing": "Votre commande est en cours de traitement",
+    "back_to_home": "Retour à l'accueil",
+    "continue_shopping": "Continuer les achats",
+    "support": {
+      "title": "Besoin d'aide ?",
+      "description": "Si vous avez des questions sur votre commande, notre équipe de support est là pour vous aider.",
+      "contact_us": "Contacter le support"
+    }
   }
 } 

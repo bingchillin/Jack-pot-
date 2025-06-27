@@ -393,5 +393,54 @@
         "content": "If you have questions about these terms, please contact us at legal@jackpot.com"
       }
     }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "subtitle": "Complete your purchase securely",
+    "payment_details": "Payment Details",
+    "order_summary": "Order Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "free": "Free",
+    "pay_now": "Pay Now",
+    "processing": "Processing...",
+    "card_number": "Card Number",
+    "secure_payment": "Secure Payment",
+    "encrypted": "Encrypted",
+    "creating_order": "Creating your order...",
+    "order_error": "Order Creation Failed",
+    "try_again": "Try Again",
+    "back_to_cart": "Back to Cart",
+    "payment_success": "Payment successful!",
+    "redirect_to_stripe": "You will be redirected to Stripe's secure payment page",
+    "proceed_to_payment": "Proceed to Payment",
+    "redirecting": "Redirecting...",
+    "security_notice": {
+      "title": "Secure Payment",
+      "description": "Your payment information is encrypted and secure. We never store your card details."
+    }
+  },
+  "order_success": {
+    "title": "Order Confirmed!",
+    "subtitle": "Thank you for your purchase. Your order has been successfully placed.",
+    "order_details": "Order Details",
+    "order_info": "Order Information",
+    "order_number": "Order Number",
+    "order_date": "Order Date",
+    "total_amount": "Total Amount",
+    "status": "Status",
+    "paid": "Paid",
+    "next_steps": "What happens next?",
+    "email_confirmation": "You'll receive an email confirmation shortly",
+    "shipping_preparation": "We'll prepare your order for shipping",
+    "order_processing": "Your order is being processed",
+    "back_to_home": "Back to Home",
+    "continue_shopping": "Continue Shopping",
+    "support": {
+      "title": "Need help?",
+      "description": "If you have any questions about your order, our support team is here to help.",
+      "contact_us": "Contact Support"
+    }
   }
 } 
