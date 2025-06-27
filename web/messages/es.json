@@ -393,5 +393,54 @@
       "each": "cada uno",
       "in_your_cart": "en tu carrito"
     }
+  },
+  "checkout": {
+    "title": "Pago",
+    "subtitle": "Complete su compra de forma segura",
+    "payment_details": "Detalles del pago",
+    "order_summary": "Resumen del pedido",
+    "subtotal": "Subtotal",
+    "shipping": "Envío",
+    "total": "Total",
+    "free": "Gratis",
+    "pay_now": "Pagar ahora",
+    "processing": "Procesando...",
+    "card_number": "Número de tarjeta",
+    "secure_payment": "Pago seguro",
+    "encrypted": "Encriptado",
+    "creating_order": "Creando su pedido...",
+    "order_error": "Error al crear el pedido",
+    "try_again": "Intentar de nuevo",
+    "back_to_cart": "Volver al carrito",
+    "payment_success": "¡Pago exitoso!",
+    "redirect_to_stripe": "Será redirigido a la página de pago segura de Stripe",
+    "proceed_to_payment": "Proceder al pago",
+    "redirecting": "Redirigiendo...",
+    "security_notice": {
+      "title": "Pago seguro",
+      "description": "Su información de pago está encriptada y segura. Nunca almacenamos los detalles de su tarjeta."
+    }
+  },
+  "order_success": {
+    "title": "¡Pedido confirmado!",
+    "subtitle": "Gracias por su compra. Su pedido ha sido colocado exitosamente.",
+    "order_details": "Detalles del pedido",
+    "order_info": "Información del pedido",
+    "order_number": "Número de pedido",
+    "order_date": "Fecha del pedido",
+    "total_amount": "Monto total",
+    "status": "Estado",
+    "paid": "Pagado",
+    "next_steps": "¿Qué sigue?",
+    "email_confirmation": "Recibirá un email de confirmación pronto",
+    "shipping_preparation": "Prepararemos su pedido para envío",
+    "order_processing": "Su pedido está siendo procesado",
+    "back_to_home": "Volver al inicio",
+    "continue_shopping": "Continuar comprando",
+    "support": {
+      "title": "¿Necesita ayuda?",
+      "description": "Si tiene preguntas sobre su pedido, nuestro equipo de soporte está aquí para ayudar.",
+      "contact_us": "Contactar soporte"
+    }
   }
 } 
