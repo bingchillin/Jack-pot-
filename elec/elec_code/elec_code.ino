@@ -47,6 +47,17 @@ int exposition_time_sun = 0;
 float conductivity_electrolyte = 0;
 float ph_ground_sensor = 0;
 
+// ======= CONFIGURATION  WIFI=======
+const char* WIFI_SSID = "C42";
+const char* WIFI_PASSWORD = "56025602";
+
+const char* SERVER_IP = "192.168.94.165";
+const int SERVER_PORT = 3000;
+const char* OBJECT_ID = "1";
+
+const unsigned long NETWORK_SEND_INTERVAL = 30000; // 30s
+
+
 
 void setup() {
   Serial.begin(115200);
@@ -69,7 +80,7 @@ void setup() {
   WiFi.begin("C42", "56025602");
 
   // Démarre la tâche réseau après les autres
-  xTaskCreate(taskNetworkSender, "HTTP Sender", 8192, NULL, 1, NULL);
+  xTaskCreate(taskPatchDataBase, "HTTP Sender", 8192, NULL, 1, NULL);
 
   //get variable sensor temperature ground
   xTaskCreate(taskGetSensorTemperatureGround, "Temperature ground sensor", 4096, NULL, 1, NULL);
@@ -98,58 +109,81 @@ void setup() {
 
 
 ////////////// For communication WIFI ///////////////////////////////////
-void taskNetworkSender(void * parameter) {
-  while (1) {
-    Serial.println("🔁 Vérification réseau...");
 
-    if (WiFi.status() == WL_CONNECTED) {
-      Serial.println("✅ WiFi connecté, envoi des données...");
+void checkWiFiConnection() {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("🔌 Connexion WiFi perdue. Tentative de reconnexion...");
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-      HTTPClient http;
-
-      // Remplace :id par l'identifiant réel
-      String url = "http://192.168.94.165:3000/object-profile-elec/1";
-      http.begin(url);
-      http.addHeader("Content-Type", "application/json");
-      
-
-      // Construction du JSON
-      String payload = "{";
-      payload += "\"humidityAirSensor\":" + String(sensor_extern_humidity, 2) + ",";
-      payload += "\"humidityGroundSensor\":" + String(sensor_ground_humidity, 2) + ",";
-      payload += "\"phGroundSensor\":" + String(ph_ground_sensor, 2) + ",";
-      payload += "\"conductivityElectriqueFertilitySensor\":" + String(conductivity_electrolyte, 2) + ",";
-      payload += "\"lightSensor\":" + String(uv_led ? 1 : 0) + ",";
-      payload += "\"temperatureSensorGround\":" + String(sensor_temprature_ground, 2) + ",";
-      payload += "\"temperatureSensorExtern\":" + String(sensor_extern_temperature, 2) + ",";
-      payload += "\"expositionTimeSun\":" + String(exposition_time_sun) + ",";
-      payload += "\"water_sensor\":" + String(sensor_water_level, 2);
-      payload += "}";
-
-      Serial.println("📤 Payload JSON :");
-      Serial.println(payload);
-
-      int httpResponseCode = http.sendRequest("PATCH", payload);
-
-      if (httpResponseCode > 0) {
-        Serial.print("📡 HTTP code: ");
-        Serial.println(httpResponseCode);
-        String response = http.getString();
-        Serial.println("📝 Réponse serveur : " + response);
-      } else {
-        Serial.print("❌ Erreur HTTP : ");
-        Serial.println(httpResponseCode);
-      }
-
-      http.end();
-    } else {
-      Serial.println("📴 Pas de connexion WiFi. Pas d'envoi.");
+    unsigned long startAttemptTime = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 10000) {
+      delay(500);
+      Serial.print(".");
     }
 
-    // Re-vérifie toutes les 30 secondes
-    vTaskDelay(30000 / portTICK_PERIOD_MS);
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("\n✅ Reconnecté au WiFi !");
+    } else {
+      Serial.println("\n❌ Impossible de se reconnecter.");
+    }
   }
 }
+
+void sendPatchRequest(String endpoint, const String& jsonPayload) {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("📴 Pas de WiFi, requête ignorée.");
+    return;
+  }
+
+  HTTPClient http;
+  String url = "http://" + String(SERVER_IP) + ":" + String(SERVER_PORT) + endpoint;
+
+  http.begin(url);
+  http.addHeader("Content-Type", "application/json");
+
+  Serial.println("📤 Envoi PATCH vers : " + url);
+  Serial.println("📦 Payload : " + jsonPayload);
+
+  int httpResponseCode = http.sendRequest("PATCH", jsonPayload);
+
+  if (httpResponseCode > 0) {
+    Serial.print("✅ Réponse HTTP : ");
+    Serial.println(httpResponseCode);
+    Serial.println("📝 " + http.getString());
+  } else {
+    Serial.print("❌ Erreur HTTP : ");
+    Serial.println(httpResponseCode);
+  }
+
+  http.end();
+}
+
+void taskPatchDataBase(void* parameter) {
+  while (true) {
+    checkWiFiConnection();
+
+     if (WiFi.status() == WL_CONNECTED) {
+
+          // Construction du JSON
+          String payload = "{";
+          payload += "\"humidityAirSensor\":" + String(sensor_extern_humidity, 2) + ",";
+          payload += "\"humidityGroundSensor\":" + String(sensor_ground_humidity, 2) + ",";
+          payload += "\"phGroundSensor\":" + String(ph_ground_sensor, 2) + ",";
+          payload += "\"conductivityElectriqueFertilitySensor\":" + String(conductivity_electrolyte, 2) + ",";
+          payload += "\"lightSensor\":" + String(uv_led ? 1 : 0) + ",";
+          payload += "\"temperatureSensorGround\":" + String(sensor_temprature_ground, 2) + ",";
+          payload += "\"temperatureSensorExtern\":" + String(sensor_extern_temperature, 2) + ",";
+          payload += "\"expositionTimeSun\":" + String(exposition_time_sun) + ",";
+          payload += "\"water_sensor\":" + String(sensor_water_level, 2);
+          payload += "}";
+      
+          sendPatchRequest("/object-profile-elec/" + String(OBJECT_ID), payload);
+     }
+
+    vTaskDelay(NETWORK_SEND_INTERVAL / portTICK_PERIOD_MS);
+  }
+}
+
 
 
 ////////////// Get variable sensor ///////////////////////////////////

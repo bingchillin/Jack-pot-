@@ -25,7 +25,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/signup': (_) => const SignupPage(),
   '/get_code_email': (_) => const GetCodeEmailPage(),
   '/reset_password': (_) => const ResetPasswordPage(),
-  '/add_my_object': (_) => const AddMyObjectPage(),
+  '/add_my_object': (_) => AddMyObjectPage(),
 
 
 };

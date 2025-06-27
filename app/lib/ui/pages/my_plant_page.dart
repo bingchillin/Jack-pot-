@@ -1,12 +1,14 @@
 import 'package:app/ui/pages/widget/plant_card_my_list/plant_item_my_list_widget.dart';
+import 'package:app/ui/pages/widget/plant_card_favorite/plant_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
+
 import '../../bloc/object_profile/object_profile_bloc.dart';
 import '../../bloc/object_profile/object_profile_event.dart';
 import '../../bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
 import '../../bloc/object_profile_my_list/object_profile_my_list_event.dart';
 import '../../models/object_profile.dart';
-import 'widget/plant_card_favorite/plant_item_widget.dart';
 
 class MyPlantPage extends StatefulWidget {
   const MyPlantPage({Key? key}) : super(key: key);
@@ -24,6 +26,10 @@ class _MyPlantPageState extends State<MyPlantPage> {
     super.initState();
     favoriteBloc = context.read<ObjectProfileBloc>();
     myListBloc = context.read<ObjectProfileMyListBloc>();
+
+    // Charger les données initiales
+    favoriteBloc.add(LoadProfiles());
+    myListBloc.add(LoadProfilesMyList());
   }
 
   Future<void> _refreshFavorite() async {
@@ -36,6 +42,37 @@ class _MyPlantPageState extends State<MyPlantPage> {
     await myListBloc.profilesStream.firstWhere((_) => true);
   }
 
+  Widget buildShimmerCard({double width = 280, double height = 400}) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: width,
+        height: height,
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+  }
+
+  Widget buildShimmerListItem({double height = 100}) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        height: height,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +83,7 @@ class _MyPlantPageState extends State<MyPlantPage> {
             await Future.wait([_refreshFavorite(), _refreshMyList()]);
           },
           child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -61,12 +98,18 @@ class _MyPlantPageState extends State<MyPlantPage> {
                     stream: favoriteBloc.profilesStream,
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
+                        return ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 3,
+                          itemBuilder: (context, index) => buildShimmerCard(),
+                        );
                       }
+
                       final plants = snapshot.data!;
                       if (plants.isEmpty) {
                         return const Center(child: Text("Aucune plante trouvée."));
                       }
+
                       return ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: plants.length,
@@ -97,12 +140,19 @@ class _MyPlantPageState extends State<MyPlantPage> {
                   stream: myListBloc.profilesStream,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: 4,
+                        itemBuilder: (context, index) => buildShimmerListItem(),
+                      );
                     }
+
                     final plants = snapshot.data!;
                     if (plants.isEmpty) {
                       return const Center(child: Text("Aucune plante trouvée."));
                     }
+
                     return ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
@@ -118,7 +168,6 @@ class _MyPlantPageState extends State<MyPlantPage> {
           ),
         ),
       ),
-      // Button
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 30.0, right: 10.0),
         child: SizedBox(
@@ -140,6 +189,5 @@ class _MyPlantPageState extends State<MyPlantPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
-
   }
 }
