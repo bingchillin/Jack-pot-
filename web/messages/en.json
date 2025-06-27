@@ -1,13 +1,12 @@
 {
   "nav": {
-    "home": "Home",
-    "about": "About",
     "products": "Products",
     "contact": "Contact",
+    "cart": "Cart",
     "auth": {
-      "profile": "Profil",
       "sign_in": "Sign In",
       "create_account": "Create Account",
+      "profile": "Profile",
       "sign_out": "Sign Out"
     }
   },
@@ -210,9 +209,9 @@
       "in_stock": "In Stock",
       "available": "available",
       "free_shipping": "Free shipping",
-      "quick_add": "Quick Add",
       "add_to_cart": "Add to Cart",
       "in_cart": "In Cart",
+      "add_more": "Add More",
       "stock_status": {
         "in_stock": "In Stock ({quantity} available)",
         "out_of_stock": "Out of Stock"
@@ -275,6 +274,25 @@
       "out_of_stock": "Out of Stock",
       "add_more": "Add More",
       "max_reached": "Max Reached"
+    },
+    "cart": {
+      "title": "Shopping Cart",
+      "empty_title": "Your cart is empty",
+      "empty_message": "Looks like you haven't added any items to your cart yet.",
+      "continue_shopping": "Continue Shopping",
+      "cart_items": "Cart Items",
+      "clear_cart": "Clear Cart",
+      "order_summary": "Order Summary",
+      "subtotal": "Subtotal ({items} items)",
+      "shipping": "Shipping",
+      "free_shipping": "Free",
+      "total": "Total",
+      "proceed_to_checkout": "Proceed to Checkout",
+      "item_removed": "Item removed from cart",
+      "cart_cleared": "Cart cleared",
+      "stock_available": "Stock: {quantity} available",
+      "each": "each",
+      "in_your_cart": "in your cart"
     }
   },
   "contact": {
