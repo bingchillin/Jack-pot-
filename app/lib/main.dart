@@ -25,9 +25,33 @@ void main() {
     ),
   );
 }
-
-class RootApp extends StatelessWidget {
+class RootApp extends StatefulWidget {
   const RootApp({super.key});
+
+  @override
+  State<RootApp> createState() => _RootAppState();
+}
+
+class _RootAppState extends State<RootApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Écoute des changements AuthProvider pour rebuild
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    authProvider.addListener(_onAuthChanged);
+  }
+
+  @override
+  void dispose() {
+    Provider.of<AuthProvider>(context, listen: false).removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  void _onAuthChanged() {
+    // Force le rebuild quand login/signup change l’état
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,3 +94,4 @@ class RootApp extends StatelessWidget {
     );
   }
 }
+
