@@ -1,0 +1,33 @@
+Beug:
+
+API:
+
+- Requête inscripption: pas optimal et non fonctionel 
+    pourquoi besoin d'un verification code ?
+    pourquoi on verifie le numéro de tel ?
+    pourquoi interdire l'inscription si un numéro de tel est non valide ?
+     par defaut notre role est 2 mais si le role est à deux on ne peux pas se connecter (il faut débloquer cela, car tout le monde doit pouvoir accès à l'app mobile)
+
+- L'api n'est dispo qu'en local
+
+- les requêtes renvoie une erreur 404 si vide et non un tableau vide:
+        http://localhost:3000/person/:personId/object-profiles
+        http://localhost:3000/person/:personId/object-profiles/favoris
+
+
+APP Mobile
+
+- Mot de passe oublié pas encore opérationnel : 
+        on a bien une partie mais l'envoie de mail et reception n'a pas ete traité (à revoir).
+- Au lieu d'un loader pas très jolie pour les listes, il faut mettre un shimmer.
+
+
+Electronique:
+
+
+
+Front:
+
+
+
+Back End:
