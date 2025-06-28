@@ -3,6 +3,19 @@ import { persist } from 'zustand/middleware';
 import { CartItem, CartState, CartSummary } from '@/interfaces/cart.interface';
 import { Product, getProductPrice } from '@/interfaces/product.interface';
 
+/**
+ * Cart Store with Persistence
+ * 
+ * Cart Behavior:
+ * - Anonymous users: Cart persists across sessions (localStorage)
+ * - Logged-in users: Cart persists across sessions (localStorage)
+ * - On logout: Cart is cleared for privacy/security
+ * - On login: Cart is preserved (user might have added items while anonymous)
+ * - On register: Cart is preserved (user might have added items while anonymous)
+ * 
+ * Future enhancement: Server-side cart synchronization for logged-in users
+ */
+
 interface CartStore extends CartState {
   // Actions
   addItem: (product: Product, quantity?: number) => void;
@@ -13,6 +26,10 @@ interface CartStore extends CartState {
   openCart: () => void;
   closeCart: () => void;
   setLoading: (loading: boolean) => void;
+  
+  // User-specific cart operations
+  mergeWithServerCart: (serverItems: CartItem[]) => void;
+  syncWithUser: (userId: number) => void;
   
   // Computed values
   getSummary: () => CartSummary;
@@ -116,6 +133,39 @@ export const useCartStore = create<CartStore>()(
 
       setLoading: (loading: boolean) => {
         set({ isLoading: loading });
+      },
+
+      // User-specific cart operations
+      mergeWithServerCart: (serverItems: CartItem[]) => {
+        set((state) => {
+          const mergedItems = [...state.items];
+          
+          serverItems.forEach(serverItem => {
+            const existingItem = mergedItems.find(item => 
+              item.product.idProduct === serverItem.product.idProduct
+            );
+            
+            if (existingItem) {
+              // Merge quantities, respecting stock limits
+              const newQuantity = Math.min(
+                existingItem.quantity + serverItem.quantity,
+                serverItem.product.stockQuantity
+              );
+              existingItem.quantity = newQuantity;
+            } else {
+              // Add new item if not already in cart
+              mergedItems.push(serverItem);
+            }
+          });
+          
+          return { items: mergedItems };
+        });
+      },
+
+      syncWithUser: (userId: number) => {
+        // Future implementation: sync cart with server for logged-in users
+        // This could load user's saved cart from server and merge with local cart
+        console.log('Syncing cart with user:', userId);
       },
 
       // Computed values

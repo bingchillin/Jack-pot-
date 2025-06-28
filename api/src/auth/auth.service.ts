@@ -196,6 +196,8 @@ export class AuthService {
                 surname: user.surname,
                 idRole: user.idRole,
                 numberPhone: user.numberPhone,
+                isEmailVerified: user.isEmailVerified,
+                stripeCustomerId: user.stripeCustomerId
             },
         };
     }
@@ -453,6 +455,15 @@ export class AuthService {
         return result;
     }
 
+    async getProfile(userId: number) {
+        const person = await this.personService.findOne(userId);
+        if (!person) {
+            throw new UnauthorizedException('User not found');
+        }
 
+        // Return user without password
+        const { password: _, ...result } = person;
+        return result;
+    }
 }
 

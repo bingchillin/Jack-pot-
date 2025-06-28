@@ -6,6 +6,7 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
 import { orderService } from '@/services/order.service';
+import { useCartStore } from '@/stores/cartStore';
 import { toast } from 'react-hot-toast';
 import { 
   CheckCircle, 
@@ -27,6 +28,7 @@ export default function OrderSuccessPage() {
   const searchParams = useSearchParams();
   const locale = params.locale as string;
   const t = useTranslations('order_success');
+  const { clearCart } = useCartStore();
   
   const orderId = searchParams.get('orderId');
 
@@ -40,11 +42,17 @@ export default function OrderSuccessPage() {
 
   useEffect(() => {
     if (orderId) {
+      // Clear cart and sessionStorage on successful payment
+      clearCart();
+      sessionStorage.removeItem('checkout_order');
+      sessionStorage.removeItem('cart_order');
+      console.log('Cart cleared and sessionStorage cleaned up after successful payment');
+      
       loadOrder();
     } else {
       setLoading(false);
     }
-  }, [orderId]);
+  }, [orderId, clearCart]);
 
   const loadOrder = async () => {
     try {
@@ -57,6 +65,13 @@ export default function OrderSuccessPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function to safely format amount
+  const formatAmount = (amount: any) => {
+    if (amount === null || amount === undefined) return '0.00';
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return isNaN(numAmount) ? '0.00' : numAmount.toFixed(2);
   };
 
   if (loading) {
@@ -107,7 +122,7 @@ export default function OrderSuccessPage() {
                     <div className="space-y-2 text-sm text-gray-600">
                       <p><span className="font-medium">{t('order_number')}:</span> #{order.idOrder}</p>
                       <p><span className="font-medium">{t('order_date')}:</span> {new Date(order.createdAt).toLocaleDateString()}</p>
-                      <p><span className="font-medium">{t('total_amount')}:</span> {order.totalAmount.toFixed(2)} €</p>
+                      <p><span className="font-medium">{t('total_amount')}:</span> {formatAmount(order.totalAmount)} €</p>
                       <p><span className="font-medium">{t('status')}:</span> <span className="text-green-600 font-medium">{t('paid')}</span></p>
                     </div>
                   </div>
