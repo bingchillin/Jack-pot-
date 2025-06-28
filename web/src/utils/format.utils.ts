@@ -12,7 +12,8 @@ export const formatDate = (dateString: string, locale: string = 'en-US') => {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    timeZone: 'Europe/Paris'
   });
 };
 
@@ -42,6 +43,7 @@ export const formatDateTime = (dateString: string, locale: string = 'en-US') => 
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    timeZone: 'Europe/Paris'
   });
 }; 

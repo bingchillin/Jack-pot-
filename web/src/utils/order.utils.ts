@@ -49,24 +49,62 @@ export const getStatusDescription = (status: OrderStatus): string => {
 };
 
 export const canCancelOrder = (order: Order): boolean => {
+  console.log('=== canCancelOrder DEBUG START ===');
+  console.log('Order details:', {
+    orderId: order.idOrder,
+    status: order.status,
+    paidAt: order.paidAt,
+    createdAt: order.createdAt
+  });
+
   // Can't cancel if already cancelled or refunded
   if (order.status === OrderStatus.CANCELLED || order.status === OrderStatus.REFUNDED) {
+    console.log('❌ Cannot cancel: already cancelled or refunded');
     return false;
   }
 
   // Can't cancel if shipped or delivered
   if (order.status === OrderStatus.SHIPPED || order.status === OrderStatus.DELIVERED) {
+    console.log('❌ Cannot cancel: shipped or delivered');
     return false;
+  }
+
+  // Can cancel pending and payment processing orders
+  if (order.status === OrderStatus.PENDING || order.status === OrderStatus.PAYMENT_PROCESSING) {
+    console.log(`✅ Can cancel: ${order.status} order`);
+    return true;
   }
 
   // For paid orders, check if within 48 hours
   if (order.status === OrderStatus.PAID) {
-    const hoursSincePayment = (Date.now() - new Date(order.paidAt || order.createdAt).getTime()) / (1000 * 60 * 60);
-    return hoursSincePayment <= 48;
+    console.log('🔍 Processing PAID order...');
+    
+    try {
+      const paidAtTime = new Date(order.paidAt || order.createdAt).getTime();
+      const currentTime = Date.now();
+      const hoursSincePayment = (currentTime - paidAtTime) / (1000 * 60 * 60);
+      
+      console.log('⏰ Time calculation details:', {
+        paidAtString: order.paidAt,
+        paidAtTime,
+        currentTime,
+        hoursSincePayment,
+        hoursSincePaymentFormatted: `${hoursSincePayment.toFixed(2)} hours`,
+        canCancel: hoursSincePayment <= 48,
+        timeLimit: 48
+      });
+      
+      const result = hoursSincePayment <= 48;
+      console.log(`🎯 Final result for PAID order: ${result ? '✅ CANCEL' : '❌ NO CANCEL'}`);
+      return result;
+    } catch (error) {
+      console.error('❌ Error in time calculation:', error);
+      return false;
+    }
   }
 
-  // Can cancel pending and payment processing orders
-  return order.status === OrderStatus.PENDING || order.status === OrderStatus.PAYMENT_PROCESSING;
+  console.log(`❌ Cannot cancel: unknown status ${order.status}`);
+  return false;
 };
 
 export const getCancellationTimeLeft = (order: Order): { hours: number; minutes: number } | null => {
