@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
 import { useAuthStore } from '@/stores/authStore';
@@ -18,6 +18,8 @@ export default function ProfilePage() {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
+  const locale = params.locale as string;
   const { user, isAuthenticated, isLoading, isHydrated } = useAuthStore();
   const { checkVerification } = useVerificationCheck();
 
@@ -51,6 +53,12 @@ export default function ProfilePage() {
 
   // Check if we should show verification modal
   useEffect(() => {
+    console.log('Profile page - User verification status:', {
+      user: user ? { email: user.email, isEmailVerified: user.isEmailVerified } : null,
+      isHydrated,
+      showVerificationModal
+    });
+    
     if (user && !user.isEmailVerified && isHydrated) {
       // Check if user has already dismissed the modal
       const hasDismissedVerification = localStorage.getItem('verificationModalDismissed');
@@ -280,8 +288,7 @@ export default function ProfilePage() {
                     <button 
                       onClick={() => {
                         if (checkVerification()) {
-                          // Navigate to orders page or show orders
-                          toast.success('Orders feature coming soon!');
+                          router.push(`/${locale}/orders`);
                         }
                       }}
                       className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px]"
@@ -296,7 +303,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <Footer t={t} />
+      <Footer />
     </div>
   );
 } 

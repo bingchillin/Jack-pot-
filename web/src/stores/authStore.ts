@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AuthState, User, LoginRequest, RegisterRequest } from '@/interfaces/auth.interface';
 import { authService } from '@/services/auth.service';
+import { useCartStore } from './cartStore';
+import { toast } from 'react-hot-toast';
 
 interface AuthStore extends AuthState {
   // Additional state for hydration
@@ -62,6 +64,9 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: true,
             isLoading: false
           });
+          
+          // Cart is preserved when logging in (user might have added items while anonymous)
+          // The cart store persists automatically via localStorage
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -84,6 +89,9 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: true,
             isLoading: false
           });
+          
+          // Cart is preserved when registering (user might have added items while anonymous)
+          // The cart store persists automatically via localStorage
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -118,6 +126,22 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: () => {
+        // Clear cart when logging out for privacy/security
+        const cartStore = useCartStore.getState();
+        const cartSummary = cartStore.getSummary();
+        
+        if (cartSummary.totalItems > 0) {
+          toast.success('Cart cleared for privacy');
+        }
+        
+        cartStore.clearCart();
+        
+        // Clear sessionStorage related to orders
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('cart_order');
+          sessionStorage.removeItem('checkout_order');
+        }
+        
         authService.clearAuthData();
         set({
           user: null,

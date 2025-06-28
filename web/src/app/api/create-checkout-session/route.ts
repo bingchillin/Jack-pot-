@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripeKey = "sk_test_51RcrKKRvWLFjv3oeXjJR6w7OVXgS8BX7CAyERO1Q2UkiJ7xyBgmf480sSGgEYz5OPyTl3i2klYPkccw0ofeUswGd00IbXGIsj0"
+const stripeKey = process.env.STRIPE_SECRET_KEY;
 
 // Debug log to check if the Stripe secret key is being read
-console.log('DEBUG STRIPE_SECRET_KEY:', stripeKey);
+console.log('DEBUG STRIPE_SECRET_KEY:', stripeKey ? 'Key is set' : 'Key is missing');
 
 // Check if Stripe secret key is available
 if (!stripeKey) {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     // Create line items for Stripe checkout
     const lineItems = items ? items.map((item: any) => ({
       price_data: {
-        currency: 'usd', // You might want to make this dynamic
+        currency: 'eur', // Use EUR to match backend currency
         product_data: {
           name: item.product.name,
           description: item.product.description,
