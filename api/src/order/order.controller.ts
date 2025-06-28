@@ -28,12 +28,27 @@ export class OrderController {
     console.log('Raw body content:', request.rawBody?.toString('utf8'));
     console.log('Signature:', signature);
     
-    if (!request.rawBody) {
+    // Try both rawBody and body properties
+    const rawBody = request.rawBody || request.body;
+    
+    if (!rawBody) {
       console.error('No raw body received!');
       throw new BadRequestException('No raw body received');
     }
     
-    return this.orderService.handleWebhook(request.rawBody, signature);
+    // Ensure we have a Buffer
+    let buffer: Buffer;
+    if (Buffer.isBuffer(rawBody)) {
+      buffer = rawBody;
+    } else if (typeof rawBody === 'string') {
+      buffer = Buffer.from(rawBody, 'utf8');
+    } else if (typeof rawBody === 'object') {
+      buffer = Buffer.from(JSON.stringify(rawBody), 'utf8');
+    } else {
+      throw new BadRequestException('Invalid raw body format');
+    }
+    
+    return this.orderService.handleWebhook(buffer, signature);
   }
 
   @Post('create-payment-intent')

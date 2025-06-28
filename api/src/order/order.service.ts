@@ -151,6 +151,7 @@ export class OrderService {
         metadata: {
           orderId: savedOrder.idOrder.toString(),
           personId: createOrderDto.personId.toString(),
+          items: JSON.stringify(createOrderDto.items),
         },
       });
 
@@ -591,8 +592,14 @@ export class OrderService {
     try {
       this.logger.log('=== WEBHOOK RECEIVED ===');
       this.logger.log('Webhook signature:', signature);
+      this.logger.log('Raw body type:', typeof rawBody);
+      this.logger.log('Raw body is Buffer:', Buffer.isBuffer(rawBody));
+      this.logger.log('Raw body length:', rawBody?.length);
+      this.logger.log('Raw body content (first 200 chars):', rawBody?.toString('utf8').substring(0, 200));
       
       const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+      this.logger.log('Webhook secret from env:', webhookSecret ? `${webhookSecret.substring(0, 10)}...` : 'NOT FOUND');
+      
       if (!webhookSecret) {
         this.logger.error('STRIPE_WEBHOOK_SECRET not configured');
         throw new Error('STRIPE_WEBHOOK_SECRET not configured');
@@ -639,8 +646,9 @@ export class OrderService {
     } catch (error) {
       this.logger.error('=== WEBHOOK ERROR ===');
       this.logger.error('Webhook error:', error);
+      this.logger.error('Error message:', error.message);
       this.logger.error('Error stack:', error.stack);
-      throw new BadRequestException('Webhook signature verification failed');
+      throw new BadRequestException(`Webhook signature verification failed: ${error.message}`);
     }
   }
 
@@ -649,113 +657,51 @@ export class OrderService {
     this.logger.log(`Payment succeeded for payment intent: ${paymentIntent.id}`);
     this.logger.log(`Payment intent metadata:`, JSON.stringify(paymentIntent.metadata, null, 2));
     
-    // Check if order already exists for this payment intent
+    // Find existing order for this payment intent
     let order = await this.findByStripePaymentIntent(paymentIntent.id).catch(() => null);
     
-    if (order) {
-      this.logger.log(`Order already exists for payment intent ${paymentIntent.id}:`, order.idOrder);
+    if (!order) {
+      this.logger.error(`Order not found for payment intent ${paymentIntent.id}`);
       return;
     }
     
-    // Create the order now that payment has succeeded
-    this.logger.log(`Creating order for successful payment intent: ${paymentIntent.id}`);
+    // Check if order is already paid
+    if (order.status === OrderStatus.PAID) {
+      this.logger.log(`Order ${order.idOrder} is already marked as paid. Skipping.`);
+      return;
+    }
+    
+    this.logger.log(`Updating order ${order.idOrder} to PAID status`);
     
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      // Extract order data from payment intent metadata
-      const personId = parseInt(paymentIntent.metadata.personId);
-      const items = JSON.parse(paymentIntent.metadata.items || '[]');
-      
-      this.logger.log(`Extracted personId: ${personId}, items:`, items);
-      
-      if (!personId || !items.length) {
-        throw new Error('Missing personId or items in payment intent metadata');
-      }
-
-      // Verify person exists
-      const person = await this.personRepository.findOne({
-        where: { idPerson: personId },
-      });
-      if (!person) {
-        throw new Error(`Person with ID ${personId} not found`);
-      }
-      this.logger.log(`Person found: ${person.firstname} ${person.surname}`);
-
-      // Calculate totals and verify stock
-      let totalAmount = 0;
-      const orderItems: Partial<OrderItem>[] = [];
-
-      for (const item of items) {
-        const product = await this.productRepository.findOne({
-          where: { idProduct: item.productId, isActive: true },
-        });
-        
-        if (!product) {
-          throw new Error(`Product with ID ${item.productId} not found`);
-        }
-        
-        if (product.stockQuantity < item.quantity) {
-          throw new Error(`Insufficient stock for ${product.name}`);
-        }
-
-        const itemTotal = product.price * item.quantity;
-        totalAmount += itemTotal;
-
-        orderItems.push({
-          idProduct: item.productId,
-          quantity: item.quantity,
-          unitPrice: product.price,
-          totalPrice: itemTotal,
-        });
-        
-        this.logger.log(`Added item: ${product.name} x${item.quantity} = $${itemTotal}`);
-      }
-
-      this.logger.log(`Total amount: $${totalAmount}`);
-
-      // Create the order
-      const newOrder = this.orderRepository.create({
-        idPerson: personId,
+      // Update order status to PAID
+      await queryRunner.manager.update(Order, order.idOrder, {
         status: OrderStatus.PAID,
-        totalAmount: totalAmount,
-        currency: 'usd',
-        paymentMethod: 'stripe',
-        stripePaymentIntentId: paymentIntent.id,
         paidAt: new Date(),
-        orderItems: orderItems,
+        paymentMethod: 'stripe',
       });
 
-      const savedOrder = await queryRunner.manager.save(Order, newOrder);
-      this.logger.log(`Order created successfully: ${savedOrder.idOrder}`);
-
-      // Save order items
-      for (const item of orderItems) {
-        await queryRunner.manager.save(OrderItem, {
-          ...item,
-          idOrder: savedOrder.idOrder,
-        });
-      }
-
-      // Update product stock
-      for (const item of orderItems) {
-        await this.productRepository
+      // Convert reserved stock to sold stock
+      for (const orderItem of order.orderItems) {
+        await queryRunner.manager
           .createQueryBuilder()
           .update(Product)
           .set({ 
-            stockQuantity: () => `stock_quantity - ${item.quantity}`,
+            reservedQuantity: () => `reserved_quantity - ${orderItem.quantity}`,
           })
-          .where('id_product = :id', { id: item.idProduct })
+          .where('id_product = :id', { id: orderItem.idProduct })
           .execute();
       }
 
       await queryRunner.commitTransaction();
-      this.logger.log(`=== ORDER CREATION COMPLETED ===`);
+      this.logger.log(`=== ORDER ${order.idOrder} MARKED AS PAID ===`);
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.logger.error(`Failed to create order for payment intent ${paymentIntent.id}:`, error);
+      this.logger.error(`Failed to update order ${order.idOrder} to paid status:`, error);
       throw error;
     } finally {
       await queryRunner.release();
@@ -772,13 +718,19 @@ export class OrderService {
       return;
     }
 
+    // Check if order is already marked as failed
+    if (order.status === OrderStatus.PAYMENT_FAILED) {
+      this.logger.log(`Order ${order.idOrder} is already marked as payment failed. Skipping.`);
+      return;
+    }
+
     // Update order status to PAYMENT_FAILED
     await this.updateStatus(order.idOrder, OrderStatus.PAYMENT_FAILED);
     
     // Release reserved stock back to available
     await this.releaseReservedStock(order.idOrder);
     
-    this.logger.log(`Order ${order.idOrder} marked as payment failed`);
+    this.logger.log(`Order ${order.idOrder} marked as payment failed and stock released`);
   }
 
   private async handleCheckoutSessionCompleted(session: Stripe.Checkout.Session): Promise<void> {
@@ -877,6 +829,15 @@ export class OrderService {
 
       // Create Stripe Payment Intent
       const paymentIntent = await this.stripeService.createPaymentIntent(savedOrder, stripeCustomerId);
+
+      // Update the payment intent with order metadata
+      await this.stripeService.updatePaymentIntent(paymentIntent.id, {
+        metadata: {
+          orderId: savedOrder.idOrder.toString(),
+          personId: createOrderDto.personId.toString(),
+          items: JSON.stringify(createOrderDto.items),
+        },
+      });
 
       // Update order with payment intent ID
       await queryRunner.manager.update(Order, savedOrder.idOrder, {
