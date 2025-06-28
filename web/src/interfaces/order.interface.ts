@@ -23,6 +23,9 @@ export interface Order {
   notes: string | null;
   createdAt: string;
   updatedAt: string;
+  paidAt?: string;
+  refundedAt?: string;
+  refundAmount?: number;
   orderItems: OrderItem[];
 }
 
