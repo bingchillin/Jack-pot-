@@ -118,6 +118,7 @@ export default function CartPage() {
           personId: user.idPerson,
           returnUrl: `${window.location.origin}/${locale}/order-success?session_id={CHECKOUT_SESSION_ID}`,
           items: items,
+          locale: locale,
         }),
       });
 

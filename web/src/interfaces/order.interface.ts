@@ -45,6 +45,7 @@ export interface CreateOrderRequest {
   shippingAddress?: string;
   billingAddress?: string;
   notes?: string;
+  locale?: string;
 }
 
 export interface CreateOrderResponse {

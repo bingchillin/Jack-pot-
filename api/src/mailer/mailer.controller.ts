@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { MailerService } from './mailer.service';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 
@@ -55,6 +55,31 @@ export class MailerController {
       return {
         success: false,
         message: 'Failed to send contact form',
+        error: error.message,
+      };
+    }
+  }
+
+  @Get('test')
+  async testMailer() {
+    try {
+      // Test basic mailer configuration
+      const config = {
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        user: process.env.MAIL_USER,
+        password: process.env.MAIL_PASSWORD ? 'SET' : 'NOT SET',
+        from: process.env.MAIL_FROM,
+      };
+      
+      return {
+        message: 'Mailer configuration test',
+        config,
+        status: 'Check configuration above',
+      };
+    } catch (error) {
+      return {
+        message: 'Mailer test failed',
         error: error.message,
       };
     }
