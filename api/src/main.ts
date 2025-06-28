@@ -17,11 +17,17 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Configure raw body parsing for Stripe webhooks only
-  app.use('/stripe/webhook', raw({ type: 'application/json' }));
+  // Custom middleware for webhook raw body parsing
+  app.use((req, res, next) => {
+    if (req.path === '/orders/webhook') {
+      raw({ type: 'application/json', limit: '10mb' })(req, res, next);
+    } else {
+      next();
+    }
+  });
   
   // Use JSON parsing for all other routes
-  app.use(json());
+  app.use(json({ limit: '10mb' }));
 
   // Use cookie parser
   app.use(cookieParser());

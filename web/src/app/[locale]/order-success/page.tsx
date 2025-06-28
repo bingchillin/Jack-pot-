@@ -22,6 +22,7 @@ export default function OrderSuccessPage() {
   const [scrolled, setScrolled] = useState(false);
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const router = useRouter();
   const params = useParams();
@@ -31,6 +32,8 @@ export default function OrderSuccessPage() {
   const { clearCart } = useCartStore();
   
   const orderId = searchParams.get('orderId');
+  const paymentIntentId = searchParams.get('paymentIntentId');
+  const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,27 +44,31 @@ export default function OrderSuccessPage() {
   }, []);
 
   useEffect(() => {
-    if (orderId) {
+    if (orderId || paymentIntentId || sessionId) {
       // Clear cart and sessionStorage on successful payment
       clearCart();
       sessionStorage.removeItem('checkout_order');
       sessionStorage.removeItem('cart_order');
-      console.log('Cart cleared and sessionStorage cleaned up after successful payment');
       
       loadOrder();
     } else {
       setLoading(false);
     }
-  }, [orderId, clearCart]);
+  }, [orderId, paymentIntentId, sessionId, clearCart]);
 
   const loadOrder = async () => {
+    if (!sessionId) return;
+
     try {
       setLoading(true);
-      const orderData = await orderService.getOrder(Number(orderId));
-      setOrder(orderData);
-    } catch (err) {
-      console.error('Failed to load order:', err);
-      toast.error('Failed to load order details');
+      setError(null);
+
+      // Try to get or create the order
+      const order = await orderService.getOrderBySessionWithRetry(sessionId);
+      setOrder(order);
+    } catch (error) {
+      console.error('Failed to load order:', error);
+      setError('Failed to load order details. Please contact support.');
     } finally {
       setLoading(false);
     }
@@ -112,7 +119,21 @@ export default function OrderSuccessPage() {
             </div>
 
             {/* Order Details */}
-            {order && (
+            {error ? (
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-8 mb-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="w-8 h-8 text-red-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-red-900 mb-2">Payment Successful</h2>
+                  <p className="text-red-700 mb-4">{error}</p>
+                  <p className="text-red-600 text-sm">
+                    Your payment was successful, but we're having trouble loading your order details. 
+                    Please contact support with your session ID: {sessionId}
+                  </p>
+                </div>
+              </div>
+            ) : order ? (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('order_details')}</h2>
                 
@@ -146,7 +167,7 @@ export default function OrderSuccessPage() {
                   </div>
                 </div>
               </div>
-            )}
+            ) : null}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

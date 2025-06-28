@@ -296,6 +296,7 @@
     "products": {
       "title": "Nos Produits",
       "subtitle": "Découvrez nos solutions de jardinage intelligentes",
+      "in_your_cart": "dans votre panier",
       "search_placeholder": "Rechercher des produits...",
       "quantity_selector": "Sélecteur de Quantité",
       "loading": "Chargement des produits...",
@@ -311,6 +312,7 @@
       "add_to_cart": "Ajouter au panier",
       "in_cart": "Dans le Panier",
       "add_more": "Ajouter plus",
+      "max_reached": "Maximum atteint",
       "stock_status": {
         "in_stock": "En Stock ({quantity} disponible)",
         "out_of_stock": "Rupture de Stock"

@@ -140,6 +140,17 @@ export class StripeService implements OnModuleInit {
     }
   }
 
+  async retrieveSession(sessionId: string): Promise<Stripe.Checkout.Session> {
+    this.checkStripeInitialized();
+    
+    try {
+      return await this.stripe!.checkout.sessions.retrieve(sessionId);
+    } catch (error) {
+      this.logger.error(`Failed to retrieve session ${sessionId}:`, error);
+      throw error;
+    }
+  }
+
   async createRefund(paymentIntentId: string, amount?: number): Promise<Stripe.Refund> {
     this.checkStripeInitialized();
     

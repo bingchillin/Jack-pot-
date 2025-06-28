@@ -21,7 +21,7 @@ class OrderService {
   }
 
   async createOrder(orderData: CreateOrderRequest): Promise<CreateOrderResponse> {
-    const response = await fetch(`${API_BASE_URL}/orders`, {
+    const response = await fetch(`${API_BASE_URL}/orders/create-payment-intent`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(orderData),
@@ -67,6 +67,43 @@ class OrderService {
     return this.handleResponse<Order>(response);
   }
 
+  async getOrderByPaymentIntent(paymentIntentId: string): Promise<Order> {
+    const response = await fetch(`${API_BASE_URL}/orders/by-payment-intent/${paymentIntentId}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    
+    return this.handleResponse<Order>(response);
+  }
+
+  async getOrderBySession(sessionId: string): Promise<Order> {
+    const response = await fetch(`${API_BASE_URL}/orders/by-session/${sessionId}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    
+    return this.handleResponse<Order>(response);
+  }
+
+  async getOrderBySessionWithRetry(sessionId: string): Promise<any> {
+    try {
+      const order = await this.getOrderBySession(sessionId);
+      return order;
+    } catch (error) {
+      // Order not found, create it from session data
+      return this.createOrderFromSession(sessionId);
+    }
+  }
+
+  async createOrderFromSession(sessionId: string): Promise<Order> {
+    const response = await fetch(`${API_BASE_URL}/orders/create-from-session/${sessionId}`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+    });
+    
+    return this.handleResponse<Order>(response);
+  }
+
   async cancelOrder(orderId: number): Promise<Order> {
     const response = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
       method: 'PATCH',
@@ -74,6 +111,16 @@ class OrderService {
     });
     
     return this.handleResponse<Order>(response);
+  }
+
+  async createPaymentIntent(orderData: CreateOrderRequest): Promise<{ clientSecret: string; paymentIntentId: string; totalAmount: number }> {
+    const response = await fetch(`${API_BASE_URL}/orders/create-payment-intent`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(orderData),
+    });
+    
+    return this.handleResponse<{ clientSecret: string; paymentIntentId: string; totalAmount: number }>(response);
   }
 }
 
