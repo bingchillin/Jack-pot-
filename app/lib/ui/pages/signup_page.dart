@@ -102,10 +102,11 @@ class _SignupPageState extends State<SignupPage> {
                 validator: (v) => v == null || v.isEmpty ? "Requis" : null,
               ),
               const SizedBox(height: 12),
-              const Text("Nom"),
+              const Text("Nom *"),
               TextFormField(
                 controller: _surnameController,
                 decoration: const InputDecoration(hintText: "Nom"),
+                validator: (v) => v == null || v.isEmpty ? "Requis" : null,
               ),
               const SizedBox(height: 12),
               const Text("Téléphone"),
