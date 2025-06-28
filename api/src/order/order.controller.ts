@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -35,8 +35,14 @@ export class OrderController {
   @Get('my-orders')
   @ApiOperation({ summary: 'Get current user orders' })
   @ApiResponse({ status: 200, description: 'List of user orders', type: [Order] })
-  findMyOrders(@Request() req): Promise<Order[]> {
-    return this.orderService.findByPerson(req.user.idPerson);
+  findMyOrders(
+    @Request() req,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10'
+  ) {
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    return this.orderService.findByPerson(req.user.idPerson, pageNum, limitNum);
   }
 
   @Get(':id')

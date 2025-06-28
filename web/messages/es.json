@@ -77,12 +77,12 @@
       "pending_verification": "Verificación pendiente",
       "administrator": "Administrador",
       "customer": "Cliente",
-      "email_verification_notice": "Por favor revisa tu correo electrónico para verificar tu cuenta",
+      "email_verification_notice": "Verifica tu email para confirmar tu cuenta",
       "edit_information": "Editar información",
       "verification_modal": {
-        "title": "Verificación de correo electrónico requerida",
-        "message": "¡Tu cuenta ha sido creada exitosamente! Para acceder a todas las funciones y completar tu registro, por favor verifica tu dirección de correo electrónico.",
-        "check_email": "Por favor revisa tu correo electrónico:",
+        "title": "Verificación de email requerida",
+        "message": "¡Tu cuenta ha sido creada exitosamente! Para acceder a todas las funciones y completar tu registro, por favor verifica tu dirección de email.",
+        "check_email": "Por favor verifica tu email:",
         "got_it": "¡Entendido!",
         "close": "Cerrar"
       },
@@ -91,14 +91,14 @@
         "subtitle": "Actualiza tu información personal",
         "first_name": "Nombre",
         "last_name": "Apellido",
-        "email_address": "Dirección de correo electrónico (No modificable)",
+        "email_address": "Dirección de email (No se puede cambiar)",
         "phone": "Número de teléfono",
         "phone_placeholder": "1234567890",
         "phone_help_text": "El número de teléfono debe tener entre 9 y 15 dígitos",
         "current_password": "Contraseña actual",
         "current_password_placeholder": "Ingresa tu contraseña actual",
         "new_password": "Nueva contraseña (Opcional)",
-        "new_password_placeholder": "Ingresa nueva contraseña",
+        "new_password_placeholder": "Ingresa la nueva contraseña",
         "confirm_new_password": "Confirmar nueva contraseña",
         "confirm_new_password_placeholder": "Confirma la nueva contraseña",
         "save_changes": "Guardar",
@@ -107,13 +107,13 @@
         "success": "¡Perfil actualizado exitosamente!",
         "password_changed": "¡Perfil y contraseña actualizados exitosamente!",
         "error": {
-          "fill_required_fields": "Por favor completa todos los campos obligatorios",
+          "fill_required_fields": "Por favor completa todos los campos requeridos",
           "current_password_required": "La contraseña actual es requerida para actualizar el perfil",
           "current_password_incorrect": "La contraseña actual es incorrecta",
           "phone_invalid": "El número de teléfono debe tener entre 9 y 15 dígitos",
           "new_passwords_no_match": "Las nuevas contraseñas no coinciden",
           "new_password_min_length": "La nueva contraseña debe tener al menos 6 caracteres",
-          "update_failed": "Error al actualizar el perfil. Por favor inténtalo de nuevo."
+          "update_failed": "Error al actualizar el perfil. Por favor intenta de nuevo."
         }
       },
       "quick_actions": "Acciones rápidas",
@@ -122,7 +122,7 @@
       "plant_care_guide": "Guía de cuidado de plantas",
       "settings": "Configuración",
       "recent_activity": "Actividad reciente",
-      "no_recent_activity": "No hay actividad reciente que mostrar",
+      "no_recent_activity": "No hay actividad reciente para mostrar",
       "no_activity_description": "Comienza a explorar productos para ver tu actividad aquí"
     },
     "common": {
@@ -441,6 +441,47 @@
       "title": "¿Necesita ayuda?",
       "description": "Si tiene preguntas sobre su pedido, nuestro equipo de soporte está aquí para ayudar.",
       "contact_us": "Contactar soporte"
+    }
+  },
+  "orders": {
+    "title": "Mis pedidos",
+    "subtitle": "Sigue el historial y estado de tus pedidos",
+    "back_to_profile": "Volver al perfil",
+    "refresh": "Actualizar",
+    "refreshing": "Actualizando...",
+    "loading": "Cargando tus pedidos...",
+    "error_loading": "Error al cargar los pedidos",
+    "try_again": "Intentar de nuevo",
+    "no_orders": "Aún no hay pedidos",
+    "no_orders_description": "Aún no has realizado ningún pedido. Comienza a comprar para ver tu historial de pedidos aquí.",
+    "start_shopping": "Comenzar a comprar",
+    "order_number": "Pedido #{id}",
+    "items_count": "{count} artículo",
+    "items_count_plural": "{count} artículos",
+    "view_details": "Ver detalles",
+    "cancel_order": "Cancelar pedido",
+    "cancel_order_confirm": "¿Estás seguro de que quieres cancelar este pedido?",
+    "cancel_order_description": "Esta acción no se puede deshacer e iniciará un proceso de reembolso.",
+    "cancel": "Cancelar",
+    "confirm_cancel": "Sí, cancelar pedido",
+    "order_cancelled": "Pedido cancelado exitosamente",
+    "order_cancel_failed": "Error al cancelar el pedido",
+    "cancelling": "Cancelando...",
+    "status": {
+      "pending": "Pendiente",
+      "payment_processing": "Procesando pago",
+      "paid": "Pagado",
+      "payment_failed": "Pago fallido",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado",
+      "refunded": "Reembolsado"
+    },
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Página {current} de {total}",
+      "showing": "Mostrando {from}-{to} de {total} pedidos"
     }
   }
 } 

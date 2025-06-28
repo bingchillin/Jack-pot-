@@ -49,13 +49,13 @@ class OrderService {
     return this.handleResponse<PaymentStatusResponse>(response);
   }
 
-  async getMyOrders(): Promise<Order[]> {
-    const response = await fetch(`${API_BASE_URL}/orders/my-orders`, {
+  async getMyOrders(page: number = 1, limit: number = 10): Promise<{ orders: Order[]; total: number; page: number; limit: number }> {
+    const response = await fetch(`${API_BASE_URL}/orders/my-orders?page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: this.getHeaders(),
     });
     
-    return this.handleResponse<Order[]>(response);
+    return this.handleResponse<{ orders: Order[]; total: number; page: number; limit: number }>(response);
   }
 
   async getOrder(orderId: number): Promise<Order> {
