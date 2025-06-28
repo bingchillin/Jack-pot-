@@ -100,6 +100,9 @@ export class Order {
   @Column({ name: 'stripe_payment_method_id', length: 255, nullable: true })
   stripePaymentMethodId?: string;
 
+  @Column({ name: 'locale', length: 5, default: 'en' })
+  locale: string;
+
   @OneToMany(() => OrderItem, orderItem => orderItem.order, { cascade: true })
   orderItems: OrderItem[];
 } 

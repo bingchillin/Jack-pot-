@@ -296,7 +296,7 @@ export class AuthService {
             });
 
             // Send the reset email
-            await this.mailerService.sendPasswordResetEmail(person.email, resetCode);
+            await this.mailerService.sendResetPasswordEmail(person.email, resetCode);
             
             return { message: 'Si cet email existe, un code vous a été envoyé.' };
         } catch (error) {

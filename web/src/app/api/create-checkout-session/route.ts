@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('Request body:', body);
 
-    const { returnUrl, items, personId } = body;
+    const { returnUrl, items, personId, locale } = body;
 
     if (!returnUrl || !items || !personId) {
       console.error('Missing required parameters:', { returnUrl, items, personId });
@@ -42,7 +42,8 @@ export async function POST(request: NextRequest) {
     console.log('Creating checkout session with:', {
       returnUrl,
       items,
-      personId
+      personId,
+      locale: locale || 'en'
     });
 
     // Create line items for Stripe checkout
@@ -69,6 +70,7 @@ export async function POST(request: NextRequest) {
       cancel_url: returnUrl.replace('order-success', 'cart'),
       metadata: {
         personId: personId.toString(),
+        locale: locale || 'en',
         items: JSON.stringify(items.map((item: any) => ({
           productId: item.product.idProduct,
           quantity: item.quantity,
@@ -79,6 +81,7 @@ export async function POST(request: NextRequest) {
         capture_method: 'automatic',
         metadata: {
           personId: personId.toString(),
+          locale: locale || 'en',
           items: JSON.stringify(items.map((item: any) => ({
             productId: item.product.idProduct,
             quantity: item.quantity,

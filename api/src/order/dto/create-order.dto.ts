@@ -89,6 +89,11 @@ export class CreateOrderDto {
   @IsString()
   notes?: string;
 
+  @ApiPropertyOptional({ description: 'Locale for emails and communications (e.g., en, fr, es)', default: 'en' })
+  @IsOptional()
+  @IsString()
+  locale?: string;
+
   @ApiProperty({ description: 'Order items', type: [OrderItemDto] })
   @IsArray()
   @ValidateNested({ each: true })

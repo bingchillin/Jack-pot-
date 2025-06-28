@@ -19,6 +19,7 @@ import {
   PaymentIntentNotFoundError 
 } from './exceptions/payment.exceptions';
 import Stripe from 'stripe';
+import { MailerService } from '../mailer/mailer.service';
 
 @Injectable()
 export class OrderService {
@@ -38,6 +39,8 @@ export class OrderService {
     private readonly personService: PersonService,
     @Inject(forwardRef(() => StripeService))
     private readonly stripeService: StripeService,
+    @Inject(forwardRef(() => MailerService))
+    private readonly mailerService: MailerService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<CreateOrderResponseDto> {
@@ -142,6 +145,7 @@ export class OrderService {
         notes: createOrderDto.notes,
         status: OrderStatus.PAYMENT_PROCESSING,
         stripePaymentIntentId: paymentIntent.id,
+        locale: createOrderDto.locale || 'en',
       });
 
       const savedOrder = await queryRunner.manager.save(Order, order);
@@ -347,6 +351,7 @@ export class OrderService {
           stripePaymentIntentId: session.payment_intent as string,
           paidAt: new Date(),
           paymentMethod: 'card', // Default payment method
+          locale: session.metadata?.locale || 'en', // Use locale from session metadata
         });
 
         const savedOrder = await queryRunner.manager.save(Order, newOrder);
@@ -618,7 +623,8 @@ export class OrderService {
       switch (event.type) {
         case 'payment_intent.succeeded':
           this.logger.log('Processing payment_intent.succeeded event');
-          await this.handlePaymentSucceeded(event.data.object as Stripe.PaymentIntent);
+          // Skip this event - we handle payment success through checkout.session.completed
+          this.logger.log('Skipping payment_intent.succeeded - handled by checkout.session.completed');
           break;
         case 'payment_intent.payment_failed':
           this.logger.log('Processing payment_intent.payment_failed event');
@@ -626,11 +632,11 @@ export class OrderService {
           break;
         case 'charge.succeeded':
           this.logger.log('Processing charge.succeeded event');
-          // Charge succeeded is handled by payment_intent.succeeded, so we can ignore it
+          // Charge succeeded is handled by checkout.session.completed, so we can ignore it
           break;
         case 'checkout.session.completed':
           this.logger.log('Processing checkout.session.completed event');
-          // Checkout session completed - we can use this to create orders too
+          // Checkout session completed - create order and send email if payment succeeded
           await this.handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
           break;
         case 'payment_intent.created':
@@ -649,62 +655,6 @@ export class OrderService {
       this.logger.error('Error message:', error.message);
       this.logger.error('Error stack:', error.stack);
       throw new BadRequestException(`Webhook signature verification failed: ${error.message}`);
-    }
-  }
-
-  private async handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent): Promise<void> {
-    this.logger.log(`=== PAYMENT SUCCEEDED ===`);
-    this.logger.log(`Payment succeeded for payment intent: ${paymentIntent.id}`);
-    this.logger.log(`Payment intent metadata:`, JSON.stringify(paymentIntent.metadata, null, 2));
-    
-    // Find existing order for this payment intent
-    let order = await this.findByStripePaymentIntent(paymentIntent.id).catch(() => null);
-    
-    if (!order) {
-      this.logger.error(`Order not found for payment intent ${paymentIntent.id}`);
-      return;
-    }
-    
-    // Check if order is already paid
-    if (order.status === OrderStatus.PAID) {
-      this.logger.log(`Order ${order.idOrder} is already marked as paid. Skipping.`);
-      return;
-    }
-    
-    this.logger.log(`Updating order ${order.idOrder} to PAID status`);
-    
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      // Update order status to PAID
-      await queryRunner.manager.update(Order, order.idOrder, {
-        status: OrderStatus.PAID,
-        paidAt: new Date(),
-        paymentMethod: 'stripe',
-      });
-
-      // Convert reserved stock to sold stock
-      for (const orderItem of order.orderItems) {
-        await queryRunner.manager
-          .createQueryBuilder()
-          .update(Product)
-          .set({ 
-            reservedQuantity: () => `reserved_quantity - ${orderItem.quantity}`,
-          })
-          .where('id_product = :id', { id: orderItem.idProduct })
-          .execute();
-      }
-
-      await queryRunner.commitTransaction();
-      this.logger.log(`=== ORDER ${order.idOrder} MARKED AS PAID ===`);
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      this.logger.error(`Failed to update order ${order.idOrder} to paid status:`, error);
-      throw error;
-    } finally {
-      await queryRunner.release();
     }
   }
 
@@ -738,14 +688,94 @@ export class OrderService {
     this.logger.log(`Checkout session completed: ${session.id}`);
     this.logger.log(`Session metadata:`, JSON.stringify(session.metadata, null, 2));
     
-    if (session.payment_intent && typeof session.payment_intent === 'string') {
-      // Retrieve the payment intent to get full details
-      const paymentIntent = await this.stripeService.retrievePaymentIntent(session.payment_intent);
-      await this.handlePaymentSucceeded(paymentIntent);
-    } else if (session.payment_intent && typeof session.payment_intent === 'object') {
-      await this.handlePaymentSucceeded(session.payment_intent as Stripe.PaymentIntent);
+    // Check if order already exists for this session
+    let order = await this.findBySession(session.id).catch(() => null);
+    
+    if (!order) {
+      this.logger.log(`Creating order from session ${session.id}`);
+      order = await this.createFromSession(session.id);
+    }
+    
+    // Load order with items for email
+    const orderWithItems = await this.orderRepository.findOne({
+      where: { idOrder: order.idOrder },
+      relations: ['orderItems', 'orderItems.product'],
+    });
+    
+    if (!orderWithItems) {
+      this.logger.error(`Order ${order.idOrder} not found after creation`);
+      return;
+    }
+    
+    // Check if payment was successful
+    if (session.payment_status === 'paid') {
+      if (orderWithItems.status !== OrderStatus.PAID) {
+        this.logger.log(`Payment successful for session ${session.id}, updating order ${orderWithItems.idOrder} to PAID`);
+        
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+          // Update order status to PAID
+          await queryRunner.manager.update(Order, orderWithItems.idOrder, {
+            status: OrderStatus.PAID,
+            paidAt: new Date(),
+            paymentMethod: 'stripe',
+          });
+
+          // Load order items for stock reduction
+          const orderItems = await queryRunner.manager.find(OrderItem, {
+            where: { idOrder: orderWithItems.idOrder },
+          });
+
+          this.logger.log(`Found ${orderItems.length} order items for stock reduction`);
+
+          // Convert reserved stock to sold stock
+          for (const orderItem of orderItems) {
+            this.logger.log(`Reducing reserved stock for product ${orderItem.idProduct} by ${orderItem.quantity}`);
+            await queryRunner.manager
+              .createQueryBuilder()
+              .update(Product)
+              .set({ 
+                reservedQuantity: () => `reserved_quantity - ${orderItem.quantity}`,
+              })
+              .where('id_product = :id', { id: orderItem.idProduct })
+              .execute();
+          }
+
+          await queryRunner.commitTransaction();
+          this.logger.log(`=== ORDER ${orderWithItems.idOrder} MARKED AS PAID ===`);
+        } catch (error) {
+          await queryRunner.rollbackTransaction();
+          this.logger.error(`Failed to update order ${orderWithItems.idOrder} to paid status:`, error);
+          throw error;
+        } finally {
+          await queryRunner.release();
+        }
+      } else {
+        this.logger.log(`Order ${orderWithItems.idOrder} is already marked as PAID`);
+      }
+
+      // Send order confirmation email (regardless of whether we just updated the status)
+      try {
+        const person = await this.personRepository.findOne({
+          where: { idPerson: orderWithItems.idPerson },
+        });
+        
+        if (person) {
+          this.logger.log(`Sending order confirmation email to ${person.email}`);
+          await this.mailerService.sendOrderConfirmationEmail(orderWithItems, person, orderWithItems.locale || 'en');
+          this.logger.log(`Order confirmation email sent for order ${orderWithItems.idOrder}`);
+        } else {
+          this.logger.error(`Person not found for order ${orderWithItems.idOrder}`);
+        }
+      } catch (emailError) {
+        this.logger.error(`Failed to send order confirmation email for order ${orderWithItems.idOrder}:`, emailError);
+        // Don't throw error - email failure shouldn't fail the order
+      }
     } else {
-      this.logger.warn(`No payment intent found in checkout session ${session.id}`);
+      this.logger.log(`Payment status: ${session.payment_status}, order status: ${orderWithItems.status}`);
     }
   }
 
@@ -823,6 +853,7 @@ export class OrderService {
         billingAddress: createOrderDto.billingAddress,
         notes: createOrderDto.notes,
         status: OrderStatus.PENDING,
+        locale: createOrderDto.locale || 'en',
       });
 
       const savedOrder = await queryRunner.manager.save(Order, order);
@@ -878,4 +909,4 @@ export class OrderService {
       await queryRunner.release();
     }
   }
-} 
+}
