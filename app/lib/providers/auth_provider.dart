@@ -115,18 +115,26 @@ class AuthProvider extends ChangeNotifier {
   }) async {
     final url = Uri.parse(AppConfig.signupEndpoint);
 
+    final payload = {
+      'email': email,
+      'password': password,
+      'firstname': firstname,
+    };
+
+    if (surname != null && surname.isNotEmpty) {
+      payload['surname'] = surname;
+    }
+
+    if (numberPhone != null && numberPhone.isNotEmpty) {
+      payload['numberPhone'] = numberPhone;
+    }
+
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-        'firstname': firstname,
-        'surname': surname ?? '',
-        'numberPhone': numberPhone ?? "+33600000000",
-        'verificationCode': "0000000",
-      }),
+      body: jsonEncode(payload),
     );
+
 
     print("Signup status: ${response.statusCode}");
     print("Response: ${response.body}");
@@ -138,6 +146,9 @@ class AuthProvider extends ChangeNotifier {
       _userId = data['user']['idPerson'].toString();
       _firstName = data['user']['firstname'];
 
+      _accessToken = data['access_token'];
+      _userData = data['user'];
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('userId', _userId!);
       await prefs.setString('firstName', _firstName!);
@@ -145,8 +156,8 @@ class AuthProvider extends ChangeNotifier {
       await prefs.setString('refresh_token', data['refresh_token']);
       await prefs.setString('userData', jsonEncode(_userData)); //
 
-      notifyListeners();
       _isLoadingUser = false;
+      notifyListeners();
       return true;
     } else {
       return false;
