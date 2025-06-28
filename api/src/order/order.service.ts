@@ -218,12 +218,23 @@ export class OrderService {
     return order;
   }
 
-  async findByPerson(personId: number): Promise<Order[]> {
-    return await this.orderRepository.find({
+  async findByPerson(personId: number, page: number = 1, limit: number = 10): Promise<{ orders: Order[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    
+    const [orders, total] = await this.orderRepository.findAndCount({
       where: { idPerson: personId },
       relations: ['orderItems', 'orderItems.product'],
       order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+
+    return {
+      orders,
+      total,
+      page,
+      limit,
+    };
   }
 
   async findByStripePaymentIntent(stripePaymentIntentId: string): Promise<Order> {

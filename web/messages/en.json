@@ -442,5 +442,46 @@
       "description": "If you have any questions about your order, our support team is here to help.",
       "contact_us": "Contact Support"
     }
+  },
+  "orders": {
+    "title": "My Orders",
+    "subtitle": "Track your order history and status",
+    "back_to_profile": "Back to Profile",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "loading": "Loading your orders...",
+    "error_loading": "Error Loading Orders",
+    "try_again": "Try Again",
+    "no_orders": "No Orders Yet",
+    "no_orders_description": "You haven't placed any orders yet. Start shopping to see your order history here.",
+    "start_shopping": "Start Shopping",
+    "order_number": "Order #{id}",
+    "items_count": "{count} item",
+    "items_count_plural": "{count} items",
+    "view_details": "View Details",
+    "cancel_order": "Cancel Order",
+    "cancel_order_confirm": "Are you sure you want to cancel this order?",
+    "cancel_order_description": "This action cannot be undone and will initiate a refund process.",
+    "cancel": "Cancel",
+    "confirm_cancel": "Yes, Cancel Order",
+    "order_cancelled": "Order cancelled successfully",
+    "order_cancel_failed": "Failed to cancel order",
+    "cancelling": "Cancelling...",
+    "status": {
+      "pending": "Pending",
+      "payment_processing": "Payment Processing",
+      "paid": "Paid",
+      "payment_failed": "Payment Failed",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {current} of {total}",
+      "showing": "Showing {from}-{to} of {total} orders"
+    }
   }
 } 

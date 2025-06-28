@@ -10,20 +10,21 @@ import { orderService } from '@/services/order.service';
 import { Order, OrderStatus } from '@/interfaces/order.interface';
 import { toast } from 'react-hot-toast';
 import { 
-  Package, 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
-  AlertCircle,
-  ArrowLeft,
-  Loader2,
   MapPin,
   Phone,
   Mail,
-  Truck,
-  CreditCard
+  CreditCard,
+  Loader2,
+  ArrowLeft
 } from 'lucide-react';
 import Link from 'next/link';
+import { 
+  getStatusIcon, 
+  getStatusColor, 
+  getStatusDescription 
+} from '@/utils/order.utils';
+import { formatDate, formatAmountWithoutCurrency } from '@/utils/format.utils';
+import { LoadingSpinner, ErrorState, EmptyState } from '@/utils/ui.utils';
 
 export default function OrderDetailsPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -91,77 +92,9 @@ export default function OrderDetailsPage() {
     }
   };
 
-  const getStatusIcon = (status: OrderStatus) => {
-    switch (status) {
-      case OrderStatus.DELIVERED:
-        return <CheckCircle className="w-6 h-6 text-green-600" />;
-      case OrderStatus.SHIPPED:
-        return <Truck className="w-6 h-6 text-blue-600" />;
-      case OrderStatus.PROCESSING:
-        return <Clock className="w-6 h-6 text-yellow-600" />;
-      case OrderStatus.CANCELLED:
-        return <XCircle className="w-6 h-6 text-red-600" />;
-      default:
-        return <AlertCircle className="w-6 h-6 text-gray-600" />;
-    }
-  };
-
-  const getStatusColor = (status: OrderStatus) => {
-    switch (status) {
-      case OrderStatus.DELIVERED:
-        return 'bg-green-100 text-green-800 border-green-200';
-      case OrderStatus.SHIPPED:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case OrderStatus.PROCESSING:
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case OrderStatus.CANCELLED:
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getStatusDescription = (status: OrderStatus) => {
-    switch (status) {
-      case OrderStatus.DELIVERED:
-        return 'Your order has been delivered successfully!';
-      case OrderStatus.SHIPPED:
-        return 'Your order is on its way to you.';
-      case OrderStatus.PROCESSING:
-        return 'We are preparing your order for shipment.';
-      case OrderStatus.CANCELLED:
-        return 'This order has been cancelled.';
-      default:
-        return 'Order status unknown.';
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatAmount = (amount: any) => {
-    if (amount === null || amount === undefined) return '0.00';
-    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    return isNaN(numAmount) ? '0.00' : numAmount.toFixed(2);
-  };
-
   // Show loading while hydrating or loading auth state
   if (!isHydrated || isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center">
-        <div className="flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-green-600/30 border-t-green-600 rounded-full animate-spin mr-3"></div>
-          <span className="text-slate-600">Loading...</span>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading..." />;
   }
 
   // Don't render anything if not authenticated (will redirect)
@@ -174,7 +107,7 @@ export default function OrderDetailsPage() {
       <Navigation scrolled={scrolled} />
       
       <div className="pt-32 pb-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
             <Link
@@ -196,33 +129,19 @@ export default function OrderDetailsPage() {
               </div>
             </div>
           ) : error ? (
-            <div className="text-center py-20">
-              <div className="bg-red-50 border border-red-200 rounded-2xl p-8 max-w-md mx-auto">
-                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Order</h2>
-                <p className="text-gray-600 mb-6">{error}</p>
-                <button
-                  onClick={loadOrder}
-                  className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Try Again
-                </button>
-              </div>
-            </div>
+            <ErrorState
+              title="Error Loading Order"
+              message={error}
+              onRetry={loadOrder}
+              retryText="Try Again"
+            />
           ) : !order ? (
-            <div className="text-center py-20">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 max-w-md mx-auto">
-                <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Order Not Found</h2>
-                <p className="text-gray-600 mb-6">The order you're looking for doesn't exist or you don't have permission to view it.</p>
-                <Link
-                  href={`/${locale}/orders`}
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Back to Orders
-                </Link>
-              </div>
-            </div>
+            <EmptyState
+              title="Order Not Found"
+              description="The order you're looking for doesn't exist or you don't have permission to view it."
+              actionText="Back to Orders"
+              actionHref={`/${locale}/orders`}
+            />
           ) : (
             <div className="space-y-6">
               {/* Order Status */}
@@ -230,7 +149,7 @@ export default function OrderDetailsPage() {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-gray-900">Order Status</h2>
                   <div className="flex items-center space-x-3">
-                    {getStatusIcon(order.status)}
+                    {getStatusIcon(order.status, 'lg')}
                     <span className={`px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(order.status)}`}>
                       {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                     </span>
@@ -238,7 +157,7 @@ export default function OrderDetailsPage() {
                 </div>
                 <p className="text-gray-600">{getStatusDescription(order.status)}</p>
                 
-                {order.status === OrderStatus.PROCESSING && (
+                {order.status === OrderStatus.PAYMENT_PROCESSING && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <button
                       onClick={cancelOrder}
@@ -270,7 +189,7 @@ export default function OrderDetailsPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Order Date:</span>
-                      <span className="font-medium">{formatDate(order.createdAt)}</span>
+                      <span className="font-medium">{formatDate(order.createdAt, locale)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Payment Method:</span>
@@ -282,7 +201,7 @@ export default function OrderDetailsPage() {
                     {order.updatedAt && order.updatedAt !== order.createdAt && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Last Updated:</span>
-                        <span className="font-medium">{formatDate(order.updatedAt)}</span>
+                        <span className="font-medium">{formatDate(order.updatedAt, locale)}</span>
                       </div>
                     )}
                   </div>
@@ -335,11 +254,11 @@ export default function OrderDetailsPage() {
                       <div className="flex-1 min-w-0">
                         <h4 className="text-lg font-medium text-gray-900">{item.product.name}</h4>
                         <p className="text-gray-600">Quantity: {item.quantity}</p>
-                        <p className="text-gray-600">Unit Price: {formatAmount(item.unitPrice)} €</p>
+                        <p className="text-gray-600">Unit Price: {formatAmountWithoutCurrency(item.unitPrice)} €</p>
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-semibold text-gray-900">
-                          {formatAmount(item.totalPrice)} €
+                          {formatAmountWithoutCurrency(item.totalPrice)} €
                         </p>
                       </div>
                     </div>
@@ -351,7 +270,7 @@ export default function OrderDetailsPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold text-gray-900">Total</span>
                     <span className="text-2xl font-bold text-gray-900">
-                      {formatAmount(order.totalAmount)} €
+                      {formatAmountWithoutCurrency(order.totalAmount)} €
                     </span>
                   </div>
                 </div>

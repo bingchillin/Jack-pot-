@@ -77,12 +77,12 @@
       "pending_verification": "Vérification en attente",
       "administrator": "Administrateur",
       "customer": "Client",
-      "email_verification_notice": "Veuillez vérifier votre e-mail pour vérifier votre compte",
+      "email_verification_notice": "Vérifiez votre email pour confirmer votre compte",
       "edit_information": "Modifier les informations",
       "verification_modal": {
-        "title": "Vérification d'e-mail requise",
-        "message": "Votre compte a été créé avec succès ! Pour accéder à toutes les fonctionnalités et finaliser votre inscription, veuillez vérifier votre adresse e-mail.",
-        "check_email": "Veuillez vérifier votre e-mail :",
+        "title": "Vérification d'email requise",
+        "message": "Votre compte a été créé avec succès ! Pour accéder à toutes les fonctionnalités et compléter votre inscription, veuillez vérifier votre adresse email.",
+        "check_email": "Veuillez vérifier votre email :",
         "got_it": "Compris !",
         "close": "Fermer"
       },
@@ -90,8 +90,8 @@
         "title": "Modifier le profil",
         "subtitle": "Mettre à jour vos informations personnelles",
         "first_name": "Prénom",
-        "last_name": "Nom de famille",
-        "email_address": "Adresse e-mail (Non modifiable)",
+        "last_name": "Nom",
+        "email_address": "Adresse email (Ne peut pas être modifiée)",
         "phone": "Numéro de téléphone",
         "phone_placeholder": "1234567890",
         "phone_help_text": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
@@ -107,7 +107,7 @@
         "success": "Profil mis à jour avec succès !",
         "password_changed": "Profil et mot de passe mis à jour avec succès !",
         "error": {
-          "fill_required_fields": "Veuillez remplir tous les champs obligatoires",
+          "fill_required_fields": "Veuillez remplir tous les champs requis",
           "current_password_required": "Le mot de passe actuel est requis pour mettre à jour le profil",
           "current_password_incorrect": "Le mot de passe actuel est incorrect",
           "phone_invalid": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
@@ -119,7 +119,7 @@
       "quick_actions": "Actions rapides",
       "browse_products": "Parcourir les produits",
       "my_orders": "Mes commandes",
-      "plant_care_guide": "Guide de soin des plantes",
+      "plant_care_guide": "Guide d'entretien des plantes",
       "settings": "Paramètres",
       "recent_activity": "Activité récente",
       "no_recent_activity": "Aucune activité récente à afficher",
@@ -441,6 +441,47 @@
       "title": "Besoin d'aide ?",
       "description": "Si vous avez des questions sur votre commande, notre équipe de support est là pour vous aider.",
       "contact_us": "Contacter le support"
+    }
+  },
+  "orders": {
+    "title": "Mes commandes",
+    "subtitle": "Suivez l'historique et le statut de vos commandes",
+    "back_to_profile": "Retour au profil",
+    "refresh": "Actualiser",
+    "refreshing": "Actualisation...",
+    "loading": "Chargement de vos commandes...",
+    "error_loading": "Erreur lors du chargement des commandes",
+    "try_again": "Réessayer",
+    "no_orders": "Aucune commande pour le moment",
+    "no_orders_description": "Vous n'avez pas encore passé de commande. Commencez à faire des achats pour voir votre historique de commandes ici.",
+    "start_shopping": "Commencer les achats",
+    "order_number": "Commande #{id}",
+    "items_count": "{count} article",
+    "items_count_plural": "{count} articles",
+    "view_details": "Voir les détails",
+    "cancel_order": "Annuler la commande",
+    "cancel_order_confirm": "Êtes-vous sûr de vouloir annuler cette commande ?",
+    "cancel_order_description": "Cette action ne peut pas être annulée et initiera un processus de remboursement.",
+    "cancel": "Annuler",
+    "confirm_cancel": "Oui, annuler la commande",
+    "order_cancelled": "Commande annulée avec succès",
+    "order_cancel_failed": "Échec de l'annulation de la commande",
+    "cancelling": "Annulation...",
+    "status": {
+      "pending": "En attente",
+      "payment_processing": "Paiement en cours",
+      "paid": "Payée",
+      "payment_failed": "Paiement échoué",
+      "shipped": "Expédiée",
+      "delivered": "Livrée",
+      "cancelled": "Annulée",
+      "refunded": "Remboursée"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "page": "Page {current} sur {total}",
+      "showing": "Affichage de {from}-{to} sur {total} commandes"
     }
   }
 } 

@@ -28,8 +28,9 @@ export interface Order {
 
 export enum OrderStatus {
   PENDING = 'pending',
-  CONFIRMED = 'confirmed',
-  PROCESSING = 'processing',
+  PAYMENT_PROCESSING = 'payment_processing',
+  PAID = 'paid',
+  PAYMENT_FAILED = 'payment_failed',
   SHIPPED = 'shipped',
   DELIVERED = 'delivered',
   CANCELLED = 'cancelled',
