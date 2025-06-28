@@ -13,9 +13,10 @@ import {
   MapPin,
   Phone,
   Mail,
-  CreditCard,
   Loader2,
-  ArrowLeft
+  ArrowLeft,
+  Download,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
@@ -25,6 +26,7 @@ import {
 } from '@/utils/order.utils';
 import { formatDate, formatAmountWithoutCurrency } from '@/utils/format.utils';
 import { LoadingSpinner, ErrorState, EmptyState } from '@/utils/ui.utils';
+import { generateOrderReceipt } from '@/utils/pdf.utils';
 
 export default function OrderDetailsPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -32,12 +34,14 @@ export default function OrderDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
   const orderId = parseInt(params.id as string);
-  const t = useTranslations('orders');
+  const t = useTranslations('order_details');
   const { isAuthenticated, user, isLoading, isHydrated } = useAuthStore();
 
   useEffect(() => {
@@ -68,8 +72,8 @@ export default function OrderDetailsPage() {
       setOrder(orderData);
     } catch (err: any) {
       console.error('Failed to load order:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to load order');
-      toast.error('Failed to load order details');
+      setError(err.response?.data?.message || err.message || t('error_loading'));
+      toast.error(t('error_loading'));
     } finally {
       setLoading(false);
     }
@@ -81,20 +85,36 @@ export default function OrderDetailsPage() {
     try {
       setCancelling(true);
       await orderService.cancelOrder(order.idOrder);
-      toast.success('Order cancelled successfully');
+      toast.success(t('order_cancelled'));
+      setShowCancelModal(false);
       // Reload order to get updated status
       loadOrder();
     } catch (err: any) {
       console.error('Failed to cancel order:', err);
-      toast.error(err.response?.data?.message || err.message || 'Failed to cancel order');
+      toast.error(err.response?.data?.message || err.message || t('order_cancel_failed'));
     } finally {
       setCancelling(false);
     }
   };
 
+  const exportReceipt = async () => {
+    if (!order) return;
+    
+    try {
+      setExporting(true);
+      generateOrderReceipt(order, locale, user);
+      toast.success(t('receipt_exported'));
+    } catch (err: any) {
+      console.error('Failed to export receipt:', err);
+      toast.error(t('receipt_export_failed'));
+    } finally {
+      setExporting(false);
+    }
+  };
+
   // Show loading while hydrating or loading auth state
   if (!isHydrated || isLoading) {
-    return <LoadingSpinner message="Loading..." />;
+    return <LoadingSpinner message={t('loading')} />;
   }
 
   // Don't render anything if not authenticated (will redirect)
@@ -110,36 +130,45 @@ export default function OrderDetailsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <Link
-              href={`/${locale}/orders`}
-              className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Orders
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Details</h1>
-            <p className="text-gray-600">Order #{orderId}</p>
+            <div className="flex items-center space-x-4 mb-4">
+              <Link
+                href={`/${locale}/orders`}
+                className="inline-flex items-center text-blue-600 hover:text-blue-700"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {t('back_to_orders')}
+              </Link>
+              <span className="text-gray-400">|</span>
+              <Link
+                href={`/${locale}/profile`}
+                className="inline-flex items-center text-blue-600 hover:text-blue-700"
+              >
+                {t('back_to_profile')}
+              </Link>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('title')}</h1>
+            <p className="text-gray-600">{t('order_number', { id: orderId })}</p>
           </div>
 
           {loading ? (
             <div className="text-center py-20">
               <div className="flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600 mr-3" />
-                <span className="text-slate-600">Loading order details...</span>
+                <span className="text-slate-600">{t('loading')}</span>
               </div>
             </div>
           ) : error ? (
             <ErrorState
-              title="Error Loading Order"
+              title={t('error_loading')}
               message={error}
               onRetry={loadOrder}
-              retryText="Try Again"
+              retryText={t('try_again')}
             />
           ) : !order ? (
             <EmptyState
-              title="Order Not Found"
-              description="The order you're looking for doesn't exist or you don't have permission to view it."
-              actionText="Back to Orders"
+              title={t('not_found')}
+              description={t('not_found_description')}
+              actionText={t('back_to_orders')}
               actionHref={`/${locale}/orders`}
             />
           ) : (
@@ -147,60 +176,63 @@ export default function OrderDetailsPage() {
               {/* Order Status */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-gray-900">Order Status</h2>
+                  <h2 className="text-xl font-bold text-gray-900">{t('order_status')}</h2>
                   <div className="flex items-center space-x-3">
                     {getStatusIcon(order.status, 'lg')}
                     <span className={`px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(order.status)}`}>
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      {t(`status_names.${order.status}`)}
                     </span>
                   </div>
                 </div>
-                <p className="text-gray-600">{getStatusDescription(order.status)}</p>
+                <p className="text-gray-600">{t(`status_descriptions.${order.status}`)}</p>
                 
-                {order.status === OrderStatus.PAYMENT_PROCESSING && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
+                  {order.status === OrderStatus.PAYMENT_PROCESSING && (
                     <button
-                      onClick={cancelOrder}
-                      disabled={cancelling}
+                      onClick={() => setShowCancelModal(true)}
                       className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                      {cancelling ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2 inline" />
-                          Cancelling...
-                        </>
-                      ) : (
-                        'Cancel Order'
-                      )}
+                      {t('cancel_order')}
                     </button>
-                  </div>
-                )}
+                  )}
+                  
+                  <button
+                    onClick={exportReceipt}
+                    disabled={exporting}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                  >
+                    {exporting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        {t('exporting')}
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        {t('export_receipt')}
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* Order Information */}
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Order Details */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('order_information')}</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Order ID:</span>
+                      <span className="text-gray-600">{t('order_id')}:</span>
                       <span className="font-medium">#{order.idOrder}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Order Date:</span>
+                      <span className="text-gray-600">{t('order_date')}:</span>
                       <span className="font-medium">{formatDate(order.createdAt, locale)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Payment Method:</span>
-                      <span className="font-medium flex items-center">
-                        <CreditCard className="w-4 h-4 mr-1" />
-                        Stripe
-                      </span>
                     </div>
                     {order.updatedAt && order.updatedAt !== order.createdAt && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Last Updated:</span>
+                        <span className="text-gray-600">{t('last_updated')}:</span>
                         <span className="font-medium">{formatDate(order.updatedAt, locale)}</span>
                       </div>
                     )}
@@ -209,7 +241,7 @@ export default function OrderDetailsPage() {
 
                 {/* Shipping Information */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Shipping Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('shipping_information')}</h3>
                   <div className="space-y-3">
                     <div className="flex items-start space-x-2">
                       <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
@@ -234,7 +266,7 @@ export default function OrderDetailsPage() {
 
               {/* Order Items */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('order_items')}</h3>
                 <div className="space-y-4">
                   {order.orderItems?.map((item) => (
                     <div key={item.idOrderItem} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
@@ -253,8 +285,8 @@ export default function OrderDetailsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-lg font-medium text-gray-900">{item.product.name}</h4>
-                        <p className="text-gray-600">Quantity: {item.quantity}</p>
-                        <p className="text-gray-600">Unit Price: {formatAmountWithoutCurrency(item.unitPrice)} €</p>
+                        <p className="text-gray-600">{t('quantity')}: {item.quantity}</p>
+                        <p className="text-gray-600">{t('unit_price')}: {formatAmountWithoutCurrency(item.unitPrice)} €</p>
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-semibold text-gray-900">
@@ -268,7 +300,7 @@ export default function OrderDetailsPage() {
                 {/* Order Summary */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold text-gray-900">Total</span>
+                    <span className="text-lg font-semibold text-gray-900">{t('total')}</span>
                     <span className="text-2xl font-bold text-gray-900">
                       {formatAmountWithoutCurrency(order.totalAmount)} €
                     </span>
@@ -279,6 +311,46 @@ export default function OrderDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* Cancel Order Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">{t('cancel_order')}</h3>
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-gray-600 mb-6">{t('cancel_order_description')}</p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={cancelOrder}
+                disabled={cancelling}
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {cancelling ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2 inline" />
+                    {t('cancelling')}
+                  </>
+                ) : (
+                  t('confirm_cancel')
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <Footer />
     </div>
