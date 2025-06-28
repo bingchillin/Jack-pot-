@@ -172,6 +172,15 @@ const OrderReceipt = ({ order, locale, person }: {
         total: 'Total',
         thankYou: 'Thank you for your purchase!',
         support: 'For support, please contact our customer service.',
+        paid: 'Paid',
+        pending: 'Pending',
+        processing: 'Processing',
+        payment_processing: 'Payment Processing',
+        payment_failed: 'Payment Failed',
+        shipped: 'Shipped',
+        delivered: 'Delivered',
+        cancelled: 'Cancelled',
+        refunded: 'Refunded',
       },
       fr: {
         receipt: 'Reçu',
@@ -189,6 +198,15 @@ const OrderReceipt = ({ order, locale, person }: {
         total: 'Total',
         thankYou: 'Merci pour votre achat !',
         support: 'Pour le support, veuillez contacter notre service client.',
+        paid: 'Payé',
+        pending: 'En attente',
+        processing: 'En cours',
+        payment_processing: 'En cours de paiement',
+        payment_failed: 'Paiement échoué',
+        shipped: 'Expédié',
+        delivered: 'Livré',
+        cancelled: 'Annulé',
+        refunded: 'Remboursé',
       },
       es: {
         receipt: 'Recibo',
@@ -206,6 +224,15 @@ const OrderReceipt = ({ order, locale, person }: {
         total: 'Total',
         thankYou: '¡Gracias por su compra!',
         support: 'Para soporte, por favor contacte nuestro servicio al cliente.',
+        paid: 'Pagado',
+        pending: 'Pendiente',
+        processing: 'Procesando',
+        payment_processing: 'Procesando pago',
+        payment_failed: 'Pago fallido',
+        shipped: 'Enviado',
+        delivered: 'Entregado',
+        cancelled: 'Cancelado',
+        refunded: 'Reembolsado',
       },
     };
     return translations[locale as keyof typeof translations]?.[key as keyof typeof translations.en] || translations.en[key as keyof typeof translations.en];
@@ -238,7 +265,7 @@ const OrderReceipt = ({ order, locale, person }: {
         
         React.createElement(View, { key: 'status', style: styles.row }, [
           React.createElement(Text, { key: 'label', style: styles.label }, `${t('status')}:`),
-          React.createElement(Text, { key: 'value', style: styles.status }, order.status.toUpperCase())
+          React.createElement(Text, { key: 'value', style: styles.status }, t(order.status.toLowerCase()) || order.status.toUpperCase())
         ])
       ]),
       
