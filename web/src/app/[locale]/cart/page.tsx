@@ -6,8 +6,6 @@ import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
-import { orderService } from '@/services/order.service';
-import { CreateOrderRequest } from '@/interfaces/order.interface';
 import { getProductPrice } from '@/interfaces/product.interface';
 import { toast } from 'react-hot-toast';
 import { 
@@ -28,7 +26,6 @@ import { useCartHydration } from '@/hooks/useCartHydration';
 export default function CartPage() {
   const [scrolled, setScrolled] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [existingOrder, setExistingOrder] = useState<any>(null);
   const { items, removeItem, updateQuantity, clearCart, getSummary } = useCartStore();
   const { isAuthenticated } = useAuthStore();
   const cartSummary = getSummary();
@@ -46,30 +43,14 @@ export default function CartPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Check for existing order in sessionStorage
-  useEffect(() => {
-    const savedOrder = sessionStorage.getItem('cart_order');
-    if (savedOrder) {
-      try {
-        const parsedOrder = JSON.parse(savedOrder);
-        setExistingOrder(parsedOrder);
-        console.log('Found existing order in sessionStorage:', parsedOrder);
-      } catch (e) {
-        console.log('Failed to parse saved order, removing from sessionStorage');
-        sessionStorage.removeItem('cart_order');
-      }
-    }
-  }, []);
-
   const handleQuantityChange = (productId: number, newQuantity: number) => {
     if (newQuantity <= 0) {
       removeItem(productId);
       toast.success(t('item_removed'));
       
-      // If cart becomes empty and there's an existing order, cancel it
-      // Check if this was the last item (cart will be empty after removal)
+      // If cart becomes empty, clear it
       const remainingItems = items.filter(item => item.product.idProduct !== productId);
-      if (remainingItems.length === 0 && existingOrder) {
+      if (remainingItems.length === 0) {
         handleClearCart();
       }
     } else {
@@ -87,62 +68,16 @@ export default function CartPage() {
     removeItem(productId);
     toast.success(t('item_removed'));
     
-    // If cart becomes empty and there's an existing order, cancel it
+    // If cart becomes empty, clear it
     const remainingItems = items.filter(item => item.product.idProduct !== productId);
-    if (remainingItems.length === 0 && existingOrder) {
+    if (remainingItems.length === 0) {
       handleClearCart();
     }
   };
 
   const handleClearCart = async () => {
-    // Show warning if there's an existing order
-    if (existingOrder) {
-      const confirmed = window.confirm(
-        'Clearing the cart will also cancel your existing order. Are you sure you want to continue?'
-      );
-      if (!confirmed) {
-        return;
-      }
-    }
-    
-    // Cancel existing order on server if it exists
-    if (existingOrder) {
-      try {
-        await orderService.cancelOrder(existingOrder.idOrder);
-        console.log('Existing order cancelled on server');
-      } catch (error) {
-        console.error('Failed to cancel order on server:', error);
-        // Continue with cart clearing even if order cancellation fails
-      }
-    }
-    
     clearCart();
-    // Also clear any existing order from sessionStorage
-    sessionStorage.removeItem('cart_order');
-    setExistingOrder(null);
     toast.success(t('cart_cleared'));
-  };
-
-  const createOrderWithRetry = async (orderRequest: CreateOrderRequest, maxRetries = 3): Promise<any> => {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`Creating order attempt ${attempt}/${maxRetries}`);
-        const order = await orderService.createOrder(orderRequest);
-        console.log('Order created successfully:', order);
-        return order;
-      } catch (error) {
-        console.error(`Order creation attempt ${attempt} failed:`, error);
-        
-        if (attempt === maxRetries) {
-          throw error; // Re-throw on final attempt
-        }
-        
-        // Wait before retrying (exponential backoff)
-        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
-        console.log(`Retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
   };
 
   const handleProceedToPayment = async () => {
@@ -167,55 +102,21 @@ export default function CartPage() {
     setIsProcessing(true);
 
     try {
-      let order = existingOrder;
-
-      // Only create new order if we don't have an existing one
-      if (!order) {
-        const orderRequest: CreateOrderRequest = {
-          items: items.map(item => ({
-            productId: item.product.idProduct,
-            quantity: item.quantity,
-          })),
-          notes: 'Order placed from cart',
-        };
-
-        console.log('Creating new order from cart:', orderRequest);
-        order = await createOrderWithRetry(orderRequest);
-        console.log('Order created:', order);
-
-        // Save order to sessionStorage
-        sessionStorage.setItem('cart_order', JSON.stringify(order));
-        setExistingOrder(order);
-      } else {
-        console.log('Using existing order:', order);
-        
-        // Verify the existing order is still valid
-        try {
-          const orderStatus = await orderService.getPaymentStatus(order.stripePaymentIntentId);
-          if (orderStatus.status === 'succeeded') {
-            // Order is already paid, clear it and create new one
-            sessionStorage.removeItem('cart_order');
-            setExistingOrder(null);
-            toast.error('Previous order was already completed. Creating new order.');
-            // Recursive call to create new order
-            setIsProcessing(false);
-            return handleProceedToPayment();
-          }
-        } catch (error) {
-          console.log('Could not verify order status, proceeding with existing order');
-        }
+      // Get user info for personId
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (!user.idPerson) {
+        throw new Error('User information not found. Please log in again.');
       }
 
-      // Create Stripe checkout session
+      // Create Stripe checkout session directly (order will be created by webhook)
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          paymentIntentId: order.stripePaymentIntentId,
-          orderId: order.idOrder,
-          returnUrl: `${window.location.origin}/${locale}/order-success?orderId=${order.idOrder}`,
+          personId: user.idPerson,
+          returnUrl: `${window.location.origin}/${locale}/order-success?session_id={CHECKOUT_SESSION_ID}`,
           items: items,
         }),
       });
@@ -249,10 +150,6 @@ export default function CartPage() {
       console.error('Payment processing failed:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to process payment. Please try again.';
       toast.error(errorMessage);
-      
-      // On error, clear the existing order so user can retry
-      sessionStorage.removeItem('cart_order');
-      setExistingOrder(null);
     } finally {
       setIsProcessing(false);
     }

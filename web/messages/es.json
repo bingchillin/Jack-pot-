@@ -311,6 +311,7 @@
       "add_to_cart": "Añadir al carrito",
       "in_cart": "En el Carrito",
       "add_more": "Añadir más",
+      "max_reached": "Máximo alcanzado",
       "stock_status": {
         "in_stock": "En Stock ({quantity} disponible)",
         "out_of_stock": "Sin Stock"

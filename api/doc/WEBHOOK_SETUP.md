@@ -1,124 +1,126 @@
-# Stripe Webhooks Setup Guide
+# Stripe Webhook Setup Guide
 
-## 🔧 Environment Variables
+## Overview
+This implementation creates orders only after successful payment completion, eliminating orphaned orders and stock reservation issues.
 
-Add this to your `.env` file:
+## Local Development Setup
 
+### 1. Install Stripe CLI
 ```bash
-# Stripe Webhook Secret (get this from Stripe Dashboard)
-STRIPE_WEBHOOK_SECRET=whsec_your_stripe_webhook_secret_here
+# macOS (using Homebrew)
+brew install stripe/stripe-cli/stripe
+
+# Or download from: https://github.com/stripe/stripe-cli/releases
 ```
 
-## 🔗 Webhook Endpoint
-
-Your webhook endpoint is: `http://localhost:3000/stripe/webhook`
-
-## 📋 Stripe Dashboard Setup
-
-### 1. Go to Stripe Dashboard
-- Visit: https://dashboard.stripe.com/test/webhooks
-- Click "Add endpoint"
-
-### 2. Configure Endpoint
-- **Endpoint URL**: `http://localhost:3000/stripe/webhook`
-- **Events to send**: Select these events:
-  - `payment_intent.succeeded`
-  - `payment_intent.payment_failed`
-  - `payment_intent.canceled`
-  - `payment_intent.requires_action`
-  - `customer.created`
-  - `payment_method.attached`
-
-### 3. Get Webhook Secret
-- After creating the endpoint, click on it
-- In the "Signing secret" section, click "Reveal"
-- Copy the secret (starts with `whsec_`)
-- Add it to your `.env` file as `STRIPE_WEBHOOK_SECRET`
-
-## 🧪 Testing Webhooks
-
-### Option 1: Stripe CLI (Recommended for local testing)
-
+### 2. Login to Stripe
 ```bash
-# Install Stripe CLI
-# Download from: https://stripe.com/docs/stripe-cli
-
-# Login to Stripe
 stripe login
-
-# Forward events to your local server
-stripe listen --forward-to localhost:3000/stripe/webhook
-
-# This will show you the webhook secret to use in your .env
 ```
 
-### Option 2: ngrok (For external testing)
-
+### 3. Forward Webhooks to Local Server
 ```bash
-# Install ngrok
-npm install -g ngrok
+# Forward webhooks to your local API server
+stripe listen --forward-to localhost:3000/orders/webhook
 
-# Expose your local server
-ngrok http 3000
-
-# Use the ngrok URL in Stripe dashboard
-# Example: https://abc123.ngrok.io/stripe/webhook
+# This will output a webhook signing secret like:
+# Ready! Your webhook signing secret is whsec_xxxxxxxxxxxxxxxxxxxxx
 ```
 
-## 📊 What the Webhooks Do
+### 4. Set Environment Variables
+Add the webhook secret to your `.env` file:
+```env
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxx
+```
 
-### Payment Success (`payment_intent.succeeded`)
-- ✅ Mark order as `PAID`
-- ✅ Set `paidAt` timestamp
-- ✅ Convert reserved stock to sold
-- ✅ Log payment method
+## Production Setup
 
-### Payment Failed (`payment_intent.payment_failed`)
-- ❌ Mark order as `PAYMENT_FAILED`
-- ❌ Release reserved stock back to inventory
-- ❌ Log error details
+### 1. Create Webhook Endpoint in Stripe Dashboard
+1. Go to [Stripe Dashboard > Webhooks](https://dashboard.stripe.com/webhooks)
+2. Click "Add endpoint"
+3. Set endpoint URL: `https://yourdomain.com/orders/webhook`
+4. Select events to listen for:
+   - `payment_intent.succeeded`
+   - `payment_intent.payment_failed`
+5. Click "Add endpoint"
 
-### Payment Canceled (`payment_intent.canceled`)
-- 🚫 Mark order as `CANCELLED`
-- 🚫 Release reserved stock
-- 🚫 Log cancellation
+### 2. Get Webhook Signing Secret
+1. In the webhook details page, click "Reveal" next to "Signing secret"
+2. Copy the secret starting with `whsec_`
+3. Add to your production environment variables
 
-### Payment Requires Action (`payment_intent.requires_action`)
-- 🔄 Keep order as `PAYMENT_PROCESSING`
-- 🔄 Wait for customer action (3D Secure, etc.)
+## How It Works
 
-## 🔒 Security Features
+### 1. Order Creation Flow
+```
+User adds items to cart → 
+Create payment intent (reserves stock) → 
+User completes payment → 
+Stripe sends webhook → 
+Order marked as PAID
+```
 
-- ✅ **Signature Verification**: All webhooks are verified using Stripe signatures
-- ✅ **Idempotency**: Prevents duplicate processing of same event
-- ✅ **Error Handling**: Proper HTTP status codes returned to Stripe
-- ✅ **Logging**: Comprehensive logging for debugging
+### 2. Webhook Events Handled
+- **`payment_intent.succeeded`**: Order status → PAID, stock permanently reserved
+- **`payment_intent.payment_failed`**: Order status → PAYMENT_FAILED, stock released back
 
-## 🐛 Debugging
+### 3. Stock Management
+- **Reserved**: Stock is held during payment processing
+- **Permanent**: Stock is permanently allocated after successful payment
+- **Released**: Stock is returned to available if payment fails
 
-### Check Webhook Logs
+## Testing
+
+### 1. Test Successful Payment
 ```bash
-# In your API logs, look for:
-📨 Received webhook: payment_intent.succeeded (evt_1234567890)
-✅ Order 1 marked as PAID and stock updated
+# Create a test payment intent
+stripe payment_intents create --amount=1000 --currency=eur
+
+# Simulate successful payment
+stripe payment_intents confirm pi_xxxxxxxxxxxxx
 ```
 
-### Test Webhook Endpoint
+### 2. Test Failed Payment
 ```bash
-curl -X POST http://localhost:3000/stripe/webhook/test \
-  -H "Content-Type: application/json" \
-  -d '{"test": "webhook"}'
+# Create a test payment intent
+stripe payment_intents create --amount=1000 --currency=eur
+
+# Simulate failed payment
+stripe payment_intents cancel pi_xxxxxxxxxxxxx
 ```
 
-### Verify Stripe Events
-- Go to Stripe Dashboard > Events
-- Check if webhooks are being sent
-- Look for delivery attempts and responses
+### 3. Monitor Webhooks
+```bash
+# View webhook events
+stripe events list
 
-## 🚀 Production Setup
+# View specific event
+stripe events retrieve evt_xxxxxxxxxxxxx
+```
 
-1. **Use HTTPS**: Stripe requires HTTPS for production webhooks
-2. **Environment Variables**: Set `STRIPE_WEBHOOK_SECRET` in production
-3. **Rate Limiting**: Consider adding rate limiting to webhook endpoint
-4. **Monitoring**: Set up alerts for webhook failures
-5. **Idempotency**: Store processed event IDs in database for production 
+## Benefits
+
+1. **No Orphaned Orders**: Orders only exist after successful payment
+2. **Clean Stripe Dashboard**: No pending/processing orders cluttering the view
+3. **Automatic Stock Management**: Stock is properly managed based on payment status
+4. **Reliable State**: Order status always reflects actual payment state
+5. **Simplified Logic**: No need for complex cleanup or retry mechanisms
+
+## Troubleshooting
+
+### Webhook Not Receiving Events
+1. Check if Stripe CLI is forwarding: `stripe listen --print-secret`
+2. Verify webhook secret in environment variables
+3. Check API server logs for webhook errors
+4. Ensure endpoint URL is accessible
+
+### Orders Not Being Created
+1. Verify webhook events are being received
+2. Check order service logs for payment intent lookup
+3. Ensure stock is available for reservation
+4. Verify Stripe customer ID exists
+
+### Stock Issues
+1. Check if stock is being properly reserved/released
+2. Verify product stock quantities in database
+3. Check for transaction rollbacks in logs 

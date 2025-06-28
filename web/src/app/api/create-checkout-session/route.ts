@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripeKey = process.env.STRIPE_SECRET_KEY;
+const stripeKey = "sk_test_51RcrKKRvWLFjv3oeXjJR6w7OVXgS8BX7CAyERO1Q2UkiJ7xyBgmf480sSGgEYz5OPyTl3i2klYPkccw0ofeUswGd00IbXGIsj0";
 
 // Debug log to check if the Stripe secret key is being read
 console.log('DEBUG STRIPE_SECRET_KEY:', stripeKey ? 'Key is set' : 'Key is missing');
@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('Request body:', body);
 
-    const { paymentIntentId, orderId, returnUrl, items } = body;
+    const { returnUrl, items, personId } = body;
 
-    if (!paymentIntentId || !orderId || !returnUrl) {
-      console.error('Missing required parameters:', { paymentIntentId, orderId, returnUrl });
+    if (!returnUrl || !items || !personId) {
+      console.error('Missing required parameters:', { returnUrl, items, personId });
       return NextResponse.json(
         { error: 'Missing required parameters' },
         { status: 400 }
@@ -40,14 +40,13 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Creating checkout session with:', {
-      paymentIntentId,
-      orderId,
       returnUrl,
-      items
+      items,
+      personId
     });
 
     // Create line items for Stripe checkout
-    const lineItems = items ? items.map((item: any) => ({
+    const lineItems = items.map((item: any) => ({
       price_data: {
         currency: 'eur', // Use EUR to match backend currency
         product_data: {
@@ -58,9 +57,10 @@ export async function POST(request: NextRequest) {
         unit_amount: Math.round(item.product.price * 100), // Convert to cents
       },
       quantity: item.quantity,
-    })) : [];
+    }));
 
-    // Create a checkout session
+    // Create a checkout session WITHOUT payment intent
+    // Payment intent will be created only when user actually pays
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -68,8 +68,22 @@ export async function POST(request: NextRequest) {
       success_url: returnUrl,
       cancel_url: returnUrl.replace('order-success', 'cart'),
       metadata: {
-        orderId: orderId.toString(),
-        paymentIntentId: paymentIntentId,
+        personId: personId.toString(),
+        items: JSON.stringify(items.map((item: any) => ({
+          productId: item.product.idProduct,
+          quantity: item.quantity,
+        }))),
+      },
+      // This ensures payment intent is created only when payment is submitted
+      payment_intent_data: {
+        capture_method: 'automatic',
+        metadata: {
+          personId: personId.toString(),
+          items: JSON.stringify(items.map((item: any) => ({
+            productId: item.product.idProduct,
+            quantity: item.quantity,
+          }))),
+        },
       },
     });
 
