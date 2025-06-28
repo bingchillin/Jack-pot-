@@ -529,29 +529,117 @@ export class OrderService {
   async cancelOrder(orderId: number): Promise<Order> {
     const order = await this.findOne(orderId);
     
-    if (order.status === OrderStatus.PAID) {
-      throw new BadRequestException('Cannot cancel a paid order. Please request a refund instead.');
+    // Check if order can be cancelled
+    if (order.status === OrderStatus.CANCELLED) {
+      throw new BadRequestException('Order is already cancelled.');
+    }
+    
+    if (order.status === OrderStatus.REFUNDED) {
+      throw new BadRequestException('Order has already been refunded.');
     }
     
     if (order.status === OrderStatus.SHIPPED || order.status === OrderStatus.DELIVERED) {
       throw new BadRequestException('Cannot cancel a shipped or delivered order.');
     }
 
-    // Cancel the payment intent if it exists
-    if (order.stripePaymentIntentId) {
-      try {
-        await this.stripeService.cancelPaymentIntent(order.stripePaymentIntentId);
-      } catch (error) {
-        this.logger.warn(`Failed to cancel payment intent ${order.stripePaymentIntentId}:`, error);
-        // Continue with order cancellation even if Stripe cancellation fails
+    // For paid orders, check if within 48 hours
+    if (order.status === OrderStatus.PAID) {
+      const hoursSincePayment = (Date.now() - order.paidAt!.getTime()) / (1000 * 60 * 60);
+      if (hoursSincePayment > 48) {
+        throw new BadRequestException('Cannot cancel order after 48 hours of payment. Please contact support for assistance.');
       }
     }
 
-    // Release reserved stock
-    await this.releaseReservedStock(orderId);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    // Update order status
-    return await this.updateStatus(orderId, OrderStatus.CANCELLED);
+    try {
+      let refund: Stripe.Refund | null = null;
+
+      // Process refund for paid orders
+      if (order.status === OrderStatus.PAID) {
+        this.logger.log(`Processing refund for paid order ${orderId} - amount: ${order.totalAmount}€`);
+        
+        try {
+          refund = await this.stripeService.createRefundForOrder(order);
+          this.logger.log(`Refund created successfully: ${refund.id} - amount: ${refund.amount / 100}€`);
+        } catch (refundError) {
+          this.logger.error(`Failed to create refund for order ${orderId}:`, refundError);
+          throw new Error(`Failed to process refund: ${refundError.message}`);
+        }
+      } else {
+        this.logger.log(`Order ${orderId} status is ${order.status} - no refund needed, only cancelling payment intent`);
+      }
+
+      // Cancel the payment intent if it exists and order is not paid
+      if (order.stripePaymentIntentId && order.status !== OrderStatus.PAID) {
+        try {
+          await this.stripeService.cancelPaymentIntent(order.stripePaymentIntentId);
+        } catch (error) {
+          this.logger.warn(`Failed to cancel payment intent ${order.stripePaymentIntentId}:`, error);
+          // Continue with order cancellation even if Stripe cancellation fails
+        }
+      }
+
+      // Release reserved stock
+      await this.releaseReservedStock(orderId);
+
+      // Update order status and refund information
+      const updateData: any = {
+        status: OrderStatus.CANCELLED,
+      };
+
+      if (refund) {
+        updateData.refundedAt = new Date();
+        updateData.refundAmount = refund.amount / 100; // Convert from cents to euros
+      }
+
+      await queryRunner.manager.update(Order, orderId, updateData);
+
+      await queryRunner.commitTransaction();
+      
+      this.logger.log(`Order ${orderId} cancelled successfully${refund ? ` with refund ${refund.id}` : ''}`);
+      
+      // Send cancellation email
+      try {
+        const person = await this.personRepository.findOne({
+          where: { idPerson: order.idPerson },
+        });
+        
+        if (person) {
+          const formatAmount = (amount: any): string => {
+            if (amount === null || amount === undefined) return '0.00 €';
+            const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+            return `${numAmount.toFixed(2)} €`;
+          };
+          
+          // For paid orders, use the actual refund amount
+          // For payment processing orders, no refund since no money was charged
+          const refundAmount = order.status === OrderStatus.PAID && refund 
+            ? formatAmount(refund.amount / 100) // Convert from cents to euros
+            : '0.00 €';
+            
+          this.logger.log(`Sending cancellation email to ${person.email} with refund amount: ${refundAmount}`);
+          await this.mailerService.sendOrderCancellationEmail(order, person, refundAmount, order.locale || 'en');
+          this.logger.log(`Cancellation email sent for order ${order.idOrder}`);
+        } else {
+          this.logger.error(`Person not found for order ${order.idOrder}`);
+        }
+      } catch (emailError) {
+        this.logger.error(`Failed to send cancellation email for order ${order.idOrder}:`, emailError);
+        // Don't throw error - email failure shouldn't fail the cancellation
+      }
+      
+      // Return updated order
+      return await this.findOne(orderId);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      this.logger.error(`Failed to cancel order ${orderId}:`, error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   private async releaseReservedStock(orderId: number): Promise<void> {

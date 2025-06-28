@@ -16,13 +16,15 @@ import {
   Loader2,
   ArrowLeft,
   Download,
-  X
+  X,
+  RotateCcw,
+  Ban
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
-  getStatusIcon, 
-  getStatusColor, 
-  getStatusDescription 
+  getStatusIcon,
+  getStatusColor,
+  canCancelOrder
 } from '@/utils/order.utils';
 import { formatDate, formatAmountWithoutCurrency } from '@/utils/format.utils';
 import { LoadingSpinner, ErrorState, EmptyState } from '@/utils/ui.utils';
@@ -85,10 +87,18 @@ export default function OrderDetailsPage() {
     try {
       setCancelling(true);
       await orderService.cancelOrder(order.idOrder);
+      
+      // Show success message
       toast.success(t('order_cancelled'));
       setShowCancelModal(false);
-      // Reload order to get updated status
-      loadOrder();
+      
+      // Reload order to get updated status and refund information
+      await loadOrder();
+      
+      // Show additional info for paid orders
+      if (order.status === OrderStatus.PAID) {
+        toast.success(t('refund_initiated'), { duration: 5000 });
+      }
     } catch (err: any) {
       console.error('Failed to cancel order:', err);
       toast.error(err.response?.data?.message || err.message || t('order_cancel_failed'));
@@ -186,14 +196,71 @@ export default function OrderDetailsPage() {
                 </div>
                 <p className="text-gray-600">{t(`status_descriptions.${order.status}`)}</p>
                 
+                {/* Refund Information */}
+                {(order.status === OrderStatus.CANCELLED || order.status === OrderStatus.REFUNDED) && order.refundedAt && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <RotateCcw className="w-5 h-5 text-blue-600" />
+                      <h4 className="font-medium text-blue-900">{t('refund_information')}</h4>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-blue-700">{t('refund_amount')}:</span>
+                        <span className="font-medium text-blue-900">
+                          {formatAmountWithoutCurrency(order.refundAmount || order.totalAmount)} €
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-700">{t('refund_date')}:</span>
+                        <span className="font-medium text-blue-900">{formatDate(order.refundedAt, locale)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-700">{t('refund_status')}:</span>
+                        <span className="font-medium text-green-600">{t('refund_processed')}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Cancellation Notice */}
+                {order.status === OrderStatus.CANCELLED && !order.refundedAt && (
+                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Ban className="w-5 h-5 text-red-600" />
+                      <h4 className="font-medium text-red-900">{t('order_cancelled')}</h4>
+                    </div>
+                    <p className="text-sm text-red-700">{t('cancellation_notice')}</p>
+                  </div>
+                )}
+                
                 <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
-                  {order.status === OrderStatus.PAYMENT_PROCESSING && (
-                    <button
-                      onClick={() => setShowCancelModal(true)}
-                      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      {t('cancel_order')}
-                    </button>
+                  {canCancelOrder(order) && (
+                    <div className="flex items-center space-x-4">
+                      <button
+                        onClick={() => setShowCancelModal(true)}
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {t('cancel_order')}
+                      </button>
+                      {order.status === OrderStatus.PAID && (
+                        <div className="text-sm text-gray-600">
+                          {(() => {
+                            const hoursSincePayment = (Date.now() - new Date(order.paidAt || order.createdAt).getTime()) / (1000 * 60 * 60);
+                            const timeLeft = 48 - hoursSincePayment;
+                            
+                            if (timeLeft > 0) {
+                              const hours = Math.floor(timeLeft);
+                              const minutes = Math.floor((timeLeft - hours) * 60);
+                              return t('cancellation_time_left', {
+                                hours: hours,
+                                minutes: minutes
+                              });
+                            }
+                            return null;
+                          })()}
+                        </div>
+                      )}
+                    </div>
                   )}
                   
                   <button
