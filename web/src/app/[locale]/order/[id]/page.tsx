@@ -71,6 +71,13 @@ export default function OrderDetailsPage() {
       setError(null);
       
       const orderData = await orderService.getOrder(orderId);
+      console.log('Order data from API:', {
+        id: orderData.idOrder,
+        status: orderData.status,
+        paidAt: orderData.paidAt,
+        createdAt: orderData.createdAt,
+        fullOrder: orderData
+      });
       setOrder(orderData);
     } catch (err: any) {
       console.error('Failed to load order:', err);
@@ -234,7 +241,31 @@ export default function OrderDetailsPage() {
                 )}
                 
                 <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
-                  {canCancelOrder(order) && (
+                  {(() => {
+                    // Check if order can be cancelled based on status and time
+                    let canCancel = false;
+                    
+                    if (order.status === OrderStatus.PENDING || order.status === OrderStatus.PAYMENT_PROCESSING) {
+                      canCancel = true;
+                    } else if (order.status === OrderStatus.PAID) {
+                      // For paid orders, check if within 48 hours
+                      const paidAtTime = new Date(order.paidAt || order.createdAt).getTime();
+                      const currentTime = Date.now();
+                      const hoursSincePayment = (currentTime - paidAtTime) / (1000 * 60 * 60);
+                      canCancel = hoursSincePayment <= 48;
+                    }
+                    
+                    console.log('FIXED CANCEL CHECK:', {
+                      orderId: order.idOrder,
+                      status: order.status,
+                      canCancel,
+                      paidAt: order.paidAt,
+                      hoursSincePayment: order.status === OrderStatus.PAID ? 
+                        ((Date.now() - new Date(order.paidAt || order.createdAt).getTime()) / (1000 * 60 * 60)).toFixed(2) : 'N/A'
+                    });
+                    
+                    return canCancel;
+                  })() && (
                     <div className="flex items-center space-x-4">
                       <button
                         onClick={() => setShowCancelModal(true)}
@@ -245,7 +276,9 @@ export default function OrderDetailsPage() {
                       {order.status === OrderStatus.PAID && (
                         <div className="text-sm text-gray-600">
                           {(() => {
-                            const hoursSincePayment = (Date.now() - new Date(order.paidAt || order.createdAt).getTime()) / (1000 * 60 * 60);
+                            const paidAtTime = new Date(order.paidAt || order.createdAt).getTime();
+                            const currentTime = Date.now();
+                            const hoursSincePayment = (currentTime - paidAtTime) / (1000 * 60 * 60);
                             const timeLeft = 48 - hoursSincePayment;
                             
                             if (timeLeft > 0) {
