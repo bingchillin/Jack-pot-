@@ -7,6 +7,7 @@ import { VerifyEmailCodeDto } from './dto/verify-email-code.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { MailerService } from '../mailer/mailer.service';
 import { StripeService } from '../stripe/stripe.service';
 import * as crypto from 'crypto';
@@ -33,7 +34,7 @@ export class AuthService {
         private readonly refreshTokenRepository: Repository<RefreshToken>,
     ) { }
 
-    async validateUser(email: string, password: string): Promise<any> {
+    async validateUser(email: string, password: string, client?: string): Promise<any> {
         const person = await this.personService.findByEmail(email);
         if (!person) {
             throw new UnauthorizedException('Invalid credentials');
@@ -44,8 +45,8 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        // Check if user is admin (role ID 1)
-        if (person.idRole !== 1) {
+        // Check if user is admin (role ID 1) only for backoffice
+        if (client === 'backoffice' && person.idRole !== 1) {
             throw new UnauthorizedException('You do not have permission to access the backoffice');
         }
 
@@ -60,7 +61,8 @@ export class AuthService {
             throw new UnauthorizedException('User already exists');
         }
 
-        // Verification code expiry (verif code comes from frontend)
+        // Generate verification code on the backend
+        const verificationCode = this.generateVerificationCode();
         const verificationCodeExpires = this.setVerificationCodeExpiration();
 
         // Create new user with default role and verification code
@@ -68,7 +70,7 @@ export class AuthService {
             ...signupDto,
             idRole: 2,
             isEmailVerified: false,
-            verificationCode: signupDto.verificationCode,
+            verificationCode,
             verificationCodeExpires
         });
 
@@ -91,7 +93,7 @@ export class AuthService {
         }
 
         // Send verification email
-        await this.mailerService.sendVerificationEmail(newUser.email, signupDto.verificationCode);
+        await this.mailerService.sendVerificationEmail(newUser.email, verificationCode);
 
         // Generate tokens
         const tokens = await this.generateTokens(newUser);
@@ -408,6 +410,47 @@ export class AuthService {
 
     async revokeAllRefreshTokensForUser(userId: number) {
         await this.refreshTokenRepository.delete({ user: { idPerson: userId } });
+    }
+
+    async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
+        // First, get the user to validate current password
+        const person = await this.personService.findOne(userId);
+        if (!person) {
+            throw new UnauthorizedException('User not found');
+        }
+
+        // Validate current password
+        const isCurrentPasswordValid = await bcrypt.compare(updateProfileDto.currentPassword, person.password);
+        if (!isCurrentPasswordValid) {
+            throw new UnauthorizedException('Current password is incorrect');
+        }
+
+        // Prepare update data (without currentPassword)
+        const updateData: any = {};
+        
+        if (updateProfileDto.firstname !== undefined) {
+            updateData.firstname = updateProfileDto.firstname;
+        }
+        
+        if (updateProfileDto.surname !== undefined) {
+            updateData.surname = updateProfileDto.surname;
+        }
+        
+        if (updateProfileDto.numberPhone !== undefined) {
+            updateData.numberPhone = updateProfileDto.numberPhone;
+        }
+
+        // If new password is provided, hash it
+        if (updateProfileDto.newPassword) {
+            updateData.password = updateProfileDto.newPassword;
+        }
+
+        // Update the person
+        const updatedPerson = await this.personService.update(userId, updateData);
+        
+        // Return user without password
+        const { password: _, ...result } = updatedPerson;
+        return result;
     }
 
 

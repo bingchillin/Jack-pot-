@@ -39,4 +39,5 @@ export class CreateObjectProfileDto {
     @IsBoolean()
     @IsOptional()
     isWillWatering?: boolean;
+
 } 

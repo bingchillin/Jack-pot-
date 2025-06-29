@@ -1,6 +1,7 @@
-import { Controller, Post, Body, UseGuards, Req, Headers, UnauthorizedException, Query, DefaultValuePipe } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Headers, UnauthorizedException, Query, DefaultValuePipe, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 import { Request } from 'express';
 import { AuthDocs } from 'src/api/swagger/auth.docs';
 import { SignupDto } from './dto/signup.dto';
@@ -8,6 +9,7 @@ import { VerifyEmailCodeDto } from './dto/verify-email-code.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -66,5 +68,12 @@ export class AuthController {
         }
         const resetToken = authHeader.split(' ')[1];
         return this.authService.resetPassword(resetPasswordDto, resetToken);
+    }
+
+    @Patch('profile')
+    @UseGuards(JwtAuthGuard)
+    async updateProfile(@Req() req: Request, @Body() updateProfileDto: UpdateProfileDto) {
+        const userId = (req.user as any).idPerson;
+        return this.authService.updateProfile(userId, updateProfileDto);
     }
 } 
