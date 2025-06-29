@@ -20,6 +20,7 @@ interface AuthStore extends AuthState {
     currentPassword: string;
     newPassword?: string;
   }) => Promise<void>;
+  refreshUser: () => Promise<void>;
   logout: () => void;
   refreshAuth: () => Promise<void>;
   initializeAuth: () => void;
@@ -109,9 +110,7 @@ export const useAuthStore = create<AuthStore>()(
       }) => {
         try {
           set({ isLoading: true });
-          console.log('🔍 Auth Store - Updating profile with data:', updateData);
           const updatedUser = await authService.updateProfile(get().user!, updateData);
-          console.log('🔍 Auth Store - Received updated user:', updatedUser);
           
           // Update localStorage with new user data
           if (typeof window !== 'undefined') {
@@ -124,7 +123,28 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false
           });
         } catch (error) {
-          console.error('🔍 Auth Store - Error updating profile:', error);
+          set({ isLoading: false });
+          throw error;
+        }
+      },
+
+      refreshUser: async () => {
+        try {
+          const { user } = get();
+          if (!user) {
+            throw new Error('No user available');
+          }
+
+          set({ isLoading: true });
+          const updatedUser = await authService.refreshUser(user);
+          
+          // Update store
+          set({
+            user: updatedUser,
+            isLoading: false
+          });
+        } catch (error) {
+          console.error('🔍 Auth Store - Error refreshing user:', error);
           set({ isLoading: false });
           throw error;
         }

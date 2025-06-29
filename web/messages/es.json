@@ -84,6 +84,10 @@
         "title": "Verificación de email requerida",
         "message": "¡Tu cuenta ha sido creada exitosamente! Para acceder a todas las funciones y completar tu registro, por favor verifica tu dirección de email.",
         "check_email": "Por favor verifica tu email:",
+        "resend": "Reenviar email de verificación",
+        "resending": "Enviando...",
+        "resend_success": "¡Email de verificación enviado exitosamente!",
+        "resend_error": "Error al enviar email de verificación. Por favor inténtalo de nuevo.",
         "got_it": "¡Entendido!",
         "close": "Cerrar"
       },
@@ -400,7 +404,8 @@
       "stock_available": "Stock: {quantity} disponible",
       "each": "cada uno",
       "in_your_cart": "en tu carrito",
-      "address_required": "La dirección de envío es requerida. Por favor actualiza tu perfil primero."
+      "address_required": "La dirección de envío es requerida. Por favor actualiza tu perfil primero.",
+      "email_verification_required": "La verificación del email es requerida para completar tu pedido. Por favor verifica tu dirección de email primero."
     }
   },
   "checkout": {

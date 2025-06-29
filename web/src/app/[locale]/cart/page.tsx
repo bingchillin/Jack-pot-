@@ -27,7 +27,7 @@ export default function CartPage() {
   const [scrolled, setScrolled] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { items, removeItem, updateQuantity, clearCart, getSummary } = useCartStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user, refreshUser } = useAuthStore();
   const cartSummary = getSummary();
   const t = useTranslations('shop.cart');
   const params = useParams();
@@ -43,6 +43,15 @@ export default function CartPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Refresh user data when cart page loads to ensure we have latest address
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      refreshUser().catch(error => {
+        console.error('Failed to refresh user data:', error);
+      });
+    }
+  }, [isAuthenticated, user, refreshUser]);
 
   // Check for success message from profile update
   useEffect(() => {
@@ -98,6 +107,13 @@ export default function CartPage() {
       return;
     }
 
+    // Check if user email is verified
+    if (!user?.isEmailVerified) {
+      toast.error(t('email_verification_required'));
+      router.push(`/${locale}/profile?verification_required=true`);
+      return;
+    }
+
     if (items.length === 0) {
       toast.error('Your cart is empty');
       return;
@@ -111,9 +127,8 @@ export default function CartPage() {
       }
     }
 
-    // Check if user has an address
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (!user.address || user.address.trim() === '') {
+    // Check if user has an address using auth store instead of localStorage
+    if (!user?.address || user.address.trim() === '') {
       toast.error(t('address_required'));
       router.push(`/${locale}/profile/edit?redirect=cart`);
       return;
@@ -122,9 +137,8 @@ export default function CartPage() {
     setIsProcessing(true);
 
     try {
-      // Get user info for personId
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      if (!user.idPerson) {
+      // Use auth store user instead of localStorage
+      if (!user?.idPerson) {
         throw new Error('User information not found. Please log in again.');
       }
 

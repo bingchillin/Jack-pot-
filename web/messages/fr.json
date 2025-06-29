@@ -81,9 +81,13 @@
       "edit_information": "Modifier les informations",
       "contact_information": "Informations de contact",
       "verification_modal": {
-        "title": "Vérification d'email requise",
-        "message": "Votre compte a été créé avec succès ! Pour accéder à toutes les fonctionnalités et compléter votre inscription, veuillez vérifier votre adresse email.",
+        "title": "Vérification de l'email requise",
+        "message": "Votre compte a été créé avec succès ! Pour accéder à toutes les fonctionnalités et finaliser votre inscription, veuillez vérifier votre adresse email.",
         "check_email": "Veuillez vérifier votre email :",
+        "resend": "Renvoyer l'email de vérification",
+        "resending": "Envoi...",
+        "resend_success": "Email de vérification envoyé avec succès !",
+        "resend_error": "Échec de l'envoi de l'email de vérification. Veuillez réessayer.",
         "got_it": "Compris !",
         "close": "Fermer"
       },
@@ -401,7 +405,8 @@
       "stock_available": "Stock : {quantity} disponible",
       "each": "l'unité",
       "in_your_cart": "dans votre panier",
-      "address_required": "L'adresse de livraison est requise. Veuillez d'abord mettre à jour votre profil."
+      "address_required": "L'adresse de livraison est requise. Veuillez d'abord mettre à jour votre profil.",
+      "email_verification_required": "La vérification de l'email est requise pour finaliser votre commande. Veuillez d'abord vérifier votre adresse email."
     }
   },
   "checkout": {

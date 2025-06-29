@@ -106,6 +106,7 @@ export class AuthService {
                 firstname: updatedPerson.firstname,
                 surname: updatedPerson.surname,
                 numberPhone: updatedPerson.numberPhone,
+                address: updatedPerson.address,
                 isEmailVerified: updatedPerson.isEmailVerified,
                 stripeCustomerId: updatedPerson.stripeCustomerId
             },
@@ -196,6 +197,7 @@ export class AuthService {
                 surname: user.surname,
                 idRole: user.idRole,
                 numberPhone: user.numberPhone,
+                address: user.address,
                 isEmailVerified: user.isEmailVerified,
                 stripeCustomerId: user.stripeCustomerId
             },
@@ -451,13 +453,8 @@ export class AuthService {
             updateData.password = updateProfileDto.newPassword;
         }
 
-        console.log('🔍 Backend Auth Service - Updating person with data:', updateData);
-        console.log('🔍 Backend Auth Service - Person ID:', userId);
-
         // Update the person
         const updatedPerson = await this.personService.update(userId, updateData);
-        
-        console.log('🔍 Backend Auth Service - Updated person:', updatedPerson);
         
         // Return user without password
         const { password: _, ...result } = updatedPerson;

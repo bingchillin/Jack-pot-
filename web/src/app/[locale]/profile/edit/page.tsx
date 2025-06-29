@@ -165,12 +165,7 @@ export default function EditProfilePage() {
         ...(formData.newPassword && { newPassword: formData.newPassword }),
       };
 
-      console.log('🔍 Edit Profile - Form data being sent:', updateData);
-      console.log('🔍 Edit Profile - Current user data:', user);
-
       await updateProfile(updateData);
-      
-      console.log('🔍 Edit Profile - Profile updated successfully');
       
       const successMessage = formData.newPassword 
         ? t('auth.profile.edit.password_changed')
