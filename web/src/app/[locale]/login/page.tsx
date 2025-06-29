@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
 import { useAuthStore } from '@/stores/authStore';
+import { useAuth } from '@/hooks/useAuth';
 import { Eye, EyeOff, User, Lock, Mail, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -22,9 +23,15 @@ export default function LoginPage() {
 
   const t = useTranslations();
   const router = useRouter();
-  const { login, isLoading, isAuthenticated } = useAuthStore();
+  const searchParams = useSearchParams();
+  const { login, isLoading } = useAuthStore();
   const params = useParams();
   const locale = params.locale as string;
+
+  // Use auth hook to handle redirects
+  const { isAuthenticated } = useAuth({
+    redirectTo: `/${locale}/profile` // Redirect authenticated users to profile
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,12 +41,17 @@ export default function LoginPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push(`/${locale}/profile`);
-    }
-  }, [isAuthenticated, router]);
+  // Show loading while auth is being initialized
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center">
+        <div className="flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-green-600/30 border-t-green-600 rounded-full animate-spin mr-3"></div>
+          <span className="text-slate-600">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -64,8 +76,7 @@ export default function LoginPage() {
     try {
       await login(formData);
       setSuccess(t('auth.login.success'));
-      
-        router.push(`/${locale}/profile`);
+      // Redirect is handled by useAuth hook
     } catch (error: any) {
       setError(error.message || t('auth.login.error.login_failed'));
     }
@@ -230,7 +241,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <Footer t={t} />
+      <Footer />
     </div>
   );
 } 

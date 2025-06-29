@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
 import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuth } from '@/hooks/useAuth';
 import { orderService } from '@/services/order.service';
 import { Order, OrderStatus } from '@/interfaces/order.interface';
 import { toast } from 'react-hot-toast';
@@ -47,7 +47,9 @@ export default function OrdersPage() {
   const params = useParams();
   const locale = params.locale as string;
   const t = useTranslations('orders');
-  const { isAuthenticated, user, isLoading, isHydrated } = useAuthStore();
+  const { isAuthenticated, user, isLoading } = useAuth({
+    requireAuth: true
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,15 +60,10 @@ export default function OrdersPage() {
   }, []);
 
   useEffect(() => {
-    if (isHydrated && !isLoading && !isAuthenticated) {
-      router.push(`/${locale}/login?redirect=orders`);
-      return;
-    }
-
     if (isAuthenticated && user) {
       loadOrders();
     }
-  }, [isAuthenticated, isLoading, isHydrated, user, locale, router, currentPage]);
+  }, [isAuthenticated, isLoading, user, locale, router, currentPage]);
 
   // Auto-refresh active orders every 30 seconds
   useEffect(() => {
@@ -143,7 +140,7 @@ export default function OrdersPage() {
   };
 
   // Show loading while hydrating or loading auth state
-  if (!isHydrated || isLoading) {
+  if (!isAuthenticated || isLoading) {
     return <LoadingSpinner message="Loading..." />;
   }
 

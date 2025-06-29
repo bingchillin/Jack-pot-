@@ -224,6 +224,7 @@
       "in_cart": "In Cart",
       "add_more": "Add More",
       "max_reached": "Max Reached",
+      "in_your_cart": "in your cart",
       "stock_status": {
         "in_stock": "In Stock ({quantity} available)",
         "out_of_stock": "Out of Stock"
