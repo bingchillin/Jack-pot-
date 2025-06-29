@@ -24,6 +24,8 @@ import { MailerService } from '../mailer/mailer.service';
 @Injectable()
 export class OrderService {
   private readonly logger = new Logger(OrderService.name);
+  private readonly processingPaymentIntents = new Set<string>();
+  private readonly processedPaymentIntents = new Map<string, number>(); // paymentIntentId -> timestamp
 
   constructor(
     @InjectRepository(Order)
@@ -42,6 +44,16 @@ export class OrderService {
     @Inject(forwardRef(() => MailerService))
     private readonly mailerService: MailerService,
   ) {}
+
+  // helper to clean old processed intents (older than 1h)
+  private cleanProcessedIntents() {
+    const now = Date.now();
+    for (const [pid, ts] of this.processedPaymentIntents) {
+      if (now - ts > 60 * 60 * 1000) {
+        this.processedPaymentIntents.delete(pid);
+      }
+    }
+  }
 
   async create(createOrderDto: CreateOrderDto): Promise<CreateOrderResponseDto> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -273,130 +285,191 @@ export class OrderService {
       throw new NotFoundException(`No payment intent found for session ${sessionId}`);
     }
     
-    // Then find the order by payment intent ID
+    // Simply find the existing order by payment intent
     return this.findByStripePaymentIntent(session.payment_intent as string);
   }
 
   async createFromSession(sessionId: string): Promise<Order> {
     // Retrieve the session from Stripe
     const session = await this.stripeService.retrieveSession(sessionId);
-    
-    if (!session.payment_intent) {
-      throw new BadRequestException(`No payment intent found for session ${sessionId}`);
+
+    // Guard against concurrent processing of the same payment intent
+    if (this.processingPaymentIntents.has(session.payment_intent as string)) {
+      // Another request is already creating the order – wait briefly and return the existing one
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return this.findByStripePaymentIntent(session.payment_intent as string);
     }
 
-    // Check if order already exists
+    // Mark this payment intent as being processed
+    this.processingPaymentIntents.add(session.payment_intent as string);
+
     try {
-      const existingOrder = await this.findByStripePaymentIntent(session.payment_intent as string);
-      return existingOrder; // Return existing order if found
-    } catch (error) {
-      // Order doesn't exist, create it
+      // Check if order already exists
+      try {
+        const existingOrder = await this.findByStripePaymentIntent(session.payment_intent as string);
+        return existingOrder;
+      } catch (error) {
+        // Order doesn't exist, create it
+      }
+
       this.logger.log(`Creating order from session ${sessionId} with payment intent ${session.payment_intent}`);
       
-      const queryRunner = this.dataSource.createQueryRunner();
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
-
-      try {
-        // Extract order data from session metadata
-        const personId = parseInt(session.metadata.personId);
-        const items = JSON.parse(session.metadata.items || '[]');
-        
-        if (!personId || !items.length) {
-          throw new BadRequestException('Missing personId or items in session metadata');
-        }
-
-        // Verify person exists
-        const person = await this.personRepository.findOne({
-          where: { idPerson: personId },
-        });
-        if (!person) {
-          throw new BadRequestException(`Person with ID ${personId} not found`);
-        }
-
-        // Check if user email is verified
-        if (!person.isEmailVerified) {
-          throw new BadRequestException('Email verification is required to complete your order. Please verify your email address first.');
-        }
-
-        // Calculate totals and verify stock
-        let totalAmount = 0;
-        const orderItems: Partial<OrderItem>[] = [];
-
-        for (const item of items) {
-          const product = await this.productRepository.findOne({
-            where: { idProduct: item.productId, isActive: true },
-          });
-          
-          if (!product) {
-            throw new BadRequestException(`Product with ID ${item.productId} not found`);
-          }
-          
-          // For paid orders, check if there's enough total stock (available + reserved)
-          // since reserved stock will be converted to sold stock
-          const totalAvailableStock = product.stockQuantity + product.reservedQuantity;
-          if (totalAvailableStock < item.quantity) {
-            throw new BadRequestException(`Insufficient stock for ${product.name}. Available: ${totalAvailableStock}, Requested: ${item.quantity}`);
-          }
-
-          const itemTotal = product.price * item.quantity;
-          totalAmount += itemTotal;
-
-          orderItems.push({
-            idProduct: item.productId,
-            quantity: item.quantity,
-            unitPrice: product.price,
-            totalPrice: itemTotal,
-          });
-        }
-
-        // Create order with PAID status
-        const newOrder = this.orderRepository.create({
-          idPerson: personId,
-          amount: totalAmount,
-          shippingCost: 0, // Add shipping logic if needed
-          taxAmount: 0, // Add tax logic if needed
-          totalAmount,
-          status: OrderStatus.PAID,
-          stripePaymentIntentId: session.payment_intent as string,
-          paidAt: new Date(),
-          paymentMethod: 'card', // Default payment method
-          locale: session.metadata?.locale || 'en', // Use locale from session metadata
-        });
-
-        const savedOrder = await queryRunner.manager.save(Order, newOrder);
-
-        // Create order items and reduce stock
-        for (const item of orderItems) {
-          const orderItem = this.orderItemRepository.create({
-            ...item,
-            idOrder: savedOrder.idOrder,
-          });
-          await queryRunner.manager.save(OrderItem, orderItem);
-
-          // For paid orders, reduce reserved quantity since the stock was already reserved
-          // during the initial order creation
-          await queryRunner.manager
-            .createQueryBuilder()
-            .update(Product)
-            .set({ 
-              reservedQuantity: () => `reserved_quantity - ${item.quantity}`,
-            })
-            .where('id_product = :id', { id: item.idProduct })
-            .execute();
-        }
-
-        await queryRunner.commitTransaction();
-        
-        this.logger.log(`Order ${savedOrder.idOrder} created from session ${sessionId}`);
-        return savedOrder;
-      } catch (error) {
-        await queryRunner.rollbackTransaction();
-        this.logger.error(`Failed to create order from session ${sessionId}:`, error);
-        throw error;
-      } finally {
-        await queryRunner.release();
+      // Create the order with full transaction
+      const order = await this.createOrderTransaction(session);
+      
+      // Send confirmation email after order is created
+      await this.sendOrderConfirmationEmail(order);
+      
+      this.logger.log(`Order ${order.idOrder} fully processed and ready`);
+      
+      // Return the fully processed order
+      return order;
+    } finally {
+      // Always remove the processing flag so future requests can proceed
+      if (session.payment_intent) {
+        this.processingPaymentIntents.delete(session.payment_intent as string);
       }
+    }
+  }
+
+  private async createOrderTransaction(session: Stripe.Checkout.Session): Promise<Order> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Extract order data from session metadata
+      const personId = parseInt(session.metadata.personId);
+      const items = JSON.parse(session.metadata.items || '[]');
+      
+      if (!personId || !items.length) {
+        throw new BadRequestException('Missing personId or items in session metadata');
+      }
+
+      // Verify person exists
+      const person = await this.personRepository.findOne({
+        where: { idPerson: personId },
+      });
+      if (!person) {
+        throw new BadRequestException(`Person with ID ${personId} not found`);
+      }
+
+      // Check if user email is verified
+      if (!person.isEmailVerified) {
+        throw new BadRequestException('Email verification is required to complete your order. Please verify your email address first.');
+      }
+
+      // Calculate totals and verify stock
+      let totalAmount = 0;
+      const orderItems: Partial<OrderItem>[] = [];
+
+      for (const item of items) {
+        const product = await this.productRepository.findOne({
+          where: { idProduct: item.productId, isActive: true },
+        });
+        
+        if (!product) {
+          throw new BadRequestException(`Product with ID ${item.productId} not found`);
+        }
+        
+        // For paid orders, check if there's enough total stock (available + reserved)
+        // since reserved stock will be converted to sold stock
+        const totalAvailableStock = product.stockQuantity + product.reservedQuantity;
+        if (totalAvailableStock < item.quantity) {
+          throw new BadRequestException(`Insufficient stock for ${product.name}. Available: ${totalAvailableStock}, Requested: ${item.quantity}`);
+        }
+
+        const itemTotal = product.price * item.quantity;
+        totalAmount += itemTotal;
+
+        orderItems.push({
+          idProduct: item.productId,
+          quantity: item.quantity,
+          unitPrice: product.price,
+          totalPrice: itemTotal,
+        });
+      }
+
+      // Create order with PAID status
+      const newOrder = this.orderRepository.create({
+        idPerson: personId,
+        amount: totalAmount,
+        shippingCost: 0, // Add shipping logic if needed
+        taxAmount: 0, // Add tax logic if needed
+        totalAmount,
+        status: OrderStatus.PAID,
+        stripePaymentIntentId: session.payment_intent as string,
+        paidAt: new Date(),
+        paymentMethod: 'card', // Default payment method
+        locale: session.metadata?.locale || 'en', // Use locale from session metadata
+      });
+
+      let savedOrder: Order;
+      try {
+        savedOrder = await queryRunner.manager.save(Order, newOrder);
+      } catch (err) {
+        if (err.code === '23505') {
+          this.logger.warn(`Duplicate order detected for payment intent ${session.payment_intent}. Fetching existing order.`);
+          await queryRunner.rollbackTransaction();
+          return await this.findByStripePaymentIntent(session.payment_intent as string);
+        }
+        throw err;
+      }
+
+      // Create order items and reduce stock
+      for (const item of orderItems) {
+        const orderItem = this.orderItemRepository.create({
+          ...item,
+          idOrder: savedOrder.idOrder,
+        });
+        await queryRunner.manager.save(OrderItem, orderItem);
+
+        // For paid orders created from session (payment already succeeded),
+        // reduce the actual stock quantity since there was no prior reservation
+        await queryRunner.manager
+          .createQueryBuilder()
+          .update(Product)
+          .set({ 
+            stockQuantity: () => `stock_quantity - ${item.quantity}`,
+          })
+          .where('id_product = :id', { id: item.idProduct })
+          .execute();
+      }
+
+      await queryRunner.commitTransaction();
+      
+      this.logger.log(`Order ${savedOrder.idOrder} created from session ${session.id}`);
+
+      // Return order with relations loaded
+      return await this.orderRepository.findOne({
+        where: { idOrder: savedOrder.idOrder },
+        relations: ['person', 'orderItems', 'orderItems.product'],
+      });
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      this.logger.error(`Failed to create order from session ${session.id}:`, error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  private async sendOrderConfirmationEmail(order: Order): Promise<void> {
+    try {
+      const person = await this.personRepository.findOne({
+        where: { idPerson: order.idPerson },
+      });
+      
+      if (person) {
+        this.logger.log(`Sending order confirmation email to ${person.email}`);
+        await this.mailerService.sendOrderConfirmationEmail(order, person, order.locale || 'en');
+        this.logger.log(`Order confirmation email sent for order ${order.idOrder}`);
+      } else {
+        this.logger.error(`Person not found for order ${order.idOrder}`);
+      }
+    } catch (emailError) {
+      this.logger.error(`Failed to send order confirmation email for order ${order.idOrder}:`, emailError);
+      // Don't throw error - email failure shouldn't fail the order
     }
   }
 
