@@ -20,7 +20,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCartHydration } from '@/hooks/useCartHydration';
 
 export default function CartPage() {
@@ -31,6 +31,7 @@ export default function CartPage() {
   const cartSummary = getSummary();
   const t = useTranslations('shop.cart');
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const locale = params.locale as string;
   const { isHydrated, isLoading } = useCartHydration();
@@ -42,6 +43,17 @@ export default function CartPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Check for success message from profile update
+  useEffect(() => {
+    const success = searchParams.get('success');
+    if (success) {
+      // Clean up the URL without showing toast to prevent double toasts
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('success');
+      window.history.replaceState({}, '', newUrl.toString());
+    }
+  }, [searchParams]);
 
   const handleQuantityChange = (productId: number, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -97,6 +109,14 @@ export default function CartPage() {
         toast.error(`${item.product.name}: Only ${item.product.stockQuantity} items available in stock`);
         return;
       }
+    }
+
+    // Check if user has an address
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!user.address || user.address.trim() === '') {
+      toast.error(t('address_required'));
+      router.push(`/${locale}/profile/edit?redirect=cart`);
+      return;
     }
 
     setIsProcessing(true);

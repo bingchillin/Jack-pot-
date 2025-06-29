@@ -442,13 +442,22 @@ export class AuthService {
             updateData.numberPhone = updateProfileDto.numberPhone;
         }
 
+        if (updateProfileDto.address !== undefined) {
+            updateData.address = updateProfileDto.address;
+        }
+
         // If new password is provided, hash it
         if (updateProfileDto.newPassword) {
             updateData.password = updateProfileDto.newPassword;
         }
 
+        console.log('🔍 Backend Auth Service - Updating person with data:', updateData);
+        console.log('🔍 Backend Auth Service - Person ID:', userId);
+
         // Update the person
         const updatedPerson = await this.personService.update(userId, updateData);
+        
+        console.log('🔍 Backend Auth Service - Updated person:', updatedPerson);
         
         // Return user without password
         const { password: _, ...result } = updatedPerson;

@@ -16,6 +16,7 @@ interface AuthStore extends AuthState {
     firstname?: string;
     surname?: string;
     numberPhone?: string;
+    address?: string;
     currentPassword: string;
     newPassword?: string;
   }) => Promise<void>;
@@ -102,12 +103,15 @@ export const useAuthStore = create<AuthStore>()(
         firstname?: string;
         surname?: string;
         numberPhone?: string;
+        address?: string;
         currentPassword: string;
         newPassword?: string;
       }) => {
         try {
           set({ isLoading: true });
+          console.log('🔍 Auth Store - Updating profile with data:', updateData);
           const updatedUser = await authService.updateProfile(get().user!, updateData);
+          console.log('🔍 Auth Store - Received updated user:', updatedUser);
           
           // Update localStorage with new user data
           if (typeof window !== 'undefined') {
@@ -120,6 +124,7 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false
           });
         } catch (error) {
+          console.error('🔍 Auth Store - Error updating profile:', error);
           set({ isLoading: false });
           throw error;
         }
