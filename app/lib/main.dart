@@ -1,5 +1,5 @@
-import 'package:app/app_config.dart';
-import 'package:app/providers/plant_provider_my_List.dart';
+import 'package:jackpote/app_config.dart';
+import 'package:jackpote/providers/plant_provider_my_List.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';

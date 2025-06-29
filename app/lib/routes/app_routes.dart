@@ -1,4 +1,4 @@
-import 'package:app/ui/pages/add_my_object_page.dart';
+import 'package:jackpote/ui/pages/add_my_object_page.dart';
 import 'package:flutter/material.dart';
 import '../ui/pages/advise_page.dart';
 import '../ui/pages/auth_wrapper_redirection.dart';

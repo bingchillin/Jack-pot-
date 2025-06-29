@@ -1,7 +1,7 @@
-import 'package:app/ui/pages/widget/plant_card_favorite/plant_control_switches_widget.dart';
+import 'package:jackpote/ui/pages/widget/plant_card_favorite/plant_control_switches_widget.dart';
 import 'package:flutter/material.dart';
 import '../../../../models/object_profile.dart';
-import 'package:app/app_config.dart';
+import 'package:jackpote/app_config.dart';
 
 import '../../plant_detail_page.dart';
 
