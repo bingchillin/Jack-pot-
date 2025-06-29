@@ -1,4 +1,4 @@
-import 'package:app/ui/pages/widget/plant_card_my_list/plant_item_my_list_widget.dart';
+import 'package:jackpote/ui/pages/widget/plant_card_my_list/plant_item_my_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/object_profile/object_profile_bloc.dart';

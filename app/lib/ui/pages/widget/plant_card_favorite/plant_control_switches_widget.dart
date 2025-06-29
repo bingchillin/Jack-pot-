@@ -1,4 +1,4 @@
-import 'package:app/providers/auth_provider.dart';
+import 'package:jackpote/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../models/object_profile.dart';

@@ -1,4 +1,4 @@
-import 'package:app/ui/pages/my_plant_page_login.dart';
+import 'package:jackpote/ui/pages/my_plant_page_login.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/nav_provider.dart';
