@@ -1,13 +1,144 @@
 {
-  "HomePage": {
-    "title": "bonjour!",
-    "about": "Go to the about page"
-  },
   "nav": {
     "home": "Accueil",
     "about": "À propos",
     "products": "Produits",
-    "contact": "Contact"
+    "contact": "Contact",
+    "auth": {
+      "profile": "Profil",
+      "sign_in": "Se Connecter",
+      "create_account": "Créer un Compte",
+      "sign_out": "Se Déconnecter"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Se connecter",
+      "subtitle": "Connectez-vous à votre compte",
+      "welcome_back": "Bon retour",
+      "description": "Accédez à votre compte pour gérer vos plantes et suivre les progrès de votre jardin",
+      "email": "Adresse e-mail",
+      "email_placeholder": "votre.email@exemple.com",
+      "password": "Mot de passe",
+      "password_placeholder": "Entrez votre mot de passe",
+      "forgot_password": "Mot de passe oublié ?",
+      "sign_in": "Se connecter",
+      "signing_in": "Connexion en cours...",
+      "no_account": "Vous n'avez pas de compte ?",
+      "sign_up_here": "Inscrivez-vous ici",
+      "new_to_jack_pot": "Nouveau sur Jack Pot ?",
+      "create_account": "Créer un compte",
+      "success": "Connexion réussie ! Redirection...",
+      "error": {
+        "fill_fields": "Veuillez remplir tous les champs",
+        "login_failed": "Échec de la connexion. Veuillez réessayer."
+      }
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Créez votre compte",
+      "join_jack_pot": "Rejoignez Jack Pot",
+      "description": "Commencez votre parcours de soin des plantes avec Jack Pot et faites grandir votre jardin en toute confiance",
+      "first_name": "Prénom",
+      "first_name_placeholder": "Jean",
+      "last_name": "Nom de famille",
+      "last_name_placeholder": "Dupont",
+      "email": "Adresse e-mail",
+      "email_placeholder": "votre.email@exemple.com",
+      "phone": "Numéro de téléphone",
+      "phone_placeholder": "1234567890",
+      "phone_help_text": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
+      "password": "Mot de passe",
+      "password_placeholder": "Min 6 caractères",
+      "confirm_password": "Confirmer le mot de passe",
+      "confirm_password_placeholder": "Répétez le mot de passe",
+      "create_account": "Créer un compte",
+      "creating_account": "Création du compte...",
+      "already_have_account": "Vous avez déjà un compte ?",
+      "sign_in_here": "Connectez-vous ici",
+      "terms_agreement": "En créant un compte, vous acceptez nos",
+      "terms_of_service": "Conditions d'utilisation",
+      "and": "et",
+      "privacy_policy": "Politique de confidentialité",
+      "success": "Compte créé avec succès ! Veuillez vérifier votre e-mail pour la vérification.",
+      "error": {
+        "fill_required_fields": "Veuillez remplir tous les champs obligatoires",
+        "password_min_length": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwords_no_match": "Les mots de passe ne correspondent pas",
+        "invalid_email": "Veuillez entrer une adresse e-mail valide",
+        "phone_invalid": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
+        "registration_failed": "L'inscription a échoué. Veuillez réessayer."
+      }
+    },
+    "profile": {
+      "title": "Profil",
+      "welcome_back": "Bon retour",
+      "description": "Gérez votre compte et suivez votre parcours de soin des plantes",
+      "verified": "Vérifié",
+      "pending_verification": "Vérification en attente",
+      "administrator": "Administrateur",
+      "customer": "Client",
+      "email_verification_notice": "Veuillez vérifier votre e-mail pour vérifier votre compte",
+      "edit_information": "Modifier les informations",
+      "verification_modal": {
+        "title": "Vérification d'e-mail requise",
+        "message": "Votre compte a été créé avec succès ! Pour accéder à toutes les fonctionnalités et finaliser votre inscription, veuillez vérifier votre adresse e-mail.",
+        "check_email": "Veuillez vérifier votre e-mail :",
+        "got_it": "Compris !",
+        "close": "Fermer"
+      },
+      "edit": {
+        "title": "Modifier le profil",
+        "subtitle": "Mettre à jour vos informations personnelles",
+        "first_name": "Prénom",
+        "last_name": "Nom de famille",
+        "email_address": "Adresse e-mail (Non modifiable)",
+        "phone": "Numéro de téléphone",
+        "phone_placeholder": "1234567890",
+        "phone_help_text": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
+        "current_password": "Mot de passe actuel",
+        "current_password_placeholder": "Entrez votre mot de passe actuel",
+        "new_password": "Nouveau mot de passe (Optionnel)",
+        "new_password_placeholder": "Entrez le nouveau mot de passe",
+        "confirm_new_password": "Confirmer le nouveau mot de passe",
+        "confirm_new_password_placeholder": "Confirmez le nouveau mot de passe",
+        "save_changes": "Enregistrer",
+        "saving": "Enregistrement...",
+        "cancel": "Annuler",
+        "success": "Profil mis à jour avec succès !",
+        "password_changed": "Profil et mot de passe mis à jour avec succès !",
+        "error": {
+          "fill_required_fields": "Veuillez remplir tous les champs obligatoires",
+          "current_password_required": "Le mot de passe actuel est requis pour mettre à jour le profil",
+          "current_password_incorrect": "Le mot de passe actuel est incorrect",
+          "phone_invalid": "Le numéro de téléphone doit contenir entre 9 et 15 chiffres",
+          "new_passwords_no_match": "Les nouveaux mots de passe ne correspondent pas",
+          "new_password_min_length": "Le nouveau mot de passe doit contenir au moins 6 caractères",
+          "update_failed": "Échec de la mise à jour du profil. Veuillez réessayer."
+        }
+      },
+      "quick_actions": "Actions rapides",
+      "browse_products": "Parcourir les produits",
+      "my_orders": "Mes commandes",
+      "plant_care_guide": "Guide de soin des plantes",
+      "settings": "Paramètres",
+      "recent_activity": "Activité récente",
+      "no_recent_activity": "Aucune activité récente à afficher",
+      "no_activity_description": "Commencez à parcourir les produits pour voir votre activité ici"
+    },
+    "common": {
+      "loading": "Chargement...",
+      "sign_out": "Se déconnecter",
+      "profile": "Profil"
+    },
+    "errors": {
+      "invalid_credentials": "Email ou mot de passe invalide",
+      "email_already_exists": "L'email existe déjà",
+      "phone_already_exists": "Le numéro de téléphone existe déjà",
+      "invalid_current_password": "Le mot de passe actuel est incorrect",
+      "not_authenticated": "Vous devez être connecté pour effectuer cette action",
+      "verification_required": "Veuillez vérifier votre adresse email pour effectuer cette action"
+    }
   },
   "hero": {
     "title": "Découvrez Jack, Votre Compagnon de Jardinage Intelligent",
@@ -58,8 +189,8 @@
     "company": "Jack Pot",
     "rights": "Tous droits réservés.",
     "links": {
-      "privacy": "Politique de confidentialité",
-      "terms": "Conditions d'utilisation",
+      "privacy": "Politique de Confidentialité",
+      "terms": "Conditions d'Utilisation",
       "support": "Contact"
     }
   },
@@ -160,6 +291,89 @@
         "title": "Nous contacter",
         "content": "Si vous avez des questions sur ces conditions, veuillez nous contacter à legal@jackpot.com"
       }
+    }
+  },
+  "shop": {
+    "products": {
+      "title": "Nos Produits",
+      "subtitle": "Découvrez nos solutions de jardinage intelligentes",
+      "search_placeholder": "Rechercher des produits...",
+      "quantity_selector": "Sélecteur de Quantité",
+      "loading": "Chargement des produits...",
+      "error": "Échec du chargement des produits. Veuillez réessayer.",
+      "try_again": "Réessayer",
+      "no_products": "Aucun produit disponible.",
+      "no_search_results": "Aucun produit trouvé correspondant à votre recherche.",
+      "showing_results": "Affichage de {count} sur {total} produits",
+      "out_of_stock": "Rupture de Stock",
+      "in_stock": "En Stock",
+      "available": "disponible",
+      "free_shipping": "Livraison gratuite",
+      "quick_add": "Ajout Rapide",
+      "add_to_cart": "Ajouter au Panier",
+      "in_cart": "Dans le Panier",
+      "stock_status": {
+        "in_stock": "En Stock ({quantity} disponible)",
+        "out_of_stock": "Rupture de Stock"
+      },
+      "stock_validation": {
+        "max_quantity": "Vous avez déjà la quantité maximale disponible ({quantity}) dans votre panier !",
+        "only_available": "Seulement {quantity} de plus disponible. Veuillez réduire la quantité.",
+        "added_to_cart": "{name} ajouté au panier !"
+      }
+    },
+    "product_detail": {
+      "breadcrumb": {
+        "home": "Accueil",
+        "products": "Produits"
+      },
+      "loading": "Chargement du produit...",
+      "not_found": "Produit Non Trouvé",
+      "not_found_message": "Produit non trouvé ou échec du chargement.",
+      "back_to_products": "Retour aux Produits",
+      "quantity": "Quantité :",
+      "available": "disponible",
+      "in_cart": "Dans le panier",
+      "trust_badges": {
+        "secure_payment": "Paiement Sécurisé",
+        "free_shipping": "Livraison gratuite"
+      },
+      "tabs": {
+        "description": "Description",
+        "specifications": "Spécifications",
+        "shipping": "Livraison et Retours"
+      },
+      "description": {
+        "title": "Description du Produit",
+        "no_description": "Aucune description disponible pour ce produit."
+      },
+      "specifications": {
+        "title": "Spécifications du Produit",
+        "sku": "Référence",
+        "stock": "Stock",
+        "status": "Statut",
+        "units": "unités",
+        "active": "Actif",
+        "inactive": "Inactif"
+      },
+      "shipping": {
+        "title": "Livraison et Retours",
+        "return_policy": "Politique de Retour",
+        "return_policy_text": "Politique de retour de 30 jours. Les articles doivent être dans leur état d'origine."
+      },
+      "stock_status": {
+        "in_stock": "En Stock ({quantity} disponible)",
+        "out_of_stock": "Rupture de Stock"
+      },
+      "stock_validation": {
+        "max_quantity": "Vous avez déjà la quantité maximale disponible ({quantity}) dans votre panier !",
+        "only_available": "Seulement {quantity} de plus disponible. Veuillez réduire la quantité.",
+        "added_to_cart": "{name} ajouté au panier !"
+      },
+      "add_to_cart": "Ajouter au Panier",
+      "out_of_stock": "Rupture de Stock",
+      "add_more": "Ajouter Plus",
+      "max_reached": "Maximum Atteint"
     }
   }
 } 

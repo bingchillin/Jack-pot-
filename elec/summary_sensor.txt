@@ -34,7 +34,42 @@ Convertir en volts
 Estimer un indice UV simplifié (ex. UV = voltage * 10.0)
 Définir des seuils d’alerte plus c'est haut plus ca tape... donc en fonction de la plante, on informe de la dangerosité
 
+Intensité UV	Tension en sortie (V)	Commentaire
+0 (aucun UV)	Environ 0,3 V	Ombre, intérieur sans soleil
+UV faible	0,4 – 0,8 V	Nuageux, début de lumière UV
+UV modéré	0,8 – 1,5 V	Soleil partiel ou matin/soir
+UV fort	1,5 – 2,2 V (max)	Plein soleil direct, été
 
 Temperature ground sensor (temperature_sensor_ground):
 
 lis la temparature en °C
+
+
+moteur Pression:
+
+Utilisation avec transitor 2N2222 
+
+cablage transistor : 
+emeteur -> ground
+base -> resistance 1K ohm -> GPIO (PIN)
+collecteur -> moteur Pression
+
+
+cablage moteur:
+1: VCC
+2: collecteur du transitor
+
+led UV:
+
+Simple connexion PIN et Ground
+
+
+Pin utiliser issue de l'ide pour ESP32:
+
+#define SENSOR_TEMPERATURE_GROUND_P 15
+#define SENSOR_WATER_P 34
+#define SENSOR_HUMIDITY_GROUND  35
+#define SENSOR_TEMPERATURE_HUMIDITY_EXTERN 14
+#define SENSOR_UV 32
+#define MOTOR 16
+#define UVLED 18

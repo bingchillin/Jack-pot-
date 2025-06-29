@@ -12,6 +12,7 @@ class AuthProvider extends ChangeNotifier {
 
   Map<String, dynamic>? _userData;
 
+  bool _isLoadingUser = true;
 
   bool get isAuthenticated => _isAuthenticated;
   String? get userId => _userId;
@@ -24,6 +25,9 @@ class AuthProvider extends ChangeNotifier {
   Map<String, dynamic>? get user => _user;
 
   bool get isLoggedIn => _isAuthenticated;
+
+
+  bool get isLoadingUser => _isLoadingUser;
 
 
   AuthProvider() {
@@ -111,17 +115,26 @@ class AuthProvider extends ChangeNotifier {
   }) async {
     final url = Uri.parse(AppConfig.signupEndpoint);
 
+    final payload = {
+      'email': email,
+      'password': password,
+      'firstname': firstname,
+    };
+
+    if (surname != null && surname.isNotEmpty) {
+      payload['surname'] = surname;
+    }
+
+    if (numberPhone != null && numberPhone.isNotEmpty) {
+      payload['numberPhone'] = numberPhone;
+    }
+
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-        'firstname': firstname,
-        'surname': surname ?? '',
-        'numberPhone': numberPhone ?? '',
-      }),
+      body: jsonEncode(payload),
     );
+
 
     print("Signup status: ${response.statusCode}");
     print("Response: ${response.body}");
@@ -133,12 +146,17 @@ class AuthProvider extends ChangeNotifier {
       _userId = data['user']['idPerson'].toString();
       _firstName = data['user']['firstname'];
 
+      _accessToken = data['access_token'];
+      _userData = data['user'];
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('userId', _userId!);
       await prefs.setString('firstName', _firstName!);
-      await prefs.setString('accessToken', data['access_token']);
-      await prefs.setString('refreshToken', data['refresh_token']);
+      await prefs.setString('access_token', data['access_token']);
+      await prefs.setString('refresh_token', data['refresh_token']);
+      await prefs.setString('userData', jsonEncode(_userData)); //
 
+      _isLoadingUser = false;
       notifyListeners();
       return true;
     } else {

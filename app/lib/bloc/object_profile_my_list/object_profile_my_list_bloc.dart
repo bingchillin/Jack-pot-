@@ -37,15 +37,17 @@ class ObjectProfileMyListBloc extends Bloc<ObjectProfileMyListEvent, ObjectProfi
   Future<void> _onLoad(LoadProfilesMyList event, Emitter<ObjectProfileMyListState> emit) async {
     try {
       final profiles = await provider.fetchProfilesMyList(personId);
-      if (!listEquals(profiles, _currentProfiles)) {
-        _currentProfiles = profiles;
-        _profilesController.add(_currentProfiles);
-        emit(ProfileLoaded(_currentProfiles));
-      }
+
+      // Toujours émettre, même si la liste est vide
+      _currentProfiles = profiles;
+      _profilesController.add(_currentProfiles);
+      emit(ProfileLoaded(_currentProfiles));
+
     } catch (e) {
       emit(ProfileError("Erreur de chargement : $e"));
     }
   }
+
 
   void _onToggleAutomatic(ToggleAutomatic event, Emitter<ObjectProfileMyListState> emit) {
     if (state is! ProfileLoaded) return;

@@ -44,7 +44,7 @@ class _SignupPageState extends State<SignupPage> {
     setState(() => _isLoading = false);
 
     if (success && mounted) {
-      Navigator.pushReplacementNamed(context, '/profile');
+      Navigator.pushReplacementNamed(context, '/');
     } else if (mounted) {
       showDialog(
         context: context,
@@ -102,10 +102,11 @@ class _SignupPageState extends State<SignupPage> {
                 validator: (v) => v == null || v.isEmpty ? "Requis" : null,
               ),
               const SizedBox(height: 12),
-              const Text("Nom"),
+              const Text("Nom *"),
               TextFormField(
                 controller: _surnameController,
                 decoration: const InputDecoration(hintText: "Nom"),
+                validator: (v) => v == null || v.isEmpty ? "Requis" : null,
               ),
               const SizedBox(height: 12),
               const Text("Téléphone"),
