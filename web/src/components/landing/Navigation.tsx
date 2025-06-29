@@ -45,8 +45,16 @@ export default function Navigation({ scrolled }: NavigationProps) {
     // Remove the current locale from the pathname
     const pathnameWithoutLocale = pathname.replace(/^\/(en|fr|es)/, '');
     
-    // Navigate to the new locale
-    router.push(`/${newLocale}${pathnameWithoutLocale || ''}`);
+    // Get current search params
+    const searchParams = new URLSearchParams(window.location.search);
+    const queryString = searchParams.toString();
+    
+    // Build the new URL with query parameters
+    const newPath = `/${newLocale}${pathnameWithoutLocale || ''}`;
+    const newUrl = queryString ? `${newPath}?${queryString}` : newPath;
+    
+    // Navigate to the new locale with preserved query parameters
+    router.push(newUrl);
     setIsMenuOpen(false);
   };
 
