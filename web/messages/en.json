@@ -147,7 +147,10 @@
       "phone_already_exists": "Phone number already exists",
       "invalid_current_password": "Current password is incorrect",
       "not_authenticated": "You must be logged in to perform this action",
-      "verification_required": "Please verify your email address to perform this action"
+      "verification_required": "Please verify your email address to perform this action",
+      "page_not_found": "Page not found",
+      "page_not_found_description": "Sorry, we couldn't find the page you're looking for. It might have been moved, deleted, or you entered the wrong URL.",
+      "go_home": "Go Home"
     }
   },
   "hero": {
