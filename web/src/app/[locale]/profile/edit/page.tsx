@@ -151,14 +151,19 @@ export default function EditProfilePage() {
     setIsSubmitting(true);
     
     try {
-      const updateData = {
+      const updateData: any = {
         firstname: formData.firstname,
         surname: formData.surname,
         numberPhone: formData.numberPhone || undefined,
-        address: formData.address || undefined,
         currentPassword: formData.currentPassword,
         ...(formData.newPassword && { newPassword: formData.newPassword }),
       };
+
+      // Only include address if it's different from the original user address
+      // or if it's not empty when user had no address before
+      if (formData.address !== user.address) {
+        updateData.address = formData.address;
+      }
 
       await updateProfile(updateData);
       
