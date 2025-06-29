@@ -89,16 +89,6 @@ export class OrderController {
     return this.orderService.findByPerson(req.user.idPerson, pageNum, limitNum);
   }
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get an order by ID' })
-  @ApiResponse({ status: 200, description: 'Order found', type: Order })
-  @ApiResponse({ status: 404, description: 'Order not found' })
-  findOne(@Param('id') id: string): Promise<Order> {
-    return this.orderService.findOne(+id);
-  }
-
   @Get('by-payment-intent/:paymentIntentId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -127,6 +117,24 @@ export class OrderController {
   @ApiResponse({ status: 400, description: 'Invalid session data' })
   createFromSession(@Param('sessionId') sessionId: string): Promise<Order> {
     return this.orderService.createFromSession(sessionId);
+  }
+
+  @Get('payment-status/:paymentIntentId')
+  @ApiOperation({ summary: 'Get payment status by payment intent ID' })
+  @ApiResponse({ status: 200, description: 'Payment status retrieved', type: PaymentStatusResponseDto })
+  @ApiResponse({ status: 404, description: 'Payment intent not found' })
+  getPaymentStatus(@Param('paymentIntentId') paymentIntentId: string): Promise<PaymentStatusResponseDto> {
+    return this.orderService.getPaymentStatus(paymentIntentId);
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get an order by ID' })
+  @ApiResponse({ status: 200, description: 'Order found', type: Order })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  findOne(@Param('id') id: string): Promise<Order> {
+    return this.orderService.findOne(+id);
   }
 
   @Patch(':id')
@@ -162,14 +170,6 @@ export class OrderController {
   @ApiResponse({ status: 400, description: 'Payment processing failed' })
   confirmPayment(@Body() confirmPaymentDto: ConfirmPaymentDto): Promise<PaymentStatusResponseDto> {
     return this.orderService.confirmPayment(confirmPaymentDto);
-  }
-
-  @Get('payment-status/:paymentIntentId')
-  @ApiOperation({ summary: 'Get payment status by payment intent ID' })
-  @ApiResponse({ status: 200, description: 'Payment status retrieved', type: PaymentStatusResponseDto })
-  @ApiResponse({ status: 404, description: 'Payment intent not found' })
-  getPaymentStatus(@Param('paymentIntentId') paymentIntentId: string): Promise<PaymentStatusResponseDto> {
-    return this.orderService.getPaymentStatus(paymentIntentId);
   }
 
   @Patch(':id/cancel')

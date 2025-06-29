@@ -85,14 +85,32 @@ class OrderService {
     return this.handleResponse<Order>(response);
   }
 
-  async getOrderBySessionWithRetry(sessionId: string): Promise<any> {
-    try {
-      const order = await this.getOrderBySession(sessionId);
-      return order;
-    } catch (error) {
-      // Order not found, create it from session data
-      return this.createOrderFromSession(sessionId);
+  async getOrderBySessionWithRetry(sessionId: string, maxRetries: number = 3): Promise<Order> {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        // First try to get existing order (webhook might have created it)
+        const order = await this.getOrderBySession(sessionId);
+        console.log(`Order found on attempt ${attempt + 1}`);
+        return order;
+      } catch (error) {
+        // If order doesn't exist, try to create it from session
+        try {
+          const createdOrder = await this.createOrderFromSession(sessionId);
+          console.log(`Order created successfully on attempt ${attempt + 1}`);
+          return createdOrder;
+        } catch (createError) {
+          console.log(`Attempt ${attempt + 1}: Order not ready yet...`);
+          
+          // If this is not the last attempt, wait a moment before retrying
+          if (attempt < maxRetries - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+      }
     }
+    
+    // If all attempts failed, throw a helpful error
+    throw new Error(`Order is still being processed. Please refresh the page in a few seconds.`);
   }
 
   async createOrderFromSession(sessionId: string): Promise<Order> {
