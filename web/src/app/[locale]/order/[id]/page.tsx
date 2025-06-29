@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
 import Navigation from '../../../../components/landing/Navigation';
 import Footer from '../../../../components/landing/Footer';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuth } from '@/hooks/useAuth';
 import { orderService } from '@/services/order.service';
 import { Order, OrderStatus } from '@/interfaces/order.interface';
 import { toast } from 'react-hot-toast';
@@ -44,7 +44,9 @@ export default function OrderDetailsPage() {
   const locale = params.locale as string;
   const orderId = parseInt(params.id as string);
   const t = useTranslations('order_details');
-  const { isAuthenticated, user, isLoading, isHydrated } = useAuthStore();
+  const { isAuthenticated, user, isLoading } = useAuth({
+    requireAuth: true
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,15 +57,10 @@ export default function OrderDetailsPage() {
   }, []);
 
   useEffect(() => {
-    if (isHydrated && !isLoading && !isAuthenticated) {
-      router.push(`/${locale}/login?redirect=order/${orderId}`);
-      return;
-    }
-
     if (isAuthenticated && user && orderId) {
       loadOrder();
     }
-  }, [isAuthenticated, isLoading, isHydrated, user, orderId, locale, router]);
+  }, [isAuthenticated, isLoading, user, orderId, locale, router]);
 
   const loadOrder = async () => {
     try {
@@ -130,7 +127,7 @@ export default function OrderDetailsPage() {
   };
 
   // Show loading while hydrating or loading auth state
-  if (!isHydrated || isLoading) {
+  if (!isAuthenticated || isLoading) {
     return <LoadingSpinner message={t('loading')} />;
   }
 

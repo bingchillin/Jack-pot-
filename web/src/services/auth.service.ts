@@ -15,6 +15,23 @@ import {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 class AuthService {
+  private isRefreshing = false;
+  private failedQueue: Array<{
+    resolve: (value: any) => void;
+    reject: (error: any) => void;
+  }> = [];
+
+  private processQueue(error: any, token: string | null = null) {
+    this.failedQueue.forEach(({ resolve, reject }) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(token);
+      }
+    });
+    this.failedQueue = [];
+  }
+
   private getHeaders(): HeadersInit {
     return {
       'Content-Type': 'application/json',
@@ -41,6 +58,91 @@ class AuthService {
   // Generate a 6-digit verification code
   private generateVerificationCode(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  // Enhanced request method with automatic token refresh
+  private async makeAuthenticatedRequest<T>(url: string, options: RequestInit = {}): Promise<T> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+
+    // Check if token is about to expire (within 5 minutes)
+    if (this.isTokenExpired(token, 5 * 60 * 1000)) {
+      if (this.isRefreshing) {
+        // Wait for the current refresh to complete
+        return new Promise((resolve, reject) => {
+          this.failedQueue.push({ resolve, reject });
+        }).then(() => this.makeAuthenticatedRequest<T>(url, options));
+      }
+
+      this.isRefreshing = true;
+      const refreshToken = localStorage.getItem('refreshToken');
+
+      if (refreshToken) {
+        try {
+          const response = await this.refreshToken(refreshToken);
+          this.saveAuthData(response);
+          this.processQueue(null, response.access_token);
+          this.isRefreshing = false;
+        } catch (error) {
+          this.processQueue(error, null);
+          this.isRefreshing = false;
+          this.clearAuthData();
+          throw new Error('Authentication expired. Please log in again.');
+        }
+      } else {
+        this.isRefreshing = false;
+        this.clearAuthData();
+        throw new Error('No refresh token available. Please log in again.');
+      }
+    }
+
+    // Make the actual request
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...this.getAuthHeaders(),
+        ...options.headers,
+      },
+    });
+
+    // Handle 401 responses
+    if (response.status === 401) {
+      if (this.isRefreshing) {
+        // Wait for the current refresh to complete
+        return new Promise((resolve, reject) => {
+          this.failedQueue.push({ resolve, reject });
+        }).then(() => this.makeAuthenticatedRequest<T>(url, options));
+      }
+
+      this.isRefreshing = true;
+      const refreshToken = localStorage.getItem('refreshToken');
+
+      if (refreshToken) {
+        try {
+          const refreshResponse = await this.refreshToken(refreshToken);
+          this.saveAuthData(refreshResponse);
+          this.processQueue(null, refreshResponse.access_token);
+          this.isRefreshing = false;
+          
+          // Retry the original request with new token
+          return this.makeAuthenticatedRequest<T>(url, options);
+        } catch (error) {
+          this.processQueue(error, null);
+          this.isRefreshing = false;
+          this.clearAuthData();
+          throw new Error('Authentication expired. Please log in again.');
+        }
+      } else {
+        this.isRefreshing = false;
+        this.clearAuthData();
+        throw new Error('No refresh token available. Please log in again.');
+      }
+    }
+
+    return this.handleResponse<T>(response);
   }
 
   async login(loginData: LoginRequest): Promise<LoginResponse> {
@@ -122,10 +224,7 @@ class AuthService {
   }
 
   async getProfile(): Promise<User> {
-    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
-      headers: this.getAuthHeaders(),
-    });
-    return this.handleResponse<User>(response);
+    return this.makeAuthenticatedRequest<User>(`${API_BASE_URL}/auth/profile`);
   }
 
   async updateProfile(user: User, updateData: {
@@ -136,21 +235,14 @@ class AuthService {
     currentPassword: string;
     newPassword?: string;
   }): Promise<User> {
-    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+    return this.makeAuthenticatedRequest<User>(`${API_BASE_URL}/auth/profile`, {
       method: 'PATCH',
-      headers: this.getAuthHeaders(),
       body: JSON.stringify(updateData),
     });
-    const result = await this.handleResponse<User>(response);
-    return result;
   }
 
   async refreshUser(user: User): Promise<User> {
-    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
-      headers: this.getAuthHeaders(),
-    });
-    const result = await this.handleResponse<User>(response);
-    return result;
+    return this.makeAuthenticatedRequest<User>(`${API_BASE_URL}/auth/profile`);
   }
 
   // Local storage helpers
@@ -183,10 +275,12 @@ class AuthService {
     }
   }
 
-  isTokenExpired(token: string): boolean {
+  isTokenExpired(token: string, margin: number = 0): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return Date.now() >= (payload.exp * 1000);
+      const exp = payload.exp * 1000;
+      const now = Date.now();
+      return now + margin >= exp;
     } catch {
       return true;
     }

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Navigation from '../../../../components/landing/Navigation';
 import Footer from '../../../../components/landing/Footer';
 import { useAuthStore } from '@/stores/authStore';
+import { useAuth } from '@/hooks/useAuth';
 import { User, Phone, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowLeft, MapPin } from 'lucide-react';
 
 export default function EditProfilePage() {
@@ -34,7 +35,13 @@ export default function EditProfilePage() {
   const searchParams = useSearchParams();
   const locale = params.locale as string;
   const redirect = searchParams.get('redirect');
-  const { user, updateProfile, isLoading, isAuthenticated, isHydrated } = useAuthStore();
+  
+  // Use auth hook for authentication
+  const { user, isAuthenticated, isLoading } = useAuth({
+    requireAuth: true
+  });
+
+  const { updateProfile } = useAuthStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,13 +50,6 @@ export default function EditProfilePage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (isHydrated && !isLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, isLoading, isHydrated, router]);
 
   // Initialize form data with user information
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function EditProfilePage() {
   }, [user]);
 
   // Show loading while hydrating or loading auth state (but not during form submission)
-  if (!isHydrated || (!user && !isLoading)) {
+  if (!isAuthenticated || !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center">
         <div className="flex items-center justify-center">
@@ -74,11 +74,6 @@ export default function EditProfilePage() {
         </div>
       </div>
     );
-  }
-
-  // Don't render anything if not authenticated (will redirect)
-  if (!isAuthenticated || !user) {
-    return null;
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -22,12 +22,13 @@ import {
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCartHydration } from '@/hooks/useCartHydration';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function CartPage() {
   const [scrolled, setScrolled] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { items, removeItem, updateQuantity, clearCart, getSummary } = useCartStore();
-  const { isAuthenticated, user, refreshUser } = useAuthStore();
+  const { refreshUser } = useAuthStore();
   const cartSummary = getSummary();
   const t = useTranslations('shop.cart');
   const params = useParams();
@@ -36,6 +37,12 @@ export default function CartPage() {
   const locale = params.locale as string;
   const { isHydrated, isLoading } = useCartHydration();
 
+  // Use auth hook for authentication and verification (only when needed)
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth({
+    // No requireAuth - cart should be accessible without login
+    // No requireVerification - only check when proceeding to payment
+  });
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -43,15 +50,6 @@ export default function CartPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Refresh user data when cart page loads to ensure we have latest address
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      refreshUser().catch(error => {
-        console.error('Failed to refresh user data:', error);
-      });
-    }
-  }, [isAuthenticated, user, refreshUser]);
 
   // Check for success message from profile update
   useEffect(() => {
@@ -102,20 +100,39 @@ export default function CartPage() {
   };
 
   const handleProceedToPayment = async () => {
+    if (items.length === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+
+    // Check authentication first - refresh user data to ensure it's current
     if (!isAuthenticated) {
       router.push(`/${locale}/login?redirect=cart`);
       return;
     }
 
-    // Check if user email is verified
-    if (!user?.isEmailVerified) {
-      toast.error(t('email_verification_required'));
-      router.push(`/${locale}/profile?verification_required=true`);
+    // Refresh user data to ensure we have the latest info (in case localStorage was cleared)
+    try {
+      await refreshUser();
+    } catch (error) {
+      // If refresh fails, user is no longer authenticated
+      console.log('User refresh failed, redirecting to login');
+      router.push(`/${locale}/login?redirect=cart`);
       return;
     }
 
-    if (items.length === 0) {
-      toast.error('Your cart is empty');
+    // Get fresh user data after refresh
+    const freshUser = useAuthStore.getState().user;
+    
+    if (!freshUser) {
+      router.push(`/${locale}/login?redirect=cart`);
+      return;
+    }
+
+    // Check email verification
+    if (!freshUser.isEmailVerified) {
+      toast.error(t('email_verification_required'));
+      router.push(`/${locale}/profile?verification_required=true`);
       return;
     }
 
@@ -127,8 +144,8 @@ export default function CartPage() {
       }
     }
 
-    // Check if user has an address using auth store instead of localStorage
-    if (!user?.address || user.address.trim() === '') {
+    // Check if user has an address
+    if (!freshUser.address || freshUser.address.trim() === '') {
       toast.error(t('address_required'));
       router.push(`/${locale}/profile/edit?redirect=cart`);
       return;
@@ -137,8 +154,7 @@ export default function CartPage() {
     setIsProcessing(true);
 
     try {
-      // Use auth store user instead of localStorage
-      if (!user?.idPerson) {
+      if (!freshUser.idPerson) {
         throw new Error('User information not found. Please log in again.');
       }
 
@@ -149,7 +165,7 @@ export default function CartPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          personId: user.idPerson,
+          personId: freshUser.idPerson,
           returnUrl: `${window.location.origin}/${locale}/order-success?session_id={CHECKOUT_SESSION_ID}`,
           items: items,
           locale: locale,

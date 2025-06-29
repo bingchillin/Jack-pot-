@@ -25,15 +25,15 @@ export default function Navigation({ scrolled }: NavigationProps) {
   const locales = ['en', 'fr', 'es'];
 
   // Auth state
-  const { user, isAuthenticated, logout, isHydrated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   
   // Cart state
   const { getSummary } = useCartStore();
   const cartSummary = getSummary();
   const { isHydrated: isCartHydrated } = useCartHydration();
 
-  // Only show auth-related UI after hydration to prevent mismatches
-  const shouldShowAuth = isHydrated;
+  // Show auth-related UI immediately (no hydration needed)
+  const shouldShowAuth = true;
   
   // Only show cart badge after hydration to prevent mismatches
   const shouldShowCartBadge = isCartHydrated;

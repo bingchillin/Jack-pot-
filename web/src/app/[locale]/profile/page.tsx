@@ -7,6 +7,7 @@ import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
 import { useAuthStore } from '@/stores/authStore';
 import { useVerificationCheck } from '@/hooks/useVerificationCheck';
+import { useAuth } from '@/hooks/useAuth';
 import { User, Mail, Phone, CheckCircle2, AlertCircle, Edit3, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { authService } from '@/services/auth.service';
@@ -22,8 +23,12 @@ export default function ProfilePage() {
   const searchParams = useSearchParams();
   const params = useParams();
   const locale = params.locale as string;
-  const { user, isAuthenticated, isLoading, isHydrated } = useAuthStore();
   const { checkVerification } = useVerificationCheck();
+
+  // Use auth hook for authentication
+  const { user, isAuthenticated, isLoading } = useAuth({
+    requireAuth: true
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,21 +70,21 @@ export default function ProfilePage() {
       return;
     }
     
-    if (user && !user.isEmailVerified && isHydrated) {
+    if (user && !user.isEmailVerified) {
       // Check if user has already dismissed the modal
       const hasDismissedVerification = localStorage.getItem('verificationModalDismissed');
       if (!hasDismissedVerification) {
         setShowVerificationModal(true);
       }
     }
-  }, [user, isHydrated, searchParams]);
+  }, [user, searchParams]);
 
-  // Only redirect after hydration is complete and we're not loading
+  // Only redirect after loading is complete
   useEffect(() => {
-    if (isHydrated && !isLoading && !isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       router.push('/login');
     }
-  }, [isAuthenticated, isLoading, isHydrated, router]);
+  }, [isAuthenticated, isLoading, router]);
 
   const handleResendVerification = async () => {
     if (!user?.email) return;
@@ -95,8 +100,8 @@ export default function ProfilePage() {
     }
   };
 
-  // Show loading while hydrating or loading auth state
-  if (!isHydrated || isLoading) {
+  // Show loading while loading auth state
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center">
         <div className="flex items-center justify-center">
@@ -268,11 +273,7 @@ export default function ProfilePage() {
             {/* Account Actions */}
             <div className="grid md:grid-cols-2 gap-4">
               <button
-                onClick={() => {
-                  if (checkVerification()) {
-                    router.push('/profile/edit');
-                  }
-                }}
+                onClick={() => router.push(`/${locale}/profile/edit`)}
                 className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-slate-600/25 hover:shadow-slate-700/30 transform hover:translate-y-[-1px] flex items-center justify-center space-x-2"
               >
                 <Edit3 className="h-5 w-5" />
@@ -280,11 +281,7 @@ export default function ProfilePage() {
               </button>
 
               <button 
-                onClick={() => {
-                  if (checkVerification()) {
-                    router.push(`/${locale}/orders`);
-                  }
-                }}
+                onClick={() => router.push(`/${locale}/orders`)}
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px] flex items-center justify-center space-x-2"
               >
                 <span>{t('auth.profile.my_orders')}</span>
