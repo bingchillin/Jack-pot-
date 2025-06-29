@@ -4,6 +4,7 @@ export interface User {
   firstname: string;
   surname: string;
   numberPhone?: string;
+  address?: string;
   idRole: number;
   stripeCustomerId?: string;
   isEmailVerified?: boolean;

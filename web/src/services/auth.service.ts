@@ -132,15 +132,19 @@ class AuthService {
     firstname?: string;
     surname?: string;
     numberPhone?: string;
+    address?: string;
     currentPassword: string;
     newPassword?: string;
   }): Promise<User> {
+    console.log('🔍 Auth Service - Sending update request with data:', updateData);
     const response = await fetch(`${API_BASE_URL}/auth/profile`, {
       method: 'PATCH',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(updateData),
     });
-    return this.handleResponse<User>(response);
+    const result = await this.handleResponse<User>(response);
+    console.log('🔍 Auth Service - Received response:', result);
+    return result;
   }
 
   // Local storage helpers

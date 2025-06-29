@@ -79,6 +79,7 @@
       "customer": "Cliente",
       "email_verification_notice": "Verifica tu email para confirmar tu cuenta",
       "edit_information": "Editar información",
+      "contact_information": "Información de contacto",
       "verification_modal": {
         "title": "Verificación de email requerida",
         "message": "¡Tu cuenta ha sido creada exitosamente! Para acceder a todas las funciones y completar tu registro, por favor verifica tu dirección de email.",
@@ -87,32 +88,38 @@
         "close": "Cerrar"
       },
       "edit": {
-        "title": "Editar perfil",
-        "subtitle": "Actualiza tu información personal",
+        "title": "Editar Perfil",
+        "subtitle": "Actualiza tu información personal y configuración de seguridad",
         "first_name": "Nombre",
         "last_name": "Apellido",
-        "email_address": "Dirección de email (No se puede cambiar)",
+        "email_address": "Dirección de correo electrónico",
         "phone": "Número de teléfono",
-        "phone_placeholder": "1234567890",
-        "phone_help_text": "El número de teléfono debe tener entre 9 y 15 dígitos",
+        "phone_help_text": "Opcional: Ingresa tu número de teléfono para actualizaciones de pedidos",
+        "address": "Dirección",
+        "address_placeholder": "Ingresa tu dirección",
+        "address_help_text": "Opcional: Ingresa tu dirección para envío",
         "current_password": "Contraseña actual",
         "current_password_placeholder": "Ingresa tu contraseña actual",
-        "new_password": "Nueva contraseña (Opcional)",
-        "new_password_placeholder": "Ingresa la nueva contraseña",
+        "new_password": "Nueva contraseña",
+        "new_password_placeholder": "Ingresa tu nueva contraseña (opcional)",
         "confirm_new_password": "Confirmar nueva contraseña",
-        "confirm_new_password_placeholder": "Confirma la nueva contraseña",
-        "save_changes": "Guardar",
+        "confirm_new_password_placeholder": "Confirma tu nueva contraseña",
+        "save_changes": "Guardar cambios",
         "saving": "Guardando...",
         "cancel": "Cancelar",
         "success": "¡Perfil actualizado exitosamente!",
         "password_changed": "¡Perfil y contraseña actualizados exitosamente!",
+        "back_to_profile": "Volver al perfil",
+        "back_to_orders": "Volver a los pedidos",
+        "address_required_for_shipping": "La dirección de envío es requerida para completar tu pedido",
         "error": {
           "fill_required_fields": "Por favor completa todos los campos requeridos",
-          "current_password_required": "La contraseña actual es requerida para actualizar el perfil",
+          "current_password_required": "La contraseña actual es requerida",
           "current_password_incorrect": "La contraseña actual es incorrecta",
-          "phone_invalid": "El número de teléfono debe tener entre 9 y 15 dígitos",
-          "new_passwords_no_match": "Las nuevas contraseñas no coinciden",
+          "phone_invalid": "Por favor ingresa un número de teléfono válido (9-15 dígitos)",
           "new_password_min_length": "La nueva contraseña debe tener al menos 6 caracteres",
+          "new_passwords_no_match": "Las nuevas contraseñas no coinciden",
+          "address_required_for_shipping": "La dirección de envío es requerida para completar tu pedido",
           "update_failed": "Error al actualizar el perfil. Por favor intenta de nuevo."
         }
       },
@@ -392,7 +399,8 @@
       "cart_cleared": "Carrito vaciado",
       "stock_available": "Stock: {quantity} disponible",
       "each": "cada uno",
-      "in_your_cart": "en tu carrito"
+      "in_your_cart": "en tu carrito",
+      "address_required": "La dirección de envío es requerida. Por favor actualiza tu perfil primero."
     }
   },
   "checkout": {

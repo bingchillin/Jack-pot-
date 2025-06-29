@@ -36,6 +36,9 @@ export class Person {
   @Index()
   numberPhone: string;
 
+  @Column({ length: 500, nullable: true })
+  address: string;
+
   @Column({ name: 'id_role', nullable: true })
   idRole: number;
 

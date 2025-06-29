@@ -29,4 +29,9 @@ export class UpdatePersonDto extends PartialType(CreatePersonDto) {
     @IsString()
     @MaxLength(50)
     numberPhone?: string;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    address?: string;
 } 

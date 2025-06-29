@@ -109,7 +109,17 @@ export class PersonService {
     }
 
     async update(id: number, updatePersonDto: UpdatePersonDto): Promise<Person> {
+        console.log('🔍 Person Service - Updating person with ID:', id);
+        console.log('🔍 Person Service - Update data:', updatePersonDto);
+        
         const person = await this.findOne(id);
+        console.log('🔍 Person Service - Current person data:', {
+            idPerson: person.idPerson,
+            firstname: person.firstname,
+            surname: person.surname,
+            address: person.address,
+            numberPhone: person.numberPhone
+        });
 
         if (updatePersonDto.password) {
             updatePersonDto.password = await bcrypt.hash(updatePersonDto.password, 10);
@@ -121,7 +131,24 @@ export class PersonService {
         }
 
         Object.assign(person, updatePersonDto);
-        return await this.personRepository.save(person);
+        console.log('🔍 Person Service - Person after Object.assign:', {
+            idPerson: person.idPerson,
+            firstname: person.firstname,
+            surname: person.surname,
+            address: person.address,
+            numberPhone: person.numberPhone
+        });
+        
+        const savedPerson = await this.personRepository.save(person);
+        console.log('🔍 Person Service - Saved person data:', {
+            idPerson: savedPerson.idPerson,
+            firstname: savedPerson.firstname,
+            surname: savedPerson.surname,
+            address: savedPerson.address,
+            numberPhone: savedPerson.numberPhone
+        });
+        
+        return savedPerson;
     }
 
     async findObjectsByPersonId(id: number): Promise<ObjectEntity[]> {

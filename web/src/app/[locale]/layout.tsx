@@ -27,6 +27,10 @@ export default async function LocaleLayout({
         </NextIntlClientProvider>
         <Toaster 
           position="top-right"
+          containerStyle={{
+            top: 65,
+            right: 16,
+          }}
           toastOptions={{
             duration: 4000,
             style: {

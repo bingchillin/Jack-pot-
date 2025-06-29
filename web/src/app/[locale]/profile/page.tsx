@@ -93,12 +93,12 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
       <Navigation scrolled={scrolled} />
       
       {/* Success Toast */}
       {showToast && successMessage && (
-        <div className="fixed top-20 right-4 z-50 max-w-md">
+        <div className="fixed top-28 right-4 z-50 max-w-md">
           <div className="bg-white border-l-4 border-green-500 rounded-lg shadow-lg p-4 flex items-center space-x-3 animate-slide-in-right">
             <div className="flex-shrink-0">
               <CheckCircle2 className="h-6 w-6 text-green-500" />
@@ -206,99 +206,81 @@ export default function ProfilePage() {
       </div>
 
       {/* Main Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Profile Card */}
-          <div className="lg:col-span-1">
-            <div className="bg-white/80 backdrop-blur-sm shadow-2xl shadow-slate-200/50 border border-slate-200/50 rounded-3xl p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-12 translate-x-12 opacity-60"></div>
-              
-              <div className="relative">
-                <div className="text-center mb-6">
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <User className="h-10 w-10 text-green-600" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                    {user.firstname} {user.surname}
-                  </h2>
-                  <div className="flex items-center justify-center space-x-2">
-                    {user.isEmailVerified ? (
-                      <>
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        <span className="text-sm text-green-600 font-medium">{t('auth.profile.verified')}</span>
-                      </>
-                    ) : (
-                      <>
-                        <AlertCircle className="h-4 w-4 text-yellow-500" />
-                        <span className="text-sm text-yellow-600 font-medium">{t('auth.profile.pending_verification')}</span>
-                      </>
-                    )}
-                  </div>
+      <div className="flex-1 relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="bg-white/80 backdrop-blur-sm shadow-2xl shadow-slate-200/50 border border-slate-200/50 rounded-3xl p-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-12 translate-x-12 opacity-60"></div>
+          <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-green-100 to-blue-100 rounded-full translate-y-10 -translate-x-10 opacity-60"></div>
+          
+          <div className="relative">
+            {/* Profile Header */}
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="h-10 w-10 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                {user.firstname} {user.surname}
+              </h2>
+              {/* Only show verification status if NOT verified */}
+              {!user.isEmailVerified && (
+                <div className="flex items-center justify-center space-x-2">
+                  <AlertCircle className="h-4 w-4 text-yellow-500" />
+                  <span className="text-sm text-yellow-600 font-medium">{t('auth.profile.pending_verification')}</span>
                 </div>
+              )}
+            </div>
 
-                <div className="space-y-4 mb-6">
+            {/* Contact Information */}
+            <div className="bg-slate-50 rounded-2xl p-6 mb-8">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">{t('auth.profile.contact_information')}</h3>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 text-slate-600">
+                  <Mail className="h-4 w-4" />
+                  <span className="text-sm">{user.email}</span>
+                </div>
+                
+                {user.numberPhone && (
                   <div className="flex items-center space-x-3 text-slate-600">
-                    <Mail className="h-4 w-4" />
-                    <span className="text-sm">{user.email}</span>
-                  </div>
-                  
-                  {user.numberPhone && (
-                    <div className="flex items-center space-x-3 text-slate-600">
-                      <Phone className="h-4 w-4" />
-                      <span className="text-sm">{user.numberPhone}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Modify Information Button */}
-                <button
-                  onClick={() => {
-                    if (checkVerification()) {
-                      router.push('/profile/edit');
-                    }
-                  }}
-                  className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-slate-600/25 hover:shadow-slate-700/30 transform hover:translate-y-[-1px] flex items-center justify-center space-x-2"
-                >
-                  <Edit3 className="h-4 w-4" />
-                  <span>{t('auth.profile.edit_information')}</span>
-                </button>
-
-                {!user.isEmailVerified && (
-                  <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
-                    <p className="text-yellow-700 text-sm text-center">
-                      {t('auth.profile.email_verification_notice')}
-                    </p>
+                    <Phone className="h-4 w-4" />
+                    <span className="text-sm">{user.numberPhone}</span>
                   </div>
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Main Content Area */}
-          <div className="lg:col-span-2">
-            <div className="grid gap-6">
-              {/* Quick Actions */}
-              <div className="bg-white/80 backdrop-blur-sm shadow-2xl shadow-slate-200/50 border border-slate-200/50 rounded-3xl p-8 relative overflow-hidden">
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-100 to-blue-100 rounded-full translate-y-12 -translate-x-12 opacity-60"></div>
-                
-                <div className="relative">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-6">{t('auth.profile.quick_actions')}</h3>
-                  
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <button 
-                      onClick={() => {
-                        if (checkVerification()) {
-                          router.push(`/${locale}/orders`);
-                        }
-                      }}
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px]"
-                    >
-                      {t('auth.profile.my_orders')}
-                    </button>
-                  </div>
-                </div>
-              </div>
+            {/* Account Actions */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <button
+                onClick={() => {
+                  if (checkVerification()) {
+                    router.push('/profile/edit');
+                  }
+                }}
+                className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-slate-600/25 hover:shadow-slate-700/30 transform hover:translate-y-[-1px] flex items-center justify-center space-x-2"
+              >
+                <Edit3 className="h-5 w-5" />
+                <span>{t('auth.profile.edit_information')}</span>
+              </button>
+
+              <button 
+                onClick={() => {
+                  if (checkVerification()) {
+                    router.push(`/${locale}/orders`);
+                  }
+                }}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px] flex items-center justify-center space-x-2"
+              >
+                <span>{t('auth.profile.my_orders')}</span>
+              </button>
             </div>
+
+            {/* Verification Notice */}
+            {!user.isEmailVerified && (
+              <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
+                <p className="text-yellow-700 text-sm text-center">
+                  {t('auth.profile.email_verification_notice')}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
