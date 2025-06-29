@@ -147,7 +147,10 @@
       "phone_already_exists": "El número de teléfono ya existe",
       "invalid_current_password": "La contraseña actual es incorrecta",
       "not_authenticated": "Debes estar conectado para realizar esta acción",
-      "verification_required": "Por favor verifica tu dirección de email para realizar esta acción"
+      "verification_required": "Por favor verifica tu dirección de email para realizar esta acción",
+      "page_not_found": "Página no encontrada",
+      "page_not_found_description": "Lo sentimos, no pudimos encontrar la página que estás buscando. Puede que haya sido movida, eliminada o ingresaste una URL incorrecta.",
+      "go_home": "Volver a la página de inicio"
     }
   },
   "hero": {
