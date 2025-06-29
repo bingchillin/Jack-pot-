@@ -147,7 +147,8 @@ export default function CartPage() {
     // Check if user has an address
     if (!freshUser.address || freshUser.address.trim() === '') {
       toast.error(t('address_required'));
-      router.push(`/${locale}/profile/edit?redirect=cart`);
+      const params = new URLSearchParams({ redirect: 'cart' });
+      router.push(`/${locale}/profile/edit?${params.toString()}`);
       return;
     }
 

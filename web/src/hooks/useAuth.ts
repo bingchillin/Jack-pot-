@@ -58,7 +58,8 @@ export function useAuth({
     const redirectParam = searchParams.get('redirect');
     if (redirectParam && isAuthenticated) {
       const currentPath = window.location.pathname;
-      if (currentPath !== redirectParam) {
+      // Don't redirect if we're on the profile edit page (to avoid redirect loops)
+      if (currentPath !== redirectParam && !currentPath.includes('/profile/edit')) {
         router.push(redirectParam);
       }
       return;
