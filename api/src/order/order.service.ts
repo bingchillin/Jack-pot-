@@ -57,6 +57,11 @@ export class OrderService {
         throw new NotFoundException(`Person with ID ${createOrderDto.personId} not found`);
       }
 
+      // Check if user email is verified
+      if (!person.isEmailVerified) {
+        throw new BadRequestException('Email verification is required to complete your order. Please verify your email address first.');
+      }
+
       // Ensure person has a Stripe customer ID (create one if they don't)
       let stripeCustomerId = person.stripeCustomerId;
       if (!stripeCustomerId) {
@@ -307,6 +312,11 @@ export class OrderService {
         });
         if (!person) {
           throw new BadRequestException(`Person with ID ${personId} not found`);
+        }
+
+        // Check if user email is verified
+        if (!person.isEmailVerified) {
+          throw new BadRequestException('Email verification is required to complete your order. Please verify your email address first.');
         }
 
         // Calculate totals and verify stock
@@ -879,6 +889,11 @@ export class OrderService {
       });
       if (!person) {
         throw new NotFoundException(`Person with ID ${createOrderDto.personId} not found`);
+      }
+
+      // Check if user email is verified
+      if (!person.isEmailVerified) {
+        throw new BadRequestException('Email verification is required to complete your order. Please verify your email address first.');
       }
 
       // Ensure person has a Stripe customer ID

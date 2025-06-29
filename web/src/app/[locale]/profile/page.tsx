@@ -9,12 +9,14 @@ import { useAuthStore } from '@/stores/authStore';
 import { useVerificationCheck } from '@/hooks/useVerificationCheck';
 import { User, Mail, Phone, CheckCircle2, AlertCircle, Edit3, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { authService } from '@/services/auth.service';
 
 export default function ProfilePage() {
   const [scrolled, setScrolled] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -53,11 +55,15 @@ export default function ProfilePage() {
 
   // Check if we should show verification modal
   useEffect(() => {
-    console.log('Profile page - User verification status:', {
-      user: user ? { email: user.email, isEmailVerified: user.isEmailVerified } : null,
-      isHydrated,
-      showVerificationModal
-    });
+    // Check if verification is required from URL parameter
+    const verificationRequired = searchParams.get('verification_required');
+    if (verificationRequired === 'true') {
+      setShowVerificationModal(true);
+      // Clear the URL parameter
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      return;
+    }
     
     if (user && !user.isEmailVerified && isHydrated) {
       // Check if user has already dismissed the modal
@@ -66,7 +72,7 @@ export default function ProfilePage() {
         setShowVerificationModal(true);
       }
     }
-  }, [user, isHydrated]);
+  }, [user, isHydrated, searchParams]);
 
   // Only redirect after hydration is complete and we're not loading
   useEffect(() => {
@@ -74,6 +80,20 @@ export default function ProfilePage() {
       router.push('/login');
     }
   }, [isAuthenticated, isLoading, isHydrated, router]);
+
+  const handleResendVerification = async () => {
+    if (!user?.email) return;
+    
+    setIsResendingVerification(true);
+    try {
+      await authService.resendVerification(user.email);
+      toast.success(t('auth.profile.verification_modal.resend_success'));
+    } catch (error) {
+      toast.error(t('auth.profile.verification_modal.resend_error'));
+    } finally {
+      setIsResendingVerification(false);
+    }
+  };
 
   // Show loading while hydrating or loading auth state
   if (!isHydrated || isLoading) {
@@ -163,13 +183,11 @@ export default function ProfilePage() {
               {/* Action Buttons */}
               <div className="flex flex-col gap-3">
                 <button
-                  onClick={() => {
-                    setShowVerificationModal(false);
-                    localStorage.setItem('verificationModalDismissed', 'true');
-                  }}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-700/30 transform hover:translate-y-[-1px]"
+                  onClick={handleResendVerification}
+                  disabled={isResendingVerification}
+                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-green-600/25 hover:shadow-green-700/30 transform hover:translate-y-[-1px] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {t('auth.profile.verification_modal.got_it')}
+                  {isResendingVerification ? t('auth.profile.verification_modal.resending') : t('auth.profile.verification_modal.resend')}
                 </button>
                 
                 <button

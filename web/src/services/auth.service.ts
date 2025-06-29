@@ -136,14 +136,20 @@ class AuthService {
     currentPassword: string;
     newPassword?: string;
   }): Promise<User> {
-    console.log('🔍 Auth Service - Sending update request with data:', updateData);
     const response = await fetch(`${API_BASE_URL}/auth/profile`, {
       method: 'PATCH',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(updateData),
     });
     const result = await this.handleResponse<User>(response);
-    console.log('🔍 Auth Service - Received response:', result);
+    return result;
+  }
+
+  async refreshUser(user: User): Promise<User> {
+    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+      headers: this.getAuthHeaders(),
+    });
+    const result = await this.handleResponse<User>(response);
     return result;
   }
 

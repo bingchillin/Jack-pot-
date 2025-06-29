@@ -84,6 +84,10 @@
         "title": "Email Verification Required",
         "message": "Your account has been created successfully! To access all features and complete your registration, please verify your email address.",
         "check_email": "Please check your email:",
+        "resend": "Resend Verification Email",
+        "resending": "Sending...",
+        "resend_success": "Verification email sent successfully!",
+        "resend_error": "Failed to send verification email. Please try again.",
         "got_it": "Got it!",
         "close": "Close"
       },
@@ -301,7 +305,8 @@
       "stock_available": "Stock: {quantity} available",
       "each": "each",
       "in_your_cart": "in your cart",
-      "address_required": "Shipping address is required. Please update your profile first."
+      "address_required": "Shipping address is required. Please update your profile first.",
+      "email_verification_required": "Email verification is required to complete your order. Please verify your email address first."
     }
   },
   "contact": {
