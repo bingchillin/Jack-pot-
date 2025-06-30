@@ -14,6 +14,6 @@ import { StripeModule } from '../stripe/stripe.module';
     ],
     controllers: [PersonController],
     providers: [PersonService],
-    exports: [PersonService]
+    exports: [PersonService, TypeOrmModule]
 })
 export class PersonModule {} 
