@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/object_profile.dart';
-import 'package:app/app_config.dart';
+import 'package:jackpote/app_config.dart';
 
 class ObjectProfileService {
   final String baseUrl =  AppConfig.baseUrl;

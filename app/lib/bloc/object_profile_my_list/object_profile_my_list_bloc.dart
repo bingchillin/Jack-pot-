@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:app/providers/plant_provider_my_List.dart';
+import 'package:jackpote/providers/plant_provider_my_List.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart'; // pour listEquals
 import '../../models/object_profile.dart';

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:app/app_config.dart';
+import 'package:jackpote/app_config.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool _isAuthenticated = false;

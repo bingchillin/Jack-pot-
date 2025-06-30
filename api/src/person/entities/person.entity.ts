@@ -13,6 +13,8 @@ import { PersonParameter } from 'src/lnk-person-parameter/entities/person-parame
 import { Notification } from 'src/notification/entities/notification.entity';
 import { RefreshToken } from '../../auth/entities/refresh-token.entity';
 import { Order } from '../../order/entities/order.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { CommentLike } from '../../comment/entities/comment-like.entity';
 
 @Entity('person')
 export class Person {
@@ -112,4 +114,10 @@ export class Person {
 
   @OneToMany(() => Order, order => order.person)
   orders: Order[];
+
+  @OneToMany(() => Comment, comment => comment.person)
+  comments: Comment[];
+
+  @OneToMany(() => CommentLike, commentLike => commentLike.person)
+  commentLikes: CommentLike[];
 }
