@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
@@ -27,9 +27,14 @@ export default function RegisterPage() {
 
   const t = useTranslations();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { register, isLoading, isAuthenticated } = useAuthStore();
   const params = useParams();
   const locale = params.locale as string;
+  
+  // Check for redirect parameter, otherwise default to profile
+  const redirectParam = searchParams.get('redirect');
+  const redirectTarget = redirectParam || `/${locale}/profile`;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,9 +47,9 @@ export default function RegisterPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push(`/${locale}/profile`);
+      router.push(redirectTarget);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, redirectTarget]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -123,9 +128,9 @@ export default function RegisterPage() {
       await register(registerData);
       setSuccess(t('auth.register.success'));
       
-      // Redirect to profile page after successful registration
+      // Redirect to intended page after successful registration
       setTimeout(() => {
-        router.push(`/${locale}/profile`);
+        router.push(redirectTarget);
       }, 2000);
     } catch (error: any) {
       setError(error.message || t('auth.register.error.registration_failed'));
