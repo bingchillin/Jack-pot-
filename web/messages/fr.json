@@ -534,7 +534,7 @@
     "unit_price": "Prix unitaire",
     "cancel_order": "Annuler la commande",
     "cancelling": "Annulation...",
-    "cancellation_time_left": "Il vous reste {hours}h {minutes}m pour annuler votre commande.",
+  
     "cancel_order_confirm": "Êtes-vous sûr de vouloir annuler cette commande ?",
     "cancel_order_description": "Cette action ne peut pas être annulée et initiera un processus de remboursement.",
     "cancel": "Annuler",

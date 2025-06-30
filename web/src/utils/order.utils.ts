@@ -93,55 +93,18 @@ export const canCancelOrder = (order: Order): boolean => {
     return true;
   }
 
-  // For paid orders, check if within 48 hours
+  // For paid orders, can cancel until shipped
   if (order.status === OrderStatus.PAID) {
-    console.log('🔍 Processing PAID order...');
-    
-    try {
-      const paidAtTime = new Date(order.paidAt || order.createdAt).getTime();
-      const currentTime = Date.now();
-      const hoursSincePayment = (currentTime - paidAtTime) / (1000 * 60 * 60);
-      
-      console.log('⏰ Time calculation details:', {
-        paidAtString: order.paidAt,
-        paidAtTime,
-        currentTime,
-        hoursSincePayment,
-        hoursSincePaymentFormatted: `${hoursSincePayment.toFixed(2)} hours`,
-        canCancel: hoursSincePayment <= 48,
-        timeLimit: 48
-      });
-      
-      const result = hoursSincePayment <= 48;
-      console.log(`🎯 Final result for PAID order: ${result ? '✅ CANCEL' : '❌ NO CANCEL'}`);
-      return result;
-    } catch (error) {
-      console.error('❌ Error in time calculation:', error);
-      return false;
-    }
+    console.log('🔍 Processing PAID order - can cancel until shipped');
+    console.log(`✅ Can cancel: PAID order not yet shipped`);
+    return true;
   }
 
   console.log(`❌ Cannot cancel: unknown status ${order.status}`);
   return false;
 };
 
-export const getCancellationTimeLeft = (order: Order): { hours: number; minutes: number } | null => {
-  if (order.status !== OrderStatus.PAID) {
-    return null;
-  }
 
-  const hoursSincePayment = (Date.now() - new Date(order.paidAt || order.createdAt).getTime()) / (1000 * 60 * 60);
-  const timeLeft = 48 - hoursSincePayment;
-
-  if (timeLeft <= 0) {
-    return null;
-  }
-
-  const hours = Math.floor(timeLeft);
-  const minutes = Math.floor((timeLeft - hours) * 60);
-
-  return { hours, minutes };
-};
 
 export const hasActiveOrders = (orders: Order[]): boolean => {
   return orders.some(order => 

@@ -534,7 +534,7 @@
     "unit_price": "Unit Price",
     "cancel_order": "Cancel Order",
     "cancelling": "Cancelling...",
-    "cancellation_time_left": "You can cancel within {hours}h {minutes}m",
+  
     "cancel_order_confirm": "Are you sure you want to cancel this order?",
     "cancel_order_description": "This action cannot be undone and will initiate a refund process.",
     "cancel": "Cancel",
