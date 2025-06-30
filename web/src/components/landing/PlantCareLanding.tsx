@@ -28,7 +28,7 @@ export default function PlantCareLanding() {
       <Features t={t} />
       <Products t={t} />
       <CTA t={t} />
-      <Footer t={t} />
+      <Footer />
     </div>
   );
 } 

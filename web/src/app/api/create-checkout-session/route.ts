@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripeKey = "sk_test_51RcrKKRvWLFjv3oeXjJR6w7OVXgS8BX7CAyERO1Q2UkiJ7xyBgmf480sSGgEYz5OPyTl3i2klYPkccw0ofeUswGd00IbXGIsj0";
-
-// Debug log to check if the Stripe secret key is being read
-console.log('DEBUG STRIPE_SECRET_KEY:', stripeKey ? 'Key is set' : 'Key is missing');
+const stripeKey = process.env.STRIPE_SECRET_KEY;
 
 // Check if Stripe secret key is available
 if (!stripeKey) {
