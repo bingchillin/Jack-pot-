@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:app/app_config.dart';
+import 'package:jackpote/app_config.dart';
 import 'package:http/http.dart' as http;
 import '../models/object_profile.dart';
 

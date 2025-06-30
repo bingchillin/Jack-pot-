@@ -26,6 +26,8 @@ import { PlantType } from './plant-type/entities/plant-type.entity';
 import { Product } from './product/entities/product.entity';
 import { Order } from './order/entities/order.entity';
 import { OrderItem } from './order/entities/order-item.entity';
+import { Comment } from './comment/entities/comment.entity';
+import { CommentLike } from './comment/entities/comment-like.entity';
 
 // Module imports
 import { RoleModule } from './role/role.module';
@@ -46,6 +48,7 @@ import { MailerModule } from './mailer/mailer.module';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { StripeModule } from './stripe/stripe.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -84,7 +87,9 @@ import { StripeModule } from './stripe/stripe.module';
             PlantType,
             Product,
             Order,
-            OrderItem
+            OrderItem,
+            Comment,
+            CommentLike
           ],
           synchronize: true,
           autoLoadEntities: true,
@@ -119,7 +124,8 @@ import { StripeModule } from './stripe/stripe.module';
     MailerModule,
     ProductModule,
     OrderModule,
-    StripeModule
+    StripeModule,
+    CommentModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../models/object_profile.dart';
-import 'package:app/app_config.dart';
+import 'package:jackpote/app_config.dart';
 import '../../plant_detail_page.dart';
 
 class PlantItemMyListWidget extends StatelessWidget {

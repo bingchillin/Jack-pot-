@@ -1,5 +1,5 @@
-import 'package:app/ui/pages/widget/plant_card_my_list/plant_item_my_list_widget.dart';
-import 'package:app/ui/pages/widget/plant_card_favorite/plant_item_widget.dart';
+import 'package:jackpote/ui/pages/widget/plant_card_my_list/plant_item_my_list_widget.dart';
+import 'package:jackpote/ui/pages/widget/plant_card_favorite/plant_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
