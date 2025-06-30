@@ -267,7 +267,14 @@ const OrderReceipt = ({ order, locale, user }: { order: Order; locale: string; u
             {order.shippingAddress && (
               <View style={styles.customerRow}>
                 <Text style={styles.customerLabel}>{t('address')}:</Text>
-                <Text style={styles.customerValue}>{order.shippingAddress}</Text>
+                <Text style={styles.customerValue}>
+                  {[
+                    `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
+                    order.shippingAddress.address,
+                    [order.shippingAddress.city, order.shippingAddress.state, order.shippingAddress.postalCode].filter(Boolean).join(' '),
+                    order.shippingAddress.country
+                  ].filter(Boolean).join(', ')}
+                </Text>
               </View>
             )}
           </View>

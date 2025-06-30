@@ -151,6 +151,18 @@ export class OrderService {
       // Create Stripe Payment Intent
       const paymentIntent = await this.stripeService.createPaymentIntent(tempOrder, stripeCustomerId);
 
+      // Create shipping address from person's profile
+      const shippingAddress = person.address ? {
+        firstName: person.firstname || '',
+        lastName: person.surname || '',
+        address: person.address,
+        city: '', // We'll need to parse this from the address field or add city/state fields later
+        state: '',
+        postalCode: '',
+        country: '',
+        phone: person.numberPhone,
+      } : null;
+
       // Create order
       const order = this.orderRepository.create({
         idPerson: createOrderDto.personId,
@@ -158,11 +170,12 @@ export class OrderService {
         shippingCost,
         taxAmount,
         totalAmount,
-        shippingAddress: createOrderDto.shippingAddress,
-        billingAddress: createOrderDto.billingAddress,
+        shippingAddress,
+        billingAddress: shippingAddress, // Use same as shipping for now
         notes: createOrderDto.notes,
         status: OrderStatus.PAYMENT_PROCESSING,
         stripePaymentIntentId: paymentIntent.id,
+        stripeCustomerId: stripeCustomerId,
         locale: createOrderDto.locale || 'en',
       });
 
@@ -391,18 +404,38 @@ export class OrderService {
         });
       }
 
+      // Extract basic data from session metadata
+      const shippingCost = session.metadata?.shippingCost ? parseFloat(session.metadata.shippingCost) : 0;
+      const taxAmount = session.metadata?.taxAmount ? parseFloat(session.metadata.taxAmount) : 0;
+
+      // Create shipping address from person's profile
+      const shippingAddress = person.address ? {
+        firstName: person.firstname || '',
+        lastName: person.surname || '',
+        address: person.address,
+        city: '', // We'll need to parse this from the address field or add city/state fields later
+        state: '',
+        postalCode: '',
+        country: '',
+        phone: person.numberPhone,
+      } : null;
+
       // Create order with PAID status
       const newOrder = this.orderRepository.create({
         idPerson: personId,
         amount: totalAmount,
-        shippingCost: 0, // Add shipping logic if needed
-        taxAmount: 0, // Add tax logic if needed
-        totalAmount,
+        shippingCost,
+        taxAmount,
+        totalAmount: totalAmount + shippingCost + taxAmount,
+        shippingAddress,
+        billingAddress: shippingAddress, // Use same as shipping
         status: OrderStatus.PAID,
         stripePaymentIntentId: session.payment_intent as string,
+        stripeCustomerId: session.customer as string,
         paidAt: new Date(),
         paymentMethod: 'card', // Default payment method
         locale: session.metadata?.locale || 'en', // Use locale from session metadata
+        shippingStatus: ShippingStatus.IN_PREPARATION, // Set initial shipping status
       });
 
       let savedOrder: Order;
@@ -1016,6 +1049,18 @@ export class OrderService {
       const taxAmount = createOrderDto.taxAmount || 0;
       totalAmount += shippingCost + taxAmount;
 
+      // Create shipping address from person's profile
+      const shippingAddress = person.address ? {
+        firstName: person.firstname || '',
+        lastName: person.surname || '',
+        address: person.address,
+        city: '', // We'll need to parse this from the address field or add city/state fields later
+        state: '',
+        postalCode: '',
+        country: '',
+        phone: person.numberPhone,
+      } : null;
+
       // Create order with PENDING status (not PAID yet)
       const order = this.orderRepository.create({
         idPerson: createOrderDto.personId,
@@ -1023,8 +1068,8 @@ export class OrderService {
         shippingCost,
         taxAmount,
         totalAmount,
-        shippingAddress: createOrderDto.shippingAddress,
-        billingAddress: createOrderDto.billingAddress,
+        shippingAddress,
+        billingAddress: shippingAddress, // Use same as shipping
         notes: createOrderDto.notes,
         status: OrderStatus.PENDING,
         locale: createOrderDto.locale || 'en',

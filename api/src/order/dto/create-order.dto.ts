@@ -58,19 +58,8 @@ export class CreateOrderDto {
   @IsPositive()
   personId?: number;
 
-  @ApiPropertyOptional({ description: 'Shipping address' })
-  @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => AddressDto)
-  shippingAddress?: AddressDto;
-
-  @ApiPropertyOptional({ description: 'Billing address' })
-  @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => AddressDto)
-  billingAddress?: AddressDto;
+  // Shipping address will be automatically populated from person's profile
+  // No need for address input in DTO - we'll use person.address, person.firstname, person.surname, etc.
 
   @ApiPropertyOptional({ description: 'Shipping cost' })
   @IsOptional()

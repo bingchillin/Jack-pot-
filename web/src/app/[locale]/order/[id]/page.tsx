@@ -344,13 +344,35 @@ export default function OrderDetailsPage() {
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('shipping_information')}</h3>
                   <div className="space-y-3">
-                    <div className="flex items-start space-x-2">
-                      <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
-                      <div>
-                        <p className="font-medium">{user.firstname} {user.surname}</p>
-                        <p className="text-gray-600 text-sm">Shipping address would be here</p>
+                    {order.shippingAddress ? (
+                      <div className="flex items-start space-x-2">
+                        <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
+                        <div>
+                          <p className="font-medium">{order.shippingAddress.firstName} {order.shippingAddress.lastName}</p>
+                          <p className="text-gray-600 text-sm">{order.shippingAddress.address}</p>
+                          {/* Only show city/state/postal if they exist */}
+                          {(order.shippingAddress.city || order.shippingAddress.state || order.shippingAddress.postalCode) && (
+                            <p className="text-gray-600 text-sm">
+                              {[order.shippingAddress.city, order.shippingAddress.state, order.shippingAddress.postalCode].filter(Boolean).join(', ')}
+                            </p>
+                          )}
+                          {order.shippingAddress.country && (
+                            <p className="text-gray-600 text-sm">{order.shippingAddress.country}</p>
+                          )}
+                          {order.shippingAddress.phone && (
+                            <p className="text-gray-600 text-sm">{t('phone')}: {order.shippingAddress.phone}</p>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex items-start space-x-2">
+                        <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
+                        <div>
+                          <p className="font-medium">{user.firstname} {user.surname}</p>
+                          <p className="text-gray-600 text-sm">{t('no_shipping_address')}</p>
+                        </div>
+                      </div>
+                    )}
                     <div className="flex items-center space-x-2">
                       <Mail className="w-4 h-4 text-gray-500" />
                       <span className="text-gray-600">{user.email}</span>

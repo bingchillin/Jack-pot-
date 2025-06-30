@@ -10,6 +10,27 @@ export interface OrderItem {
   product: Product;
 }
 
+export interface ShippingAddress {
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string; // May be empty if not parsed from person.address
+  state: string; // May be empty if not parsed from person.address
+  postalCode: string; // May be empty if not parsed from person.address
+  country: string; // May be empty if not parsed from person.address
+  phone?: string;
+}
+
+export interface BillingAddress {
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string; // May be empty if not parsed from person.address
+  state: string; // May be empty if not parsed from person.address
+  postalCode: string; // May be empty if not parsed from person.address
+  country: string; // May be empty if not parsed from person.address
+}
+
 export interface Order {
   idOrder: number;
   personId: number;
@@ -19,8 +40,9 @@ export interface Order {
   totalAmount: number;
   currency: string;
   stripePaymentIntentId: string | null;
-  shippingAddress: string | null;
-  billingAddress: string | null;
+  stripeCustomerId?: string | null;
+  shippingAddress: ShippingAddress | null;
+  billingAddress: BillingAddress | null;
   trackingNumber?: string;
   carrier?: string;
   trackingUrl?: string;
@@ -56,10 +78,9 @@ export interface CreateOrderRequest {
     productId: number;
     quantity: number;
   }[];
-  shippingAddress?: string;
-  billingAddress?: string;
   notes?: string;
   locale?: string;
+  // Shipping address will be automatically populated from user's profile
 }
 
 export interface CreateOrderResponse {
