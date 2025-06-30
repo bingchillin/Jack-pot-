@@ -58,8 +58,11 @@ export function useAuth({
     const redirectParam = searchParams.get('redirect');
     if (redirectParam && isAuthenticated) {
       const currentPath = window.location.pathname;
-      // Don't redirect if we're on the profile edit page (to avoid redirect loops)
-      if (currentPath !== redirectParam && !currentPath.includes('/profile/edit')) {
+      // Don't redirect if we're already on the target page or if we're on protected user pages
+      const isOnTargetPage = currentPath === redirectParam;
+      const isOnProtectedPage = currentPath.includes('/profile') || currentPath.includes('/order');
+      
+      if (!isOnTargetPage && !isOnProtectedPage) {
         router.push(redirectParam);
       }
       return;

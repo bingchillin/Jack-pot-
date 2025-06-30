@@ -28,9 +28,13 @@ export default function LoginPage() {
   const params = useParams();
   const locale = params.locale as string;
 
+  // Check for redirect parameter, otherwise default to profile
+  const redirectParam = searchParams.get('redirect');
+  const redirectTarget = redirectParam || `/${locale}/profile`;
+
   // Use auth hook to handle redirects
   const { isAuthenticated } = useAuth({
-    redirectTo: `/${locale}/profile` // Redirect authenticated users to profile
+    redirectTo: redirectTarget // Use redirect param if available, otherwise profile
   });
 
   useEffect(() => {
