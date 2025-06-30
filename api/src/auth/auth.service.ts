@@ -106,6 +106,7 @@ export class AuthService {
                 firstname: updatedPerson.firstname,
                 surname: updatedPerson.surname,
                 numberPhone: updatedPerson.numberPhone,
+                address: updatedPerson.address,
                 isEmailVerified: updatedPerson.isEmailVerified,
                 stripeCustomerId: updatedPerson.stripeCustomerId
             },
@@ -196,6 +197,9 @@ export class AuthService {
                 surname: user.surname,
                 idRole: user.idRole,
                 numberPhone: user.numberPhone,
+                address: user.address,
+                isEmailVerified: user.isEmailVerified,
+                stripeCustomerId: user.stripeCustomerId
             },
         };
     }
@@ -294,7 +298,7 @@ export class AuthService {
             });
 
             // Send the reset email
-            await this.mailerService.sendPasswordResetEmail(person.email, resetCode);
+            await this.mailerService.sendResetPasswordEmail(person.email, resetCode);
             
             return { message: 'Si cet email existe, un code vous a été envoyé.' };
         } catch (error) {
@@ -440,6 +444,10 @@ export class AuthService {
             updateData.numberPhone = updateProfileDto.numberPhone;
         }
 
+        if (updateProfileDto.address !== undefined) {
+            updateData.address = updateProfileDto.address;
+        }
+
         // If new password is provided, hash it
         if (updateProfileDto.newPassword) {
             updateData.password = updateProfileDto.newPassword;
@@ -453,6 +461,15 @@ export class AuthService {
         return result;
     }
 
+    async getProfile(userId: number) {
+        const person = await this.personService.findOne(userId);
+        if (!person) {
+            throw new UnauthorizedException('User not found');
+        }
 
+        // Return user without password
+        const { password: _, ...result } = person;
+        return result;
+    }
 }
 

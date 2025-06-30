@@ -6,7 +6,9 @@ import cookieParser from 'cookie-parser';
 import { json, raw } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true, // Enable raw body for all requests
+  });
   
   // Enable CORS
   app.enableCors({
@@ -17,11 +19,24 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Configure raw body parsing for Stripe webhooks only
-  app.use('/stripe/webhook', raw({ type: 'application/json' }));
-  
-  // Use JSON parsing for all other routes
-  app.use(json());
+  // Custom middleware for webhook raw body parsing
+  app.use((req, res, next) => {
+    if (req.path === '/orders/webhook') {
+      // For webhook endpoint, use raw body parsing
+      raw({ type: 'application/json', limit: '10mb' })(req, res, (err) => {
+        if (err) {
+          console.error('Raw body parsing error:', err);
+          return next(err);
+        }
+        // Store the raw body in req.rawBody for the controller to access
+        req.rawBody = req.body;
+        next();
+      });
+    } else {
+      // For all other routes, use JSON parsing
+      json({ limit: '10mb' })(req, res, next);
+    }
+  });
 
   // Use cookie parser
   app.use(cookieParser());

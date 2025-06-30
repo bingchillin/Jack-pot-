@@ -140,6 +140,17 @@ export class StripeService implements OnModuleInit {
     }
   }
 
+  async retrieveSession(sessionId: string): Promise<Stripe.Checkout.Session> {
+    this.checkStripeInitialized();
+    
+    try {
+      return await this.stripe!.checkout.sessions.retrieve(sessionId);
+    } catch (error) {
+      this.logger.error(`Failed to retrieve session ${sessionId}:`, error);
+      throw error;
+    }
+  }
+
   async createRefund(paymentIntentId: string, amount?: number): Promise<Stripe.Refund> {
     this.checkStripeInitialized();
     
@@ -278,5 +289,35 @@ export class StripeService implements OnModuleInit {
       hasKey,
       keyType
     };
+  }
+
+  async createRefundForOrder(order: any, amount?: number): Promise<Stripe.Refund> {
+    this.checkStripeInitialized();
+    
+    if (!order.stripePaymentIntentId) {
+      throw new Error('Order does not have a payment intent ID');
+    }
+
+    try {
+      const refundData: Stripe.RefundCreateParams = {
+        payment_intent: order.stripePaymentIntentId,
+        metadata: {
+          orderId: order.idOrder.toString(),
+          personId: order.idPerson.toString(),
+        },
+      };
+
+      // If amount is specified, use it; otherwise refund the full amount
+      if (amount) {
+        refundData.amount = Math.round(amount * 100); // Convert to cents
+      }
+
+      const refund = await this.stripe!.refunds.create(refundData);
+      this.logger.log(`Created refund ${refund.id} for order ${order.idOrder}, amount: ${amount || 'full'}`);
+      return refund;
+    } catch (error) {
+      this.logger.error(`Failed to create refund for order ${order.idOrder}:`, error);
+      throw error;
+    }
   }
 } 

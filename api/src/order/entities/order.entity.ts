@@ -100,6 +100,15 @@ export class Order {
   @Column({ name: 'stripe_payment_method_id', length: 255, nullable: true })
   stripePaymentMethodId?: string;
 
+  @Column({ name: 'refunded_at', type: 'timestamp', nullable: true })
+  refundedAt?: Date;
+
+  @Column({ name: 'refund_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  refundAmount?: number;
+
+  @Column({ name: 'locale', length: 5, default: 'en' })
+  locale: string;
+
   @OneToMany(() => OrderItem, orderItem => orderItem.order, { cascade: true })
   orderItems: OrderItem[];
 } 

@@ -52,10 +52,11 @@ export class OrderItemDto {
 }
 
 export class CreateOrderDto {
-  @ApiProperty({ description: 'Person ID' })
+  @ApiPropertyOptional({ description: 'Person ID (automatically set from authenticated user)' })
+  @IsOptional()
   @IsNumber()
   @IsPositive()
-  personId: number;
+  personId?: number;
 
   @ApiPropertyOptional({ description: 'Shipping address' })
   @IsOptional()
@@ -87,6 +88,11 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @ApiPropertyOptional({ description: 'Locale for emails and communications (e.g., en, fr, es)', default: 'en' })
+  @IsOptional()
+  @IsString()
+  locale?: string;
 
   @ApiProperty({ description: 'Order items', type: [OrderItemDto] })
   @IsArray()

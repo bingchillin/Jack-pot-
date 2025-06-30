@@ -8,12 +8,14 @@ import { Product } from '../product/entities/product.entity';
 import { Person } from '../person/entities/person.entity';
 import { PersonModule } from '../person/person.module';
 import { StripeModule } from '../stripe/stripe.module';
+import { MailerModule } from '../mailer/mailer.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem, Product, Person]),
     forwardRef(() => PersonModule),
     forwardRef(() => StripeModule),
+    MailerModule,
   ],
   controllers: [OrderController],
   providers: [OrderService],

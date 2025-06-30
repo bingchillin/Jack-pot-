@@ -121,7 +121,10 @@ export class PersonService {
         }
 
         Object.assign(person, updatePersonDto);
-        return await this.personRepository.save(person);
+        
+        const savedPerson = await this.personRepository.save(person);
+        
+        return savedPerson;
     }
 
     async findObjectsByPersonId(id: number): Promise<ObjectEntity[]> {

@@ -31,6 +31,17 @@ export class UpdateProfileDto {
     numberPhone?: string;
 
     @ApiProperty({ 
+        example: '123 Main Street, City, Country', 
+        description: 'Address (max 500 characters)',
+        required: false,
+        maxLength: 500
+    })
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    address?: string;
+
+    @ApiProperty({ 
         example: 'currentPassword123', 
         description: 'Current password (required for any update)',
         required: true

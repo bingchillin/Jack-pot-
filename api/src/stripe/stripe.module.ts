@@ -2,8 +2,6 @@ import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StripeService } from './stripe.service';
 import { StripeController } from './stripe.controller';
-import { WebhookService } from './webhook.service';
-import { WebhookController } from './webhook.controller';
 import { PersonModule } from '../person/person.module';
 import { OrderModule } from '../order/order.module';
 import { Order } from '../order/entities/order.entity';
@@ -14,8 +12,8 @@ import { Order } from '../order/entities/order.entity';
     forwardRef(() => PersonModule),
     forwardRef(() => OrderModule),
   ],
-  controllers: [StripeController, WebhookController],
-  providers: [StripeService, WebhookService],
-  exports: [StripeService, WebhookService],
+  controllers: [StripeController],
+  providers: [StripeService],
+  exports: [StripeService],
 })
 export class StripeModule {} 
