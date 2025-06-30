@@ -7,7 +7,7 @@ import Navigation from '../../../components/landing/Navigation';
 import Footer from '../../../components/landing/Footer';
 import { useAuth } from '@/hooks/useAuth';
 import { orderService } from '@/services/order.service';
-import { Order, OrderStatus } from '@/interfaces/order.interface';
+import { Order, OrderStatus, ShippingStatus } from '@/interfaces/order.interface';
 import { toast } from 'react-hot-toast';
 import { 
   ArrowLeft,
@@ -17,15 +17,18 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronRight,
-  Trash2
+  Trash2,
+  CheckCircle,
+  Package,
+  Truck
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
   getStatusIcon, 
   getStatusColor, 
   canCancelOrder, 
-  hasActiveOrders 
-} from '@/utils/order.utils';
+  hasActiveOrders
+} from '../../../utils/order.utils';
 import { formatDate, formatAmountWithoutCurrency } from '@/utils/format.utils';
 import { LoadingSpinner, ErrorState, EmptyState } from '@/utils/ui.utils';
 
@@ -135,6 +138,34 @@ export default function OrdersPage() {
     return t(`status.${status.toLowerCase()}`);
   };
 
+  const getShippingStatusIcon = (status?: ShippingStatus) => {
+    if (!status) return <Package className="w-4 h-4 text-gray-400" />;
+    switch (status) {
+      case ShippingStatus.IN_PREPARATION:
+        return <Package className="w-4 h-4 text-orange-500" />;
+      case ShippingStatus.SHIPPED:
+        return <Truck className="w-4 h-4 text-blue-500" />;
+      case ShippingStatus.DELIVERED:
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      default:
+        return <Package className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  const getShippingStatusText = (status?: ShippingStatus) => {
+    if (!status) return t('shipping_status.in_preparation');
+    switch (status) {
+      case ShippingStatus.IN_PREPARATION:
+        return t('shipping_status.in_preparation');
+      case ShippingStatus.SHIPPED:
+        return t('shipping_status.shipped');
+      case ShippingStatus.DELIVERED:
+        return t('shipping_status.delivered');
+      default:
+        return t('shipping_status.in_preparation');
+    }
+  };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -216,6 +247,14 @@ export default function OrdersPage() {
                               {getStatusText(order.status)}
                             </span>
                           </div>
+                          {order.status === OrderStatus.PAID && (
+                            <div className="flex items-center space-x-2">
+                              {getShippingStatusIcon(order.shippingStatus)}
+                              <span className="text-sm text-gray-600">
+                                {getShippingStatusText(order.shippingStatus)}
+                              </span>
+                            </div>
+                          )}
                           <div className="text-sm text-gray-500">
                             {t('order_number', { id: order.idOrder })}
                           </div>

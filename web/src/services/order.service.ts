@@ -1,4 +1,4 @@
-import { CreateOrderRequest, CreateOrderResponse, PaymentStatusResponse, Order } from '@/interfaces/order.interface';
+import { CreateOrderRequest, CreateOrderResponse, PaymentStatusResponse, Order, UpdateShippingStatusRequest } from '@/interfaces/order.interface';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -139,6 +139,16 @@ class OrderService {
     });
     
     return this.handleResponse<{ clientSecret: string; paymentIntentId: string; totalAmount: number }>(response);
+  }
+
+  async updateShippingStatus(orderId: number, statusData: UpdateShippingStatusRequest): Promise<Order> {
+    const response = await fetch(`${API_BASE_URL}/orders/${orderId}/shipping-status`, {
+      method: 'PATCH',
+      headers: this.getHeaders(),
+      body: JSON.stringify(statusData),
+    });
+    
+    return this.handleResponse<Order>(response);
   }
 }
 

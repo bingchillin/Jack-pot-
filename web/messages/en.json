@@ -500,6 +500,11 @@
       "next": "Next",
       "page": "Page {current} of {total}",
       "showing": "Showing {from}-{to} of {total} orders"
+    },
+    "shipping_status": {
+      "in_preparation": "Preparing",
+      "shipped": "Shipped",
+      "delivered": "Delivered"
     }
   },
   "order_details": {
@@ -564,6 +569,32 @@
       "delivered": "Your order has been delivered successfully!",
       "cancelled": "This order has been cancelled.",
       "refunded": "This order has been refunded."
+    },
+    "order_progress": {
+      "title": "Order Progress",
+      "payment_confirmed": "Payment Confirmed",
+      "in_preparation": "In Preparation",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "pending_payment": "Pending payment",
+      "order_being_prepared": "Order being prepared",
+      "not_yet_shipped": "Not yet shipped",
+      "estimated_delivery": "Estimated delivery",
+      "status_messages": {
+        "cancelled": "Order has been cancelled",
+        "refunded": "Order has been refunded", 
+        "payment_pending": "Payment pending",
+        "preparing": "Your order is being prepared for shipment",
+        "shipped": "Your order is on its way to you",
+        "delivered": "Your order has been delivered successfully!",
+        "confirmed": "Order confirmed, preparing for shipment"
+      },
+      "tracking": {
+        "tracking_number": "Tracking Number",
+        "carrier": "Carrier",
+        "track_package": "Track Package",
+        "estimated_delivery": "Estimated Delivery"
+      }
     }
   }
 } 

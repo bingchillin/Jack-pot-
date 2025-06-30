@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { UpdateShippingStatusDto } from './dto/update-shipping-status.dto';
 import { CreateOrderResponseDto } from './dto/create-order-response.dto';
 import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
 import { PaymentStatusResponseDto } from './dto/payment-status-response.dto';
@@ -180,5 +181,19 @@ export class OrderController {
   @ApiResponse({ status: 400, description: 'Cannot cancel this order' })
   cancelOrder(@Param('id') id: string): Promise<Order> {
     return this.orderService.cancelOrder(+id);
+  }
+
+  @Patch(':id/shipping-status')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update order shipping status with tracking information' })
+  @ApiResponse({ status: 200, description: 'Shipping status updated successfully', type: Order })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiResponse({ status: 400, description: 'Cannot update shipping status for this order' })
+  updateShippingStatus(
+    @Param('id') id: string, 
+    @Body() updateDto: UpdateShippingStatusDto
+  ): Promise<Order> {
+    return this.orderService.updateShippingStatus(+id, updateDto);
   }
 } 

@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Order, OrderStatus } from './entities/order.entity';
+import { Order, OrderStatus, ShippingStatus } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { Product } from '../product/entities/product.entity';
 import { Person } from '../person/entities/person.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { UpdateShippingStatusDto } from './dto/update-shipping-status.dto';
 import { CreateOrderResponseDto } from './dto/create-order-response.dto';
 import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
 import { PaymentStatusResponseDto } from './dto/payment-status-response.dto';
@@ -621,7 +622,7 @@ export class OrderService {
       throw new BadRequestException('Order has already been refunded.');
     }
     
-    if (order.status === OrderStatus.SHIPPED || order.status === OrderStatus.DELIVERED) {
+    if (order.shippingStatus === ShippingStatus.SHIPPED || order.shippingStatus === ShippingStatus.DELIVERED) {
       throw new BadRequestException('Cannot cancel a shipped or delivered order.');
     }
 
@@ -751,10 +752,6 @@ export class OrderService {
         return 'Payment successful! Your order has been confirmed.';
       case OrderStatus.PAYMENT_FAILED:
         return 'Payment failed. Please try again.';
-      case OrderStatus.SHIPPED:
-        return 'Your order has been shipped.';
-      case OrderStatus.DELIVERED:
-        return 'Your order has been delivered.';
       case OrderStatus.CANCELLED:
         return 'Order has been cancelled.';
       case OrderStatus.REFUNDED:
@@ -888,11 +885,12 @@ export class OrderService {
         await queryRunner.startTransaction();
 
         try {
-          // Update order status to PAID
+          // Update order status to PAID and set shipping status to IN_PREPARATION
           await queryRunner.manager.update(Order, orderWithItems.idOrder, {
             status: OrderStatus.PAID,
             paidAt: new Date(),
             paymentMethod: 'stripe',
+            shippingStatus: ShippingStatus.IN_PREPARATION,
           });
 
           // Load order items for stock reduction
@@ -1084,5 +1082,53 @@ export class OrderService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  /**
+   * Update shipping status with tracking information
+   */
+  async updateShippingStatus(orderId: number, updateDto: UpdateShippingStatusDto): Promise<Order> {
+    const order = await this.findOne(orderId);
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${orderId} not found`);
+    }
+
+    // Check if order is paid before allowing shipping updates
+    if (order.status !== OrderStatus.PAID) {
+      throw new BadRequestException('Can only update shipping status for paid orders');
+    }
+
+    const updateData: Partial<Order> = {
+      shippingStatus: updateDto.shippingStatus,
+    };
+
+    // Set tracking info if provided
+    if (updateDto.trackingNumber) {
+      updateData.trackingNumber = updateDto.trackingNumber;
+    }
+    if (updateDto.carrier) {
+      updateData.carrier = updateDto.carrier;
+    }
+    if (updateDto.trackingUrl) {
+      updateData.trackingUrl = updateDto.trackingUrl;
+    }
+    if (updateDto.estimatedDeliveryDate) {
+      updateData.estimatedDeliveryDate = new Date(updateDto.estimatedDeliveryDate);
+    }
+
+    // Set timestamps based on status
+    const now = new Date();
+    switch (updateDto.shippingStatus) {
+      case ShippingStatus.SHIPPED:
+        updateData.shippedAt = now;
+        break;
+      case ShippingStatus.DELIVERED:
+        updateData.deliveredAt = now;
+        break;
+    }
+
+    await this.orderRepository.update(orderId, updateData);
+    return this.findOne(orderId);
   }
 }

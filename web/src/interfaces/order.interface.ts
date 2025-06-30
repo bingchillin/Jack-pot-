@@ -15,15 +15,22 @@ export interface Order {
   personId: number;
   orderNumber: string;
   status: OrderStatus;
+  shippingStatus?: ShippingStatus;
   totalAmount: number;
   currency: string;
   stripePaymentIntentId: string | null;
   shippingAddress: string | null;
   billingAddress: string | null;
+  trackingNumber?: string;
+  carrier?: string;
+  trackingUrl?: string;
+  estimatedDeliveryDate?: string;
   notes: string | null;
   createdAt: string;
   updatedAt: string;
   paidAt?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
   refundedAt?: string;
   refundAmount?: number;
   orderItems: OrderItem[];
@@ -34,10 +41,14 @@ export enum OrderStatus {
   PAYMENT_PROCESSING = 'payment_processing',
   PAID = 'paid',
   PAYMENT_FAILED = 'payment_failed',
-  SHIPPED = 'shipped',
-  DELIVERED = 'delivered',
   CANCELLED = 'cancelled',
   REFUNDED = 'refunded'
+}
+
+export enum ShippingStatus {
+  IN_PREPARATION = 'in_preparation',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered'
 }
 
 export interface CreateOrderRequest {
@@ -74,4 +85,12 @@ export interface OrderListResponse {
   total: number;
   page: number;
   limit: number;
+}
+
+export interface UpdateShippingStatusRequest {
+  shippingStatus: ShippingStatus;
+  trackingNumber?: string;
+  carrier?: string;
+  trackingUrl?: string;
+  estimatedDeliveryDate?: string;
 } 
