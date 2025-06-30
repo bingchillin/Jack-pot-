@@ -25,7 +25,8 @@ import {
   getStatusIcon,
   getStatusColor,
   canCancelOrder
-} from '@/utils/order.utils';
+} from '../../../../utils/order.utils';
+import { OrderProgress } from '../../../../components/OrderProgress';
 import { formatDate, formatAmountWithoutCurrency } from '@/utils/format.utils';
 import { LoadingSpinner, ErrorState, EmptyState } from '@/utils/ui.utils';
 import { generateOrderReceipt } from '@/utils/pdf.utils';
@@ -312,6 +313,9 @@ export default function OrderDetailsPage() {
                   </button>
                 </div>
               </div>
+
+              {/* Order Progress Timeline */}
+              <OrderProgress order={order} />
 
               {/* Order Information */}
               <div className="grid md:grid-cols-2 gap-6">

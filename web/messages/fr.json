@@ -500,6 +500,11 @@
       "next": "Suivant",
       "page": "Page {current} sur {total}",
       "showing": "Affichage de {from}-{to} sur {total} commandes"
+    },
+    "shipping_status": {
+      "in_preparation": "En préparation",
+      "shipped": "Expédié",
+      "delivered": "Livré"
     }
   },
   "order_details": {
@@ -527,7 +532,7 @@
     "unit_price": "Prix unitaire",
     "cancel_order": "Annuler la commande",
     "cancelling": "Annulation...",
-    "cancellation_time_left": "Vous pouvez annuler dans {hours}h {minutes}m",
+    "cancellation_time_left": "Il vous reste {hours}h {minutes}m pour annuler votre commande.",
     "cancel_order_confirm": "Êtes-vous sûr de vouloir annuler cette commande ?",
     "cancel_order_description": "Cette action ne peut pas être annulée et initiera un processus de remboursement.",
     "cancel": "Annuler",
@@ -564,6 +569,32 @@
       "delivered": "Votre commande a été livrée avec succès !",
       "cancelled": "Cette commande a été annulée.",
       "refunded": "Cette commande a été remboursée."
+    },
+    "order_progress": {
+      "title": "Suivi de commande",
+      "payment_confirmed": "Paiement confirmé",
+      "in_preparation": "En préparation",
+      "shipped": "Expédié",
+      "delivered": "Livré",
+      "pending_payment": "Paiement en attente",
+      "order_being_prepared": "Commande en préparation",
+      "not_yet_shipped": "Pas encore expédié",
+      "estimated_delivery": "Livraison estimée",
+      "status_messages": {
+        "cancelled": "La commande a été annulée",
+        "refunded": "La commande a été remboursée", 
+        "payment_pending": "Paiement en attente",
+        "preparing": "Votre commande est en cours de préparation pour l'expédition",
+        "shipped": "Votre commande est en route vers vous",
+        "delivered": "Votre commande a été livrée avec succès !",
+        "confirmed": "Commande confirmée, préparation en cours"
+      },
+      "tracking": {
+        "tracking_number": "Numéro de suivi",
+        "carrier": "Transporteur",
+        "track_package": "Suivre le colis",
+        "estimated_delivery": "Livraison estimée"
+      }
     }
   }
 } 

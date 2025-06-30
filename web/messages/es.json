@@ -500,6 +500,11 @@
       "next": "Siguiente",
       "page": "Página {current} de {total}",
       "showing": "Mostrando {from}-{to} de {total} pedidos"
+    },
+    "shipping_status": {
+      "in_preparation": "En preparación",
+      "shipped": "Enviado",
+      "delivered": "Entregado"
     }
   },
   "order_details": {
@@ -564,6 +569,32 @@
       "delivered": "¡Tu pedido ha sido entregado exitosamente!",
       "cancelled": "Este pedido ha sido cancelado.",
       "refunded": "Este pedido ha sido reembolsado."
+    },
+    "order_progress": {
+      "title": "Progreso del pedido",
+      "payment_confirmed": "Pago confirmado",
+      "in_preparation": "En preparación",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "pending_payment": "Pago pendiente",
+      "order_being_prepared": "Pedido en preparación",
+      "not_yet_shipped": "Aún no enviado",
+      "estimated_delivery": "Entrega estimada",
+      "status_messages": {
+        "cancelled": "El pedido ha sido cancelado",
+        "refunded": "El pedido ha sido reembolsado", 
+        "payment_pending": "Pago pendiente",
+        "preparing": "Tu pedido está siendo preparado para el envío",
+        "shipped": "Tu pedido está en camino hacia ti",
+        "delivered": "¡Tu pedido ha sido entregado exitosamente!",
+        "confirmed": "Pedido confirmado, preparación en curso"
+      },
+      "tracking": {
+        "tracking_number": "Número de seguimiento",
+        "carrier": "Transportista",
+        "track_package": "Rastrear paquete",
+        "estimated_delivery": "Entrega estimada"
+      }
     }
   }
 } 

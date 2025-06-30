@@ -7,10 +7,14 @@ export enum OrderStatus {
   PAYMENT_PROCESSING = 'payment_processing',
   PAID = 'paid',
   PAYMENT_FAILED = 'payment_failed',
-  SHIPPED = 'shipped',
-  DELIVERED = 'delivered',
   CANCELLED = 'cancelled',
   REFUNDED = 'refunded'
+}
+
+export enum ShippingStatus {
+  IN_PREPARATION = 'in_preparation',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered'
 }
 
 @Entity('orders')
@@ -79,8 +83,32 @@ export class Order {
   @Column({ name: 'total_amount', type: 'decimal', precision: 10, scale: 2, nullable: false })
   totalAmount: number;
 
+  @Column({ 
+    type: 'enum', 
+    enum: ShippingStatus,
+    name: 'shipping_status',
+    nullable: true,
+    default: ShippingStatus.IN_PREPARATION
+  })
+  shippingStatus: ShippingStatus;
+
   @Column({ name: 'tracking_number', length: 255, nullable: true })
   trackingNumber: string;
+
+  @Column({ name: 'carrier', length: 100, nullable: true })
+  carrier: string;
+
+  @Column({ name: 'tracking_url', length: 500, nullable: true })
+  trackingUrl: string;
+
+  @Column({ name: 'estimated_delivery_date', type: 'timestamp', nullable: true })
+  estimatedDeliveryDate: Date;
+
+  @Column({ name: 'shipped_at', type: 'timestamp', nullable: true })
+  shippedAt?: Date;
+
+  @Column({ name: 'delivered_at', type: 'timestamp', nullable: true })
+  deliveredAt?: Date;
 
   @Column({ name: 'notes', type: 'text', nullable: true })
   notes: string;
