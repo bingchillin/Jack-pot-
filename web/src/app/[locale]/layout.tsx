@@ -2,6 +2,7 @@ import {NextIntlClientProvider, hasLocale} from 'next-intl';
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
 import { Toaster } from 'react-hot-toast';
+import AuthProvider from '@/components/auth/AuthProvider';
 
 export default async function LocaleLayout({
   children,
@@ -19,9 +20,17 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </NextIntlClientProvider>
         <Toaster 
           position="top-right"
+          containerStyle={{
+            top: 65,
+            right: 16,
+          }}
           toastOptions={{
             duration: 4000,
             style: {

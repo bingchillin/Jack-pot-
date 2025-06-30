@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navigation from '../../../../components/landing/Navigation';
 import Footer from '../../../../components/landing/Footer';
 import { useAuthStore } from '@/stores/authStore';
-import { User, Phone, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { User, Phone, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowLeft, MapPin } from 'lucide-react';
 
 export default function EditProfilePage() {
   const [scrolled, setScrolled] = useState(false);
@@ -15,6 +16,7 @@ export default function EditProfilePage() {
     firstname: '',
     surname: '',
     numberPhone: '',
+    address: '',
     currentPassword: '',
     newPassword: '',
     confirmNewPassword: ''
@@ -29,7 +31,17 @@ export default function EditProfilePage() {
 
   const t = useTranslations();
   const router = useRouter();
-  const { user, updateProfile, isLoading, isAuthenticated, isHydrated } = useAuthStore();
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const locale = params.locale as string;
+  const redirect = searchParams.get('redirect');
+  
+  // Use auth hook for authentication
+  const { user, isAuthenticated, isLoading } = useAuth({
+    requireAuth: true
+  });
+
+  const { updateProfile } = useAuthStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,13 +51,6 @@ export default function EditProfilePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (isHydrated && !isLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, isLoading, isHydrated, router]);
-
   // Initialize form data with user information
   useEffect(() => {
     if (user) {
@@ -53,13 +58,14 @@ export default function EditProfilePage() {
         ...prev,
         firstname: user.firstname || '',
         surname: user.surname || '',
-        numberPhone: user.numberPhone || ''
+        numberPhone: user.numberPhone || '',
+        address: user.address || ''
       }));
     }
   }, [user]);
 
   // Show loading while hydrating or loading auth state (but not during form submission)
-  if (!isHydrated || (!user && !isLoading)) {
+  if (!isAuthenticated || !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center">
         <div className="flex items-center justify-center">
@@ -68,11 +74,6 @@ export default function EditProfilePage() {
         </div>
       </div>
     );
-  }
-
-  // Don't render anything if not authenticated (will redirect)
-  if (!isAuthenticated || !user) {
-    return null;
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,6 +106,12 @@ export default function EditProfilePage() {
 
     if (!formData.currentPassword) {
       setError(t('auth.profile.edit.error.current_password_required'));
+      return false;
+    }
+
+    // If redirected from cart, address is required
+    if (redirect === 'cart' && (!formData.address || formData.address.trim() === '')) {
+      setError(t('auth.profile.edit.error.address_required_for_shipping'));
       return false;
     }
 
@@ -144,13 +151,19 @@ export default function EditProfilePage() {
     setIsSubmitting(true);
     
     try {
-      const updateData = {
+      const updateData: any = {
         firstname: formData.firstname,
         surname: formData.surname,
         numberPhone: formData.numberPhone || undefined,
         currentPassword: formData.currentPassword,
         ...(formData.newPassword && { newPassword: formData.newPassword }),
       };
+
+      // Only include address if it's different from the original user address
+      // or if it's not empty when user had no address before
+      if (formData.address !== user.address) {
+        updateData.address = formData.address;
+      }
 
       await updateProfile(updateData);
       
@@ -166,10 +179,18 @@ export default function EditProfilePage() {
         confirmNewPassword: ''
       }));
 
-      // Redirect with success message
-      const params = new URLSearchParams();
-      params.set('success', successMessage);
-      router.push(`/profile?${params.toString()}`);
+      // Redirect based on redirect parameter or default to profile
+      if (redirect === 'cart') {
+        // Redirect back to cart with success message
+        const params = new URLSearchParams();
+        params.set('success', successMessage);
+        router.push(`/${locale}/cart?${params.toString()}`);
+      } else {
+        // Default redirect to profile with success message
+        const params = new URLSearchParams();
+        params.set('success', successMessage);
+        router.push(`/${locale}/profile?${params.toString()}`);
+      }
       return; // Exit early to prevent the finally block from running
     } catch (error: any) {
       // Handle specific error cases
@@ -192,6 +213,19 @@ export default function EditProfilePage() {
 
       {/* Main Content */}
       <div className="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-24">
+        {/* Header with return buttons */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-4 mb-4">
+            <Link
+              href={`/${locale}/profile`}
+              className="inline-flex items-center text-blue-600 hover:text-blue-700"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {t('auth.profile.edit.back_to_profile')}
+            </Link>
+          </div>
+        </div>
+
         <div className="bg-white/80 backdrop-blur-sm shadow-2xl shadow-slate-200/50 border border-slate-200/50 rounded-3xl p-8 relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-16 translate-x-16 opacity-60"></div>
@@ -201,6 +235,13 @@ export default function EditProfilePage() {
             <div className="mb-10 text-center">
               <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('auth.profile.edit.title')}</h2>
               <p className="text-slate-600">{t('auth.profile.edit.subtitle')}</p>
+              {redirect === 'cart' && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-2xl">
+                  <p className="text-blue-800 text-sm font-medium">
+                    {t('auth.profile.edit.address_required_for_shipping')}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Error/Success Messages */}
@@ -339,6 +380,42 @@ export default function EditProfilePage() {
                 {/* Helpful text */}
                 <p className="mt-2 text-xs text-slate-500">
                   {t('auth.profile.edit.phone_help_text')}
+                </p>
+              </div>
+
+              {/* Address Field */}
+              <div className="group">
+                <label 
+                  htmlFor="address" 
+                  className={`block text-sm font-semibold mb-3 transition-colors ${
+                    focusedField === 'address' ? 'text-slate-900' : 'text-slate-700'
+                  }`}
+                >
+                  {t('auth.profile.edit.address')} {redirect === 'cart' && '*'}
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <MapPin className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    required={redirect === 'cart'}
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    onFocus={() => setFocusedField('address')}
+                    onBlur={() => setFocusedField(null)}
+                    className="w-full pl-12 pr-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
+                    placeholder={t('auth.profile.edit.address_placeholder')}
+                  />
+                </div>
+                {/* Helpful text */}
+                <p className="mt-2 text-xs text-slate-500">
+                  {redirect === 'cart' 
+                    ? t('auth.profile.edit.address_required_for_shipping')
+                    : t('auth.profile.edit.address_help_text')
+                  }
                 </p>
               </div>
 
@@ -490,7 +567,7 @@ export default function EditProfilePage() {
         </div>
       </div>
 
-      <Footer t={t} />
+      <Footer/>
     </div>
   );
 } 

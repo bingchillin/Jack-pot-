@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req, Headers, UnauthorizedException, Query, DefaultValuePipe, Patch } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Headers, UnauthorizedException, Query, DefaultValuePipe, Patch, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -75,5 +75,12 @@ export class AuthController {
     async updateProfile(@Req() req: Request, @Body() updateProfileDto: UpdateProfileDto) {
         const userId = (req.user as any).idPerson;
         return this.authService.updateProfile(userId, updateProfileDto);
+    }
+
+    @Get('profile')
+    @UseGuards(JwtAuthGuard)
+    async getProfile(@Req() req: Request) {
+        const userId = (req.user as any).idPerson;
+        return this.authService.getProfile(userId);
     }
 } 

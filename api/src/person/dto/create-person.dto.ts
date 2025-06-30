@@ -53,6 +53,16 @@ export class CreatePersonDto {
     @IsOptional()
     numberPhone?: string;
 
+    @ApiProperty({ 
+        example: '123 Main Street, City, Country', 
+        description: 'Address (max 500 characters)',
+        required: false,
+        maxLength: 500
+    })
+    @IsString()
+    @IsOptional()
+    address?: string;
+
     @IsNumber()
     @Transform(({ value }) => value ?? 2)
     @ApiProperty({ 

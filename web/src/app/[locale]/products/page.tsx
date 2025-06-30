@@ -7,8 +7,9 @@ import Footer from '../../../components/landing/Footer';
 import { ProductCard } from '../../../components/product/ProductCard';
 import { Product } from '@/interfaces/product.interface';
 import { productService } from '@/services/product.service';
-import { ShoppingCart, Search, Filter, Loader2, RefreshCw } from 'lucide-react';
+import { ShoppingCart, Search, Loader2, RefreshCw } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
+import { useCartHydration } from '@/hooks/useCartHydration';
 
 export default function ProductsPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -17,11 +18,11 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showQuantity, setShowQuantity] = useState(false);
   
   const t = useTranslations('shop.products');
   const { getSummary } = useCartStore();
   const cartSummary = getSummary();
+  const { isHydrated: isCartHydrated } = useCartHydration();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,9 +77,17 @@ export default function ProductsPage() {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
+            {/* Cart summary - always render but conditionally show content */}
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 text-sm font-medium shadow-sm border border-slate-200/50">
               <ShoppingCart className="w-4 h-4 mr-2 text-green-500" />
-              {cartSummary.totalItems} items in cart
+              {isCartHydrated ? (
+                `${cartSummary.totalItems} ${t('in_your_cart')}`
+              ) : (
+                <div className="flex items-center">
+                  <div className="w-3 h-3 border border-green-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Loading...
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -101,19 +110,6 @@ export default function ProductsPage() {
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200"
                 />
               </div>
-              
-              {/* Toggle Quantity Selector */}
-              <button
-                onClick={() => setShowQuantity(!showQuantity)}
-                className={`px-4 py-3 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 ${
-                  showQuantity 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <Filter className="w-4 h-4" />
-                <span>{t('quantity_selector')}</span>
-              </button>
             </div>
           </div>
         </div>
@@ -174,14 +170,13 @@ export default function ProductsPage() {
               <ProductCard 
                 key={product.idProduct} 
                 product={product} 
-                showQuantity={showQuantity}
               />
             ))}
           </div>
         )}
       </div>
 
-      <Footer t={t} />
+      <Footer />
     </div>
   );
 } 

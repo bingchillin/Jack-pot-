@@ -8,15 +8,12 @@ interface AuthProviderProps {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const { initializeAuth, isHydrated } = useAuthStore();
+  const { initializeAuth } = useAuthStore();
 
   useEffect(() => {
-    // Only initialize auth manually if not already hydrated
-    // (Zustand persist will handle hydration automatically)
-    if (isHydrated) {
-      initializeAuth();
-    }
-  }, [initializeAuth, isHydrated]);
+    // Initialize auth state on app load
+    initializeAuth();
+  }, [initializeAuth]);
 
   return <>{children}</>;
 } 
