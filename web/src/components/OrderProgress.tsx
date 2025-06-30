@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, Steps, Tag, Typography, Button, Space } from 'antd';
 import { CheckCircle, Package, Truck, CreditCard, ExternalLink } from 'lucide-react';
 import { Order, OrderStatus, ShippingStatus } from '@/interfaces/order.interface';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 const { Title, Text } = Typography;
 
@@ -15,6 +15,7 @@ interface OrderProgressProps {
 export const OrderProgress: React.FC<OrderProgressProps> = ({ order }) => {
   const t = useTranslations('order_details.order_progress');
   const tShipping = useTranslations('orders.shipping_status');
+  const locale = useLocale();
   const getCurrentStep = () => {
     if (order.status !== OrderStatus.PAID) {
       return 0; // Payment step
@@ -41,7 +42,7 @@ export const OrderProgress: React.FC<OrderProgressProps> = ({ order }) => {
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return null;
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -130,9 +131,14 @@ export const OrderProgress: React.FC<OrderProgressProps> = ({ order }) => {
     <div className="space-y-4">
       {/* Status Overview */}
       <Card>
-                     <Tag color={getStatusColor()} className="text-sm px-3 py-1">
-             {order.shippingStatus ? tShipping(order.shippingStatus).toUpperCase() : tShipping('in_preparation').toUpperCase()}
-           </Tag>
+        <div className="flex items-center justify-between mb-4">
+          <Title level={4} className="mb-0">Order #{order.idOrder}</Title>
+          <Tag color={getStatusColor()} className="text-sm px-3 py-1">
+            {order.shippingStatus ? tShipping(order.shippingStatus).toUpperCase() : tShipping('in_preparation').toUpperCase()}
+          </Tag>
+        </div>
+        
+        <Text className="text-gray-600 block mb-4">{getStatusMessage()}</Text>
         
         {/* Tracking Info */}
         {order.trackingNumber && (

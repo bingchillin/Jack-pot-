@@ -119,6 +119,22 @@ export class MailerService {
         return translations[locale as keyof typeof translations] || translations.en;
       };
 
+      // Format shipping address as string
+      const formatShippingAddress = (address: any): string => {
+        if (!address) return undefined;
+        if (typeof address === 'string') return address;
+        
+        // Handle potentially empty city/state/postal fields
+        const addressParts = [
+          `${address.firstName} ${address.lastName}`,
+          address.address,
+          [address.city, address.state, address.postalCode].filter(Boolean).join(' '),
+          address.country
+        ].filter(Boolean);
+        
+        return addressParts.join(', ');
+      };
+
       this.logger.log(`Rendering email template...`);
       const html = await render(OrderConfirmationEmail({
         orderNumber: order.idOrder.toString(),
@@ -127,7 +143,7 @@ export class MailerService {
         orderDate: new Date(order.createdAt).toLocaleDateString(order.locale || locale),
         totalAmount: formatAmount(order.totalAmount),
         orderItems,
-        shippingAddress: order.shippingAddress,
+        shippingAddress: formatShippingAddress(order.shippingAddress),
         locale: order.locale || locale,
       }));
       this.logger.log(`Email template rendered, HTML length: ${html.length}`);

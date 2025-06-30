@@ -1,4 +1,4 @@
-import { Order, OrderStatus } from '@/interfaces/order.interface';
+import { Order, OrderStatus, ShippingStatus } from '@/interfaces/order.interface';
 import { Clock, CreditCard, CheckCircle, XCircle, Truck, Package, Ban, RotateCcw } from 'lucide-react';
 import React from 'react';
 
@@ -12,14 +12,23 @@ export const getStatusColor = (status: OrderStatus): string => {
       return 'bg-green-100 text-green-800 border-green-200';
     case OrderStatus.PAYMENT_FAILED:
       return 'bg-red-100 text-red-800 border-red-200';
-    case OrderStatus.SHIPPED:
-      return 'bg-blue-100 text-blue-800 border-blue-200';
-    case OrderStatus.DELIVERED:
-      return 'bg-green-100 text-green-800 border-green-200';
     case OrderStatus.CANCELLED:
       return 'bg-red-100 text-red-800 border-red-200';
     case OrderStatus.REFUNDED:
       return 'bg-purple-100 text-purple-800 border-purple-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+  }
+};
+
+export const getShippingStatusColor = (status: ShippingStatus): string => {
+  switch (status) {
+    case ShippingStatus.IN_PREPARATION:
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case ShippingStatus.SHIPPED:
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case ShippingStatus.DELIVERED:
+      return 'bg-green-100 text-green-800 border-green-200';
     default:
       return 'bg-gray-100 text-gray-800 border-gray-200';
   }
@@ -35,16 +44,25 @@ export const getStatusDescription = (status: OrderStatus): string => {
       return 'Your payment has been confirmed! We are preparing your order for shipment.';
     case OrderStatus.PAYMENT_FAILED:
       return 'Payment failed. Please try again with a different payment method.';
-    case OrderStatus.SHIPPED:
-      return 'Your order has been shipped! Track your package using the tracking number.';
-    case OrderStatus.DELIVERED:
-      return 'Your order has been delivered! Thank you for your purchase.';
     case OrderStatus.CANCELLED:
       return 'Your order has been cancelled.';
     case OrderStatus.REFUNDED:
       return 'Your order has been refunded. The refund will appear in your account within 3-5 business days.';
     default:
       return 'Order status unknown.';
+  }
+};
+
+export const getShippingStatusDescription = (status: ShippingStatus): string => {
+  switch (status) {
+    case ShippingStatus.IN_PREPARATION:
+      return 'Your order is being prepared for shipment.';
+    case ShippingStatus.SHIPPED:
+      return 'Your order has been shipped! Track your package using the tracking number.';
+    case ShippingStatus.DELIVERED:
+      return 'Your order has been delivered! Thank you for your purchase.';
+    default:
+      return 'Shipping status unknown.';
   }
 };
 
@@ -64,7 +82,7 @@ export const canCancelOrder = (order: Order): boolean => {
   }
 
   // Can't cancel if shipped or delivered
-  if (order.status === OrderStatus.SHIPPED || order.status === OrderStatus.DELIVERED) {
+  if (order.shippingStatus === ShippingStatus.SHIPPED || order.shippingStatus === ShippingStatus.DELIVERED) {
     console.log('❌ Cannot cancel: shipped or delivered');
     return false;
   }
@@ -129,8 +147,7 @@ export const hasActiveOrders = (orders: Order[]): boolean => {
   return orders.some(order => 
     order.status === OrderStatus.PENDING || 
     order.status === OrderStatus.PAYMENT_PROCESSING || 
-    order.status === OrderStatus.PAID ||
-    order.status === OrderStatus.SHIPPED
+    order.status === OrderStatus.PAID
   );
 };
 
@@ -146,14 +163,25 @@ export const getStatusIcon = (status: OrderStatus, size: 'sm' | 'md' | 'lg' = 'm
       return React.createElement(CheckCircle, { size: iconSize });
     case OrderStatus.PAYMENT_FAILED:
       return React.createElement(XCircle, { size: iconSize });
-    case OrderStatus.SHIPPED:
-      return React.createElement(Truck, { size: iconSize });
-    case OrderStatus.DELIVERED:
-      return React.createElement(Package, { size: iconSize });
     case OrderStatus.CANCELLED:
       return React.createElement(Ban, { size: iconSize });
     case OrderStatus.REFUNDED:
       return React.createElement(RotateCcw, { size: iconSize });
+    default:
+      return React.createElement(Clock, { size: iconSize });
+  }
+};
+
+export const getShippingStatusIcon = (status: ShippingStatus, size: 'sm' | 'md' | 'lg' = 'md'): React.ReactElement => {
+  const iconSize = size === 'sm' ? 16 : size === 'md' ? 20 : 24;
+  
+  switch (status) {
+    case ShippingStatus.IN_PREPARATION:
+      return React.createElement(Package, { size: iconSize });
+    case ShippingStatus.SHIPPED:
+      return React.createElement(Truck, { size: iconSize });
+    case ShippingStatus.DELIVERED:
+      return React.createElement(CheckCircle, { size: iconSize });
     default:
       return React.createElement(Clock, { size: iconSize });
   }

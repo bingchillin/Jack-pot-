@@ -520,6 +520,8 @@
     "order_status": "Statut de la commande",
     "order_information": "Informations de commande",
     "shipping_information": "Informations de livraison",
+    "phone": "Téléphone",
+    "no_shipping_address": "Aucune adresse de livraison fournie",
     "order_items": "Articles de la commande",
     "order_summary": "Résumé de la commande",
     "total": "Total",
