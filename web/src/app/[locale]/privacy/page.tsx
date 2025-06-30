@@ -105,7 +105,7 @@ export default function PrivacyPage() {
         </div>
       </div>
 
-      <Footer t={t} />
+      <Footer />
     </div>
   );
 } 

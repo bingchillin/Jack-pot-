@@ -128,7 +128,7 @@ export default function OrderSuccessPage() {
                   <h2 className="text-xl font-semibold text-red-900 mb-2">Payment Successful</h2>
                   <p className="text-red-700 mb-4">{error}</p>
                   <p className="text-red-600 text-sm">
-                    Your payment was successful, but we're having trouble loading your order details. 
+                    Your payment was successful, but we&#39;re having trouble loading your order details. 
                     Please contact support with your session ID: {sessionId}
                   </p>
                 </div>

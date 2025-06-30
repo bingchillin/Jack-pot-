@@ -447,7 +447,7 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      <Footer t={t} />
+      <Footer />
     </div>
   );
 } 

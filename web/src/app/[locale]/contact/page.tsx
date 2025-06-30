@@ -313,7 +313,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <Footer t={t} />
+      <Footer />
     </div>
   );
 }

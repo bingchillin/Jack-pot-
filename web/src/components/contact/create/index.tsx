@@ -63,7 +63,7 @@ export const CreateContactModal: React.FC<CreateContactModalProps> = ({
       >
         <Form {...formProps} layout="vertical">
           <Text type="secondary" style={{ marginBottom: 16, display: "block" }}>
-            Create a relationship between two people. You'll need to create two contacts - one for each person's perspective of the relationship.
+            Create a relationship between two people. You&#39;ll need to create two contacts - one for each person&#39;s perspective of the relationship.
           </Text>
 
           <Form.Item

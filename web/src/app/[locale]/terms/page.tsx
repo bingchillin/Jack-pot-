@@ -125,7 +125,7 @@ export default function TermsPage() {
         </div>
       </div>
 
-      <Footer t={t} />
+      <Footer/>
     </div>
   );
 } 
