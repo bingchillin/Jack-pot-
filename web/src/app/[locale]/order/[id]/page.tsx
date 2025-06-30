@@ -239,59 +239,13 @@ export default function OrderDetailsPage() {
                 )}
                 
                 <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
-                  {(() => {
-                    // Check if order can be cancelled based on status and time
-                    let canCancel = false;
-                    
-                    if (order.status === OrderStatus.PENDING || order.status === OrderStatus.PAYMENT_PROCESSING) {
-                      canCancel = true;
-                    } else if (order.status === OrderStatus.PAID) {
-                      // For paid orders, check if within 48 hours
-                      const paidAtTime = new Date(order.paidAt || order.createdAt).getTime();
-                      const currentTime = Date.now();
-                      const hoursSincePayment = (currentTime - paidAtTime) / (1000 * 60 * 60);
-                      canCancel = hoursSincePayment <= 48;
-                    }
-                    
-                    console.log('FIXED CANCEL CHECK:', {
-                      orderId: order.idOrder,
-                      status: order.status,
-                      canCancel,
-                      paidAt: order.paidAt,
-                      hoursSincePayment: order.status === OrderStatus.PAID ? 
-                        ((Date.now() - new Date(order.paidAt || order.createdAt).getTime()) / (1000 * 60 * 60)).toFixed(2) : 'N/A'
-                    });
-                    
-                    return canCancel;
-                  })() && (
-                    <div className="flex items-center space-x-4">
-                      <button
-                        onClick={() => setShowCancelModal(true)}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        {t('cancel_order')}
-                      </button>
-                      {order.status === OrderStatus.PAID && (
-                        <div className="text-sm text-gray-600">
-                          {(() => {
-                            const paidAtTime = new Date(order.paidAt || order.createdAt).getTime();
-                            const currentTime = Date.now();
-                            const hoursSincePayment = (currentTime - paidAtTime) / (1000 * 60 * 60);
-                            const timeLeft = 48 - hoursSincePayment;
-                            
-                            if (timeLeft > 0) {
-                              const hours = Math.floor(timeLeft);
-                              const minutes = Math.floor((timeLeft - hours) * 60);
-                              return t('cancellation_time_left', {
-                                hours: hours,
-                                minutes: minutes
-                              });
-                            }
-                            return null;
-                          })()}
-                        </div>
-                      )}
-                    </div>
+                  {canCancelOrder(order) && (
+                    <button
+                      onClick={() => setShowCancelModal(true)}
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {t('cancel_order')}
+                    </button>
                   )}
                   
                   <button
