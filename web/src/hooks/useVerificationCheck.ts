@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import { toast } from 'react-hot-toast';
 
 export const useVerificationCheck = () => {
-  const { user, isAuthenticated, isHydrated } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const t = useTranslations();
 
   // Check if user is verified
@@ -11,8 +11,6 @@ export const useVerificationCheck = () => {
 
   // Function to check verification and show toast if needed
   const checkVerification = (): boolean => {
-    if (!isHydrated) return false;
-    
     if (!isAuthenticated) {
       toast.error(t('auth.errors.not_authenticated'));
       return false;
@@ -33,7 +31,6 @@ export const useVerificationCheck = () => {
     isVerified,
     checkVerification,
     isAuthenticated,
-    isHydrated,
     user
   };
 }; 
