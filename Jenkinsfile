@@ -33,9 +33,10 @@ pipeline {
         
         stage('Verify') {
             steps {
-                echo '🏥 Vérification...'
-                sleep(3)
-                sh "curl -f http://${VPS_HOST}:3000/api/persons || echo '⚠️ App pas accessible'"
+                def result = sh(script: "curl -f -s -o /dev/null -w '%{http_code}' http://${vps_host}:3000/api/persons", returnStdout: true).trim()
+                    if (result == "200") {
+                        echo '✅ App répond correctement (HTTP 200)'
+                    }
             }
         }
     }
