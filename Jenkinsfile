@@ -35,7 +35,7 @@ pipeline {
             steps {
                 echo '🏥 Vérification...'
                 sleep(3)
-                sh "curl -f http://${VPS_HOST}:3000 || echo '⚠️ App pas accessible'"
+                sh "curl -f http://${VPS_HOST}:3000/api/persons || echo '⚠️ App pas accessible'"
             }
         }
     }
