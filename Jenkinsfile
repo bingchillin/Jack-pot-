@@ -24,7 +24,7 @@ pipeline {
     stage('Build backend') {
       steps {
         dir('api') {
-          sh 'npm run build'
+          sh 'npx nest build'
         }
       }
     }
@@ -33,7 +33,7 @@ pipeline {
       steps {
         dir('api') {
           // Si déjà démarré, restart. Sinon start.
-          sh 'pm2 restart backend-app || pm2 start npm --name backend-app -- run start:prod'
+          sh 'pm2 restart backend-app || pm2 start dist/src/main.js --name backend-app'
         }
       }
     }
