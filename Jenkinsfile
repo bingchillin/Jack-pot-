@@ -33,10 +33,23 @@ pipeline {
         
         stage('Verify') {
             steps {
-                def result = sh(script: "curl -f -s -o /dev/null -w '%{http_code}' http://${vps_host}:3000/api/persons", returnStdout: true).trim()
+                script {
+                    def result = sh(script: "curl -f -s -o /dev/null -w '%{http_code}' http://${vps_host}:3000/api/persons", returnStdout: true).trim()
                     if (result == "200") {
                         echo '✅ App répond correctement (HTTP 200)'
+                    } else {
+                        echo "⚠️ App retourne HTTP ${result}"
+                        // Afficher les logs PM2 pour debug
+                        sshagent(['vps-ssh-key']) {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} '
+                                    echo "📋 Derniers logs PM2:" &&
+                                    pm2 logs backend-app --lines 10 --nostream
+                                '
+                            """
+                        }
                     }
+                }
             }
         }
     }
