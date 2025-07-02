@@ -598,5 +598,31 @@
         "estimated_delivery": "Livraison estimée"
       }
     }
+  },
+  "returns": {
+    "title": "Retourner la commande",
+    "request_return": "Demander un retour",
+    "submit_request": "Soumettre la demande de retour",
+    "requesting": "Soumission...",
+    "cancel": "Annuler",
+    "request_submitted": "Demande de retour soumise avec succès",
+    "request_failed": "Échec de la soumission de la demande de retour",
+    "eligible_message": "Vous pouvez retourner cette commande dans les 14 jours suivant la livraison à vos frais.",
+    "not_eligible": "Cette commande n'est pas éligible au retour",
+    "expiry_warning": "La période de retour expire dans {days} jour(s)",
+    "reason": "Raison du retour",
+    "reason_optional": "Raison du retour (optionnel)",
+    "reason_placeholder": "Dites-nous pourquoi vous retournez cette commande...",
+    "requested_on": "Demandé le {date}",
+    "refunded_on": "Remboursé le {date}",
+    "refund_processed": "Retour reçu et remboursement traité",
+    "refund_info": "Un remboursement de {amount} a été traité sur votre méthode de paiement originale.",
+    "return_address": "Adresse de retour:",
+    "return_instructions": {
+      "title": "Instructions de retour",
+      "step_1": "Emballez votre article en sécurité et incluez votre numéro de commande:",
+      "step_2": "Expédiez le colis à l'adresse ci-dessus à vos frais.",
+      "step_3": "Gardez votre reçu d'expédition pour le suivi. Nous traiterons votre remboursement une fois reçu."
+    }
   }
 } 

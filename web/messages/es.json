@@ -598,5 +598,31 @@
         "estimated_delivery": "Entrega estimada"
       }
     }
+  },
+  "returns": {
+    "title": "Devolver pedido",
+    "request_return": "Solicitar devolución",
+    "submit_request": "Enviar solicitud de devolución",
+    "requesting": "Enviando...",
+    "cancel": "Cancelar",
+    "request_submitted": "Solicitud de devolución enviada exitosamente",
+    "request_failed": "Error al enviar solicitud de devolución",
+    "eligible_message": "Puedes devolver este pedido dentro de 14 días de la entrega por tu cuenta.",
+    "not_eligible": "Este pedido no es elegible para devolución",
+    "expiry_warning": "El período de devolución expira en {days} día(s)",
+    "reason": "Razón de la devolución",
+    "reason_optional": "Razón de la devolución (opcional)",
+    "reason_placeholder": "Dinos por qué estás devolviendo este pedido...",
+    "requested_on": "Solicitado el {date}",
+    "refunded_on": "Reembolsado el {date}",
+    "refund_processed": "Devolución recibida y reembolso procesado",
+    "refund_info": "Se ha procesado un reembolso de {amount} a tu método de pago original.",
+    "return_address": "Dirección de devolución:",
+    "return_instructions": {
+      "title": "Instrucciones de devolución",
+      "step_1": "Empaca tu artículo de forma segura e incluye tu número de pedido:",
+      "step_2": "Envía el paquete a la dirección de arriba por tu cuenta.",
+      "step_3": "Guarda tu recibo de envío para rastreo. Procesaremos tu reembolso una vez recibido."
+    }
   }
 } 

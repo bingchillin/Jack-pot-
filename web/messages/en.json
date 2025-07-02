@@ -183,13 +183,22 @@
     "jack": {
       "title": "Jack, the smart pot",
       "description": "Connected pot with integrated sensors",
-      "features": ["Soil moisture detection", "Temperature and humidity monitoring", "Light level tracking", "Plug into power outlet"],
+      "features": [
+        "Soil moisture detection",
+        "Temperature and humidity monitoring",
+        "Light level tracking",
+        "Plug into power outlet"
+      ],
       "price": "$39"
     },
     "app": {
       "title": "Jack Pot, the mobile app",
       "description": "Mobile app for plant management and gamification",
-      "features": ["Real-time plant statistics", "Health notifications", "Care reminders"],
+      "features": [
+        "Real-time plant statistics",
+        "Health notifications",
+        "Care reminders"
+      ],
       "price": "Free"
     }
   },
@@ -534,7 +543,6 @@
     "unit_price": "Unit Price",
     "cancel_order": "Cancel Order",
     "cancelling": "Cancelling...",
-  
     "cancel_order_confirm": "Are you sure you want to cancel this order?",
     "cancel_order_description": "This action cannot be undone and will initiate a refund process.",
     "cancel": "Cancel",
@@ -584,7 +592,7 @@
       "estimated_delivery": "Estimated delivery",
       "status_messages": {
         "cancelled": "Order has been cancelled",
-        "refunded": "Order has been refunded", 
+        "refunded": "Order has been refunded",
         "payment_pending": "Payment pending",
         "preparing": "Your order is being prepared for shipment",
         "shipped": "Your order is on its way to you",
@@ -598,5 +606,31 @@
         "estimated_delivery": "Estimated Delivery"
       }
     }
+  },
+  "returns": {
+    "title": "Return Order",
+    "request_return": "Request Return",
+    "submit_request": "Submit Return Request",
+    "requesting": "Submitting...",
+    "cancel": "Cancel",
+    "request_submitted": "Return request submitted successfully",
+    "request_failed": "Failed to submit return request",
+    "eligible_message": "You can return this order within 14 days of delivery at your own expense.",
+    "not_eligible": "This order is not eligible for return",
+    "expiry_warning": "Return period expires in {days} day(s)",
+    "reason": "Reason for return",
+    "reason_optional": "Reason for return (optional)",
+    "reason_placeholder": "Tell us why you're returning this order...",
+    "requested_on": "Requested on {date}",
+    "refunded_on": "Refunded on {date}",
+    "refund_processed": "Return Received & Refund Processed",
+    "refund_info": "A refund of {amount} has been processed to your original payment method.",
+    "return_address": "Return Address:",
+    "return_instructions": {
+      "title": "Return Instructions",
+      "step_1": "Package your item securely and include your order number:",
+      "step_2": "Ship the package to the address above at your own expense.",
+      "step_3": "Keep your shipping receipt for tracking. We'll process your refund once received."
+    }
   }
-} 
+}

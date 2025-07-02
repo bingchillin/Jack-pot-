@@ -27,6 +27,7 @@ import {
   canCancelOrder
 } from '../../../../utils/order.utils';
 import { OrderProgress } from '../../../../components/OrderProgress';
+import ReturnSection from '@/components/returns/ReturnSection';
 import { formatDate, formatAmountWithoutCurrency } from '@/utils/format.utils';
 import { LoadingSpinner, ErrorState, EmptyState } from '@/utils/ui.utils';
 import { generateOrderReceipt } from '@/utils/pdf.utils';
@@ -270,6 +271,9 @@ export default function OrderDetailsPage() {
 
               {/* Order Progress Timeline */}
               <OrderProgress order={order} />
+
+              {/* Return Section */}
+              <ReturnSection order={order} locale={locale} />
 
               {/* Order Information */}
               <div className="grid md:grid-cols-2 gap-6">
