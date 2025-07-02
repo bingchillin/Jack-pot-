@@ -24,7 +24,7 @@ pipeline {
     stage('Build backend') {
       steps {
         dir('api') {
-          sh 'npx nest build'
+          sh 'npm run build'
         }
       }
     }
