@@ -52,6 +52,8 @@ gen-external-apklibs
 ### Dart ###
 # See https://www.dartlang.org/guides/libraries/private-files
 
+Jenkinsfile
+
 # Files and directories created by pub
 .dart_tool/
 .packages
