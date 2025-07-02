@@ -1,6 +1,7 @@
 export const getResourceEndpoint = (resource: string): string => {
   const resourceMappings: { [key: string]: string } = {
 
+
     persons: "person",
     "plant-types": "plant-type",
     "event-parties": "event-party",
@@ -9,7 +10,8 @@ export const getResourceEndpoint = (resource: string): string => {
     "plants": "plants",
     "roles": "role",
     "objects": "object",
-    "category-types": "category-type"
+    "category-types": "category-type",
+    "orders": "orders"
 };
 
   return resourceMappings[resource] || resource;

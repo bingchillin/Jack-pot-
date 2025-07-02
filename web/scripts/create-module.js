@@ -67,7 +67,7 @@ const createModule = async (pluralInput) => {
     const singularPascal = capitalize(singularCamel);
 
     // === 1. Copy main module ===
-    const sourceDir = path.join(__dirname, '..', 'src', 'app', 'persons');
+    const sourceDir = path.join(__dirname, '..', 'src', 'components', 'person');
     const targetDir = path.join(__dirname, '..', 'src', 'app', pluralKebab);
     copyDir(sourceDir, targetDir);
 

@@ -193,6 +193,18 @@ export default function RootLayout({
                           parent: "object-management",
                         },
                       },
+                      {
+                        name: "orders",
+                        list: "/back/orders",
+                        create: "/back/orders/create",
+                        edit: "/back/orders/edit/:id",
+                        show: "/back/orders/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <UserOutlined />,
+                          parent: "order-management",
+                        },
+                      },
                     ]}
                     options={{
                       syncWithLocation: true,
