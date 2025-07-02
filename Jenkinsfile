@@ -1,41 +1,51 @@
 pipeline {
-  agent any
-
-  tools {
-    nodejs 'NodeJS'
-  }
-
-  stages {
-    stage('Pull code') {
-      steps {
-        // Clone automatique si pas déjà dans Jenkins
-        git url: 'https://github.com/bingchillin/Jack-pot-.git', branch: 'main'
-      }
+    agent any
+    
+    environment {
+        VPS_HOST = '51.222.110.241'
+        VPS_USER = 'debian'
+        PROJECT_PATH = '/var/www/html/api_jackpot/api_topkcaj_A/Jack-pot-/api'
     }
-
-    stage('Install dependencies') {
-      steps {
-        dir('api') {
-          sh 'npm install'
+    
+    stages {
+        stage('Pull & Build') {
+            steps {
+                echo '🚀 Déploiement en cours...'
+                sshagent(['vps-ssh-key']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} '
+                            cd ${PROJECT_PATH} &&
+                            echo "📥 Git pull..." &&
+                            git pull origin main &&
+                            echo "📦 npm install..." &&
+                            npm install &&
+                            echo "🔨 Build..." &&
+                            npm run build &&
+                            echo "🔄 PM2 reload..." &&
+                            pm2 reload all &&
+                            echo "📊 PM2 status:" &&
+                            pm2 status
+                        '
+                    """
+                }
+            }
         }
-      }
-    }
-
-    stage('Build backend') {
-      steps {
-        dir('api') {
-          sh 'npm start'
+        
+        stage('Verify') {
+            steps {
+                echo '🏥 Vérification...'
+                sleep(3)
+                sh "curl -f http://${VPS_HOST}:3000 || echo '⚠️ App pas accessible'"
+            }
         }
-      }
     }
-
-    stage('Restart with pm2') {
-      steps {
-        dir('api') {
-          // Si déjà démarré, restart. Sinon start.
-          sh 'pm2 restart backend-app || pm2 start dist/src/main.js --name backend-app'
+    
+    post {
+        success {
+            echo '✅ Déploiement réussi ! 🎉'
         }
-      }
+        failure {
+            echo '❌ Merde, ça a foiré 💥'
+        }
     }
-  }
 }
