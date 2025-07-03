@@ -2,20 +2,16 @@
 
 import {
   DeleteButton,
-  EditButton,
   List,
   ShowButton,
   useTable,
-  CreateButton,
   DateField
 } from "@refinedev/antd";
 import { type BaseRecord } from "@refinedev/core";
-import { Space, Table, Tag, Drawer, Input, Typography, Row, Col, Select, DatePicker, Card, Descriptions, Tooltip } from "antd";
+import { Space, Table, Tag, Drawer, Input, Typography, Row, Col, Select, DatePicker, Card, Descriptions, Tooltip, Button, message, Popconfirm, Popover } from "antd";
 import { 
   CheckCircleOutlined, 
-  CloseCircleOutlined, 
   CrownOutlined, 
-  PlusCircleOutlined, 
   UserOutlined, 
   SearchOutlined,
   MailOutlined,
@@ -26,13 +22,14 @@ import {
   ClockCircleOutlined,
   ExclamationCircleOutlined,
   InboxOutlined,
-  CalendarOutlined
+  LoadingOutlined
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { PersonDetails } from "@components/person/show";
-import { CreatePersonModal } from "@components/person/create";
+import { orderService } from "@/services/order.service";
+import { ShippingStatus, UpdateShippingStatusRequest } from "@/interfaces/order.interface";
+import { ShippingModal } from "@/components/order/shipping-modal";
 
 const { Text, Title } = Typography;
 const { RangePicker } = DatePicker;
@@ -158,22 +155,23 @@ function OrderDetails({ record }: { record: any }) {
               {record.person?.email}
             </Space>
           </Descriptions.Item>
-          {record.person?.phone && (
+          {record.person?.numberPhone && (
             <Descriptions.Item label="Phone">
               <Space>
                 <PhoneOutlined />
-                {record.person.phone}
+                {record.person.numberPhone}
               </Space>
             </Descriptions.Item>
           )}
-          {record.billingAddress && (
-            <Descriptions.Item label="Billing Address">
-              <Space>
-                <HomeOutlined />
+          {record.shippingAddress && (
+            <Descriptions.Item label="Shipping Address">
+              <Space align="start">
+                <HomeOutlined style={{ marginTop: 4 }} />
                 <div>
-                  {record.billingAddress.street}<br />
-                  {record.billingAddress.city}, {record.billingAddress.postalCode}<br />
-                  {record.billingAddress.country}
+                  {record.shippingAddress.address}<br />
+                  {record.shippingAddress.city && `${record.shippingAddress.city}, `}
+                  {record.shippingAddress.postalCode && `${record.shippingAddress.postalCode}`}<br />
+                  {record.shippingAddress.country}
                 </div>
               </Space>
             </Descriptions.Item>
@@ -213,7 +211,7 @@ function OrderDetails({ record }: { record: any }) {
       </Card>
 
       {/* Shipping Information */}
-      {(record.shippingStatus !== 'in_preparation' || record.shippingAddress) && (
+      {(record.shippingStatus !== 'in_preparation' || record.trackingNumber || record.carrier) && (
         <Card 
           title={
             <Space>
@@ -225,23 +223,26 @@ function OrderDetails({ record }: { record: any }) {
           style={{ marginBottom: 16 }}
         >
           <Descriptions column={1} size="small">
-            {record.shippingAddress && (
-              <Descriptions.Item label="Shipping Address">
-                <div>
-                  {record.shippingAddress.street}<br />
-                  {record.shippingAddress.city}, {record.shippingAddress.postalCode}<br />
-                  {record.shippingAddress.country}
-                </div>
-              </Descriptions.Item>
-            )}
             {record.carrier && (
               <Descriptions.Item label="Carrier">
-                {record.carrier}
+                <Text strong>{record.carrier}</Text>
               </Descriptions.Item>
             )}
             {record.trackingNumber && (
               <Descriptions.Item label="Tracking Number">
-                <Text code>{record.trackingNumber}</Text>
+                <Text code copyable>{record.trackingNumber}</Text>
+              </Descriptions.Item>
+            )}
+            {record.trackingUrl && (
+              <Descriptions.Item label="Tracking URL">
+                <a href={record.trackingUrl} target="_blank" rel="noopener noreferrer">
+                  Track Package
+                </a>
+              </Descriptions.Item>
+            )}
+            {record.estimatedDeliveryDate && (
+              <Descriptions.Item label="Estimated Delivery">
+                <DateField value={record.estimatedDeliveryDate} format="DD/MM/YYYY" />
               </Descriptions.Item>
             )}
             {record.shippedAt && (
@@ -302,6 +303,9 @@ export default function OrdersList() {
   const searchParams = useSearchParams();
   const [selectedPerson, setSelectedPerson] = useState<BaseRecord | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState<number | null>(null);
+  const [shippingModalVisible, setShippingModalVisible] = useState(false);
+  const [selectedOrderForShipping, setSelectedOrderForShipping] = useState<BaseRecord | null>(null);
   
   // Filters
   const [searchCustomer, setSearchCustomer] = useState("");
@@ -360,9 +364,9 @@ export default function OrdersList() {
   useEffect(() => {
     const showId = searchParams.get('show');
     if (showId) {
-      const person = filteredData.find(p => p.idPerson === parseInt(showId));
-      if (person) {
-        setSelectedPerson(person);
+      const order = filteredData.find(o => o.idOrder === parseInt(showId));
+      if (order) {
+        setSelectedPerson(order);
         setDrawerVisible(true);
       }
     } else {
@@ -385,7 +389,7 @@ export default function OrdersList() {
     setDrawerVisible(true);
     // Update URL with show parameter
     const params = new URLSearchParams(searchParams.toString());
-    params.set('show', record.idPerson.toString());
+    params.set('show', record.idOrder.toString());
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -396,6 +400,53 @@ export default function OrdersList() {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('show');
     router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handleChangeShippingStatus = async (record: BaseRecord, newStatus: ShippingStatus) => {
+    if (record.status !== 'paid') {
+      message.error('Can only update shipping status for paid orders');
+      return;
+    }
+
+    setUpdatingStatus(record.idOrder);
+    try {
+      await orderService.updateShippingStatus(record.idOrder, { shippingStatus: newStatus });
+      message.success(`Shipping status updated to ${newStatus.replace('_', ' ')}`);
+      // Refresh the table data
+      tableQueryResult.refetch();
+    } catch (error: any) {
+      message.error(error.message || 'Failed to update shipping status');
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  const handleShipOrder = (record: BaseRecord) => {
+    setSelectedOrderForShipping(record);
+    setShippingModalVisible(true);
+  };
+
+  const handleShippingModalSuccess = async (shippingData: UpdateShippingStatusRequest) => {
+    if (!selectedOrderForShipping) return;
+
+    setUpdatingStatus(selectedOrderForShipping.idOrder);
+    try {
+      await orderService.updateShippingStatus(selectedOrderForShipping.idOrder, shippingData);
+      message.success('Order marked as shipped successfully');
+      setShippingModalVisible(false);
+      setSelectedOrderForShipping(null);
+      // Refresh the table data
+      tableQueryResult.refetch();
+    } catch (error: any) {
+      message.error(error.message || 'Failed to update shipping status');
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  const handleShippingModalCancel = () => {
+    setShippingModalVisible(false);
+    setSelectedOrderForShipping(null);
   };
 
 
@@ -508,23 +559,69 @@ export default function OrdersList() {
           <Table.Column
             title={"Actions"}
             dataIndex="actions"
-            render={(_, record: BaseRecord) => (
-              <Space>
-
-                <ShowButton hideText size="small" onClick={() => handleShow(record)} />
-                <DeleteButton hideText size="small" recordItemId={record.idOrder} />
-              </Space>
-            )}
+            render={(_, record: BaseRecord) => {
+              const isUpdating = updatingStatus === record.idOrder;
+              const canUpdateShipping = record.status === 'paid';
+              
+              return (
+                <Space>
+                  <ShowButton hideText size="small" onClick={() => handleShow(record)} />
+                  
+                  {canUpdateShipping && record.shippingStatus !== ShippingStatus.SHIPPED && record.shippingStatus !== ShippingStatus.DELIVERED && (
+                    <Button 
+                      type="primary" 
+                      size="small" 
+                      icon={isUpdating ? <LoadingOutlined /> : <TruckOutlined />}
+                      loading={isUpdating}
+                      disabled={isUpdating}
+                      onClick={() => handleShipOrder(record)}
+                    >
+                      Ship
+                    </Button>
+                  )}
+                  
+                  {canUpdateShipping && record.shippingStatus === ShippingStatus.SHIPPED && (
+                    <Popconfirm
+                      title="Mark as delivered?"
+                      description="This will update the shipping status to 'delivered'"
+                      onConfirm={() => handleChangeShippingStatus(record, ShippingStatus.DELIVERED)}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button 
+                        type="primary" 
+                        size="small" 
+                        icon={isUpdating ? <LoadingOutlined /> : <CheckCircleOutlined />}
+                        loading={isUpdating}
+                        disabled={isUpdating}
+                      >
+                        Deliver
+                      </Button>
+                    </Popconfirm>
+                  )}
+                  
+                  {!canUpdateShipping && (
+                    <Tooltip title="Order must be paid before shipping">
+                      <Button size="small" disabled>
+                        Ship
+                      </Button>
+                    </Tooltip>
+                  )}
+                  
+                  <DeleteButton hideText size="small" recordItemId={record.idOrder} />
+                </Space>
+              );
+            }}
           />
         </Table>
       </List>
 
       <Drawer
-        title={`${selectedPerson?.firstname} ${selectedPerson?.surname} details`}
+        title={`Order #${selectedPerson?.idOrder} - ${selectedPerson?.person?.firstname} ${selectedPerson?.person?.surname}`}
         placement="right"
         onClose={handleClose}
         open={drawerVisible}
-                  width={800}
+        width={800}
         styles={{
           body: {
             background: '#f5f5f5',
@@ -534,7 +631,13 @@ export default function OrdersList() {
         {selectedPerson && <OrderDetails record={selectedPerson} />}
       </Drawer>
 
-
+      <ShippingModal
+        visible={shippingModalVisible}
+        onCancel={handleShippingModalCancel}
+        onSuccess={handleShippingModalSuccess}
+        orderId={selectedOrderForShipping?.idOrder || 0}
+        loading={updatingStatus === selectedOrderForShipping?.idOrder}
+      />
     </>
   );
 }
