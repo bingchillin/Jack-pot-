@@ -49,6 +49,7 @@ import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { StripeModule } from './stripe/stripe.module';
 import { CommentModule } from './comment/comment.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -125,7 +126,8 @@ import { CommentModule } from './comment/comment.module';
     ProductModule,
     OrderModule,
     StripeModule,
-    CommentModule
+    CommentModule,
+    UploadModule
   ],
   controllers: [AppController],
   providers: [AppService],

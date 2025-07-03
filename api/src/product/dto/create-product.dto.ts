@@ -1,5 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsBoolean, IsUrl, Min, IsPositive } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class CreateProductDto {
   @ApiProperty({ description: 'Product name' })
@@ -12,6 +13,7 @@ export class CreateProductDto {
   description?: string;
 
   @ApiProperty({ description: 'Product price' })
+  @Type(() => Number)
   @IsNumber()
   @IsPositive()
   price: number;
@@ -33,11 +35,12 @@ export class CreateProductDto {
 
   @ApiPropertyOptional({ description: 'Product image URL' })
   @IsOptional()
-  @IsUrl()
+  @IsString()
   imageUrl?: string;
 
   @ApiPropertyOptional({ description: 'Stock quantity', default: 0 })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   stockQuantity?: number;
