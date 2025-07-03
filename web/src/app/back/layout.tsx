@@ -21,7 +21,10 @@ import {
   TagsOutlined,
   SafetyCertificateOutlined,
   ContactsOutlined,
-  DashboardOutlined
+  DashboardOutlined,
+  ShoppingCartOutlined,
+  ProfileOutlined,
+  ShoppingOutlined
 } from "@ant-design/icons";
 import { GiPlantRoots, GiFlowerPot } from "react-icons/gi";
 
@@ -134,6 +137,13 @@ export default function RootLayout({
                         },
                       },
                       {
+                        name: "order-management",
+                        meta: {
+                          label: "Order Management",
+                          icon: <ShoppingCartOutlined />,
+                        },
+                      },
+                      {
                         name: "plant-types",
                         list: "/back/plant-types",
                         create: "/back/plant-types/create",
@@ -189,7 +199,7 @@ export default function RootLayout({
                         show: "/back/object-profiles/show/:id",
                         meta: {
                           canDelete: true,
-                          icon: <UserOutlined />,
+                          icon: <ProfileOutlined />,
                           parent: "object-management",
                         },
                       },
@@ -201,7 +211,19 @@ export default function RootLayout({
                         show: "/back/orders/show/:id",
                         meta: {
                           canDelete: true,
-                          icon: <UserOutlined />,
+                          icon: <ShoppingOutlined />,
+                          parent: "order-management",
+                        },
+                      },
+                      {
+                        name: "products",
+                        list: "/back/products",
+                        create: "/back/products/create",
+                        edit: "/back/products/edit/:id",
+                        show: "/back/products/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <ShoppingOutlined />,
                           parent: "order-management",
                         },
                       },
