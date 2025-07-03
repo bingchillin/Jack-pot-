@@ -7,16 +7,294 @@ import {
   ShowButton,
   useTable,
   CreateButton,
+  DateField
 } from "@refinedev/antd";
 import { type BaseRecord } from "@refinedev/core";
-import { Space, Table, Tag, Drawer, Input, Typography } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined, CrownOutlined, PlusCircleOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
+import { Space, Table, Tag, Drawer, Input, Typography, Row, Col, Select, DatePicker, Card, Descriptions, Tooltip } from "antd";
+import { 
+  CheckCircleOutlined, 
+  CloseCircleOutlined, 
+  CrownOutlined, 
+  PlusCircleOutlined, 
+  UserOutlined, 
+  SearchOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  HomeOutlined,
+  TruckOutlined,
+  DollarCircleOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+  InboxOutlined,
+  CalendarOutlined
+} from "@ant-design/icons";
+import dayjs from "dayjs";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PersonDetails } from "@components/person/show";
 import { CreatePersonModal } from "@components/person/create";
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
+const { RangePicker } = DatePicker;
+
+// OrderDetails component
+function OrderDetails({ record }: { record: any }) {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'warning';
+      case 'payment_processing': return 'processing';
+      case 'paid': return 'success';
+      case 'payment_failed': return 'error';
+      case 'cancelled': return 'error';
+      case 'refunded': return 'purple';
+      default: return 'default';
+    }
+  };
+
+  const getShippingStatusColor = (status: string) => {
+    switch (status) {
+      case 'in_preparation': return 'orange';
+      case 'shipped': return 'blue';
+      case 'delivered': return 'green';
+      default: return 'default';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending': return <ClockCircleOutlined />;
+      case 'payment_processing': return <ClockCircleOutlined />;
+      case 'paid': return <CheckCircleOutlined />;
+      case 'payment_failed': return <ExclamationCircleOutlined />;
+      case 'cancelled': return <ExclamationCircleOutlined />;
+      case 'refunded': return <ExclamationCircleOutlined />;
+      default: return <ClockCircleOutlined />;
+    }
+  };
+
+  const getShippingStatusIcon = (status: string) => {
+    switch (status) {
+      case 'in_preparation': return <InboxOutlined />;
+      case 'shipped': return <TruckOutlined />;
+      case 'delivered': return <CheckCircleOutlined />;
+      default: return <InboxOutlined />;
+    }
+  };
+
+  const orderItemColumns = [
+    {
+      title: 'Product',
+      dataIndex: ['product', 'name'],
+      key: 'product',
+      render: (_: any, record: any) => (
+        <Text strong>{record.product?.name || 'Product Name'}</Text>
+      ),
+    },
+    {
+      title: 'Unit Price',
+      dataIndex: 'unitPrice',
+      key: 'unitPrice',
+      render: (price: number) => `€${Number(price || 0).toFixed(2)}`,
+    },
+    {
+      title: 'Quantity',
+      dataIndex: 'quantity',
+      key: 'quantity',
+    },
+    {
+      title: 'Total',
+      key: 'total',
+      render: (_: any, record: any) => {
+        const total = (record.unitPrice || 0) * (record.quantity || 0);
+        return <Text strong>€{Number(total).toFixed(2)}</Text>;
+      },
+    },
+  ];
+
+  return (
+    <div style={{ padding: '8px' }}>
+      {/* Order Header */}
+      <Card size="small" style={{ marginBottom: 16 }}>
+        <Row justify="space-between" align="middle">
+          <Col>
+            <Title level={4} style={{ margin: 0 }}>
+              Order #{record.idOrder}
+            </Title>
+            <Text type="secondary">
+              Created: <DateField value={record.createdAt} format="DD/MM/YYYY HH:mm" />
+            </Text>
+          </Col>
+          <Col>
+            <Space direction="vertical" align="end" size="small">
+              <Tag color={getStatusColor(record.status)} icon={getStatusIcon(record.status)}>
+                {record.status?.replace('_', ' ').toUpperCase()}
+              </Tag>
+              <Tag color={getShippingStatusColor(record.shippingStatus)} icon={getShippingStatusIcon(record.shippingStatus)}>
+                {record.shippingStatus?.replace('_', ' ').toUpperCase()}
+              </Tag>
+            </Space>
+          </Col>
+        </Row>
+      </Card>
+
+      {/* Customer Information */}
+      <Card 
+        title={
+          <Space>
+            <UserOutlined />
+            Customer Information
+          </Space>
+        } 
+        size="small" 
+        style={{ marginBottom: 16 }}
+      >
+        <Descriptions column={1} size="small">
+          <Descriptions.Item label="Name">
+            <Text strong>{record.person?.firstname} {record.person?.surname}</Text>
+          </Descriptions.Item>
+          <Descriptions.Item label="Email">
+            <Space>
+              <MailOutlined />
+              {record.person?.email}
+            </Space>
+          </Descriptions.Item>
+          {record.person?.phone && (
+            <Descriptions.Item label="Phone">
+              <Space>
+                <PhoneOutlined />
+                {record.person.phone}
+              </Space>
+            </Descriptions.Item>
+          )}
+          {record.billingAddress && (
+            <Descriptions.Item label="Billing Address">
+              <Space>
+                <HomeOutlined />
+                <div>
+                  {record.billingAddress.street}<br />
+                  {record.billingAddress.city}, {record.billingAddress.postalCode}<br />
+                  {record.billingAddress.country}
+                </div>
+              </Space>
+            </Descriptions.Item>
+          )}
+        </Descriptions>
+      </Card>
+
+      {/* Order Details */}
+      <Card 
+        title={
+          <Space>
+            <DollarCircleOutlined />
+            Order Details
+          </Space>
+        } 
+        size="small" 
+        style={{ marginBottom: 16 }}
+      >
+        <Descriptions column={2} size="small">
+          <Descriptions.Item label="Total">
+            <Text strong style={{ fontSize: '16px' }}>
+              €{Number(record.totalAmount || 0).toFixed(2)}
+            </Text>
+          </Descriptions.Item>
+          <Descriptions.Item label="Payment Method">
+            {record.paymentMethod || 'Card'}
+          </Descriptions.Item>
+        </Descriptions>
+
+        {record.paidAt && (
+          <div style={{ marginTop: 8 }}>
+            <Text type="secondary">
+              Paid: <DateField value={record.paidAt} format="DD/MM/YYYY HH:mm" />
+            </Text>
+          </div>
+        )}
+      </Card>
+
+      {/* Shipping Information */}
+      {(record.shippingStatus !== 'in_preparation' || record.shippingAddress) && (
+        <Card 
+          title={
+            <Space>
+              <TruckOutlined />
+              Shipping Information
+            </Space>
+          } 
+          size="small" 
+          style={{ marginBottom: 16 }}
+        >
+          <Descriptions column={1} size="small">
+            {record.shippingAddress && (
+              <Descriptions.Item label="Shipping Address">
+                <div>
+                  {record.shippingAddress.street}<br />
+                  {record.shippingAddress.city}, {record.shippingAddress.postalCode}<br />
+                  {record.shippingAddress.country}
+                </div>
+              </Descriptions.Item>
+            )}
+            {record.carrier && (
+              <Descriptions.Item label="Carrier">
+                {record.carrier}
+              </Descriptions.Item>
+            )}
+            {record.trackingNumber && (
+              <Descriptions.Item label="Tracking Number">
+                <Text code>{record.trackingNumber}</Text>
+              </Descriptions.Item>
+            )}
+            {record.shippedAt && (
+              <Descriptions.Item label="Shipped">
+                <DateField value={record.shippedAt} format="DD/MM/YYYY HH:mm" />
+              </Descriptions.Item>
+            )}
+            {record.deliveredAt && (
+              <Descriptions.Item label="Delivered">
+                <DateField value={record.deliveredAt} format="DD/MM/YYYY HH:mm" />
+              </Descriptions.Item>
+            )}
+          </Descriptions>
+        </Card>
+      )}
+
+      {/* Order Items */}
+      <Card 
+        title="Order Items" 
+        size="small"
+      >
+        <Table
+          dataSource={record.orderItems || []}
+          columns={orderItemColumns}
+          rowKey="idOrderItem"
+          pagination={false}
+          size="small"
+          summary={(pageData: readonly any[]) => {
+            const items = record.orderItems || [];
+            const total = items.reduce((sum: number, item: any) => sum + (item.unitPrice || 0) * (item.quantity || 0), 0);
+            return (
+              <Table.Summary.Row>
+                <Table.Summary.Cell index={0} colSpan={3}>
+                  <Text strong>Total</Text>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={1}>
+                  <Text strong>€{Number(total).toFixed(2)}</Text>
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+            );
+          }}
+        />
+      </Card>
+
+      {/* Notes */}
+      {record.notes && (
+        <Card title="Notes" size="small" style={{ marginTop: 16 }}>
+          <Text>{record.notes}</Text>
+        </Card>
+      )}
+    </div>
+  );
+}
 
 export default function OrdersList() {
   const router = useRouter();
@@ -24,8 +302,12 @@ export default function OrdersList() {
   const searchParams = useSearchParams();
   const [selectedPerson, setSelectedPerson] = useState<BaseRecord | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [searchOrderNumber, setSearchOrderNumber] = useState("");
+  
+  // Filters
+  const [searchCustomer, setSearchCustomer] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [shippingStatusFilter, setShippingStatusFilter] = useState<string>("");
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
 
   // Get all data without any server-side filtering
   const { tableProps: originalTableProps, tableQueryResult } = useTable({
@@ -36,14 +318,25 @@ export default function OrdersList() {
   const filteredData = useMemo(() => {
     if (!originalTableProps?.dataSource) return [];
     
-    if (!searchOrderNumber.trim()) {
-      return originalTableProps.dataSource;
-    }
+    return originalTableProps.dataSource.filter((order: any) => {
+      const customerMatch = !searchCustomer || 
+        `${order.person?.firstname} ${order.person?.surname} ${order.person?.email}`
+          .toLowerCase()
+          .includes(searchCustomer.toLowerCase());
+      
+      const statusMatch = !statusFilter || order.status === statusFilter;
+      const shippingStatusMatch = !shippingStatusFilter || order.shippingStatus === shippingStatusFilter;
+      
+      let dateMatch = true;
+      if (dateRange && dateRange[0] && dateRange[1]) {
+        const orderDate = dayjs(order.createdAt);
+        dateMatch = orderDate.isAfter(dateRange[0].startOf("day")) && 
+                   orderDate.isBefore(dateRange[1].endOf("day"));
+      }
 
-    return originalTableProps.dataSource.filter((person: any) => 
-      person.orderNumber?.toLowerCase().includes(searchOrderNumber.toLowerCase())
-    );
-  }, [originalTableProps?.dataSource, searchOrderNumber]);
+      return customerMatch && statusMatch && shippingStatusMatch && dateMatch;
+    });
+  }, [originalTableProps?.dataSource, searchCustomer, statusFilter, shippingStatusFilter, dateRange]);
 
   // Create modified tableProps with filtered data
   const tableProps = {
@@ -105,73 +398,111 @@ export default function OrdersList() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const handleCreate = () => {
-    setCreateModalVisible(true);
-  };
 
-  const handleCreateCancel = () => {
-    setCreateModalVisible(false);
-  };
-
-  const handleCreateSuccess = () => {
-    setCreateModalVisible(false);
-    // Refresh the table using tableQueryResult
-    tableQueryResult.refetch();
-  };
 
   return (
     <>
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <CreateButton
-          icon={<PlusCircleOutlined />}
-          size="large"
-          style={{
-            height: "40px",
-            fontWeight: 500,
-          }}
-          onClick={handleCreate}
-        >
-          Add new order
-        </CreateButton>
-        <Input
-          placeholder="Search by order number"
-          prefix={<SearchOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />}
-          value={searchOrderNumber}
-          onChange={(e) => setSearchOrderNumber(e.target.value)}
-          style={{ width: 300 }}
-          size="large"
-          allowClear
-        />
-      </div>
+      {/* Filters */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Col xs={24} sm={12} md={6}>
+          <Input
+            placeholder="Search customer..."
+            prefix={<SearchOutlined />}
+            value={searchCustomer}
+            onChange={(e) => setSearchCustomer(e.target.value)}
+            allowClear
+          />
+        </Col>
+        <Col xs={24} sm={12} md={4}>
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            allowClear
+            style={{ width: '100%' }}
+          >
+            <Select.Option value="" disabled style={{ color: '#bfbfbf' }}>
+              Select payment status
+            </Select.Option>
+            <Select.Option value="pending">Pending</Select.Option>
+            <Select.Option value="payment_processing">Processing</Select.Option>
+            <Select.Option value="paid">Paid</Select.Option>
+            <Select.Option value="payment_failed">Failed</Select.Option>
+            <Select.Option value="cancelled">Cancelled</Select.Option>
+            <Select.Option value="refunded">Refunded</Select.Option>
+          </Select>
+        </Col>
+        <Col xs={24} sm={12} md={4}>
+          <Select
+            value={shippingStatusFilter}
+            onChange={setShippingStatusFilter}
+            allowClear
+            style={{ width: '100%' }}
+          >
+            <Select.Option value="" disabled style={{ color: '#bfbfbf' }}>
+              Select shipping status
+            </Select.Option>
+            <Select.Option value="in_preparation">Preparing</Select.Option>
+            <Select.Option value="shipped">Shipped</Select.Option>
+            <Select.Option value="delivered">Delivered</Select.Option>
+          </Select>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <RangePicker
+            value={dateRange}
+            onChange={(dates) => setDateRange(dates)}
+            style={{ width: '100%' }}
+            placeholder={['Start Date', 'End Date']}
+            format="DD/MM/YYYY"
+          />
+        </Col>
+      </Row>
 
       <List
         title={false}
         canCreate={false}
       >
-        <Table {...tableProps} rowKey="idPerson">
-          <Table.Column dataIndex="idPerson" title={"ID"} />
-          <Table.Column dataIndex="firstname" title={"Firstname"} />
-          <Table.Column dataIndex="surname" title={"Surname"} />
-          <Table.Column dataIndex={"email"} title={"Email"} />
+        <Table {...tableProps} rowKey="idOrder">
+          <Table.Column 
+            dataIndex="idOrder" 
+            title={"Order #"} 
+            render={(value) => <Text strong>#{value}</Text>}
+          />
+          <Table.Column 
+            title={"Customer"} 
+            render={(_, record) => (
+              <div>
+                <div>{record.person?.firstname} {record.person?.surname}</div>
+                <Text type="secondary" style={{ fontSize: '12px' }}>
+                  {record.person?.email}
+                </Text>
+              </div>
+            )}
+          />
+          <Table.Column 
+            dataIndex="totalAmount" 
+            title={"Total"} 
+            render={(value, record) => (
+              <Text strong>
+                {Number(value || 0).toFixed(2)} {'€'}
+              </Text>
+            )}
+          />
           <Table.Column
-            dataIndex="isEmailVerified"
-            title={"Is Email Verified"}
-            render={(value) => (
-              <Tag color={value ? "success" : "error"} icon={value ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
-                {value ? "Yes" : "No"}
+            dataIndex="status"
+            title={"Payment Status"}
+            render={(status) => (
+              <Tag color={status === 'paid' ? 'green' : status === 'pending' ? 'orange' : 'red'}>
+                {status?.toUpperCase()}
               </Tag>
             )}
           />
           <Table.Column
-            dataIndex="role"
-            title={"Role"}
-            render={(value) => (
-              <Space>
-                {getRoleIcon(value?.title)}
-                <Tag color={value?.title?.toLowerCase() === 'admin' ? 'gold' : 'blue'}>
-                  {value?.title || '-'}
-                </Tag>
-              </Space>
+            dataIndex="shippingStatus"
+            title={"Shipping Status"}
+            render={(status) => (
+              <Tag color={status === 'delivered' ? 'green' : status === 'shipped' ? 'blue' : 'orange'}>
+                {status?.replace('_', ' ').toUpperCase()}
+              </Tag>
             )}
           />
           <Table.Column
@@ -179,9 +510,9 @@ export default function OrdersList() {
             dataIndex="actions"
             render={(_, record: BaseRecord) => (
               <Space>
-                <EditButton hideText size="small" recordItemId={record.idPerson} />
+
                 <ShowButton hideText size="small" onClick={() => handleShow(record)} />
-                <DeleteButton hideText size="small" recordItemId={record.idPerson} />
+                <DeleteButton hideText size="small" recordItemId={record.idOrder} />
               </Space>
             )}
           />
@@ -193,21 +524,17 @@ export default function OrdersList() {
         placement="right"
         onClose={handleClose}
         open={drawerVisible}
-        width={600}
+                  width={800}
         styles={{
           body: {
             background: '#f5f5f5',
           },
         }}
       >
-        {selectedPerson && <PersonDetails record={selectedPerson} />}
+        {selectedPerson && <OrderDetails record={selectedPerson} />}
       </Drawer>
 
-      <CreatePersonModal
-        visible={createModalVisible}
-        onCancel={handleCreateCancel}
-        onSuccess={handleCreateSuccess}
-      />
+
     </>
   );
 }
