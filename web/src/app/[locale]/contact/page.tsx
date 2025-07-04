@@ -17,7 +17,7 @@ export default function ContactPage() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const t = useTranslations();
+  const t = useTranslations('contact');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -88,19 +88,19 @@ export default function ContactPage() {
               <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              {t('contact.response_badge')}
+              {t('response_badge')}
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-6 leading-tight">
-              {t('contact.title')}
+              {t('title')}
             </h1>
             
             <p className="text-xl md:text-2xl text-slate-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              {t('contact.subtitle')}
+              {t('subtitle')}
             </p>
             
             <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
-              {t('contact.description')}
+              {t('description')}
             </p>
           </div>
         </div>
@@ -118,8 +118,8 @@ export default function ContactPage() {
               
               <div className="relative">
                 <div className="mb-10">
-                  <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('contact.form.title')}</h2>
-                  <p className="text-slate-600">{t('contact.form.subtitle')}</p>
+                  <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('form.title')}</h2>
+                  <p className="text-slate-600">{t('form.subtitle')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-8">
@@ -131,7 +131,7 @@ export default function ContactPage() {
                           focusedField === 'name' ? 'text-slate-900' : 'text-slate-700'
                         }`}
                       >
-                        {t('contact.form.name')} *
+                        {t('form.name')} *
                       </label>
                       <input
                         type="text"
@@ -143,7 +143,7 @@ export default function ContactPage() {
                         onFocus={() => setFocusedField('name')}
                         onBlur={() => setFocusedField(null)}
                         className="w-full px-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                        placeholder={t('contact.form.name_placeholder')}
+                        placeholder={t('form.name_placeholder')}
                       />
                     </div>
                     <div className="group">
@@ -153,7 +153,7 @@ export default function ContactPage() {
                           focusedField === 'email' ? 'text-slate-900' : 'text-slate-700'
                         }`}
                       >
-                        {t('contact.form.email')} *
+                        {t('form.email')} *
                       </label>
                       <input
                         type="email"
@@ -165,7 +165,7 @@ export default function ContactPage() {
                         onFocus={() => setFocusedField('email')}
                         onBlur={() => setFocusedField(null)}
                         className="w-full px-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300"
-                        placeholder={t('contact.form.email_placeholder')}
+                        placeholder={t('form.email_placeholder')}
                       />
                     </div>
                   </div>
@@ -177,7 +177,7 @@ export default function ContactPage() {
                         focusedField === 'subject' ? 'text-slate-900' : 'text-slate-700'
                       }`}
                     >
-                      {t('contact.form.subject')} *
+                      {t('form.subject')} *
                     </label>
                     <div className="relative">
                       <select
@@ -190,11 +190,12 @@ export default function ContactPage() {
                         onBlur={() => setFocusedField(null)}
                         className="w-full px-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 hover:border-slate-300 appearance-none cursor-pointer"
                       >
-                        <option value="">{t('contact.form.subject_placeholder')}</option>
-                        <option value={t('contact.topics.technical')}>{t('contact.topics.technical')}</option>
-                        <option value={t('contact.topics.product')}>{t('contact.topics.product')}</option>
-                        <option value={t('contact.topics.order')}>{t('contact.topics.order')}</option>
-                        <option value={t('contact.topics.general')}>{t('contact.topics.general')}</option>
+                        <option value="">{t('form.subject_placeholder')}</option>
+                        <option value={t('topics.technical')}>{t('topics.technical')}</option>
+                        <option value={t('topics.product')}>{t('topics.product')}</option>
+                        <option value={t('topics.order')}>{t('topics.order')}</option>
+                        <option value={t('topics.account_deletion')}>{t('topics.account_deletion')}</option>
+                        <option value={t('topics.general')}>{t('topics.general')}</option>
                       </select>
                       <div className="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none">
                         <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,7 +212,7 @@ export default function ContactPage() {
                         focusedField === 'message' ? 'text-slate-900' : 'text-slate-700'
                       }`}
                     >
-                      {t('contact.form.message')} *
+                      {t('form.message')} *
                     </label>
                     <textarea
                       id="message"
@@ -223,7 +224,7 @@ export default function ContactPage() {
                       onFocus={() => setFocusedField('message')}
                       onBlur={() => setFocusedField(null)}
                       className="w-full px-5 py-4 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-900 placeholder:text-slate-400 hover:border-slate-300 resize-none"
-                      placeholder={t('contact.form.message_placeholder')}
+                      placeholder={t('form.message_placeholder')}
                     />
                   </div>
                   
@@ -240,11 +241,11 @@ export default function ContactPage() {
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            {t('contact.form.sending')}
+                            {t('form.sending')}
                           </>
                         ) : (
                           <>
-                            {t('contact.form.submit')}
+                            {t('form.submit')}
                             <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                             </svg>
@@ -261,7 +262,7 @@ export default function ContactPage() {
                         <svg className="w-6 h-6 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <p className="text-green-800 font-medium">{t('contact.form.success')}</p>
+                        <p className="text-green-800 font-medium">{t('form.success')}</p>
                       </div>
                     </div>
                   )}
@@ -272,7 +273,7 @@ export default function ContactPage() {
                         <svg className="w-6 h-6 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                         </svg>
-                        <p className="text-red-800 font-medium">{t('contact.form.error')}</p>
+                        <p className="text-red-800 font-medium">{t('form.error')}</p>
                       </div>
                     </div>
                   )}
@@ -289,15 +290,16 @@ export default function ContactPage() {
                 <svg className="w-6 h-6 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {t('contact.topics.title')}
+                {t('topics.title')}
               </h3>
               
               <div className="grid grid-cols-1 gap-3">
                 {[
-                  { icon: '🔧', text: t('contact.topics.technical') },
-                  { icon: '📦', text: t('contact.topics.product') },
-                  { icon: '🛒', text: t('contact.topics.order') },
-                  { icon: '💬', text: t('contact.topics.general') }
+                  { icon: '🔧', text: t('topics.technical') },
+                  { icon: '📦', text: t('topics.product') },
+                  { icon: '🛒', text: t('topics.order') },
+                  { icon: '🗑️', text: t('topics.account_deletion') },
+                  { icon: '💬', text: t('topics.general') }
                 ].map((topic, index) => (
                   <div 
                     key={index}

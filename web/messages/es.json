@@ -241,6 +241,7 @@
       "technical": "Soporte Técnico",
       "product": "Información del Producto",
       "order": "Estado del Pedido",
+      "account_deletion": "Eliminación de Cuenta",
       "general": "Consulta General"
     }
   },
