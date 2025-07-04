@@ -1,5 +1,6 @@
-import 'package:jackpote/ui/pages/add_my_object_page.dart';
 import 'package:flutter/material.dart';
+import '../ui/pages/choose_your_plant_page.dart';
+import '../ui/pages/add_my_object_page.dart';
 import '../ui/pages/advise_page.dart';
 import '../ui/pages/auth_wrapper_redirection.dart';
 import '../ui/pages/event_page.dart';
@@ -27,6 +28,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/reset_password': (_) => const ResetPasswordPage(),
   '/add_my_object': (_) => AddMyObjectPage(),
   '/choose_your_plant': (_) => ChooseYouPlantPage(),
+
 
 
 };
