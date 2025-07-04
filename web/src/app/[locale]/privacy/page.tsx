@@ -17,6 +17,36 @@ export default function PrivacyPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const renderSection = (sectionKey: string) => {
+    const section = t.raw(`privacy.sections.${sectionKey}`);
+    if (!section) return null;
+
+    return (
+      <section key={sectionKey} className="mb-8">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+          {section.title}
+        </h2>
+        <div className="text-gray-700 leading-relaxed">
+          <p className="mb-4">{section.content}</p>
+          
+          {/* Render details list if available */}
+          {section.details && section.details.length > 0 && (
+            <ul className="list-disc pl-6 mb-4 space-y-2">
+              {section.details.map((detail: string, index: number) => (
+                <li key={index}>{detail}</li>
+              ))}
+            </ul>
+          )}
+          
+          {/* Render additional info if available */}
+          {section.additional_info && (
+            <p className="text-gray-600 italic">{section.additional_info}</p>
+          )}
+        </div>
+      </section>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Navigation scrolled={scrolled} />
@@ -49,55 +79,15 @@ export default function PrivacyPage() {
 
                 {/* Sections */}
                 <div className="space-y-8">
-                  {/* Data Collection */}
-                  <section>
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                      {t('privacy.sections.data_collection.title')}
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed">
-                      {t('privacy.sections.data_collection.content')}
-                    </p>
-                  </section>
-
-                  {/* Data Use */}
-                  <section>
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                      {t('privacy.sections.data_use.title')}
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed">
-                      {t('privacy.sections.data_use.content')}
-                    </p>
-                  </section>
-
-                  {/* Data Sharing */}
-                  <section>
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                      {t('privacy.sections.data_sharing.title')}
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed">
-                      {t('privacy.sections.data_sharing.content')}
-                    </p>
-                  </section>
-
-                  {/* Your Rights */}
-                  <section>
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                      {t('privacy.sections.your_rights.title')}
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed">
-                      {t('privacy.sections.your_rights.content')}
-                    </p>
-                  </section>
-
-                  {/* Contact */}
-                  <section>
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                      {t('privacy.sections.contact.title')}
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed">
-                      {t('privacy.sections.contact.content')}
-                    </p>
-                  </section>
+                  {renderSection('data_collection')}
+                  {renderSection('data_use')}
+                  {renderSection('data_sharing')}
+                  {renderSection('data_security')}
+                  {renderSection('data_retention')}
+                  {renderSection('your_rights')}
+                  {renderSection('children_policy')}
+                  {renderSection('policy_changes')}
+                  {renderSection('contact')}
                 </div>
               </div>
             </div>
