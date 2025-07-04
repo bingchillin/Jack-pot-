@@ -51,7 +51,7 @@ export default function ObjectProfileList() {
     pagination: {
       ...originalTableProps?.pagination,
       total: filteredData.length,
-      current: 1, // Reset to first page when filtering
+      // Remove the current: 1 line to allow proper pagination
     },
     footer: () => (
       <div style={{ textAlign: 'right', padding: '8px 0' }}>
