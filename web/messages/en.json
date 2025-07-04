@@ -356,33 +356,80 @@
       "technical": "Technical Support",
       "product": "Product Information",
       "order": "Order Status",
+      "account_deletion": "Account Deletion",
       "general": "General Inquiry"
     }
   },
   "privacy": {
-    "title": "Privacy Policy",
-    "last_updated": "Last updated: June 2025",
-    "intro": "At Jack Pot, we respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our smart pot and mobile application.",
+    "title": "JackPote Application Privacy Policy",
+    "last_updated": "Last updated: July 3, 2025",
+    "intro": "The JackPote application, developed by JackPote, attaches great importance to protecting your privacy. This privacy policy aims to inform you clearly and transparently about how we collect, use, and protect your personal data.",
     "sections": {
       "data_collection": {
-        "title": "Information We Collect",
-        "content": "We collect plant health data from your Jack smart pot (soil moisture, temperature, humidity, light levels), your account information, and app usage data to provide you with the best plant care experience."
+        "title": "1. Data We Collect",
+        "content": "We collect the following information when you use our application:",
+        "details": [
+          "Email address",
+          "First and last name",
+          "Date of birth",
+          "Phone number",
+          "Postal address"
+        ],
+        "additional_info": "This information is provided directly by you during registration or when using certain features of the application."
       },
       "data_use": {
-        "title": "How We Use Your Information",
-        "content": "Your data helps us provide real-time plant monitoring, send smart notifications, generate plant health analytics, and improve our services. We never sell your personal information to third parties."
+        "title": "2. Data Usage",
+        "content": "The collected data is used for the following purposes:",
+        "details": [
+          "Creating and managing your user account",
+          "Personalizing your user experience",
+          "Communicating with you (notifications, customer support, etc.)",
+          "Improving our services",
+          "Analyzing user behavior to optimize the application"
+        ]
       },
       "data_sharing": {
-        "title": "Data Sharing",
-        "content": "We only share your data with trusted service providers who help us operate our services. Your plant data is encrypted and stored securely in the cloud."
+        "title": "3. Data Sharing",
+        "content": "We do not sell or rent your personal data to third parties. However, we may share certain data with trusted third-party services used in the application:",
+        "details": [
+          "Google Analytics: to analyze application usage",
+          "Firebase: for authentication, database, and push notifications",
+          "Crashlytics: for bug tracking and application stability"
+        ],
+        "additional_info": "These services may store data outside the European Union and are subject to their own privacy policies."
+      },
+      "data_security": {
+        "title": "4. Data Security",
+        "content": "We implement appropriate technical and organizational security measures to protect your data against unauthorized access, modification, disclosure, or destruction."
+      },
+      "data_retention": {
+        "title": "5. Data Retention",
+        "content": "Your personal data is retained for as long as necessary for the purposes described in this policy, unless a longer retention period is required or permitted by law."
       },
       "your_rights": {
-        "title": "Your Rights",
-        "content": "You have the right to access, modify, or delete your personal data at any time through the Jack Pot app settings or by contacting our support team."
+        "title": "6. Your Rights",
+        "content": "In accordance with applicable data protection legislation (notably GDPR for users in Europe), you have the following rights:",
+        "details": [
+          "Right of access to your data",
+          "Right of rectification",
+          "Right to erasure (right to be forgotten)",
+          "Right to restrict processing",
+          "Right to object",
+          "Right to data portability"
+        ],
+        "additional_info": "To exercise these rights, you can contact us at the following address: jackpotproject2025@gmail.com"
+      },
+      "children_policy": {
+        "title": "7. Application Not Intended for Children",
+        "content": "Our application does not target children under 13 years of age. If we discover that personal information has been collected from a child without parental consent, we will delete it immediately."
+      },
+      "policy_changes": {
+        "title": "8. Privacy Policy Changes",
+        "content": "We reserve the right to modify this policy at any time. Any significant changes will be notified in the application or by email. We encourage you to regularly consult this page."
       },
       "contact": {
-        "title": "Contact Us",
-        "content": "If you have questions about this privacy policy, please contact us at privacy@jackpot.com"
+        "title": "9. Contact",
+        "content": "For any questions regarding this privacy policy or your personal data, you can contact us at the following address: jackpotproject2025@gmail.com"
       }
     }
   },

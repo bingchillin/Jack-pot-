@@ -241,33 +241,80 @@
       "technical": "Soporte Técnico",
       "product": "Información del Producto",
       "order": "Estado del Pedido",
+      "account_deletion": "Eliminación de Cuenta",
       "general": "Consulta General"
     }
   },
   "privacy": {
-    "title": "Política de Privacidad",
-    "last_updated": "Última actualización: Junio 2025",
-    "intro": "En Jack Pot, respetamos tu privacidad y nos comprometemos a proteger tus datos personales. Esta política de privacidad explica cómo recopilamos, usamos y protegemos tu información cuando usas nuestra maceta inteligente y aplicación móvil.",
+    "title": "Política de Privacidad de la Aplicación JackPote",
+    "last_updated": "Última actualización: 3 de julio de 2025",
+    "intro": "La aplicación JackPote, desarrollada por JackPote, otorga gran importancia a la protección de su privacidad. Esta política de privacidad tiene como objetivo informarle de manera clara y transparente sobre cómo recopilamos, utilizamos y protegemos sus datos personales.",
     "sections": {
       "data_collection": {
-        "title": "Información que Recopilamos",
-        "content": "Recopilamos datos de salud de plantas de tu maceta inteligente Jack (humedad del suelo, temperatura, humedad, niveles de luz), información de tu cuenta y datos de uso de la aplicación para brindarte la mejor experiencia de cuidado de plantas."
+        "title": "1. Datos que Recopilamos",
+        "content": "Recopilamos la siguiente información cuando utiliza nuestra aplicación:",
+        "details": [
+          "Dirección de correo electrónico",
+          "Nombre y apellidos",
+          "Fecha de nacimiento",
+          "Número de teléfono",
+          "Dirección postal"
+        ],
+        "additional_info": "Esta información es proporcionada directamente por usted durante el registro o al utilizar ciertas funcionalidades de la aplicación."
       },
       "data_use": {
-        "title": "Cómo Usamos tu Información",
-        "content": "Tus datos nos ayudan a proporcionar monitoreo de plantas en tiempo real, enviar notificaciones inteligentes, generar análisis de salud de plantas y mejorar nuestros servicios. Nunca vendemos tu información personal a terceros."
+        "title": "2. Uso de los Datos",
+        "content": "Los datos recopilados se utilizan para los siguientes fines:",
+        "details": [
+          "Creación y gestión de su cuenta de usuario",
+          "Personalización de su experiencia de usuario",
+          "Comunicación con usted (notificaciones, atención al cliente, etc.)",
+          "Mejora de nuestros servicios",
+          "Análisis del comportamiento de los usuarios para optimizar la aplicación"
+        ]
       },
       "data_sharing": {
-        "title": "Compartir Datos",
-        "content": "Solo compartimos tus datos con proveedores de servicios de confianza que nos ayudan a operar nuestros servicios. Tus datos de plantas están encriptados y almacenados de forma segura en la nube."
+        "title": "3. Compartir Datos",
+        "content": "No vendemos ni alquilamos sus datos personales a terceros. Sin embargo, podemos compartir ciertos datos con servicios de terceros de confianza utilizados en la aplicación:",
+        "details": [
+          "Google Analytics: para analizar el uso de la aplicación",
+          "Firebase: para autenticación, base de datos y notificaciones push",
+          "Crashlytics: para el seguimiento de errores y la estabilidad de la aplicación"
+        ],
+        "additional_info": "Estos servicios pueden almacenar datos fuera de la Unión Europea y están sujetos a sus propias políticas de privacidad."
+      },
+      "data_security": {
+        "title": "4. Seguridad de los Datos",
+        "content": "Implementamos medidas de seguridad técnicas y organizacionales apropiadas para proteger sus datos contra el acceso no autorizado, modificación, divulgación o destrucción."
+      },
+      "data_retention": {
+        "title": "5. Conservación de los Datos",
+        "content": "Sus datos personales se conservan durante el tiempo necesario para los fines descritos en esta política, a menos que un período de conservación más largo sea requerido o permitido por la ley."
       },
       "your_rights": {
-        "title": "Tus Derechos",
-        "content": "Tienes el derecho de acceder, modificar o eliminar tus datos personales en cualquier momento a través de la configuración de la aplicación Jack Pot o contactando a nuestro equipo de soporte."
+        "title": "6. Sus Derechos",
+        "content": "De acuerdo con la legislación aplicable en materia de protección de datos (especialmente el RGPD para usuarios en Europa), usted tiene los siguientes derechos:",
+        "details": [
+          "Derecho de acceso a sus datos",
+          "Derecho de rectificación",
+          "Derecho al borrado (derecho al olvido)",
+          "Derecho a la limitación del tratamiento",
+          "Derecho de oposición",
+          "Derecho a la portabilidad de los datos"
+        ],
+        "additional_info": "Para ejercer estos derechos, puede contactarnos en la siguiente dirección: jackpotproject2025@gmail.com"
+      },
+      "children_policy": {
+        "title": "7. Aplicación no Destinada a Niños",
+        "content": "Nuestra aplicación no está dirigida a niños menores de 13 años. Si descubrimos que se ha recopilado información personal de un niño sin el consentimiento de los padres, la eliminaremos inmediatamente."
+      },
+      "policy_changes": {
+        "title": "8. Modificaciones de la Política de Privacidad",
+        "content": "Nos reservamos el derecho de modificar esta política en cualquier momento. Cualquier cambio importante será notificado en la aplicación o por correo electrónico. Le animamos a consultar regularmente esta página."
       },
       "contact": {
-        "title": "Contáctanos",
-        "content": "Si tienes preguntas sobre esta política de privacidad, por favor contáctanos en privacy@jackpot.com"
+        "title": "9. Contacto",
+        "content": "Para cualquier pregunta sobre esta política de privacidad o sus datos personales, puede contactarnos en la siguiente dirección: jackpotproject2025@gmail.com"
       }
     }
   },
