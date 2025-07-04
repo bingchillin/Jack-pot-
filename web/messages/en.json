@@ -356,6 +356,7 @@
       "technical": "Technical Support",
       "product": "Product Information",
       "order": "Order Status",
+      "account_deletion": "Account Deletion",
       "general": "General Inquiry"
     }
   },
