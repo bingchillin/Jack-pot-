@@ -67,40 +67,26 @@ export const getShippingStatusDescription = (status: ShippingStatus): string => 
 };
 
 export const canCancelOrder = (order: Order): boolean => {
-  console.log('=== canCancelOrder DEBUG START ===');
-  console.log('Order details:', {
-    orderId: order.idOrder,
-    status: order.status,
-    paidAt: order.paidAt,
-    createdAt: order.createdAt
-  });
-
   // Can't cancel if already cancelled or refunded
   if (order.status === OrderStatus.CANCELLED || order.status === OrderStatus.REFUNDED) {
-    console.log('❌ Cannot cancel: already cancelled or refunded');
     return false;
   }
 
   // Can't cancel if shipped or delivered
   if (order.shippingStatus === ShippingStatus.SHIPPED || order.shippingStatus === ShippingStatus.DELIVERED) {
-    console.log('❌ Cannot cancel: shipped or delivered');
     return false;
   }
 
   // Can cancel pending and payment processing orders
   if (order.status === OrderStatus.PENDING || order.status === OrderStatus.PAYMENT_PROCESSING) {
-    console.log(`✅ Can cancel: ${order.status} order`);
     return true;
   }
 
   // For paid orders, can cancel until shipped
   if (order.status === OrderStatus.PAID) {
-    console.log('🔍 Processing PAID order - can cancel until shipped');
-    console.log(`✅ Can cancel: PAID order not yet shipped`);
     return true;
   }
 
-  console.log(`❌ Cannot cancel: unknown status ${order.status}`);
   return false;
 };
 

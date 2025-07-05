@@ -145,6 +145,7 @@ export class MailerService {
         orderItems,
         shippingAddress: formatShippingAddress(order.shippingAddress),
         locale: order.locale || locale,
+        supportEmail: process.env.MAIL_FROM || 'support@jackpot.com',
       }));
       this.logger.log(`Email template rendered, HTML length: ${html.length}`);
 
@@ -220,6 +221,7 @@ export class MailerService {
         refundAmount: refundAmount,
         orderItems,
         locale: order.locale || locale,
+        supportEmail: process.env.MAIL_FROM || 'support@jackpot.com',
       }));
       this.logger.log(`Cancellation email template rendered, HTML length: ${html.length}`);
 

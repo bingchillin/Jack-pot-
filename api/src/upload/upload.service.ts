@@ -27,7 +27,7 @@ export class UploadService {
     fs.writeFileSync(filePath, file.buffer);
     
     // Return the URL that can be used to access the file
-    const baseUrl = this.configService.get('API_URL') || 'http://localhost:3000';
+    const baseUrl = this.configService.get('NEXT_PUBLIC_API_URL') || 'http://localhost:3000';
     return `${baseUrl}/uploads/${filename}`;
   }
 

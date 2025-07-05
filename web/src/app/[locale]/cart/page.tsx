@@ -116,7 +116,6 @@ export default function CartPage() {
       await refreshUser();
     } catch (error) {
       // If refresh fails, user is no longer authenticated
-      console.log('User refresh failed, redirecting to login');
       router.push(`/${locale}/login?redirect=cart`);
       return;
     }
@@ -175,7 +174,6 @@ export default function CartPage() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Checkout session error:', errorText);
         
         let errorMessage = 'Failed to create checkout session';
         try {
@@ -189,7 +187,6 @@ export default function CartPage() {
       }
 
       const data = await response.json();
-      console.log('Checkout session created:', data);
 
       if (data.url) {
         // Don't clear cart here - only redirect to Stripe
@@ -199,7 +196,6 @@ export default function CartPage() {
         throw new Error('No checkout URL received');
       }
     } catch (error) {
-      console.error('Payment processing failed:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to process payment. Please try again.';
       toast.error(errorMessage);
     } finally {

@@ -138,7 +138,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         isLoading: false
       });
     } catch (error) {
-      console.error('🔍 Auth Store - Error refreshing user:', error);
       set({ isLoading: false });
       throw error;
     }
@@ -213,8 +212,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       isAuthenticated: false,
       isLoading: false
     });
-    
-    console.log('🔍 Force logout completed - all storage cleared');
   },
 
   refreshAuth: async () => {
@@ -300,7 +297,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         if (e.key === 'token' || e.key === 'refreshToken' || e.key === 'user') {
           // If any auth data was removed, logout
           if (e.newValue === null) {
-            console.log('Auth data cleared externally, logging out');
             get().logout();
           }
         }
@@ -312,18 +308,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const originalClear = localStorage.clear;
       localStorage.clear = function() {
         originalClear.call(this);
-        console.log('localStorage cleared, logging out');
         get().logout();
       };
     }
   },
 
   // Debug function to check auth state
-  debugAuthState: () => {
+    debugAuthState: () => {
     const state = get();
     const localStorageData = authService.getAuthData();
     
-    console.log('🔍 Auth Store State:', {
+    return {
       store: {
         user: state.user,
         token: state.token ? 'EXISTS' : 'NULL',
@@ -336,6 +331,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         token: localStorageData.token ? 'EXISTS' : 'NULL',
         refreshToken: localStorageData.refreshToken ? 'EXISTS' : 'NULL'
       }
-    });
+    };
   }
 })); 

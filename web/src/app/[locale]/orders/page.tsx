@@ -75,7 +75,6 @@ export default function OrdersPage() {
     if (!hasActiveOrders(orders)) return;
 
     const interval = setInterval(() => {
-      console.log('Auto-refreshing orders for active orders...');
       loadOrders(true);
     }, 30000); // 30 seconds
 
@@ -97,7 +96,6 @@ export default function OrdersPage() {
       setTotalOrders(response.total);
       setTotalPages(Math.ceil(response.total / ordersPerPage));
     } catch (err: any) {
-      console.error('Failed to load orders:', err);
       setError(err.response?.data?.message || err.message || 'Failed to load orders');
       toast.error('Failed to load your orders');
     } finally {
@@ -127,7 +125,6 @@ export default function OrdersPage() {
       // Reload orders to get updated status
       loadOrders();
     } catch (err: any) {
-      console.error('Failed to cancel order:', err);
       toast.error(err.response?.data?.message || err.message || t('order_cancel_failed'));
     } finally {
       setCancelling(false);
