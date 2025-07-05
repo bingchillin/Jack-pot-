@@ -15,6 +15,9 @@ import 'bloc/object_profile/object_profile_bloc.dart';
 import 'bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
 import 'bloc/object_profile_my_list/object_profile_my_list_event.dart';
 import 'l10n/app_localizations.dart';
+import 'bloc/comment/comment_bloc.dart';
+import 'services/comment_service.dart';
+import 'bloc/comment/comment_event.dart';
 
 void main() {
   runApp(
@@ -115,6 +118,12 @@ class _RootAppState extends State<RootApp> {
             provider: PlantProviderMyList(baseUrl: AppConfig.baseUrl, token: token),
             personId: personId,
           )..add(LoadProfilesMyList()),
+        ),
+        BlocProvider<CommentBloc>(
+          create: (_) => CommentBloc(
+            commentService: CommentService(),
+            token: token,
+          )..add(LoadComments()),
         ),
       ],
       child: MaterialApp(

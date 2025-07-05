@@ -153,21 +153,17 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _controller,
-                    maxLines: null,
-                    expands: true,
-                    textAlignVertical: TextAlignVertical.top,
-                    decoration: const InputDecoration(
-                      hintText: 'Écrivez votre réponse...',
-                      border: InputBorder.none,
-                      hintStyle: TextStyle(color: Colors.grey),
-                    ),
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ],
+              child: TextField(
+                controller: _controller,
+                maxLines: null,
+                expands: true,
+                textAlignVertical: TextAlignVertical.top,
+                decoration: const InputDecoration(
+                  hintText: 'Écrivez votre réponse...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Colors.grey),
+                ),
+                style: const TextStyle(fontSize: 16),
               ),
             ),
           ),
