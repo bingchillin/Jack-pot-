@@ -159,4 +159,41 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get currentPasswordIncorrect => 'Le mot de passe actuel est incorrect';
+
+  @override
+  String get signUp => 'S\'inscrire';
+
+  @override
+  String get signUpTitle => 'Créer votre compte';
+
+  @override
+  String get confirmPassword => 'Confirmer le mot de passe';
+
+  @override
+  String get confirmPasswordPlaceholder => 'Confirmez votre mot de passe';
+
+  @override
+  String get passwordsNoMatch => 'Les mots de passe ne correspondent pas';
+
+  @override
+  String get signUpSuccess => 'Compte créé avec succès !';
+
+  @override
+  String get signUpError =>
+      'Échec de la création du compte. Vérifiez vos informations.';
+
+  @override
+  String get alreadyHaveAccount => 'Vous avez déjà un compte ?';
+
+  @override
+  String get signInHere => 'Connectez-vous ici';
+
+  @override
+  String get error => 'Erreur';
+
+  @override
+  String get optional => 'optionnel';
+
+  @override
+  String get confirmPasswordRequired => 'Veuillez confirmer votre mot de passe';
 }

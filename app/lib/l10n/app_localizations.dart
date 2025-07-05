@@ -393,6 +393,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current password is incorrect'**
   String get currentPasswordIncorrect;
+
+  /// Sign up button text
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
+  /// Sign up page title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your Account'**
+  String get signUpTitle;
+
+  /// Confirm password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
+  /// Confirm password field placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your password'**
+  String get confirmPasswordPlaceholder;
+
+  /// Error message when passwords don't match
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsNoMatch;
+
+  /// Success message when account is created
+  ///
+  /// In en, this message translates to:
+  /// **'Account created successfully!'**
+  String get signUpSuccess;
+
+  /// Error message when signup fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create account. Please check your information.'**
+  String get signUpError;
+
+  /// Text before sign in link on signup page
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAccount;
+
+  /// Link text to go to login page
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in here'**
+  String get signInHere;
+
+  /// Error dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// Text to indicate optional field
+  ///
+  /// In en, this message translates to:
+  /// **'optional'**
+  String get optional;
+
+  /// Error message when confirm password is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password'**
+  String get confirmPasswordRequired;
 }
 
 class _AppLocalizationsDelegate

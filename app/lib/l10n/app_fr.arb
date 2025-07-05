@@ -244,5 +244,65 @@
   "currentPasswordIncorrect": "Le mot de passe actuel est incorrect",
   "@currentPasswordIncorrect": {
     "description": "Error message when current password is wrong"
+  },
+
+  "signUp": "S'inscrire",
+  "@signUp": {
+    "description": "Sign up button text"
+  },
+
+  "signUpTitle": "Créer votre compte",
+  "@signUpTitle": {
+    "description": "Sign up page title"
+  },
+
+  "confirmPassword": "Confirmer le mot de passe",
+  "@confirmPassword": {
+    "description": "Confirm password field label"
+  },
+
+  "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+  "@confirmPasswordPlaceholder": {
+    "description": "Confirm password field placeholder"
+  },
+
+  "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+  "@passwordsNoMatch": {
+    "description": "Error message when passwords don't match"
+  },
+
+  "signUpSuccess": "Compte créé avec succès !",
+  "@signUpSuccess": {
+    "description": "Success message when account is created"
+  },
+
+  "signUpError": "Échec de la création du compte. Vérifiez vos informations.",
+  "@signUpError": {
+    "description": "Error message when signup fails"
+  },
+
+  "alreadyHaveAccount": "Vous avez déjà un compte ?",
+  "@alreadyHaveAccount": {
+    "description": "Text before sign in link on signup page"
+  },
+
+  "signInHere": "Connectez-vous ici",
+  "@signInHere": {
+    "description": "Link text to go to login page"
+  },
+
+  "error": "Erreur",
+  "@error": {
+    "description": "Error dialog title"
+  },
+
+  "optional": "optionnel",
+  "@optional": {
+    "description": "Text to indicate optional field"
+  },
+
+  "confirmPasswordRequired": "Veuillez confirmer votre mot de passe",
+  "@confirmPasswordRequired": {
+    "description": "Error message when confirm password is empty"
   }
 } 
