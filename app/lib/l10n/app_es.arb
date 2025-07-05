@@ -244,5 +244,65 @@
   "currentPasswordIncorrect": "La contraseña actual es incorrecta",
   "@currentPasswordIncorrect": {
     "description": "Error message when current password is wrong"
+  },
+
+  "signUp": "Registrarse",
+  "@signUp": {
+    "description": "Sign up button text"
+  },
+
+  "signUpTitle": "Crear tu cuenta",
+  "@signUpTitle": {
+    "description": "Sign up page title"
+  },
+
+  "confirmPassword": "Confirmar contraseña",
+  "@confirmPassword": {
+    "description": "Confirm password field label"
+  },
+
+  "confirmPasswordPlaceholder": "Confirma tu contraseña",
+  "@confirmPasswordPlaceholder": {
+    "description": "Confirm password field placeholder"
+  },
+
+  "passwordsNoMatch": "Las contraseñas no coinciden",
+  "@passwordsNoMatch": {
+    "description": "Error message when passwords don't match"
+  },
+
+  "signUpSuccess": "¡Cuenta creada exitosamente!",
+  "@signUpSuccess": {
+    "description": "Success message when account is created"
+  },
+
+  "signUpError": "Error al crear la cuenta. Verifica tu información.",
+  "@signUpError": {
+    "description": "Error message when signup fails"
+  },
+
+  "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+  "@alreadyHaveAccount": {
+    "description": "Text before sign in link on signup page"
+  },
+
+  "signInHere": "Inicia sesión aquí",
+  "@signInHere": {
+    "description": "Link text to go to login page"
+  },
+
+  "error": "Error",
+  "@error": {
+    "description": "Error dialog title"
+  },
+
+  "optional": "opcional",
+  "@optional": {
+    "description": "Text to indicate optional field"
+  },
+
+  "confirmPasswordRequired": "Por favor confirma tu contraseña",
+  "@confirmPasswordRequired": {
+    "description": "Error message when confirm password is empty"
   }
 } 
