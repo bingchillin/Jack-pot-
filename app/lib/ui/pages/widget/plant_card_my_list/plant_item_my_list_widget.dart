@@ -46,7 +46,7 @@ class PlantItemMyListWidget extends StatelessWidget {
                     color: Colors.grey[200],
                     child: pathPicture != null
                         ? Image.network(
-                      Uri.parse(AppConfig.baseUrlS)
+                      Uri.parse(AppConfig.baseUrl)
                           .resolve(pathPicture)
                           .toString(),
                       fit: BoxFit.cover,

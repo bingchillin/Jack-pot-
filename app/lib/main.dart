@@ -49,7 +49,7 @@ class _RootAppState extends State<RootApp> {
   }
 
   void _onAuthChanged() {
-    // Force le rebuild quand login/signup change l’état
+    // Force le rebuild quand login/signup change l'état
     setState(() {});
   }
 
@@ -65,6 +65,7 @@ class _RootAppState extends State<RootApp> {
         theme: appTheme,
         routes: appRoutes,
         initialRoute: '/',
+        debugShowCheckedModeBanner: false,
       );
     }
 
@@ -90,6 +91,7 @@ class _RootAppState extends State<RootApp> {
         theme: appTheme,
         routes: appRoutes,
         initialRoute: '/',
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

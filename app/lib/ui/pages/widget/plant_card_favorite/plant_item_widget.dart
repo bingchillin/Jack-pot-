@@ -76,7 +76,7 @@ class PlantItemWidget extends StatelessWidget {
                             width: 180,
                             color: Colors.grey[200],
                             child: Image.network(
-                              Uri.parse(AppConfig.baseUrlS).resolve(pathPicture).toString(),
+                              Uri.parse(AppConfig.baseUrl).resolve(pathPicture).toString(),
                               fit: BoxFit.cover,
                               alignment: Alignment.center,
                               errorBuilder: (context, error, stackTrace) =>
