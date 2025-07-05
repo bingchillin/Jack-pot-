@@ -366,4 +366,103 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
   }
+
+  // Update profile
+  Future<Map<String, dynamic>> updateProfile({
+    required String currentPassword,
+    String? firstname,
+    String? surname,
+    String? numberPhone,
+    String? address,
+    String? newPassword,
+  }) async {
+    if (!_isAuthenticated || _accessToken == null) {
+      return {
+        'success': false,
+        'message': 'User not authenticated',
+      };
+    }
+
+    final url = Uri.parse('${AppConfig.baseUrl}/auth/profile');
+    
+    final updateData = <String, dynamic>{
+      'currentPassword': currentPassword,
+    };
+
+    // Only include fields that are not null/empty
+    if (firstname != null && firstname.isNotEmpty) {
+      updateData['firstname'] = firstname;
+    }
+    if (surname != null && surname.isNotEmpty) {
+      updateData['surname'] = surname;
+    }
+    if (numberPhone != null && numberPhone.isNotEmpty) {
+      updateData['numberPhone'] = numberPhone;
+    }
+    if (address != null && address.isNotEmpty) {
+      updateData['address'] = address;
+    }
+    if (newPassword != null && newPassword.isNotEmpty) {
+      updateData['newPassword'] = newPassword;
+    }
+
+    try {
+      final response = await http.patch(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_accessToken',
+        },
+        body: jsonEncode(updateData),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        
+        // Update local user data
+        _userData = responseData;
+        _user = responseData;
+        _firstName = responseData['firstname'];
+        
+        // Save updated user data to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userData', jsonEncode(_userData));
+        if (_firstName != null) {
+          await prefs.setString('firstName', _firstName!);
+        }
+
+        notifyListeners();
+        print('✅ Profile updated successfully');
+        
+        return {
+          'success': true,
+          'message': 'Profile updated successfully',
+        };
+      } else if (response.statusCode == 401) {
+        final errorData = jsonDecode(response.body);
+        if (errorData['message']?.contains('Current password is incorrect') == true) {
+          return {
+            'success': false,
+            'message': 'Current password is incorrect',
+          };
+        }
+        return {
+          'success': false,
+          'message': 'Authentication failed',
+        };
+      } else {
+        final errorData = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': errorData['message'] ?? 'Failed to update profile',
+        };
+      }
+    } catch (e) {
+      print('❌ Update profile error: $e');
+      return {
+        'success': false,
+        'message': 'Network error occurred',
+      };
+    }
+  }
 }

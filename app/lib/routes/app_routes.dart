@@ -9,6 +9,7 @@ import '../ui/pages/get_code_email_page.dart';
 import '../ui/pages/my_plant_page.dart';
 import '../ui/pages/my_plant_page_login.dart';
 import '../ui/pages/profile_page.dart';
+import '../ui/pages/edit_profile_page.dart';
 import '../ui/pages/login_page.dart';
 import '../ui/pages/reset_password_page.dart';
 import '../ui/pages/signup_page.dart';
@@ -20,6 +21,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/plant_login': (_) => const MyPlantPageLogin(),
   '/event': (_) => const EventPage(),
   '/profile': (_) => const ProfilePage(),
+  '/edit-profile': (_) => const EditProfilePage(),
   '/login': (_) => const LoginPage(),
   '/forgot_password': (_) => const ForgotPasswordPage(),
   '/signup': (_) => const SignupPage(),
