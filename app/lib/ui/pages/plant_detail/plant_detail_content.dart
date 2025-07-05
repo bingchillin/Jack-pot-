@@ -20,7 +20,7 @@ class PlantDetailContent extends StatelessWidget {
           } else if (state is PlantDetailLoaded) {
             final plant = state.plant;
             final imageUrl = plant.plantType.pathPicture != null
-                ? Uri.parse(AppConfig.baseUrlS)
+                ? Uri.parse(AppConfig.baseUrl)
                 .resolve(plant.plantType.pathPicture!)
                 .toString()
                 : null;

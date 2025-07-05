@@ -13,7 +13,6 @@ import '../ui/pages/login_page.dart';
 import '../ui/pages/reset_password_page.dart';
 import '../ui/pages/signup_page.dart';
 
-
 final Map<String, WidgetBuilder> appRoutes = {
   '/': (context) => const AuthWrapper(),
   '/advise': (_) => const AdvisePage(),
@@ -28,7 +27,4 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/reset_password': (_) => const ResetPasswordPage(),
   '/add_my_object': (_) => AddMyObjectPage(),
   '/choose_your_plant': (_) => ChooseYouPlantPage(),
-
-
-
 };

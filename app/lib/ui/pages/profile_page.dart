@@ -25,6 +25,7 @@ class ProfilePage extends StatelessWidget {
           children: [
             Text('Bienvenue, ${authProvider.firstName ?? 'Utilisateur'}!'),
             const SizedBox(height: 20),
+            
             ElevatedButton(
               onPressed: () async {
                 await authProvider.logout();
