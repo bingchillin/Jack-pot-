@@ -1,0 +1,223 @@
+{
+  "@@locale": "en",
+  
+  "appName": "Jack Pot",
+  "@appName": {
+    "description": "The name of the application"
+  },
+  
+  "loginTitle": "Login",
+  "@loginTitle": {
+    "description": "Title of the login page"
+  },
+  
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  
+  "signIn": "Sign in",
+  "@signIn": {
+    "description": "Sign in button text"
+  },
+  
+  "forgotPassword": "Forgot password?",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+  
+  "or": "or",
+  "@or": {
+    "description": "Divider text between login and signup"
+  },
+  
+  "newToJackPot": "New to Jack Pot? ",
+  "@newToJackPot": {
+    "description": "Text before create account link"
+  },
+  
+  "createAccount": "Create account",
+  "@createAccount": {
+    "description": "Create account link text"
+  },
+  
+  "emailRequired": "Email is required",
+  "@emailRequired": {
+    "description": "Email validation error message"
+  },
+  
+  "invalidEmailFormat": "Invalid email format",
+  "@invalidEmailFormat": {
+    "description": "Email format validation error message"
+  },
+  
+  "passwordMinimum": "6 characters minimum",
+  "@passwordMinimum": {
+    "description": "Password length validation error message"
+  },
+  
+  "connectionError": "Connection Error",
+  "@connectionError": {
+    "description": "Error dialog title"
+  },
+  
+  "checkCredentials": "Check your credentials and try again.",
+  "@checkCredentials": {
+    "description": "Error dialog message"
+  },
+  
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+  
+  "signingIn": "Signing in...",
+  "@signingIn": {
+    "description": "Loading state text"
+  },
+
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile page title"
+  },
+
+  "welcome": "Welcome",
+  "@welcome": {
+    "description": "Welcome greeting"
+  },
+
+  "contactInformation": "Contact Information",
+  "@contactInformation": {
+    "description": "Contact information section title"
+  },
+
+  "phoneNumber": "Phone Number",
+  "@phoneNumber": {
+    "description": "Phone number label"
+  },
+
+  "address": "Address",
+  "@address": {
+    "description": "Address label"
+  },
+
+  "editProfile": "Edit Profile",
+  "@editProfile": {
+    "description": "Edit profile button text"
+  },
+
+  "accountSettings": "Account Settings",
+  "@accountSettings": {
+    "description": "Account settings section title"
+  },
+
+  "myPlants": "My Plants",
+  "@myPlants": {
+    "description": "My plants button text"
+  },
+
+  "plantCare": "Plant Care",
+  "@plantCare": {
+    "description": "Plant care section title"
+  },
+
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button text"
+  },
+
+  "logoutConfirmation": "Are you sure you want to logout?",
+  "@logoutConfirmation": {
+    "description": "Logout confirmation message"
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+
+  "memberSince": "Member since",
+  "@memberSince": {
+    "description": "Member since label"
+  },
+
+  "notProvided": "Not provided",
+  "@notProvided": {
+    "description": "Text when information is not provided"
+  },
+
+  "firstName": "First Name",
+  "@firstName": {
+    "description": "First name label"
+  },
+
+  "lastName": "Last Name",
+  "@lastName": {
+    "description": "Last name label"
+  },
+
+  "firstNameRequired": "First name is required",
+  "@firstNameRequired": {
+    "description": "First name validation error"
+  },
+
+  "lastNameRequired": "Last name is required",
+  "@lastNameRequired": {
+    "description": "Last name validation error"
+  },
+
+  "invalidPhoneNumber": "Invalid phone number",
+  "@invalidPhoneNumber": {
+    "description": "Phone number validation error"
+  },
+
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+
+  "profileUpdatedSuccess": "Profile updated successfully!",
+  "@profileUpdatedSuccess": {
+    "description": "Profile update success message"
+  },
+
+  "profileUpdateError": "Error updating profile",
+  "@profileUpdateError": {
+    "description": "Profile update error message"
+  },
+
+  "currentPassword": "Current Password",
+  "@currentPassword": {
+    "description": "Current password field label"
+  },
+
+  "currentPasswordRequired": "Current password is required",
+  "@currentPasswordRequired": {
+    "description": "Current password validation error"
+  },
+
+  "newPassword": "New Password",
+  "@newPassword": {
+    "description": "New password field label"
+  },
+
+  "confirmNewPassword": "Confirm New Password",
+  "@confirmNewPassword": {
+    "description": "Confirm new password field label"
+  },
+
+  "newPasswordMinLength": "New password must be at least 6 characters",
+  "@newPasswordMinLength": {
+    "description": "New password length validation error"
+  },
+
+  "passwordsDoNotMatch": "Passwords do not match",
+  "@passwordsDoNotMatch": {
+    "description": "Password confirmation validation error"
+  }
+} 
