@@ -43,7 +43,12 @@ export class CommentService {
     });
 
     const savedComment = await this.commentRepository.save(comment);
-    return this.formatCommentResponse(savedComment, userId);
+    // Recharge avec toutes les relations nécessaires
+    const savedCommentWithRelations = await this.commentRepository.findOne({
+      where: { idComment: savedComment.idComment },
+      relations: ['person', 'likes', 'replies'],
+    });
+    return this.formatCommentResponse(savedCommentWithRelations, userId);
   }
 
   async findAll(userId?: number, parentCommentId?: number): Promise<CommentResponseDto[]> {
