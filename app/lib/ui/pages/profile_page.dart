@@ -77,24 +77,24 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
         centerTitle: true,
       ),
       body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  // Profile Header
-                  _buildProfileHeader(context, authProvider, localizations),
-                  
-                  const SizedBox(height: 32),
-                  
-                  // Actions Card
-                  _buildActionsCard(context, authProvider, localizations),
-                ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              // Profile Header (with animations)
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: _buildProfileHeader(context, authProvider, localizations),
+                ),
               ),
-            ),
+              
+              const SizedBox(height: 32),
+              
+              // Actions Card (without animations)
+              _buildActionsCard(context, authProvider, localizations),
+            ],
           ),
         ),
       ),

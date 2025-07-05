@@ -219,5 +219,30 @@
   "passwordsDoNotMatch": "Passwords do not match",
   "@passwordsDoNotMatch": {
     "description": "Password confirmation validation error"
+  },
+
+  "requiredFieldsNotice": "Fields marked with * are required",
+  "@requiredFieldsNotice": {
+    "description": "Notice about required fields"
+  },
+
+  "fieldRequirementsTitle": "Field Requirements:",
+  "@fieldRequirementsTitle": {
+    "description": "Title for field requirements help text"
+  },
+
+  "fieldRequirementsText": "• First Name & Last Name are required\n• Current Password is required for any changes\n• Phone number must be 9-15 digits (if provided)\n• New password must be at least 6 characters (if provided)",
+  "@fieldRequirementsText": {
+    "description": "Field requirements help text"
+  },
+
+  "profileAndPasswordUpdatedSuccess": "Profile and password updated successfully!",
+  "@profileAndPasswordUpdatedSuccess": {
+    "description": "Success message when both profile and password are updated"
+  },
+
+  "currentPasswordIncorrect": "Current password is incorrect",
+  "@currentPasswordIncorrect": {
+    "description": "Error message when current password is wrong"
   }
 } 
