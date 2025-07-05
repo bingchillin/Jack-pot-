@@ -355,18 +355,22 @@ class _AdvisePageState extends State<AdvisePage> {
             textColor: Colors.white,
             onPressed: (){
               Navigator.pushNamed(context, '/login');
-            }, // TODO: Ajouter navigation vers login
+            },
           ),
         ),
       );
       return;
     }
     
+    final parentContext = context; // Contexte de la page Advice
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const CreatePostModal(),
+      builder: (_) => BlocProvider.value(
+        value: BlocProvider.of<CommentBloc>(parentContext),
+        child: const CreatePostModal(),
+      ),
     );
   }
 
