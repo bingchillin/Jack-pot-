@@ -180,6 +180,9 @@ class _CreatePostModalState extends State<CreatePostModal> {
         CreateComment(content: content),
       );
 
+      // Rafraîchir la liste des commentaires après la création
+      context.read<CommentBloc>().add(const LoadComments());
+
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Post publié !')),
