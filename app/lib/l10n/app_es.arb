@@ -219,5 +219,30 @@
   "passwordsDoNotMatch": "Las contraseñas no coinciden",
   "@passwordsDoNotMatch": {
     "description": "Password confirmation validation error"
+  },
+
+  "requiredFieldsNotice": "Los campos marcados con * son obligatorios",
+  "@requiredFieldsNotice": {
+    "description": "Notice about required fields"
+  },
+
+  "fieldRequirementsTitle": "Requisitos de los campos:",
+  "@fieldRequirementsTitle": {
+    "description": "Title for field requirements help text"
+  },
+
+  "fieldRequirementsText": "• Nombre y apellido son obligatorios\n• La contraseña actual es requerida para cualquier cambio\n• El número de teléfono debe tener 9-15 dígitos (si se proporciona)\n• La nueva contraseña debe tener al menos 6 caracteres (si se proporciona)",
+  "@fieldRequirementsText": {
+    "description": "Field requirements help text"
+  },
+
+  "profileAndPasswordUpdatedSuccess": "¡Perfil y contraseña actualizados exitosamente!",
+  "@profileAndPasswordUpdatedSuccess": {
+    "description": "Success message when both profile and password are updated"
+  },
+
+  "currentPasswordIncorrect": "La contraseña actual es incorrecta",
+  "@currentPasswordIncorrect": {
+    "description": "Error message when current password is wrong"
   }
 } 

@@ -140,4 +140,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get requiredFieldsNotice => 'Fields marked with * are required';
+
+  @override
+  String get fieldRequirementsTitle => 'Field Requirements:';
+
+  @override
+  String get fieldRequirementsText =>
+      '• First Name & Last Name are required\n• Current Password is required for any changes\n• Phone number must be 9-15 digits (if provided)\n• New password must be at least 6 characters (if provided)';
+
+  @override
+  String get profileAndPasswordUpdatedSuccess =>
+      'Profile and password updated successfully!';
+
+  @override
+  String get currentPasswordIncorrect => 'Current password is incorrect';
 }

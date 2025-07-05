@@ -141,4 +141,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get passwordsDoNotMatch => 'Les mots de passe ne correspondent pas';
+
+  @override
+  String get requiredFieldsNotice =>
+      'Les champs marqués avec * sont obligatoires';
+
+  @override
+  String get fieldRequirementsTitle => 'Exigences des champs :';
+
+  @override
+  String get fieldRequirementsText =>
+      '• Prénom et nom sont obligatoires\n• Le mot de passe actuel est requis pour tout changement\n• Le numéro de téléphone doit contenir 9-15 chiffres (si fourni)\n• Le nouveau mot de passe doit contenir au moins 6 caractères (si fourni)';
+
+  @override
+  String get profileAndPasswordUpdatedSuccess =>
+      'Profil et mot de passe mis à jour avec succès !';
+
+  @override
+  String get currentPasswordIncorrect => 'Le mot de passe actuel est incorrect';
 }

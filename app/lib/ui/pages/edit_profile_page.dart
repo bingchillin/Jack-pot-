@@ -10,11 +10,7 @@ class EditProfilePage extends StatefulWidget {
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> with TickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-  
+class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -28,29 +24,11 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
   bool _obscureCurrentPassword = true;
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isRequirementsExpanded = false;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.0, 0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
-    _animationController.forward();
     
     // Initialize form with current user data
     _initializeForm();
@@ -70,7 +48,6 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
 
   @override
   void dispose() {
-    _animationController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneController.dispose();
@@ -110,7 +87,6 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
     final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -134,26 +110,20 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
         ),
       ),
       body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    // Edit Form Card
-                    _buildEditFormCard(context, localizations),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Save Button
-                    _buildSaveButton(context, localizations),
-                  ],
-                ),
-              ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // Edit Form Card
+                _buildEditFormCard(context, localizations),
+                
+                const SizedBox(height: 24),
+                
+                // Save Button
+                _buildSaveButton(context, localizations),
+              ],
             ),
           ),
         ),
@@ -179,11 +149,101 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Expandable requirements info
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.orange[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.orange[200]!),
+            ),
+            child: Column(
+              children: [
+                // Header row with expand/collapse functionality
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _isRequirementsExpanded = !_isRequirementsExpanded;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: Colors.orange[700],
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            localizations.requiredFieldsNotice,
+                            style: TextStyle(
+                              color: Colors.orange[700],
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          _isRequirementsExpanded 
+                              ? Icons.keyboard_arrow_up 
+                              : Icons.keyboard_arrow_down,
+                          color: Colors.orange[700],
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Expandable content
+                if (_isRequirementsExpanded)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.orange[25],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            localizations.fieldRequirementsTitle,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.orange[700],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            localizations.fieldRequirementsText,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.orange[600],
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
           // First Name Field
           _buildTextFormField(
             controller: _firstNameController,
             label: localizations.firstName,
             icon: Icons.person,
+            isRequired: true,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return localizations.firstNameRequired;
@@ -199,6 +259,7 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
             controller: _lastNameController,
             label: localizations.lastName,
             icon: Icons.person,
+            isRequired: true,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return localizations.lastNameRequired;
@@ -231,8 +292,7 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
           _buildTextFormField(
             controller: _addressController,
             label: localizations.address,
-            icon: Icons.location_on,
-            maxLines: 2,
+            icon: Icons.location_on
           ),
           
           const SizedBox(height: 20),
@@ -244,6 +304,8 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
             icon: Icons.lock,
             isPassword: true,
             passwordType: 'current',
+            isRequired: true,
+            placeholder: '••••••••',
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return localizations.currentPasswordRequired;
@@ -261,6 +323,7 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
             icon: Icons.lock_outline,
             isPassword: true,
             passwordType: 'new',
+            placeholder: '••••••••',
             validator: (value) {
               // Only validate if user entered something
               if (value != null && value.isNotEmpty && value.length < 6) {
@@ -279,6 +342,7 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
             icon: Icons.lock_outline,
             isPassword: true,
             passwordType: 'confirm',
+            placeholder: '••••••••',
             validator: (value) {
               // Only validate if new password was entered
               if (_newPasswordController.text.isNotEmpty) {
@@ -289,6 +353,8 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
               return null;
             },
           ),
+          
+
         ],
       ),
     );
@@ -303,16 +369,30 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
     int maxLines = 1,
     bool isPassword = false,
     String? passwordType, // 'current', 'new', 'confirm'
+    bool isRequired = false,
+    String? placeholder,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
+        RichText(
+          text: TextSpan(
+            text: label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
+            ),
+            children: [
+              if (isRequired)
+                TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    color: Colors.red[600],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
@@ -323,6 +403,11 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
           validator: validator,
           obscureText: isPassword ? _getPasswordVisibility(passwordType) : false,
           decoration: InputDecoration(
+            hintText: placeholder,
+            hintStyle: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 16,
+            ),
             prefixIcon: Icon(
               icon,
               size: 20,
@@ -434,7 +519,7 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
           // Check if password was changed before clearing fields
           final bool passwordChanged = _newPasswordController.text.trim().isNotEmpty;
           final successMessage = passwordChanged 
-              ? 'Profile and password updated successfully!' // TODO: Add to localizations if needed
+              ? localizations.profileAndPasswordUpdatedSuccess
               : localizations.profileUpdatedSuccess;
           
           // Clear password fields on success
@@ -454,7 +539,7 @@ class _EditProfilePageState extends State<EditProfilePage> with TickerProviderSt
           // Handle different error types
           String errorMessage = result['message'] ?? localizations.profileUpdateError;
           if (errorMessage.contains('Current password is incorrect')) {
-            errorMessage = 'Current password is incorrect'; // TODO: Add to localizations if needed
+            errorMessage = localizations.currentPasswordIncorrect;
           }
           
           ScaffoldMessenger.of(context).showSnackBar(

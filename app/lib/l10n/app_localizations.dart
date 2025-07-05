@@ -363,6 +363,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Passwords do not match'**
   String get passwordsDoNotMatch;
+
+  /// Notice about required fields
+  ///
+  /// In en, this message translates to:
+  /// **'Fields marked with * are required'**
+  String get requiredFieldsNotice;
+
+  /// Title for field requirements help text
+  ///
+  /// In en, this message translates to:
+  /// **'Field Requirements:'**
+  String get fieldRequirementsTitle;
+
+  /// Field requirements help text
+  ///
+  /// In en, this message translates to:
+  /// **'• First Name & Last Name are required\n• Current Password is required for any changes\n• Phone number must be 9-15 digits (if provided)\n• New password must be at least 6 characters (if provided)'**
+  String get fieldRequirementsText;
+
+  /// Success message when both profile and password are updated
+  ///
+  /// In en, this message translates to:
+  /// **'Profile and password updated successfully!'**
+  String get profileAndPasswordUpdatedSuccess;
+
+  /// Error message when current password is wrong
+  ///
+  /// In en, this message translates to:
+  /// **'Current password is incorrect'**
+  String get currentPasswordIncorrect;
 }
 
 class _AppLocalizationsDelegate
