@@ -1,9 +1,9 @@
-import 'package:jackpote/ui/pages/widget/plant_card_favorite/plant_control_switches_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:jackpote/ui/pages/widget/plant_card_favorite/plant_control_switches_widget.dart';
 import '../../../../models/object_profile.dart';
 import 'package:jackpote/app_config.dart';
-
 import '../../plant_detail_page.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class PlantItemWidget extends StatelessWidget {
   final ObjectProfile plant;
@@ -17,20 +17,67 @@ class PlantItemWidget extends StatelessWidget {
     this.onToggleWillWatering,
   }) : super(key: ValueKey(plant.idObjectProfile));
 
+  String _getStateText(int? state) {
+    switch (state) {
+      case 1:
+        return 'Excellent';
+      case 2:
+        return 'Bon état';
+      case 3:
+        return 'Moyen';
+      case 4:
+        return 'Attention requise';
+      case 5:
+        return 'État critique';
+      default:
+        return 'État inconnu';
+    }
+  }
 
+  Color _getStateColor(int? state) {
+    switch (state) {
+      case 1:
+        return Colors.green[600]!;
+      case 2:
+        return Colors.green[500]!;
+      case 3:
+        return Colors.orange[500]!;
+      case 4:
+        return Colors.orange[600]!;
+      case 5:
+        return Colors.red[600]!;
+      default:
+        return Colors.grey[500]!;
+    }
+  }
+
+  IconData _getStateIcon(int? state) {
+    switch (state) {
+      case 1:
+        return Icons.check_circle;
+      case 2:
+        return Icons.check_circle_outline;
+      case 3:
+        return Icons.warning_amber;
+      case 4:
+        return Icons.warning;
+      case 5:
+        return Icons.error;
+      default:
+        return Icons.help_outline;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     final pathPicture = plant.plantType.pathPicture;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final stateColor = _getStateColor(plant.state);
 
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: screenWidth * 0.8,  // Largeur max à 80% écran
-          maxHeight: screenHeight * 0.95, // Hauteur max à 95% écran
-        ),
+    return Container(
+      height: 360,
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
           onTap: () {
             Navigator.push(
@@ -40,70 +87,207 @@ class PlantItemWidget extends StatelessWidget {
               ),
             );
           },
-    borderRadius: BorderRadius.circular(16),
-        child: Card(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(
-              color: (plant.state == 5) ? Colors.red : Colors.green,
-              width: 2,
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+              border: Border.all(
+                color: stateColor.withValues(alpha: 0.2),
+                width: 2,
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: SingleChildScrollView(
-              child: IntrinsicHeight(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      plant.title ?? 'Nom inconnu',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Image centrée et crop intelligente
-                    if (pathPicture != null)
-                      Center(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            height: 180,
-                            width: 180,
-                            color: Colors.grey[200],
-                            child: Image.network(
-                              Uri.parse(AppConfig.baseUrl).resolve(pathPicture).toString(),
-                              fit: BoxFit.cover,
-                              alignment: Alignment.center,
-                              errorBuilder: (context, error, stackTrace) =>
-                              const Center(child: Text("Image non disponible")),
-                            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Plant Image with Floating Switches
+                Expanded(
+                  flex: 5,
+                  child: Stack(
+                    children: [
+                      // Image Container
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.green[50]!,
+                              Colors.green[100]!,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                         ),
-                      )
-                    else
-                      const Text("Pas d'image disponible"),
-                    const SizedBox(height: 8),
-                    Text(
-                      getStateText(plant.state),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                          child: pathPicture != null
+                              ? Image.network(
+                                  Uri.parse(AppConfig.baseUrl).resolve(pathPicture).toString(),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.green[100]!,
+                                          Colors.green[200]!,
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.eco,
+                                            color: Colors.green[600],
+                                            size: 48,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            localizations.imageNotAvailable,
+                                            style: TextStyle(
+                                              color: Colors.green[700],
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.green[100]!,
+                                        Colors.green[200]!,
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.eco,
+                                          color: Colors.green[600],
+                                          size: 48,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          localizations.noImage,
+                                          style: TextStyle(
+                                            color: Colors.green[700],
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                        ),
                       ),
-                    ),
-                    // use switch dynamic
-                    PlantControlSwitches(plant: plant),
-                  ],
+                      
+                      // Floating Control Switches
+                      Positioned(
+                        bottom: 12,
+                        left: 12,
+                        right: 12,
+                        child: PlantControlSwitches(plant: plant),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                
+                // Plant Info (No switches here anymore)
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16), // Restored normal padding
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Plant Name
+                        Text(
+                          plant.title ?? localizations.unknownName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18, // Restored larger font
+                            color: Colors.grey[800],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4), // More spacing
+                        
+                        // Plant Type
+                        Text(
+                          plant.plantType.title ?? localizations.unknownType,
+                          style: TextStyle(
+                            fontSize: 14, // Restored larger font
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 12), // More spacing
+                        
+                        // State Badge (Now with more space)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Restored padding
+                          decoration: BoxDecoration(
+                            color: stateColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(16), // Restored larger radius
+                            border: Border.all(
+                              color: stateColor.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _getStateIcon(plant.state),
+                                size: 16, // Restored larger icon
+                                color: stateColor,
+                              ),
+                              const SizedBox(width: 6), // More spacing
+                              Flexible(
+                                child: Text(
+                                  _getStateText(plant.state),
+                                  style: TextStyle(
+                                    fontSize: 12, // Restored font size
+                                    fontWeight: FontWeight.w600,
+                                    color: stateColor,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-      ),
       ),
     );
   }

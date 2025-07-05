@@ -296,13 +296,88 @@
     "description": "Error dialog title"
   },
 
-  "optional": "optional",
+  "optional": "(optional)",
   "@optional": {
-    "description": "Text to indicate optional field"
+    "description": "Optional field indicator"
   },
 
   "confirmPasswordRequired": "Please confirm your password",
   "@confirmPasswordRequired": {
     "description": "Error message when confirm password is empty"
+  },
+
+  "managePlants": "Manage your plants smartly",
+  "@managePlants": {
+    "description": "Subtitle for my plants page"
+  },
+
+  "favorites": "My Favorites",
+  "@favorites": {
+    "description": "Favorites section title"
+  },
+
+  "favoritePlantsSubtitle": "Your favorite plants",
+  "@favoritePlantsSubtitle": {
+    "description": "Subtitle for favorites section"
+  },
+
+  "myList": "My List",
+  "@myList": {
+    "description": "My list section title"
+  },
+
+  "myPlantsSubtitle": "All your plants",
+  "@myPlantsSubtitle": {
+    "description": "Subtitle for my plants section"
+  },
+
+  "noFavoritePlants": "No favorite plants",
+  "@noFavoritePlants": {
+    "description": "Empty state message for favorites"
+  },
+
+  "addFavoritePlantsDescription": "Add your favorite plants to favorites",
+  "@addFavoritePlantsDescription": {
+    "description": "Empty state description for favorites"
+  },
+
+  "noMyPlants": "No plants in your list",
+  "@noMyPlants": {
+    "description": "Empty state message for my plants list"
+  },
+
+  "addMyPlantsDescription": "Start adding your plants",
+  "@addMyPlantsDescription": {
+    "description": "Empty state description for my plants list"
+  },
+
+  "autoMode": "AUTO",
+  "@autoMode": {
+    "description": "Automatic mode toggle label"
+  },
+
+  "waterMode": "WATER",
+  "@waterMode": {
+    "description": "Water mode toggle label"
+  },
+
+  "unknownName": "Unknown name",
+  "@unknownName": {
+    "description": "Fallback text for unknown plant name"
+  },
+
+  "unknownType": "Unknown type",
+  "@unknownType": {
+    "description": "Fallback text for unknown plant type"
+  },
+
+  "imageNotAvailable": "Image not available",
+  "@imageNotAvailable": {
+    "description": "Text when plant image is not available"
+  },
+
+  "noImage": "No image",
+  "@noImage": {
+    "description": "Text when there is no image"
   }
 } 
