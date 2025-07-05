@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../models/object_profile.dart';
 import 'package:jackpote/app_config.dart';
 import '../../plant_detail_page.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class PlantItemMyListWidget extends StatelessWidget {
   final ObjectProfile plant;
@@ -11,64 +12,228 @@ class PlantItemMyListWidget extends StatelessWidget {
     required this.plant,
   }) : super(key: ValueKey(plant.idObjectProfile));
 
+  String _getStateText(int? state) {
+    switch (state) {
+      case 1:
+        return 'Excellent';
+      case 2:
+        return 'Bon';
+      case 3:
+        return 'Moyen';
+      case 4:
+        return 'Faible';
+      case 5:
+        return 'Critique';
+      default:
+        return 'Inconnu';
+    }
+  }
+
+  Color _getStateColor(int? state) {
+    switch (state) {
+      case 1:
+        return Colors.green[600]!;
+      case 2:
+        return Colors.green[500]!;
+      case 3:
+        return Colors.orange[500]!;
+      case 4:
+        return Colors.orange[600]!;
+      case 5:
+        return Colors.red[600]!;
+      default:
+        return Colors.grey[500]!;
+    }
+  }
+
+  IconData _getStateIcon(int? state) {
+    switch (state) {
+      case 1:
+        return Icons.check_circle;
+      case 2:
+        return Icons.check_circle_outline;
+      case 3:
+        return Icons.warning_amber;
+      case 4:
+        return Icons.warning;
+      case 5:
+        return Icons.error;
+      default:
+        return Icons.help_outline;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     final pathPicture = plant.plantType.pathPicture;
-    final borderColor = (plant.state == 5) ? Colors.red : Colors.green;
+    final stateColor = _getStateColor(plant.state);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 1.0),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  PlantDetailPage(plantId: plant.idObjectProfile),
-            ),
-          );
-        },
-        child: Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: borderColor, width: 2),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    color: Colors.grey[200],
-                    child: pathPicture != null
-                        ? Image.network(
-                      Uri.parse(AppConfig.baseUrl)
-                          .resolve(pathPicture)
-                          .toString(),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.error),
-                    )
-                        : const Icon(Icons.image_not_supported),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    plant.title ?? 'Nom inconnu',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PlantDetailPage(plantId: plant.idObjectProfile),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
                 ),
               ],
+              border: Border.all(
+                color: stateColor.withValues(alpha: 0.3),
+                width: 2,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Plant Image
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.green[50]!,
+                          Colors.green[100]!,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.green[200]!.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: pathPicture != null
+                          ? Image.network(
+                              Uri.parse(AppConfig.baseUrl).resolve(pathPicture).toString(),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.green[100],
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Icon(
+                                  Icons.eco,
+                                  color: Colors.green[600],
+                                  size: 32,
+                                ),
+                              ),
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                color: Colors.green[100],
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Icon(
+                                Icons.eco,
+                                color: Colors.green[600],
+                                size: 32,
+                              ),
+                            ),
+                    ),
+                  ),
+                  
+                  const SizedBox(width: 16),
+                  
+                  // Plant Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          plant.title ?? localizations.unknownName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.grey[800],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          plant.plantType.title ?? localizations.unknownType,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: stateColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: stateColor.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _getStateIcon(plant.state),
+                                size: 16,
+                                color: stateColor,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _getStateText(plant.state),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: stateColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Arrow Icon
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: Colors.green[600],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -454,10 +454,10 @@ abstract class AppLocalizations {
   /// **'Error'**
   String get error;
 
-  /// Text to indicate optional field
+  /// Optional field indicator
   ///
   /// In en, this message translates to:
-  /// **'optional'**
+  /// **'(optional)'**
   String get optional;
 
   /// Error message when confirm password is empty
@@ -465,6 +465,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please confirm your password'**
   String get confirmPasswordRequired;
+
+  /// Subtitle for my plants page
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your plants smartly'**
+  String get managePlants;
+
+  /// Favorites section title
+  ///
+  /// In en, this message translates to:
+  /// **'My Favorites'**
+  String get favorites;
+
+  /// Subtitle for favorites section
+  ///
+  /// In en, this message translates to:
+  /// **'Your favorite plants'**
+  String get favoritePlantsSubtitle;
+
+  /// My list section title
+  ///
+  /// In en, this message translates to:
+  /// **'My List'**
+  String get myList;
+
+  /// Subtitle for my plants section
+  ///
+  /// In en, this message translates to:
+  /// **'All your plants'**
+  String get myPlantsSubtitle;
+
+  /// Empty state message for favorites
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite plants'**
+  String get noFavoritePlants;
+
+  /// Empty state description for favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Add your favorite plants to favorites'**
+  String get addFavoritePlantsDescription;
+
+  /// Empty state message for my plants list
+  ///
+  /// In en, this message translates to:
+  /// **'No plants in your list'**
+  String get noMyPlants;
+
+  /// Empty state description for my plants list
+  ///
+  /// In en, this message translates to:
+  /// **'Start adding your plants'**
+  String get addMyPlantsDescription;
+
+  /// Automatic mode toggle label
+  ///
+  /// In en, this message translates to:
+  /// **'AUTO'**
+  String get autoMode;
+
+  /// Water mode toggle label
+  ///
+  /// In en, this message translates to:
+  /// **'WATER'**
+  String get waterMode;
+
+  /// Fallback text for unknown plant name
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown name'**
+  String get unknownName;
+
+  /// Fallback text for unknown plant type
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown type'**
+  String get unknownType;
+
+  /// Text when plant image is not available
+  ///
+  /// In en, this message translates to:
+  /// **'Image not available'**
+  String get imageNotAvailable;
+
+  /// Text when there is no image
+  ///
+  /// In en, this message translates to:
+  /// **'No image'**
+  String get noImage;
 }
 
 class _AppLocalizationsDelegate

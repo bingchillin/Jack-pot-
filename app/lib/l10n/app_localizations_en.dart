@@ -190,8 +190,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get error => 'Error';
 
   @override
-  String get optional => 'optional';
+  String get optional => '(optional)';
 
   @override
   String get confirmPasswordRequired => 'Please confirm your password';
+
+  @override
+  String get managePlants => 'Manage your plants smartly';
+
+  @override
+  String get favorites => 'My Favorites';
+
+  @override
+  String get favoritePlantsSubtitle => 'Your favorite plants';
+
+  @override
+  String get myList => 'My List';
+
+  @override
+  String get myPlantsSubtitle => 'All your plants';
+
+  @override
+  String get noFavoritePlants => 'No favorite plants';
+
+  @override
+  String get addFavoritePlantsDescription =>
+      'Add your favorite plants to favorites';
+
+  @override
+  String get noMyPlants => 'No plants in your list';
+
+  @override
+  String get addMyPlantsDescription => 'Start adding your plants';
+
+  @override
+  String get autoMode => 'AUTO';
+
+  @override
+  String get waterMode => 'WATER';
+
+  @override
+  String get unknownName => 'Unknown name';
+
+  @override
+  String get unknownType => 'Unknown type';
+
+  @override
+  String get imageNotAvailable => 'Image not available';
+
+  @override
+  String get noImage => 'No image';
 }
