@@ -28,6 +28,7 @@ interface OrderCancellationEmailProps {
     totalPrice: string;
   }>;
   locale?: string;
+  supportEmail?: string;
 }
 
 export const OrderCancellationEmail: React.FC<OrderCancellationEmailProps> = ({
@@ -39,6 +40,7 @@ export const OrderCancellationEmail: React.FC<OrderCancellationEmailProps> = ({
   refundAmount,
   orderItems,
   locale = 'en',
+  supportEmail = process.env.MAIL_FROM || 'support@jackpot.com',
 }) => {
   // Localized text based on locale
   const getLocalizedText = (key: string) => {
@@ -209,7 +211,7 @@ export const OrderCancellationEmail: React.FC<OrderCancellationEmailProps> = ({
           <Section style={supportSection}>
             <Text style={supportTitle}>{t('support')}</Text>
             <Text style={supportDescription}>{t('supportDescription')}</Text>
-            <Button style={supportButton} href="mailto:support@jackpot.com">
+            <Button style={supportButton} href={`mailto:${supportEmail}`}>
               {t('contactSupport')}
             </Button>
           </Section>

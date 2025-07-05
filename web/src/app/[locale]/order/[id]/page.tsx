@@ -70,16 +70,8 @@ export default function OrderDetailsPage() {
       setError(null);
       
       const orderData = await orderService.getOrder(orderId);
-      console.log('Order data from API:', {
-        id: orderData.idOrder,
-        status: orderData.status,
-        paidAt: orderData.paidAt,
-        createdAt: orderData.createdAt,
-        fullOrder: orderData
-      });
       setOrder(orderData);
     } catch (err: any) {
-      console.error('Failed to load order:', err);
       setError(err.response?.data?.message || err.message || t('error_loading'));
       toast.error(t('error_loading'));
     } finally {
@@ -106,7 +98,6 @@ export default function OrderDetailsPage() {
         toast.success(t('refund_initiated'), { duration: 5000 });
       }
     } catch (err: any) {
-      console.error('Failed to cancel order:', err);
       toast.error(err.response?.data?.message || err.message || t('order_cancel_failed'));
     } finally {
       setCancelling(false);
@@ -121,7 +112,6 @@ export default function OrderDetailsPage() {
       generateOrderReceipt(order, locale, user);
       toast.success(t('receipt_exported'));
     } catch (err: any) {
-      console.error('Failed to export receipt:', err);
       toast.error(t('receipt_export_failed'));
     } finally {
       setExporting(false);

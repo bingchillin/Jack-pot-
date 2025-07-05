@@ -22,13 +22,6 @@ export class OrderController {
     @Req() request: RawBodyRequest<Request>,
     @Headers('stripe-signature') signature: string
   ): Promise<{ received: boolean }> {
-    console.log('=== WEBHOOK CONTROLLER ===');
-    console.log('Raw body type:', typeof request.rawBody);
-    console.log('Raw body is Buffer:', Buffer.isBuffer(request.rawBody));
-    console.log('Raw body length:', request.rawBody?.length);
-    console.log('Raw body content:', request.rawBody?.toString('utf8'));
-    console.log('Signature:', signature);
-    
     // Try both rawBody and body properties
     const rawBody = request.rawBody || request.body;
     

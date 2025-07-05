@@ -165,7 +165,6 @@ export const useCartStore = create<CartStore>()(
       syncWithUser: (userId: number) => {
         // Future implementation: sync cart with server for logged-in users
         // This could load user's saved cart from server and merge with local cart
-        console.log('Syncing cart with user:', userId);
       },
 
       // Computed values

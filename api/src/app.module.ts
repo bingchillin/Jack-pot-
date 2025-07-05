@@ -95,12 +95,6 @@ import { UploadModule } from './upload/upload.module';
           synchronize: true,
           autoLoadEntities: true,
         };
-        console.log('Database Configuration:', {
-          host: config.host,
-          port: config.port,
-          username: config.username,
-          database: config.database,
-        });
         return config;
       },
       inject: [ConfigService],

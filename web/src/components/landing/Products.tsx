@@ -1,5 +1,7 @@
 "use client";
 
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { Flower, Smartphone, Package, Plus } from 'lucide-react';
 
 interface ProductsProps {
@@ -7,6 +9,9 @@ interface ProductsProps {
 }
 
 export default function Products({ t }: ProductsProps) {
+  const params = useParams();
+  const locale = params.locale as string;
+
   // Helper function to get translated features dynamically
   const getTranslatedFeatures = (productKey: string) => {
     const features = [];
@@ -37,7 +42,8 @@ export default function Products({ t }: ProductsProps) {
       price: t('products.jack.price'),
       buttonText: t('hero.cta'),
       buttonColor: 'bg-green-600 hover:bg-green-700',
-      isPopular: true
+      isPopular: true,
+      link: `/${locale}/products`
     },
     {
       icon: Smartphone,
@@ -48,7 +54,8 @@ export default function Products({ t }: ProductsProps) {
       features: getTranslatedFeatures('app'),
       price: t('products.app.price'),
       buttonText: 'Download',
-      buttonColor: 'bg-blue-600 hover:bg-blue-700'
+      buttonColor: 'bg-blue-600 hover:bg-blue-700',
+      link: '' // Blank for now - will be app store link later
     }
   ];
 
@@ -88,9 +95,17 @@ export default function Products({ t }: ProductsProps) {
                   </ul>
                   <div className="flex items-center justify-between mt-auto">
                     <span className="text-2xl font-bold text-gray-900">{product.price}</span>
-                    <button className={`${product.buttonColor} text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium`}>
-                      {product.buttonText}
-                    </button>
+                    {product.link ? (
+                      <Link href={product.link}>
+                        <button className={`${product.buttonColor} text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium`}>
+                          {product.buttonText}
+                        </button>
+                      </Link>
+                    ) : (
+                      <button className={`${product.buttonColor} text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium cursor-not-allowed opacity-75`}>
+                        {product.buttonText}
+                      </button>
+                    )}
                   </div>
                 </div>
               );

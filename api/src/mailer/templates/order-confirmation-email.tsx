@@ -29,6 +29,7 @@ interface OrderConfirmationEmailProps {
   }>;
   shippingAddress?: string;
   locale?: string;
+  supportEmail?: string;
 }
 
 export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
@@ -40,6 +41,7 @@ export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
   orderItems,
   shippingAddress,
   locale = 'en',
+  supportEmail = process.env.MAIL_FROM || 'support@jackpot.com',
 }) => {
   // Localized text based on locale
   const getLocalizedText = (key: string) => {
@@ -302,7 +304,7 @@ export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
             <Section style={supportSection}>
               <Text style={supportTitle}>{t('support')}</Text>
               <Text style={supportDescription}>{t('supportDescription')}</Text>
-              <Button style={supportButton} href="mailto:support@jackpot.com">
+              <Button style={supportButton} href={`mailto:${supportEmail}`}>
                 {t('contactSupport')}
               </Button>
             </Section>

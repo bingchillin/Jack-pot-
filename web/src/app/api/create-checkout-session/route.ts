@@ -24,7 +24,6 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log('Request body:', body);
 
     const { returnUrl, items, personId, locale } = body;
 
@@ -35,13 +34,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.log('Creating checkout session with:', {
-      returnUrl,
-      items,
-      personId,
-      locale: locale || 'en'
-    });
 
     // Create line items for Stripe checkout
     const lineItems = items.map((item: any) => ({
@@ -86,8 +78,6 @@ export async function POST(request: NextRequest) {
         },
       },
     });
-
-    console.log('Checkout session created:', session.id);
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
