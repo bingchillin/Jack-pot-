@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -24,6 +25,7 @@ export class CommentController {
   }
 
   @Get()
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Récupérer tous les commentaires principaux' })
   @ApiQuery({ name: 'parentCommentId', required: false, description: 'ID du commentaire parent pour récupérer les réponses' })
   @ApiResponse({ status: 200, description: 'Liste des commentaires', type: [CommentResponseDto] })
@@ -34,6 +36,7 @@ export class CommentController {
   }
 
   @Get('replies/:id')
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Récupérer les réponses d\'un commentaire' })
   @ApiResponse({ status: 200, description: 'Liste des réponses', type: [CommentResponseDto] })
   @ApiResponse({ status: 404, description: 'Commentaire non trouvé' })
@@ -43,6 +46,7 @@ export class CommentController {
   }
 
   @Get(':id')
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Récupérer un commentaire par son ID' })
   @ApiResponse({ status: 200, description: 'Commentaire trouvé', type: CommentResponseDto })
   @ApiResponse({ status: 404, description: 'Commentaire non trouvé' })

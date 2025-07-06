@@ -11,6 +11,7 @@ import { MailerModule } from '../mailer/mailer.module';
 import { StripeModule } from '../stripe/stripe.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
+import { OptionalJwtAuthGuard } from './optional-jwt-auth.guard';
 
 @Module({
     imports: [
@@ -32,7 +33,7 @@ import { RefreshToken } from './entities/refresh-token.entity';
         TypeOrmModule.forFeature([RefreshToken]),
     ],
     controllers: [AuthController],
-    providers: [AuthService, LocalStrategy, JwtStrategy],
+    providers: [AuthService, LocalStrategy, JwtStrategy, OptionalJwtAuthGuard],
     exports: [AuthService],
 })
 export class AuthModule {}
