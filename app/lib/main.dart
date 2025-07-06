@@ -15,9 +15,8 @@ import 'bloc/object_profile/object_profile_bloc.dart';
 import 'bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
 import 'bloc/object_profile_my_list/object_profile_my_list_event.dart';
 import 'l10n/app_localizations.dart';
-import 'bloc/comment/comment_bloc.dart';
+import 'bloc/comment/comment_list_bloc.dart';
 import 'services/comment_service.dart';
-import 'bloc/comment/comment_event.dart';
 
 void main() {
   runApp(
@@ -81,8 +80,8 @@ class _RootAppState extends State<RootApp> {
             )..add(LoadProfilesMyList()),
           ),
         ],
-        BlocProvider<CommentBloc>(
-          create: (_) => CommentBloc(
+        BlocProvider<CommentListBloc>(
+          create: (_) => CommentListBloc(
             commentService: CommentService(),
             token: token,
           )..add(LoadComments()),

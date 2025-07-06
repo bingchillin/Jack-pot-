@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../bloc/comment/comment_bloc.dart';
-import '../../../bloc/comment/comment_event.dart';
+import '../../../bloc/comment/comment_list_bloc.dart';
+import '../../../services/comment_service.dart';
 import '../../../models/comment_model.dart';
+import '../../../providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class EditCommentModal extends StatefulWidget {
   final Comment comment;
@@ -153,13 +155,14 @@ class _EditCommentModalState extends State<EditCommentModal> {
     });
 
     try {
-      context.read<CommentBloc>().add(
-        UpdateComment(
-          commentId: widget.comment.idComment,
-          content: content,
-        ),
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      await CommentService().updateComment(
+        commentId: widget.comment.idComment,
+        content: content,
+        token: token!,
       );
-
+      context.read<CommentListBloc>().add(LoadComments());
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Commentaire modifié !')),

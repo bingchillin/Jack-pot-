@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import '../../../bloc/comment/comment_bloc.dart';
-import '../../../bloc/comment/comment_event.dart';
+import '../../../bloc/comment/comment_list_bloc.dart';
 import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/comment_service.dart';
 import 'edit_comment_modal.dart';
 
 class CommentReply extends StatelessWidget {
@@ -118,7 +118,7 @@ class CommentReply extends StatelessWidget {
                     _showAuthRequiredDialog(context, 'liker');
                     return;
                   }
-                  context.read<CommentBloc>().add(ToggleLike(comment.idComment));
+                  _handleLike(context);
                 },
                 child: Row(
                   children: [
@@ -215,7 +215,7 @@ class CommentReply extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              context.read<CommentBloc>().add(DeleteComment(comment.idComment));
+              _handleDelete(context);
               Navigator.pop(context);
             },
             child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
@@ -266,5 +266,70 @@ class CommentReply extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _handleLike(BuildContext context) async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Token d\'authentification manquant'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final commentService = CommentService();
+      await commentService.toggleLike(comment.idComment, token);
+      
+      // Rafraîchir la liste des commentaires
+      context.read<CommentListBloc>().add(RefreshComments());
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors du like: \\${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleDelete(BuildContext context) async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Token d\'authentification manquant'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final commentService = CommentService();
+      await commentService.deleteComment(comment.idComment, token);
+      
+      // Rafraîchir la liste des commentaires
+      context.read<CommentListBloc>().add(RefreshComments());
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Réponse supprimée avec succès'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la suppression: \\${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 } 
