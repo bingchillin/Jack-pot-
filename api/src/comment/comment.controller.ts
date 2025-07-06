@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
@@ -86,6 +86,7 @@ export class CommentController {
   @ApiResponse({ status: 200, description: 'Like/Unlike effectué avec succès', schema: { type: 'object', properties: { liked: { type: 'boolean' } } } })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Commentaire non trouvé' })
+  @HttpCode(200)
   likeComment(@Param('id') id: string, @Request() req) {
     return this.commentService.likeComment(+id, req.user.idPerson);
   }
