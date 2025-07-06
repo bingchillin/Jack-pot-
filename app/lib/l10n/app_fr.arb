@@ -379,5 +379,215 @@
   "noImage": "Pas d'image",
   "@noImage": {
     "description": "Text when there is no image"
+  },
+
+  "plantDetail": "Détail de la plante",
+  "@plantDetail": {
+    "description": "Plant detail page title"
+  },
+
+  "tokenMissing": "Token manquant",
+  "@tokenMissing": {
+    "description": "Error message when token is missing"
+  },
+
+  "close": "Fermer",
+  "@close": {
+    "description": "Close button text"
+  },
+
+  "plantOverview": "Aperçu de la plante",
+  "@plantOverview": {
+    "description": "Plant overview section title"
+  },
+
+  "lastUpdated": "Dernière mise à jour",
+  "@lastUpdated": {
+    "description": "Last updated label"
+  },
+
+  "nextWatering": "Prochain arrosage",
+  "@nextWatering": {
+    "description": "Next watering label"
+  },
+
+  "healthScore": "Score de santé",
+  "@healthScore": {
+    "description": "Health score label"
+  },
+
+  "sensorData": "Données des capteurs",
+  "@sensorData": {
+    "description": "Sensor data section title"
+  },
+
+  "soilMoisture": "Humidité du sol",
+  "@soilMoisture": {
+    "description": "Soil moisture sensor label"
+  },
+
+  "airHumidity": "Humidité de l'air",
+  "@airHumidity": {
+    "description": "Air humidity sensor label"
+  },
+
+  "temperature": "Température",
+  "@temperature": {
+    "description": "Temperature sensor label"
+  },
+
+  "lightLevel": "Niveau de lumière",
+  "@lightLevel": {
+    "description": "Light level sensor label"
+  },
+
+  "soilPH": "pH du sol",
+  "@soilPH": {
+    "description": "Soil pH sensor label"
+  },
+
+  "fertility": "Fertilité",
+  "@fertility": {
+    "description": "Fertility sensor label"
+  },
+
+  "groundTemp": "Température du sol",
+  "@groundTemp": {
+    "description": "Ground temperature sensor label"
+  },
+
+  "sunExposure": "Exposition au soleil",
+  "@sunExposure": {
+    "description": "Sun exposure sensor label"
+  },
+
+  "optimal": "Optimal",
+  "@optimal": {
+    "description": "Optimal sensor status"
+  },
+
+  "good": "Bon",
+  "@good": {
+    "description": "Good sensor status"
+  },
+
+  "moderate": "Modéré",
+  "@moderate": {
+    "description": "Moderate sensor status"
+  },
+
+  "warning": "Attention",
+  "@warning": {
+    "description": "Warning sensor status"
+  },
+
+  "critical": "Critique",
+  "@critical": {
+    "description": "Critical sensor status"
+  },
+
+  "notAvailable": "Non disponible",
+  "@notAvailable": {
+    "description": "Not available text"
+  },
+
+  "plantCareAdvice": "Conseils d'entretien",
+  "@plantCareAdvice": {
+    "description": "Plant care advice section title"
+  },
+
+  "careRecipe": "Recette d'entretien",
+  "@careRecipe": {
+    "description": "Care recipe section title"
+  },
+
+  "noAdviceAvailable": "Aucun conseil disponible",
+  "@noAdviceAvailable": {
+    "description": "No advice available text"
+  },
+
+  "noRecipeAvailable": "Aucune recette disponible",
+  "@noRecipeAvailable": {
+    "description": "No recipe available text"
+  },
+
+  "minutesAgo": "minutes",
+  "@minutesAgo": {
+    "description": "Minutes ago text"
+  },
+
+  "hoursAgo": "heures",
+  "@hoursAgo": {
+    "description": "Hours ago text"
+  },
+
+  "daysAgo": "jours",
+  "@daysAgo": {
+    "description": "Days ago text"
+  },
+
+  "justNow": "à l'instant",
+  "@justNow": {
+    "description": "Just now text"
+  },
+
+  "tomorrow": "demain",
+  "@tomorrow": {
+    "description": "Tomorrow text"
+  },
+
+  "today": "aujourd'hui",
+  "@today": {
+    "description": "Today text"
+  },
+
+  "loadingError": "Erreur de chargement",
+  "@loadingError": {
+    "description": "Loading error message"
+  },
+
+  "stateExcellent": "Excellent",
+  "@stateExcellent": {
+    "description": "Excellent plant state"
+  },
+
+  "stateGood": "Bon état",
+  "@stateGood": {
+    "description": "Good plant state"
+  },
+
+  "stateFair": "Moyen",
+  "@stateFair": {
+    "description": "Fair plant state"
+  },
+
+  "stateNeedsAttention": "Attention requise",
+  "@stateNeedsAttention": {
+    "description": "Needs attention plant state"
+  },
+
+  "stateCritical": "État critique",
+  "@stateCritical": {
+    "description": "Critical plant state"
+  },
+
+  "stateUnknown": "État inconnu",
+  "@stateUnknown": {
+    "description": "Unknown plant state"
+  },
+
+  "loading": "Chargement...",
+  "@loading": {
+    "description": "Loading message"
+  },
+
+  "errorOccurred": "Une erreur s'est produite",
+  "@errorOccurred": {
+    "description": "General error message"
+  },
+
+  "tryAgain": "Réessayer",
+  "@tryAgain": {
+    "description": "Button text to retry an action"
   }
 } 

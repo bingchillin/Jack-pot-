@@ -15,6 +15,7 @@ class PlantDetailBloc extends Bloc<PlantDetailEvent, PlantDetailState> {
 
   ObjectProfile? _currentPlant;
   Timer? _pollingTimer;
+  StreamSubscription<int>? _plantUpdateSubscription;
 
   PlantDetailBloc({
     required this.service,
@@ -22,6 +23,17 @@ class PlantDetailBloc extends Bloc<PlantDetailEvent, PlantDetailState> {
     required this.token,
   }) : super(PlantDetailInitial()) {
     on<LoadPlantDetail>(_onLoadPlantDetail);
+
+    // Listen for global plant updates
+    _plantUpdateSubscription = ObjectProfileService.plantUpdateStream.listen((updatedPlantId) {
+      print('🔔 PlantDetailBloc received update notification for plant $updatedPlantId');
+      // If it's our plant or a global refresh, reload with small delay
+      if (updatedPlantId == plantId || updatedPlantId == -1) {
+        Timer(const Duration(milliseconds: 300), () {
+          add(LoadPlantDetail(plantId, token));
+        });
+      }
+    });
 
     // Load initial
     add(LoadPlantDetail(plantId, token));
@@ -34,6 +46,22 @@ class PlantDetailBloc extends Bloc<PlantDetailEvent, PlantDetailState> {
   Future<void> _onLoadPlantDetail(
       LoadPlantDetail event, Emitter<PlantDetailState> emit) async {
     try {
+      // Check if we have fresh cached data to avoid loading state
+      final cached = service.getCachedPlant(plantId);
+      
+      if (cached != null && _currentPlant == null) {
+        // We have cached data and this is the first load - skip loading state
+        _currentPlant = cached;
+        _plantController.add(cached);
+        emit(PlantDetailLoaded(cached));
+        return;
+      }
+      
+      // Only emit loading state if we don't have data yet
+      if (_currentPlant == null) {
+        emit(PlantDetailLoading());
+      }
+      
       final fresh = await service.fetchObjectProfileDetails(plantId, token);
 
       if (_currentPlant == null) {
@@ -76,6 +104,7 @@ class PlantDetailBloc extends Bloc<PlantDetailEvent, PlantDetailState> {
   @override
   Future<void> close() {
     _pollingTimer?.cancel();
+    _plantUpdateSubscription?.cancel();
     _plantController.close();
     return super.close();
   }

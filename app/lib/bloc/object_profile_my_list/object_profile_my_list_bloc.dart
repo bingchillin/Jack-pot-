@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart'; // pour listEquals
 import '../../models/object_profile.dart';
 import '../../providers/plant_provider_my_List.dart';
+import '../../services/object_profile_service.dart';
 import 'object_profile_my_list_event.dart';
 import 'object_profile_my_list_state.dart';
 
@@ -16,6 +17,7 @@ class ObjectProfileMyListBloc extends Bloc<ObjectProfileMyListEvent, ObjectProfi
 
   List<ObjectProfile> _currentProfiles = [];
   Timer? _pollingTimer;
+  StreamSubscription<int>? _plantUpdateSubscription;
 
   ObjectProfileMyListBloc({
     required this.provider,
@@ -24,6 +26,13 @@ class ObjectProfileMyListBloc extends Bloc<ObjectProfileMyListEvent, ObjectProfi
     on<LoadProfilesMyList>(_onLoad);
     on<ToggleAutomatic>(_onToggleAutomatic);
     on<ToggleWillWatering>(_onToggleWillWatering);
+
+    // Listen for global plant updates
+    _plantUpdateSubscription = ObjectProfileService.plantUpdateStream.listen((plantId) {
+      print('🔔 ObjectProfileMyListBloc received update notification for plant $plantId');
+      // Refresh our data when any plant is updated
+      add(LoadProfilesMyList());
+    });
 
     // Démarrage du polling automatique toutes les 10 secondes
     _pollingTimer = Timer.periodic(const Duration(seconds: 10), (_) {
@@ -81,6 +90,7 @@ class ObjectProfileMyListBloc extends Bloc<ObjectProfileMyListEvent, ObjectProfi
   Future<void> close() {
     _pollingTimer?.cancel();
     _profilesController.close();
+    _plantUpdateSubscription?.cancel();
     return super.close();
   }
 }

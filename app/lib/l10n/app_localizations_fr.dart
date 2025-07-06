@@ -242,4 +242,130 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noImage => 'Pas d\'image';
+
+  @override
+  String get plantDetail => 'Détail de la plante';
+
+  @override
+  String get tokenMissing => 'Token manquant';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String get plantOverview => 'Aperçu de la plante';
+
+  @override
+  String get lastUpdated => 'Dernière mise à jour';
+
+  @override
+  String get nextWatering => 'Prochain arrosage';
+
+  @override
+  String get healthScore => 'Score de santé';
+
+  @override
+  String get sensorData => 'Données des capteurs';
+
+  @override
+  String get soilMoisture => 'Humidité du sol';
+
+  @override
+  String get airHumidity => 'Humidité de l\'air';
+
+  @override
+  String get temperature => 'Température';
+
+  @override
+  String get lightLevel => 'Niveau de lumière';
+
+  @override
+  String get soilPH => 'pH du sol';
+
+  @override
+  String get fertility => 'Fertilité';
+
+  @override
+  String get groundTemp => 'Température du sol';
+
+  @override
+  String get sunExposure => 'Exposition au soleil';
+
+  @override
+  String get optimal => 'Optimal';
+
+  @override
+  String get good => 'Bon';
+
+  @override
+  String get moderate => 'Modéré';
+
+  @override
+  String get warning => 'Attention';
+
+  @override
+  String get critical => 'Critique';
+
+  @override
+  String get notAvailable => 'Non disponible';
+
+  @override
+  String get plantCareAdvice => 'Conseils d\'entretien';
+
+  @override
+  String get careRecipe => 'Recette d\'entretien';
+
+  @override
+  String get noAdviceAvailable => 'Aucun conseil disponible';
+
+  @override
+  String get noRecipeAvailable => 'Aucune recette disponible';
+
+  @override
+  String get minutesAgo => 'minutes';
+
+  @override
+  String get hoursAgo => 'heures';
+
+  @override
+  String get daysAgo => 'jours';
+
+  @override
+  String get justNow => 'à l\'instant';
+
+  @override
+  String get tomorrow => 'demain';
+
+  @override
+  String get today => 'aujourd\'hui';
+
+  @override
+  String get loadingError => 'Erreur de chargement';
+
+  @override
+  String get stateExcellent => 'Excellent';
+
+  @override
+  String get stateGood => 'Bon état';
+
+  @override
+  String get stateFair => 'Moyen';
+
+  @override
+  String get stateNeedsAttention => 'Attention requise';
+
+  @override
+  String get stateCritical => 'État critique';
+
+  @override
+  String get stateUnknown => 'État inconnu';
+
+  @override
+  String get loading => 'Chargement...';
+
+  @override
+  String get errorOccurred => 'Une erreur s\'est produite';
+
+  @override
+  String get tryAgain => 'Réessayer';
 }
