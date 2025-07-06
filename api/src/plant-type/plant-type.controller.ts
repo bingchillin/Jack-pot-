@@ -4,10 +4,11 @@ import { PlantTypeService } from './plant-type.service';
 import { CreatePlantTypeDto } from './dto/create-plant-type.dto';
 import { UpdatePlantTypeDto } from './dto/update-plant-type.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PlantType } from './entities/plant-type.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('plant-type')
-@UseGuards(JwtAuthGuard)
+//@UseGuards(JwtAuthGuard)
 export class PlantTypeController {
     constructor(private readonly plantTypeService: PlantTypeService) {}
 
@@ -26,6 +27,15 @@ export class PlantTypeController {
         }
         return this.plantTypeService.findAll();
     }
+
+    @Get('search')
+    @ApiExcludeEndpoint()
+    findAllSearch(@Query('title') title?: string): Promise<PlantType[]> {
+    if (title) {
+        return this.plantTypeService.findAllByTitleLike(title);
+    }
+    return this.plantTypeService.findAll();
+}
 
     @Get(':id')
     @ApiExcludeEndpoint()
