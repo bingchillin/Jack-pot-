@@ -1,95 +1,207 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
-import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
-import { CommentResponseDto } from './dto/comment-response.dto';
-
-@ApiTags('comments')
-@Controller('comments')
-export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
-
-  @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Créer un nouveau commentaire' })
-  @ApiResponse({ status: 201, description: 'Commentaire créé avec succès', type: CommentResponseDto })
-  @ApiResponse({ status: 400, description: 'Données invalides' })
-  @ApiResponse({ status: 401, description: 'Non autorisé' })
-  @ApiResponse({ status: 404, description: 'Commentaire parent non trouvé' })
-  create(@Body() createCommentDto: CreateCommentDto, @Request() req) {
-    console.log('Controller create - req.user:', req.user);
-    console.log('Controller create - userId:', req.user.idPerson);
-    return this.commentService.create(createCommentDto, req.user.idPerson);
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    Query,
+    ParseIntPipe,
+    ParseBoolPipe,
+    HttpCode,
+    HttpStatus,
+  } from '@nestjs/common';
+  import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiParam,
+    ApiQuery,
+  } from '@nestjs/swagger';
+  import { CommentService } from './comment.service';
+  import { CreateCommentDto } from './dto/create-comment.dto';
+  import { UpdateCommentDto } from './dto/update-comment.dto';
+  import { Comment } from './entities/comment.entity';
+  
+  @ApiTags('comments')
+  @Controller('comments')
+  export class CommentController {
+    constructor(private readonly commentService: CommentService) {}
+  
+    @Post()
+    @ApiOperation({ summary: 'Create a new post or comment' })
+    @ApiResponse({
+      status: 201,
+      description: 'The post/comment has been successfully created.',
+      type: Comment,
+    })
+    @ApiResponse({ status: 400, description: 'Bad Request.' })
+    @ApiResponse({ status: 404, description: 'Parent comment not found.' })
+    async create(@Body() createCommentDto: CreateCommentDto): Promise<Comment> {
+      return await this.commentService.create(createCommentDto);
+    }
+  
+    @Get('timeline')
+    @ApiOperation({ summary: 'Get timeline (posts only - with no parent comments)' })
+    @ApiQuery({
+      name: 'includeDeleted',
+      required: false,
+      type: Boolean,
+      description: 'Include deleted posts in the results',
+      example: false,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return timeline of posts.',
+      type: [Comment],
+    })
+    async getTimeline(
+      @Query('includeDeleted', new ParseBoolPipe({ optional: true })) includeDeleted?: boolean,
+    ): Promise<Comment[]> {
+      return await this.commentService.getTimeline(includeDeleted || false);
+    }
+  
+    @Get(':id')
+    @ApiOperation({ summary: 'Get a single post or comment by ID' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the post/comment',
+      example: 1,
+    })
+    @ApiQuery({
+      name: 'includeDeleted',
+      required: false,
+      type: Boolean,
+      description: 'Include deleted content in the results',
+      example: false,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return the post/comment.',
+      type: Comment,
+    })
+    @ApiResponse({ status: 404, description: 'Post/comment not found.' })
+    async findOne(
+      @Param('id', ParseIntPipe) id: number,
+      @Query('includeDeleted', new ParseBoolPipe({ optional: true })) includeDeleted?: boolean,
+    ): Promise<Comment> {
+      return await this.commentService.findOne(id, includeDeleted || false);
+    }
+  
+    @Get(':id/withComments')
+    @ApiOperation({ summary: 'Get post with all its comments (Twitter-style detail view)' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the post',
+      example: 1,
+    })
+    @ApiQuery({
+      name: 'includeDeleted',
+      required: false,
+      type: Boolean,
+      description: 'Include deleted content in the results',
+      example: false,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return the post with all its comments as a flat array.',
+      type: [Comment],
+    })
+    @ApiResponse({ status: 404, description: 'Post not found.' })
+    async getPostWithComments(
+      @Param('id', ParseIntPipe) id: number,
+      @Query('includeDeleted', new ParseBoolPipe({ optional: true })) includeDeleted?: boolean,
+    ): Promise<Comment[]> {
+      return await this.commentService.getPostWithComments(id, includeDeleted || false);
+    }
+  
+    @Get('getCommentsByParentId/:parentId')
+    @ApiOperation({ summary: 'Get all comments for a specific parent (lazy loading)' })
+    @ApiParam({
+      name: 'parentId',
+      type: Number,
+      description: 'The ID of the parent comment/post',
+      example: 1,
+    })
+    @ApiQuery({
+      name: 'includeDeleted',
+      required: false,
+      type: Boolean,
+      description: 'Include deleted comments in the results',
+      example: false,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return all comments for the specified parent.',
+      type: [Comment],
+    })
+    @ApiResponse({ status: 404, description: 'Parent not found.' })
+    async getCommentsByParentId(
+      @Param('parentId', ParseIntPipe) parentId: number,
+      @Query('includeDeleted', new ParseBoolPipe({ optional: true })) includeDeleted?: boolean,
+    ): Promise<Comment[]> {
+      return await this.commentService.getCommentsByParentId(parentId, includeDeleted || false);
+    }
+  
+    @Patch(':id')
+    @ApiOperation({ summary: 'Update a post or comment' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the post/comment to update',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'The post/comment has been successfully updated.',
+      type: Comment,
+    })
+    @ApiResponse({ status: 400, description: 'Bad Request.' })
+    @ApiResponse({ status: 404, description: 'Post/comment not found.' })
+    async update(
+      @Param('id', ParseIntPipe) id: number,
+      @Body() updateCommentDto: UpdateCommentDto,
+    ): Promise<Comment> {
+      return await this.commentService.update(id, updateCommentDto);
+    }
+  
+    @Delete(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOperation({ summary: 'Soft delete a post or comment' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the post/comment to delete',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 204,
+      description: 'The post/comment has been successfully deleted.',
+    })
+    @ApiResponse({ status: 404, description: 'Post/comment not found.' })
+    async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+      await this.commentService.remove(id);
+    }
+  
+    @Patch(':id/restore')
+    @ApiOperation({ summary: 'Restore a soft-deleted post or comment' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the post/comment to restore',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'The post/comment has been successfully restored.',
+      type: Comment,
+    })
+    @ApiResponse({ status: 400, description: 'Post/comment is not deleted.' })
+    @ApiResponse({ status: 404, description: 'Post/comment not found.' })
+    async restore(@Param('id', ParseIntPipe) id: number): Promise<Comment> {
+      return await this.commentService.restore(id);
+    }
   }
-
-  @Get()
-  @UseGuards(OptionalJwtAuthGuard)
-  @ApiOperation({ summary: 'Récupérer tous les commentaires principaux' })
-  @ApiQuery({ name: 'parentCommentId', required: false, description: 'ID du commentaire parent pour récupérer les réponses' })
-  @ApiResponse({ status: 200, description: 'Liste des commentaires', type: [CommentResponseDto] })
-  findAll(@Query('parentCommentId') parentCommentId?: string, @Request() req?: any) {
-    const userId = req?.user?.idPerson;
-    const parentId = parentCommentId ? parseInt(parentCommentId) : undefined;
-    return this.commentService.findAll(userId, parentId);
-  }
-
-  @Get('replies/:id')
-  @UseGuards(OptionalJwtAuthGuard)
-  @ApiOperation({ summary: 'Récupérer les réponses d\'un commentaire' })
-  @ApiResponse({ status: 200, description: 'Liste des réponses', type: [CommentResponseDto] })
-  @ApiResponse({ status: 404, description: 'Commentaire non trouvé' })
-  getReplies(@Param('id') id: string, @Request() req?: any) {
-    const userId = req?.user?.idPerson;
-    return this.commentService.getReplies(+id, userId);
-  }
-
-  @Get(':id')
-  @UseGuards(OptionalJwtAuthGuard)
-  @ApiOperation({ summary: 'Récupérer un commentaire par son ID' })
-  @ApiResponse({ status: 200, description: 'Commentaire trouvé', type: CommentResponseDto })
-  @ApiResponse({ status: 404, description: 'Commentaire non trouvé' })
-  findOne(@Param('id') id: string, @Request() req?: any) {
-    const userId = req?.user?.idPerson;
-    return this.commentService.findOne(+id, userId);
-  }
-
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Modifier un commentaire' })
-  @ApiResponse({ status: 200, description: 'Commentaire modifié avec succès', type: CommentResponseDto })
-  @ApiResponse({ status: 401, description: 'Non autorisé' })
-  @ApiResponse({ status: 403, description: 'Accès interdit' })
-  @ApiResponse({ status: 404, description: 'Commentaire non trouvé' })
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto, @Request() req) {
-    return this.commentService.update(+id, updateCommentDto, req.user.idPerson);
-  }
-
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Supprimer un commentaire' })
-  @ApiResponse({ status: 200, description: 'Commentaire supprimé avec succès' })
-  @ApiResponse({ status: 401, description: 'Non autorisé' })
-  @ApiResponse({ status: 403, description: 'Accès interdit' })
-  @ApiResponse({ status: 404, description: 'Commentaire non trouvé' })
-  remove(@Param('id') id: string, @Request() req) {
-    return this.commentService.remove(+id, req.user.idPerson);
-  }
-
-  @Post(':id/like')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Liker/Unliker un commentaire' })
-  @ApiResponse({ status: 200, description: 'Like/Unlike effectué avec succès', schema: { type: 'object', properties: { liked: { type: 'boolean' } } } })
-  @ApiResponse({ status: 401, description: 'Non autorisé' })
-  @ApiResponse({ status: 404, description: 'Commentaire non trouvé' })
-  @HttpCode(200)
-  likeComment(@Param('id') id: string, @Request() req) {
-    return this.commentService.likeComment(+id, req.user.idPerson);
-  }
-} 

@@ -27,7 +27,6 @@ import { Product } from './product/entities/product.entity';
 import { Order } from './order/entities/order.entity';
 import { OrderItem } from './order/entities/order-item.entity';
 import { Comment } from './comment/entities/comment.entity';
-import { CommentLike } from './comment/entities/comment-like.entity';
 
 // Module imports
 import { RoleModule } from './role/role.module';
@@ -90,7 +89,6 @@ import { UploadModule } from './upload/upload.module';
             Order,
             OrderItem,
             Comment,
-            CommentLike
           ],
           synchronize: true,
           autoLoadEntities: true,
