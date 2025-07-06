@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import '../../../bloc/comment/comment_list_bloc.dart';
+import '../../../bloc/comment/comment_replies_bloc.dart';
+import '../../../bloc/comment/comment_replies_event.dart';
+import '../../../bloc/comment/comment_replies_state.dart';
 import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/comment_service.dart';
@@ -284,8 +287,12 @@ class CommentReply extends StatelessWidget {
 
       final commentService = CommentService();
       await commentService.toggleLike(comment.idComment, token);
-      
-      // Rafraîchir la liste des commentaires
+      // Rafraîchir les réponses du parent
+      final parentCommentId = comment.parentCommentId;
+      if (parentCommentId != null) {
+        context.read<CommentRepliesBloc>().add(RefreshReplies(parentCommentId));
+      }
+      // Rafraîchir aussi la liste principale pour le replyCount
       context.read<CommentListBloc>().add(RefreshComments());
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -313,10 +320,13 @@ class CommentReply extends StatelessWidget {
 
       final commentService = CommentService();
       await commentService.deleteComment(comment.idComment, token);
-      
-      // Rafraîchir la liste des commentaires
+      // Rafraîchir les réponses du parent
+      final parentCommentId = comment.parentCommentId;
+      if (parentCommentId != null) {
+        context.read<CommentRepliesBloc>().add(RefreshReplies(parentCommentId));
+      }
+      // Rafraîchir aussi la liste principale pour le replyCount
       context.read<CommentListBloc>().add(RefreshComments());
-      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Réponse supprimée avec succès'),

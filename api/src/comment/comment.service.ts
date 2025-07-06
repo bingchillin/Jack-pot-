@@ -20,35 +20,62 @@ export class CommentService {
   ) {}
 
   async create(createCommentDto: CreateCommentDto, userId: number): Promise<CommentResponseDto> {
-    // Vérifier que l'utilisateur existe
-    const person = await this.personRepository.findOne({ where: { idPerson: userId } });
-    if (!person) {
-      throw new NotFoundException('Utilisateur non trouvé');
-    }
-
-    // Si c'est une réponse, vérifier que le commentaire parent existe
-    if (createCommentDto.parentCommentId) {
-      const parentComment = await this.commentRepository.findOne({
-        where: { idComment: createCommentDto.parentCommentId, isDeleted: false }
-      });
-      if (!parentComment) {
-        throw new NotFoundException('Commentaire parent non trouvé');
+    try {
+      console.log('Creating comment with data:', { createCommentDto, userId });
+      
+      // Vérifier que l'utilisateur existe
+      const person = await this.personRepository.findOne({ where: { idPerson: userId } });
+      if (!person) {
+        throw new NotFoundException('Utilisateur non trouvé');
       }
+      console.log('User found:', person.idPerson);
+
+      // Si c'est une réponse, vérifier que le commentaire parent existe
+      if (createCommentDto.parentCommentId) {
+        const parentComment = await this.commentRepository.findOne({
+          where: { idComment: createCommentDto.parentCommentId, isDeleted: false }
+        });
+        if (!parentComment) {
+          throw new NotFoundException('Commentaire parent non trouvé');
+        }
+        console.log('Parent comment found:', parentComment.idComment);
+      }
+
+      const comment = this.commentRepository.create({
+        content: createCommentDto.content,
+        idPerson: userId,
+        parentCommentId: createCommentDto.parentCommentId,
+      });
+
+      console.log('Comment created:', comment);
+      const savedComment = await this.commentRepository.save(comment);
+      console.log('Comment saved:', savedComment);
+
+      // Recharge avec toutes les relations nécessaires
+      const savedCommentWithRelations = await this.commentRepository
+        .createQueryBuilder('comment')
+        .leftJoinAndSelect('comment.person', 'person')
+        .leftJoinAndSelect('comment.likes', 'likes')
+        .leftJoinAndSelect('comment.replies', 'replies')
+        .where('comment.idComment = :id', { id: savedComment.idComment })
+        .getOne();
+      
+      if (!savedCommentWithRelations) {
+        throw new Error('Commentaire non trouvé après sauvegarde');
+      }
+      
+      console.log('Comment with relations:', {
+        id: savedCommentWithRelations.idComment,
+        hasPerson: !!savedCommentWithRelations.person,
+        hasLikes: !!savedCommentWithRelations.likes,
+        hasReplies: !!savedCommentWithRelations.replies,
+      });
+
+      return this.formatCommentResponse(savedCommentWithRelations, userId);
+    } catch (error) {
+      console.error('Error in create method:', error);
+      throw error;
     }
-
-    const comment = this.commentRepository.create({
-      content: createCommentDto.content,
-      idPerson: userId,
-      parentCommentId: createCommentDto.parentCommentId,
-    });
-
-    const savedComment = await this.commentRepository.save(comment);
-    // Recharge avec toutes les relations nécessaires
-    const savedCommentWithRelations = await this.commentRepository.findOne({
-      where: { idComment: savedComment.idComment },
-      relations: ['person', 'likes', 'replies'],
-    });
-    return this.formatCommentResponse(savedCommentWithRelations, userId);
   }
 
   async findAll(userId?: number, parentCommentId?: number): Promise<CommentResponseDto[]> {
@@ -172,45 +199,60 @@ export class CommentService {
   }
 
   private async formatCommentResponse(comment: Comment, userId?: number): Promise<CommentResponseDto> {
-    // Compter les likes
-    const likeCount = comment.likes?.length || 0;
+    try {
+      console.log('Formatting comment:', comment.idComment);
+      
+      if (!comment.person) {
+        console.error('Comment person is null for comment:', comment.idComment);
+        throw new Error('Person relation not loaded for comment');
+      }
 
-    // Compter les réponses
-    const replyCount = comment.replies?.filter(reply => !reply.isDeleted).length || 0;
+      // Compter les likes
+      const likeCount = comment.likes?.length || 0;
 
-    // Vérifier si l'utilisateur actuel a liké ce commentaire
-    const isLikedByCurrentUser = userId ? 
-      comment.likes?.some(like => like.idPerson === userId) || false : 
-      false;
+      // Compter les réponses
+      const replyCount = comment.replies?.filter(reply => !reply.isDeleted).length || 0;
 
-    // Formater les réponses récursivement
-    const formattedReplies = comment.replies ? 
-      await Promise.all(
-        comment.replies
-          .filter(reply => !reply.isDeleted)
-          .map(reply => this.formatCommentResponse(reply, userId))
-      ) : 
-      [];
+      // Vérifier si l'utilisateur actuel a liké ce commentaire
+      const isLikedByCurrentUser = userId ? 
+        comment.likes?.some(like => like.idPerson === userId) || false : 
+        false;
 
-    return {
-      idComment: comment.idComment,
-      content: comment.content,
-      idPerson: comment.idPerson,
-      person: {
-        idPerson: comment.person.idPerson,
-        firstname: comment.person.firstname,
-        surname: comment.person.surname,
-        email: comment.person.email,
-      },
-      parentCommentId: comment.parentCommentId,
-      isDeleted: comment.isDeleted,
-      deletedAt: comment.deletedAt,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
-      likeCount,
-      replyCount,
-      isLikedByCurrentUser,
-      replies: formattedReplies,
-    };
+      // Formater les réponses récursivement
+      const formattedReplies = comment.replies ? 
+        await Promise.all(
+          comment.replies
+            .filter(reply => !reply.isDeleted)
+            .map(reply => this.formatCommentResponse(reply, userId))
+        ) : 
+        [];
+
+      const response = {
+        idComment: comment.idComment,
+        content: comment.content,
+        idPerson: comment.idPerson,
+        person: {
+          idPerson: comment.person.idPerson,
+          firstname: comment.person.firstname,
+          surname: comment.person.surname,
+          email: comment.person.email,
+        },
+        parentCommentId: comment.parentCommentId,
+        isDeleted: comment.isDeleted,
+        deletedAt: comment.deletedAt,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+        likeCount,
+        replyCount,
+        isLikedByCurrentUser,
+        replies: formattedReplies,
+      };
+
+      console.log('Formatted comment response:', response.idComment);
+      return response;
+    } catch (error) {
+      console.error('Error in formatCommentResponse:', error);
+      throw error;
+    }
   }
 } 

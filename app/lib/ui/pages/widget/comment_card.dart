@@ -7,6 +7,9 @@ import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
 import 'edit_comment_modal.dart';
 import '../../../bloc/comment/comment_item_bloc.dart';
+import '../../../bloc/comment/comment_replies_bloc.dart';
+import '../../../bloc/comment/comment_replies_event.dart';
+import '../../../bloc/comment/comment_replies_state.dart';
 import '../../../services/comment_service.dart';
 
 class CommentCard extends StatefulWidget {
@@ -217,7 +220,10 @@ class _CommentCardState extends State<CommentCard> {
                           setState(() {
                             _showReplies = !_showReplies;
                           });
-                          // TODO: Charger les replies via un bloc dédié si besoin
+                          // Charger les réponses si on les affiche
+                          if (_showReplies) {
+                            context.read<CommentRepliesBloc>().add(LoadReplies(comment.idComment));
+                          }
                         },
                         child: Text(
                           _showReplies ? 'Masquer les réponses' : 'Voir les réponses',
@@ -233,12 +239,69 @@ class _CommentCardState extends State<CommentCard> {
               ),
               const SizedBox(height: 12),
               // Réponses
-              if (_showReplies && widget.replies.isNotEmpty)
-                Container(
-                  margin: const EdgeInsets.only(left: 16),
-                  child: Column(
-                    children: widget.replies.map((reply) => CommentReply(comment: reply)).toList(),
-                  ),
+              if (_showReplies)
+                BlocBuilder<CommentRepliesBloc, CommentRepliesState>(
+                  builder: (context, repliesState) {
+                    if (repliesState is CommentRepliesLoading && repliesState.commentId == comment.idComment) {
+                      return Container(
+                        margin: const EdgeInsets.only(left: 16),
+                        padding: const EdgeInsets.all(16),
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    
+                    if (repliesState is CommentRepliesLoaded && repliesState.commentId == comment.idComment) {
+                      if (repliesState.replies.isEmpty) {
+                        return Container(
+                          margin: const EdgeInsets.only(left: 16),
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            'Aucune réponse pour le moment',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
+                      }
+                      
+                      return Container(
+                        margin: const EdgeInsets.only(left: 16),
+                        child: Column(
+                          children: repliesState.replies.map((reply) => CommentReply(comment: reply)).toList(),
+                        ),
+                      );
+                    }
+                    
+                    if (repliesState is CommentRepliesError && repliesState.commentId == comment.idComment) {
+                      return Container(
+                        margin: const EdgeInsets.only(left: 16),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Erreur de chargement des réponses',
+                              style: TextStyle(
+                                color: Colors.red.shade600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () {
+                                context.read<CommentRepliesBloc>().add(LoadReplies(comment.idComment));
+                              },
+                              child: const Text('Réessayer'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    
+                    return const SizedBox.shrink();
+                  },
                 ),
             ],
           ),

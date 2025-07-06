@@ -64,6 +64,10 @@ class CommentService {
       if (parentCommentId != null) 'parentCommentId': parentCommentId,
     };
 
+    print('Flutter - Creating comment with body: $body');
+    print('Flutter - URL: $url');
+    print('Flutter - Token: ${token.substring(0, 20)}...');
+
     final response = await http.post(
       url,
       headers: {
@@ -73,10 +77,13 @@ class CommentService {
       body: jsonEncode(body),
     );
 
+    print('Flutter - Response status: ${response.statusCode}');
+    print('Flutter - Response body: ${response.body}');
+
     if (response.statusCode == 201) {
       return Comment.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Erreur de création du commentaire: ${response.statusCode}');
+      throw Exception('Erreur de création du commentaire: ${response.statusCode} - ${response.body}');
     }
   }
 

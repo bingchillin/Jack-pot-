@@ -16,6 +16,7 @@ import 'bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
 import 'bloc/object_profile_my_list/object_profile_my_list_event.dart';
 import 'l10n/app_localizations.dart';
 import 'bloc/comment/comment_list_bloc.dart';
+import 'bloc/comment/comment_replies_bloc.dart';
 import 'services/comment_service.dart';
 
 void main() {
@@ -85,6 +86,12 @@ class _RootAppState extends State<RootApp> {
             commentService: CommentService(),
             token: token,
           )..add(LoadComments()),
+        ),
+        BlocProvider<CommentRepliesBloc>(
+          create: (_) => CommentRepliesBloc(
+            commentService: CommentService(),
+            token: token,
+          ),
         ),
       ],
       child: MaterialApp(
