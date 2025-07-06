@@ -391,7 +391,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 padding: const EdgeInsets.only(left: 16, top: 16),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(24),
-                  onTap: () => Navigator.pushReplacementNamed(context, '/'),
+                  onTap: () => Navigator.pop(context),
                   child: Container(
                     width: 48,
                     height: 48,

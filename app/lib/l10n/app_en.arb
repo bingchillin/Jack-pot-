@@ -589,5 +589,140 @@
   "tryAgain": "Try Again",
   "@tryAgain": {
     "description": "Button text to retry an action"
+  },
+
+  "welcomeToJackPot": "Welcome to the Future of Plant Care",
+  "@welcomeToJackPot": {
+    "description": "Welcome page main title"
+  },
+
+  "smartPlantCareSimple": "Smart Plant Care Made Simple",
+  "@smartPlantCareSimple": {
+    "description": "App tagline on welcome page"
+  },
+
+  "welcomeDescription": "Monitor your plants with IoT sensors, get smart care recommendations, and join a community of plant enthusiasts.",
+  "@welcomeDescription": {
+    "description": "Welcome page description"
+  },
+
+  "smartMonitoring": "Smart Monitoring",
+  "@smartMonitoring": {
+    "description": "Feature card title"
+  },
+
+  "smartMonitoringDesc": "Real-time sensor data",
+  "@smartMonitoringDesc": {
+    "description": "Feature card description"
+  },
+
+  "autoCare": "Auto Care",
+  "@autoCare": {
+    "description": "Feature card title"
+  },
+
+  "autoCareDesc": "Remote plant control",
+  "@autoCareDesc": {
+    "description": "Feature card description"
+  },
+
+  "community": "Community",
+  "@community": {
+    "description": "Feature card title"
+  },
+
+  "communityDesc": "Share & learn together",
+  "@communityDesc": {
+    "description": "Feature card description"
+  },
+
+  "healthAnalytics": "Health Analytics",
+  "@healthAnalytics": {
+    "description": "Feature card title"
+  },
+
+  "healthAnalyticsDesc": "Track plant progress",
+  "@healthAnalyticsDesc": {
+    "description": "Feature card description"
+  },
+
+  "createAccountFree": "Create an Account",
+  "@createAccountFree": {
+    "description": "Primary CTA button text on welcome page"
+  },
+
+  "alreadyHaveAccountWelcome": "I Already Have an Account",
+  "@alreadyHaveAccountWelcome": {
+    "description": "Secondary button text on welcome page"
+  },
+
+  "justWantToExplore": "Just want to explore?",
+  "@justWantToExplore": {
+    "description": "Guest mode section header"
+  },
+
+  "continueAsGuest": "Continue as Guest",
+  "@continueAsGuest": {
+    "description": "Guest mode button text"
+  },
+
+  "termsAndPrivacy": "By continuing, you agree to our Terms of Service and Privacy Policy",
+  "@termsAndPrivacy": {
+    "description": "Legal disclaimer text"
+  },
+
+  "demoMode": "Demo Mode",
+  "@demoMode": {
+    "description": "Demo mode banner title"
+  },
+
+  "demoBannerMessage": "These are sample plants. Sign up to add your own plants and access all features!",
+  "@demoBannerMessage": {
+    "description": "Demo mode banner message"
+  },
+
+  "demoPlant": "Demo Plant",
+  "@demoPlant": {
+    "description": "Demo plant banner title"
+  },
+
+  "demoPlantMessage": "This is a sample plant. Sign up to add your own plants and control them remotely!",
+  "@demoPlantMessage": {
+    "description": "Demo plant detail page message"
+  },
+
+  "premiumFeature": "Premium Feature",
+  "@premiumFeature": {
+    "description": "Premium feature dialog title"
+  },
+
+  "plantControlsMessage": "Plant controls are available for registered users only. Sign up to control your plants remotely and access smart automation features!",
+  "@plantControlsMessage": {
+    "description": "Plant controls restriction message"
+  },
+
+  "signUpRequired": "Sign Up Required",
+  "@signUpRequired": {
+    "description": "Sign up required dialog title"
+  },
+
+  "addPlantsMessage": "You need to sign up to add your own plants and access smart monitoring features. Join thousands of plant parents who trust Jack Pot!",
+  "@addPlantsMessage": {
+    "description": "Add plants restriction message"
+  },
+
+  "unlockAllFeatures": "Sign in to unlock this feature",
+  "@unlockAllFeatures": {
+    "description": "Generic unlock feature message"
+  },
+
+  "guestModeActive": "Guest Mode",
+  "@guestModeActive": {
+    "description": "Guest mode indicator in app bar"
+  },
+
+  "exploreFeatures": "Explore all the amazing features below!",
+  "@exploreFeatures": {
+    "description": "Encourage exploration in guest mode"
   }
 } 

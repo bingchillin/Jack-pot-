@@ -522,4 +522,11 @@ class AuthProvider extends ChangeNotifier {
       };
     }
   }
+
+  // Reset to welcome page (clears guest mode)
+  void resetToWelcome() {
+    _isGuestMode = false;
+    notifyListeners();
+    print('🏠 Reset to welcome page');
+  }
 }

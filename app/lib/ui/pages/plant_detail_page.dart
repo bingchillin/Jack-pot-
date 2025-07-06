@@ -407,7 +407,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Demo Plant',
+                          localizations.demoPlant,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -416,7 +416,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'This is a sample plant. Sign up to add your own plants and control them remotely!',
+                          localizations.demoPlantMessage,
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.blue[700],
@@ -437,9 +437,9 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    child: Text(
+                      localizations.signUp,
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],

@@ -74,6 +74,7 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
   }
 
   void _showGuestDialog(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -82,17 +83,17 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
           children: [
             Icon(Icons.lock_outline, color: Colors.orange[600]),
             const SizedBox(width: 8),
-            const Text('Premium Feature'),
+            Text(localizations.premiumFeature),
           ],
         ),
-        content: const Text(
-          'Plant controls are available for registered users only. Sign up to control your plants remotely and access smart automation features!',
-          style: TextStyle(height: 1.4),
+        content: Text(
+          localizations.plantControlsMessage,
+          style: const TextStyle(height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
+            child: Text(localizations.cancel, style: TextStyle(color: Colors.grey[600])),
           ),
           ElevatedButton(
             onPressed: () {
@@ -103,7 +104,7 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
               backgroundColor: Colors.green[600],
               foregroundColor: Colors.white,
             ),
-            child: const Text('Sign Up'),
+            child: Text(localizations.signUp),
           ),
         ],
       ),

@@ -368,4 +368,93 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tryAgain => 'Réessayer';
+
+  @override
+  String get welcomeToJackPot => 'Bienvenue dans le Futur du Soin des Plantes';
+
+  @override
+  String get smartPlantCareSimple => 'Soin Intelligent des Plantes Simplifié';
+
+  @override
+  String get welcomeDescription =>
+      'Surveillez vos plantes avec des capteurs IoT, recevez des recommandations intelligentes de soins et rejoignez une communauté de passionnés de plantes.';
+
+  @override
+  String get smartMonitoring => 'Surveillance Intelligente';
+
+  @override
+  String get smartMonitoringDesc => 'Données de capteurs en temps réel';
+
+  @override
+  String get autoCare => 'Soin Automatique';
+
+  @override
+  String get autoCareDesc => 'Contrôle à distance des plantes';
+
+  @override
+  String get community => 'Communauté';
+
+  @override
+  String get communityDesc => 'Partager et apprendre ensemble';
+
+  @override
+  String get healthAnalytics => 'Analyse de Santé';
+
+  @override
+  String get healthAnalyticsDesc => 'Suivez les progrès des plantes';
+
+  @override
+  String get createAccountFree => 'Créer un Compte';
+
+  @override
+  String get alreadyHaveAccountWelcome => 'J\'ai Déjà un Compte';
+
+  @override
+  String get justWantToExplore => 'Vous voulez juste explorer ?';
+
+  @override
+  String get continueAsGuest => 'Continuer comme Invité';
+
+  @override
+  String get termsAndPrivacy =>
+      'En continuant, vous acceptez nos Conditions de Service et notre Politique de Confidentialité';
+
+  @override
+  String get demoMode => 'Mode Démo';
+
+  @override
+  String get demoBannerMessage =>
+      'Ces sont des plantes d\'exemple. Inscrivez-vous pour ajouter vos propres plantes et accéder à toutes les fonctionnalités !';
+
+  @override
+  String get demoPlant => 'Plante Démo';
+
+  @override
+  String get demoPlantMessage =>
+      'Ceci est une plante d\'exemple. Inscrivez-vous pour ajouter vos propres plantes et les contrôler à distance !';
+
+  @override
+  String get premiumFeature => 'Fonctionnalité Premium';
+
+  @override
+  String get plantControlsMessage =>
+      'Les contrôles de plantes sont disponibles uniquement pour les utilisateurs inscrits. Inscrivez-vous pour contrôler vos plantes à distance et accéder aux fonctionnalités d\'automatisation intelligente !';
+
+  @override
+  String get signUpRequired => 'Inscription Requise';
+
+  @override
+  String get addPlantsMessage =>
+      'Vous devez vous inscrire pour ajouter vos propres plantes et accéder aux fonctionnalités de surveillance intelligente. Rejoignez des milliers de parents de plantes qui font confiance à Jack Pot !';
+
+  @override
+  String get unlockAllFeatures =>
+      'Connectez-vous pour débloquer cette fonctionnalité';
+
+  @override
+  String get guestModeActive => 'Mode Invité';
+
+  @override
+  String get exploreFeatures =>
+      'Explorez toutes les fonctionnalités incroyables ci-dessous !';
 }

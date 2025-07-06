@@ -24,6 +24,10 @@ class HomePageLogin extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Jack Pot - Guest Mode'),
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.green[50],
+        surfaceTintColor: Colors.green[50],
+        elevation: 0,
+        scrolledUnderElevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
