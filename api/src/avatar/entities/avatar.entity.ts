@@ -25,6 +25,12 @@ export class Avatar {
   @Column({ name: 'path_picture', length: 3000, nullable: true })
   pathPicture: string;
 
+  @Column({ name: 'type_p', nullable: true })
+  type_p: number;
+
+   @Column({ name: 'state_p', nullable: true })
+  state_p: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

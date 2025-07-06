@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { PlantType } from './entities/plant-type.entity';
 import { CreatePlantTypeDto } from './dto/create-plant-type.dto';
 import { UpdatePlantTypeDto } from './dto/update-plant-type.dto';
+import { ILike } from 'typeorm';
+
 
 @Injectable()
 export class PlantTypeService {
@@ -47,6 +49,16 @@ export class PlantTypeService {
 
         return plantType;
     }
+
+    async findAllByTitleLike(title: string): Promise<PlantType[]> {
+    return await this.plantTypeRepository.find({
+        where: {
+        title: ILike(`%${title}%`),
+        },
+        relations: ['avatars'],
+    });
+    }
+
 
     async update(id: number, updatePlantTypeDto: UpdatePlantTypeDto): Promise<PlantType> {
         const plantType = await this.findOne(id);
