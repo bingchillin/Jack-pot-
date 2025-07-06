@@ -30,5 +30,5 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/get_code_email': (_) => const GetCodeEmailPage(),
   '/reset_password': (_) => const ResetPasswordPage(),
   '/add_my_object': (_) => AddMyObjectPage(),
-  '/choose_your_plant': (_) => ChooseYouPlantPage(),
+  '/choose_your_plant': (_) => ChooseYourPlantPage(),
 };
