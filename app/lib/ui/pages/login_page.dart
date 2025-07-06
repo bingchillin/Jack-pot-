@@ -389,29 +389,18 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.only(left: 16, top: 16),
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.15),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: Icon(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(24),
+                  onTap: () => Navigator.pushReplacementNamed(context, '/'),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    alignment: Alignment.center,
+                    child: Icon(
                       Icons.arrow_back,
                       color: Colors.green[700],
                       size: 24,
                     ),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/');
-                    },
                   ),
                 ),
               ),

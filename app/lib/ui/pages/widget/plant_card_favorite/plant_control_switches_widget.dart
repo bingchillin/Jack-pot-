@@ -49,13 +49,21 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
     }
 
     try {
+      print('🔄 Updating $field to $value for plant ${widget.plant.idObjectProfile}');
+      
       await ObjectProfileService().updateObjectProfile(
         id: widget.plant.idObjectProfile.toString(),
         body: {field: value},
         token: token,
       );
+      
+      print('✅ Successfully updated $field to $value');
+      
+      // Small delay to ensure the global notification is sent
+      await Future.delayed(const Duration(milliseconds: 100));
+      
     } catch (e) {
-      print('Erreur lors de la mise à jour $field: $e');
+      print('❌ Error updating $field: $e');
       setState(() {
         if (field == "isAutomatic") isAutomatic = !value;
         if (field == "isWillWatering") isWillWatering = !value;
@@ -121,26 +129,30 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
                       color: value ? activeColor : Colors.grey[400],
                       borderRadius: BorderRadius.circular(7),
                     ),
-                    child: AnimatedAlign(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeInOut,
-                      alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        width: 12,
-                        height: 12,
-                        margin: const EdgeInsets.all(1),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.25),
-                              blurRadius: 3,
-                              offset: const Offset(0, 1),
+                    child: Stack(
+                      children: [
+                        AnimatedPositioned(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
+                          left: value ? 12 : 0,
+                          top: 1,
+                          child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(6),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.25),
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ],

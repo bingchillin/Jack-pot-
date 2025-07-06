@@ -240,4 +240,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noImage => 'No image';
+
+  @override
+  String get plantDetail => 'Plant Detail';
+
+  @override
+  String get tokenMissing => 'Token missing';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get plantOverview => 'Plant Overview';
+
+  @override
+  String get lastUpdated => 'Last Updated';
+
+  @override
+  String get nextWatering => 'Next Watering';
+
+  @override
+  String get healthScore => 'Health Score';
+
+  @override
+  String get sensorData => 'Sensor Data';
+
+  @override
+  String get soilMoisture => 'Soil Moisture';
+
+  @override
+  String get airHumidity => 'Air Humidity';
+
+  @override
+  String get temperature => 'Temperature';
+
+  @override
+  String get lightLevel => 'Light Level';
+
+  @override
+  String get soilPH => 'Soil pH';
+
+  @override
+  String get fertility => 'Fertility';
+
+  @override
+  String get groundTemp => 'Ground Temperature';
+
+  @override
+  String get sunExposure => 'Sun Exposure';
+
+  @override
+  String get optimal => 'Optimal';
+
+  @override
+  String get good => 'Good';
+
+  @override
+  String get moderate => 'Moderate';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get critical => 'Critical';
+
+  @override
+  String get notAvailable => 'Not available';
+
+  @override
+  String get plantCareAdvice => 'Plant Care Advice';
+
+  @override
+  String get careRecipe => 'Care Recipe';
+
+  @override
+  String get noAdviceAvailable => 'No advice available';
+
+  @override
+  String get noRecipeAvailable => 'No recipe available';
+
+  @override
+  String get minutesAgo => 'minutes ago';
+
+  @override
+  String get hoursAgo => 'hours ago';
+
+  @override
+  String get daysAgo => 'days ago';
+
+  @override
+  String get justNow => 'just now';
+
+  @override
+  String get tomorrow => 'tomorrow';
+
+  @override
+  String get today => 'today';
+
+  @override
+  String get loadingError => 'Loading error';
+
+  @override
+  String get stateExcellent => 'Excellent';
+
+  @override
+  String get stateGood => 'Good condition';
+
+  @override
+  String get stateFair => 'Fair';
+
+  @override
+  String get stateNeedsAttention => 'Needs attention';
+
+  @override
+  String get stateCritical => 'Critical state';
+
+  @override
+  String get stateUnknown => 'Unknown state';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get errorOccurred => 'An error occurred';
+
+  @override
+  String get tryAgain => 'Try Again';
 }

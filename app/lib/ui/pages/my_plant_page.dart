@@ -9,6 +9,7 @@ import '../../bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
 import '../../bloc/object_profile_my_list/object_profile_my_list_event.dart';
 import '../../models/object_profile.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/object_profile_service.dart';
 
 class MyPlantPage extends StatefulWidget {
   const MyPlantPage({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class MyPlantPage extends StatefulWidget {
   State<MyPlantPage> createState() => _MyPlantPageState();
 }
 
-class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin {
+class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin, WidgetsBindingObserver {
   late ObjectProfileBloc favoriteBloc;
   late ObjectProfileMyListBloc myListBloc;
   late AnimationController _animationController;
@@ -28,6 +29,9 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
     super.initState();
     favoriteBloc = context.read<ObjectProfileBloc>();
     myListBloc = context.read<ObjectProfileMyListBloc>();
+
+    // Add observer to detect when app comes back to foreground
+    WidgetsBinding.instance.addObserver(this);
 
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
@@ -47,16 +51,31 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _animationController.dispose();
     super.dispose();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      print('🔄 App resumed, refreshing plant data');
+      // Clear cache and refresh data when returning to app
+      ObjectProfileService.clearCache();
+      favoriteBloc.add(LoadProfiles());
+      myListBloc.add(LoadProfilesMyList());
+    }
+  }
+
   Future<void> _refreshFavorite() async {
+    ObjectProfileService.clearCache();
     favoriteBloc.add(LoadProfiles());
     await favoriteBloc.profilesStream.firstWhere((_) => true);
   }
 
   Future<void> _refreshMyList() async {
+    ObjectProfileService.clearCache();
     myListBloc.add(LoadProfilesMyList());
     await myListBloc.profilesStream.firstWhere((_) => true);
   }

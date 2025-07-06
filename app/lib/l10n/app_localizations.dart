@@ -555,6 +555,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No image'**
   String get noImage;
+
+  /// Plant detail page title
+  ///
+  /// In en, this message translates to:
+  /// **'Plant Detail'**
+  String get plantDetail;
+
+  /// Error message when token is missing
+  ///
+  /// In en, this message translates to:
+  /// **'Token missing'**
+  String get tokenMissing;
+
+  /// Close button text
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Plant overview section title
+  ///
+  /// In en, this message translates to:
+  /// **'Plant Overview'**
+  String get plantOverview;
+
+  /// Last updated label
+  ///
+  /// In en, this message translates to:
+  /// **'Last Updated'**
+  String get lastUpdated;
+
+  /// Next watering label
+  ///
+  /// In en, this message translates to:
+  /// **'Next Watering'**
+  String get nextWatering;
+
+  /// Health score label
+  ///
+  /// In en, this message translates to:
+  /// **'Health Score'**
+  String get healthScore;
+
+  /// Sensor data section title
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor Data'**
+  String get sensorData;
+
+  /// Soil moisture sensor label
+  ///
+  /// In en, this message translates to:
+  /// **'Soil Moisture'**
+  String get soilMoisture;
+
+  /// Air humidity sensor label
+  ///
+  /// In en, this message translates to:
+  /// **'Air Humidity'**
+  String get airHumidity;
+
+  /// Temperature sensor label
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get temperature;
+
+  /// Light level sensor label
+  ///
+  /// In en, this message translates to:
+  /// **'Light Level'**
+  String get lightLevel;
+
+  /// Soil pH sensor label
+  ///
+  /// In en, this message translates to:
+  /// **'Soil pH'**
+  String get soilPH;
+
+  /// Fertility sensor label
+  ///
+  /// In en, this message translates to:
+  /// **'Fertility'**
+  String get fertility;
+
+  /// Ground temperature sensor label
+  ///
+  /// In en, this message translates to:
+  /// **'Ground Temperature'**
+  String get groundTemp;
+
+  /// Sun exposure sensor label
+  ///
+  /// In en, this message translates to:
+  /// **'Sun Exposure'**
+  String get sunExposure;
+
+  /// Optimal sensor status
+  ///
+  /// In en, this message translates to:
+  /// **'Optimal'**
+  String get optimal;
+
+  /// Good sensor status
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get good;
+
+  /// Moderate sensor status
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get moderate;
+
+  /// Warning sensor status
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warning;
+
+  /// Critical sensor status
+  ///
+  /// In en, this message translates to:
+  /// **'Critical'**
+  String get critical;
+
+  /// Not available text
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get notAvailable;
+
+  /// Plant care advice section title
+  ///
+  /// In en, this message translates to:
+  /// **'Plant Care Advice'**
+  String get plantCareAdvice;
+
+  /// Care recipe section title
+  ///
+  /// In en, this message translates to:
+  /// **'Care Recipe'**
+  String get careRecipe;
+
+  /// No advice available text
+  ///
+  /// In en, this message translates to:
+  /// **'No advice available'**
+  String get noAdviceAvailable;
+
+  /// No recipe available text
+  ///
+  /// In en, this message translates to:
+  /// **'No recipe available'**
+  String get noRecipeAvailable;
+
+  /// Minutes ago text
+  ///
+  /// In en, this message translates to:
+  /// **'minutes ago'**
+  String get minutesAgo;
+
+  /// Hours ago text
+  ///
+  /// In en, this message translates to:
+  /// **'hours ago'**
+  String get hoursAgo;
+
+  /// Days ago text
+  ///
+  /// In en, this message translates to:
+  /// **'days ago'**
+  String get daysAgo;
+
+  /// Just now text
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get justNow;
+
+  /// Tomorrow text
+  ///
+  /// In en, this message translates to:
+  /// **'tomorrow'**
+  String get tomorrow;
+
+  /// Today text
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get today;
+
+  /// Loading error message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading error'**
+  String get loadingError;
+
+  /// Excellent plant state
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get stateExcellent;
+
+  /// Good plant state
+  ///
+  /// In en, this message translates to:
+  /// **'Good condition'**
+  String get stateGood;
+
+  /// Fair plant state
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get stateFair;
+
+  /// Needs attention plant state
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get stateNeedsAttention;
+
+  /// Critical plant state
+  ///
+  /// In en, this message translates to:
+  /// **'Critical state'**
+  String get stateCritical;
+
+  /// Unknown plant state
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown state'**
+  String get stateUnknown;
+
+  /// Loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// General error message
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred'**
+  String get errorOccurred;
+
+  /// Button text to retry an action
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgain;
 }
 
 class _AppLocalizationsDelegate
