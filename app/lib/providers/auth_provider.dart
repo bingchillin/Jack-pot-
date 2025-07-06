@@ -14,6 +14,7 @@ class AuthProvider extends ChangeNotifier {
   Map<String, dynamic>? _userData;
   Map<String, dynamic>? _user;
   bool _isLoadingUser = true;
+  bool _isGuestMode = false;
   Timer? _refreshTimer;
 
   // Getters
@@ -25,6 +26,7 @@ class AuthProvider extends ChangeNotifier {
   Map<String, dynamic>? get user => _user;
   bool get isLoggedIn => _isAuthenticated;
   bool get isLoadingUser => _isLoadingUser;
+  bool get isGuestMode => _isGuestMode;
 
   String? _firstName;
   String? get firstName => _firstName;
@@ -189,6 +191,9 @@ class AuthProvider extends ChangeNotifier {
         // Setup automatic refresh
         _setupTokenRefreshTimer();
 
+        // Disable guest mode when user logs in
+        disableGuestMode();
+
         notifyListeners();
         print('✅ Login successful - persistent auth enabled');
         return true;
@@ -256,6 +261,9 @@ class AuthProvider extends ChangeNotifier {
         // Setup automatic refresh
         _setupTokenRefreshTimer();
 
+        // Disable guest mode when user signs up
+        disableGuestMode();
+
         _isLoadingUser = false;
         notifyListeners();
         print('✅ Signup successful - persistent auth enabled');
@@ -270,6 +278,54 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Enable guest mode
+  void enableGuestMode() {
+    _isGuestMode = true;
+    _isLoadingUser = false;
+    notifyListeners();
+    print('👤 Guest mode enabled');
+  }
+
+  // Disable guest mode (when user logs in)
+  void disableGuestMode() {
+    _isGuestMode = false;
+    notifyListeners();
+    print('👤 Guest mode disabled');
+  }
+
+  // Check if user has access to a feature
+  bool hasAccess(String feature) {
+    if (_isAuthenticated) return true;
+    if (!_isGuestMode) return false;
+    
+    // Define guest-accessible features
+    const guestFeatures = [
+      'view_plants',
+      'view_advice', 
+      'view_events',
+      'view_plant_details',
+      'browse_catalog',
+    ];
+    
+    return guestFeatures.contains(feature);
+  }
+
+  // Check if user needs to login for a feature
+  bool needsLogin(String feature) {
+    if (_isAuthenticated) return false;
+    
+    const loginRequiredFeatures = [
+      'add_plants',
+      'control_devices',
+      'create_posts',
+      'save_favorites',
+      'edit_profile',
+      'personal_data',
+    ];
+    
+    return loginRequiredFeatures.contains(feature);
+  }
+
   // Clear all authentication data
   Future<void> _clearAuthData() async {
     _isAuthenticated = false;
@@ -279,6 +335,7 @@ class AuthProvider extends ChangeNotifier {
     _userData = null;
     _user = null;
     _firstName = null;
+    _isGuestMode = false;
     _refreshTimer?.cancel();
 
     final prefs = await SharedPreferences.getInstance();

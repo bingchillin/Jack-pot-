@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('JACKPOT HOME GOOD LOGIN'),
+        title: const Text('Jack Pot'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(

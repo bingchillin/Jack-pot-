@@ -149,8 +149,8 @@ class _AdvisePageState extends State<AdvisePage> {
                                 Expanded(
                                   child: Text(
                                     authProvider.isAuthenticated 
-                                        ? 'Partagez votre expérience...'
-                                        : 'Connectez-vous pour partager...',
+                                        ? 'Share your plant experience...'
+                                        : 'Sign in to share your thoughts...',
                                     style: TextStyle(
                                       color: authProvider.isAuthenticated 
                                           ? Colors.grey.shade600 
@@ -301,7 +301,7 @@ class _AdvisePageState extends State<AdvisePage> {
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Connectez-vous pour créer un post'),
+                          content: Text('Sign in to create posts'),
                           backgroundColor: Colors.orange,
                         ),
                       );
@@ -333,17 +333,38 @@ class _AdvisePageState extends State<AdvisePage> {
   void _showCreatePostModal(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (!authProvider.isAuthenticated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Connectez-vous pour créer un post'),
-          backgroundColor: Colors.orange,
-          action: SnackBarAction(
-            label: 'Se connecter',
-            textColor: Colors.white,
-            onPressed: (){
-              Navigator.pushNamed(context, '/login');
-            },
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.lock_outline, color: Colors.orange[600]),
+              const SizedBox(width: 8),
+              const Text('Sign In Required'),
+            ],
           ),
+          content: const Text(
+            'You need to sign in to create posts and join the conversation. Sign up for free to share your plant experiences!',
+            style: TextStyle(height: 1.4),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/login');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[600],
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Sign In'),
+            ),
+          ],
         ),
       );
       return;
