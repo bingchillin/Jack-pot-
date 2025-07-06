@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import '../../../bloc/comment/comment_bloc.dart';
-import '../../../bloc/comment/comment_event.dart';
+import '../../../bloc/comment/comment_list_bloc.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/comment_service.dart';
 
 class CreatePostModal extends StatefulWidget {
   const CreatePostModal({Key? key}) : super(key: key);
@@ -176,13 +176,11 @@ class _CreatePostModalState extends State<CreatePostModal> {
     });
 
     try {
-      context.read<CommentBloc>().add(
-        CreateComment(content: content),
-      );
-
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      await CommentService().createComment(content: content, token: token!);
       // Rafraîchir la liste des commentaires après la création
-      context.read<CommentBloc>().add(const LoadComments());
-
+      context.read<CommentListBloc>().add(LoadComments());
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Post publié !')),

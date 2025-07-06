@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import '../../../bloc/comment/comment_bloc.dart';
-import '../../../bloc/comment/comment_event.dart';
+import '../../../bloc/comment/comment_list_bloc.dart';
 import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/comment_service.dart';
 
 class CreateReplyModal extends StatefulWidget {
   final Comment parentComment;
@@ -227,13 +227,14 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
     });
 
     try {
-      context.read<CommentBloc>().add(
-        CreateComment(
-          content: content,
-          parentCommentId: widget.parentComment.idComment,
-        ),
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      await CommentService().createComment(
+        content: content,
+        parentCommentId: widget.parentComment.idComment,
+        token: token!,
       );
-
+      context.read<CommentListBloc>().add(LoadComments());
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Réponse publiée !')),
