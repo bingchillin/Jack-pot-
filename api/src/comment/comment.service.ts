@@ -1,258 +1,137 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
-import { CommentLike } from './entities/comment-like.entity';
-import { Person } from '../person/entities/person.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { CommentResponseDto } from './dto/comment-response.dto';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
-    @InjectRepository(CommentLike)
-    private commentLikeRepository: Repository<CommentLike>,
-    @InjectRepository(Person)
-    private personRepository: Repository<Person>,
   ) {}
 
-  async create(createCommentDto: CreateCommentDto, userId: number): Promise<CommentResponseDto> {
-    try {
-      console.log('Creating comment with data:', { createCommentDto, userId });
-      
-      // Vérifier que l'utilisateur existe
-      const person = await this.personRepository.findOne({ where: { idPerson: userId } });
-      if (!person) {
-        throw new NotFoundException('Utilisateur non trouvé');
-      }
-      console.log('User found:', person.idPerson);
+  async create(createCommentDto: CreateCommentDto): Promise<Comment> {
+    const { parentCommentId, ...commentData } = createCommentDto;
 
-      // Si c'est une réponse, vérifier que le commentaire parent existe
-      if (createCommentDto.parentCommentId) {
-        const parentComment = await this.commentRepository.findOne({
-          where: { idComment: createCommentDto.parentCommentId, isDeleted: false }
-        });
-        if (!parentComment) {
-          throw new NotFoundException('Commentaire parent non trouvé');
-        }
-        console.log('Parent comment found:', parentComment.idComment);
-      }
-
-      const comment = this.commentRepository.create({
-        content: createCommentDto.content,
-        idPerson: userId,
-        parentCommentId: createCommentDto.parentCommentId,
+    // If parentCommentId is provided, verify the parent comment exists
+    if (parentCommentId) {
+      const parentComment = await this.commentRepository.findOne({
+        where: { idComment: parentCommentId, isDeleted: false },
       });
-
-      console.log('Comment created:', comment);
-      const savedComment = await this.commentRepository.save(comment);
-      console.log('Comment saved:', savedComment);
-
-      // Recharge avec toutes les relations nécessaires
-      const savedCommentWithRelations = await this.commentRepository
-        .createQueryBuilder('comment')
-        .leftJoinAndSelect('comment.person', 'person')
-        .leftJoinAndSelect('comment.likes', 'likes')
-        .leftJoinAndSelect('comment.replies', 'replies')
-        .where('comment.idComment = :id', { id: savedComment.idComment })
-        .getOne();
       
-      if (!savedCommentWithRelations) {
-        throw new Error('Commentaire non trouvé après sauvegarde');
+      if (!parentComment) {
+        throw new NotFoundException(`Parent comment with ID ${parentCommentId} not found`);
       }
-      
-      console.log('Comment with relations:', {
-        id: savedCommentWithRelations.idComment,
-        hasPerson: !!savedCommentWithRelations.person,
-        hasLikes: !!savedCommentWithRelations.likes,
-        hasReplies: !!savedCommentWithRelations.replies,
-      });
-
-      return this.formatCommentResponse(savedCommentWithRelations, userId);
-    } catch (error) {
-      console.error('Error in create method:', error);
-      throw error;
-    }
-  }
-
-  async findAll(userId?: number, parentCommentId?: number): Promise<CommentResponseDto[]> {
-    const query = this.commentRepository
-      .createQueryBuilder('comment')
-      .leftJoinAndSelect('comment.person', 'person')
-      .leftJoinAndSelect('comment.likes', 'likes')
-      .leftJoinAndSelect('comment.replies', 'replies')
-      .where('comment.isDeleted = :isDeleted', { isDeleted: false });
-
-    if (parentCommentId !== undefined) {
-      query.andWhere('comment.parentCommentId = :parentCommentId', { parentCommentId });
-    } else {
-      query.andWhere('comment.parentCommentId IS NULL');
     }
 
-    const comments = await query
-      .orderBy('comment.createdAt', 'DESC')
-      .getMany();
-
-    return Promise.all(comments.map(comment => this.formatCommentResponse(comment, userId)));
-  }
-
-  async findOne(id: number, userId?: number): Promise<CommentResponseDto> {
-    const comment = await this.commentRepository
-      .createQueryBuilder('comment')
-      .leftJoinAndSelect('comment.person', 'person')
-      .leftJoinAndSelect('comment.likes', 'likes')
-      .leftJoinAndSelect('comment.replies', 'replies')
-      .leftJoinAndSelect('replies.person', 'replyPerson')
-      .leftJoinAndSelect('replies.likes', 'replyLikes')
-      .where('comment.idComment = :id', { id })
-      .andWhere('comment.isDeleted = :isDeleted', { isDeleted: false })
-      .orderBy('replies.createdAt', 'ASC')
-      .getOne();
-
-    if (!comment) {
-      throw new NotFoundException('Commentaire non trouvé');
-    }
-
-    return this.formatCommentResponse(comment, userId);
-  }
-
-  async update(id: number, updateCommentDto: UpdateCommentDto, userId: number): Promise<CommentResponseDto> {
-    const comment = await this.commentRepository.findOne({
-      where: { idComment: id, isDeleted: false },
-      relations: ['person', 'likes', 'replies']
+    const comment = this.commentRepository.create({
+      ...commentData,
+      parentComment: parentCommentId ? { idComment: parentCommentId } : null,
     });
 
-    if (!comment) {
-      throw new NotFoundException('Commentaire non trouvé');
+    return await this.commentRepository.save(comment);
+  }
+
+  // Timeline: Get all posts (comments with no parent)
+  async getTimeline(includeDeleted: boolean = false): Promise<Comment[]> {
+    const whereCondition = includeDeleted 
+      ? { parentComment: null } 
+      : { parentComment: null, isDeleted: false };
+    
+    return await this.commentRepository.find({
+      where: whereCondition,
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  // Post detail: Get original post + all its comments
+  async getPostWithComments(postId: number, includeDeleted: boolean = false): Promise<Comment[]> {
+    const whereConditions = includeDeleted 
+      ? [
+          { idComment: postId }, // The original post
+          { parentComment: { idComment: postId } } // All comments on that post
+        ]
+      : [
+          { idComment: postId, isDeleted: false },
+          { parentComment: { idComment: postId }, isDeleted: false }
+        ];
+
+    const comments = await this.commentRepository.find({
+      where: whereConditions,
+      relations: ['parentComment'],
+      order: { createdAt: 'ASC' },
+    });
+    
+    if (comments.length === 0) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
     }
 
-    if (comment.idPerson !== userId) {
-      throw new ForbiddenException('Vous ne pouvez pas modifier ce commentaire');
+    // Ensure the original post is first, then all comments
+    const originalPost = comments.find(c => c.idComment === postId);
+    const replies = comments.filter(c => c.idComment !== postId);
+    
+    return originalPost ? [originalPost, ...replies] : comments;
+  }
+
+  // Get all comments for a specific parent (useful for lazy loading)
+  async getCommentsByParentId(parentId: number, includeDeleted: boolean = false): Promise<Comment[]> {
+    const whereCondition = includeDeleted 
+      ? { parentComment: { idComment: parentId } }
+      : { parentComment: { idComment: parentId }, isDeleted: false };
+
+    return await this.commentRepository.find({
+      where: whereCondition,
+      relations: ['parentComment'],
+      order: { createdAt: 'ASC' },
+    });
+  }
+
+  async findOne(id: number, includeDeleted: boolean = false): Promise<Comment> {
+    const whereCondition = includeDeleted 
+      ? { idComment: id } 
+      : { idComment: id, isDeleted: false };
+
+    const comment = await this.commentRepository.findOne({
+      where: whereCondition,
+      relations: ['parentComment'],
+    });
+    
+    if (!comment) {
+      throw new NotFoundException(`Comment with ID ${id} not found`);
+    }
+
+    return comment;
+  }
+
+  async update(id: number, updateCommentDto: UpdateCommentDto): Promise<Comment> {
+    const comment = await this.findOne(id);
+    
+    // Prevent updating deleted comments unless explicitly restoring them
+    if (comment.isDeleted && updateCommentDto.isDeleted !== false) {
+      throw new BadRequestException('Cannot update a deleted comment');
     }
 
     Object.assign(comment, updateCommentDto);
-    const updatedComment = await this.commentRepository.save(comment);
-    return this.formatCommentResponse(updatedComment, userId);
+    return await this.commentRepository.save(comment);
   }
 
-  async remove(id: number, userId: number): Promise<void> {
-    const comment = await this.commentRepository.findOne({
-      where: { idComment: id, isDeleted: false }
-    });
-
-    if (!comment) {
-      throw new NotFoundException('Commentaire non trouvé');
-    }
-
-    if (comment.idPerson !== userId) {
-      throw new ForbiddenException('Vous ne pouvez pas supprimer ce commentaire');
-    }
-
-    // Soft delete
+  async remove(id: number): Promise<void> {
+    const comment = await this.findOne(id);
     comment.isDeleted = true;
     comment.deletedAt = new Date();
     await this.commentRepository.save(comment);
   }
 
-  async likeComment(commentId: number, userId: number): Promise<{ liked: boolean }> {
-    const comment = await this.commentRepository.findOne({
-      where: { idComment: commentId, isDeleted: false }
-    });
-
-    if (!comment) {
-      throw new NotFoundException('Commentaire non trouvé');
+  async restore(id: number): Promise<Comment> {
+    const comment = await this.findOne(id, true);
+    if (!comment.isDeleted) {
+      throw new BadRequestException('Comment is not deleted');
     }
-
-    const existingLike = await this.commentLikeRepository.findOne({
-      where: { idComment: commentId, idPerson: userId }
-    });
-
-    if (existingLike) {
-      // Unlike
-      await this.commentLikeRepository.remove(existingLike);
-      return { liked: false };
-    } else {
-      // Like
-      const like = this.commentLikeRepository.create({
-        idComment: commentId,
-        idPerson: userId
-      });
-      await this.commentLikeRepository.save(like);
-      return { liked: true };
-    }
+    
+    comment.isDeleted = false;
+    comment.deletedAt = null;
+    return await this.commentRepository.save(comment);
   }
-
-  async getReplies(commentId: number, userId?: number): Promise<CommentResponseDto[]> {
-    const replies = await this.commentRepository
-      .createQueryBuilder('comment')
-      .leftJoinAndSelect('comment.person', 'person')
-      .leftJoinAndSelect('comment.likes', 'likes')
-      .where('comment.parentCommentId = :commentId', { commentId })
-      .andWhere('comment.isDeleted = :isDeleted', { isDeleted: false })
-      .orderBy('comment.createdAt', 'ASC')
-      .getMany();
-
-    return Promise.all(replies.map(reply => this.formatCommentResponse(reply, userId)));
-  }
-
-  private async formatCommentResponse(comment: Comment, userId?: number): Promise<CommentResponseDto> {
-    try {
-      console.log('Formatting comment:', comment.idComment);
-      
-      if (!comment.person) {
-        console.error('Comment person is null for comment:', comment.idComment);
-        throw new Error('Person relation not loaded for comment');
-      }
-
-      // Compter les likes
-      const likeCount = comment.likes?.length || 0;
-
-      // Compter les réponses
-      const replyCount = comment.replies?.filter(reply => !reply.isDeleted).length || 0;
-
-      // Vérifier si l'utilisateur actuel a liké ce commentaire
-      const isLikedByCurrentUser = userId ? 
-        comment.likes?.some(like => like.idPerson === userId) || false : 
-        false;
-
-      // Formater les réponses récursivement
-      const formattedReplies = comment.replies ? 
-        await Promise.all(
-          comment.replies
-            .filter(reply => !reply.isDeleted)
-            .map(reply => this.formatCommentResponse(reply, userId))
-        ) : 
-        [];
-
-      const response = {
-        idComment: comment.idComment,
-        content: comment.content,
-        idPerson: comment.idPerson,
-        person: {
-          idPerson: comment.person.idPerson,
-          firstname: comment.person.firstname,
-          surname: comment.person.surname,
-          email: comment.person.email,
-        },
-        parentCommentId: comment.parentCommentId,
-        isDeleted: comment.isDeleted,
-        deletedAt: comment.deletedAt,
-        createdAt: comment.createdAt,
-        updatedAt: comment.updatedAt,
-        likeCount,
-        replyCount,
-        isLikedByCurrentUser,
-        replies: formattedReplies,
-      };
-
-      console.log('Formatted comment response:', response.idComment);
-      return response;
-    } catch (error) {
-      console.error('Error in formatCommentResponse:', error);
-      throw error;
-    }
-  }
-} 
+}
