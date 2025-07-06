@@ -64,61 +64,23 @@ class _RootAppState extends State<RootApp> {
     final token = authProvider.accessToken;
     final personIdStr = authProvider.userId;
 
-    if (token == null || token.isEmpty || personIdStr == null) {
-      return MaterialApp(
-        title: 'Jackpot App',
-        theme: appTheme,
-        routes: appRoutes,
-        initialRoute: '/',
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en', ''),
-          Locale('fr', ''),
-          Locale('es', ''),
-        ],
-        localeResolutionCallback: (locale, supportedLocales) {
-          // Debug: Print locale info
-          print('🌍 Device locale: $locale');
-          print('🌍 Supported locales: $supportedLocales');
-          
-          // Check if the current device locale is supported
-          if (locale != null) {
-            for (var supportedLocale in supportedLocales) {
-              if (supportedLocale.languageCode == locale.languageCode) {
-                print('🌍 Using locale: $supportedLocale');
-                return supportedLocale;
-              }
-            }
-          }
-          // If not supported, return the first supported locale (English)
-          print('🌍 Falling back to: ${supportedLocales.first}');
-          return supportedLocales.first;
-        },
-      );
-    }
-
-    final personId = int.parse(personIdStr);
-
+    // Bloc global pour les commentaires, même sans connexion
     return MultiBlocProvider(
       providers: [
-        BlocProvider<ObjectProfileBloc>(
-          create: (_) => ObjectProfileBloc(
-            provider: PlantProvider(baseUrl: AppConfig.baseUrl, token: token),
-            personId: personId,
-          )..add(LoadProfiles()),
-        ),
-        BlocProvider<ObjectProfileMyListBloc>(
-          create: (_) => ObjectProfileMyListBloc(
-            provider: PlantProviderMyList(baseUrl: AppConfig.baseUrl, token: token),
-            personId: personId,
-          )..add(LoadProfilesMyList()),
-        ),
+        if (token != null && token.isNotEmpty && personIdStr != null) ...[
+          BlocProvider<ObjectProfileBloc>(
+            create: (_) => ObjectProfileBloc(
+              provider: PlantProvider(baseUrl: AppConfig.baseUrl, token: token),
+              personId: int.parse(personIdStr),
+            )..add(LoadProfiles()),
+          ),
+          BlocProvider<ObjectProfileMyListBloc>(
+            create: (_) => ObjectProfileMyListBloc(
+              provider: PlantProviderMyList(baseUrl: AppConfig.baseUrl, token: token),
+              personId: int.parse(personIdStr),
+            )..add(LoadProfilesMyList()),
+          ),
+        ],
         BlocProvider<CommentBloc>(
           create: (_) => CommentBloc(
             commentService: CommentService(),
@@ -147,7 +109,6 @@ class _RootAppState extends State<RootApp> {
           // Debug: Print locale info
           print('🌍 Device locale: $locale');
           print('🌍 Supported locales: $supportedLocales');
-          
           // Check if the current device locale is supported
           if (locale != null) {
             for (var supportedLocale in supportedLocales) {
@@ -158,7 +119,7 @@ class _RootAppState extends State<RootApp> {
             }
           }
           // If not supported, return the first supported locale (English)
-          print('🌍 Falling back to: ${supportedLocales.first}');
+          print('🌍 Falling back to: [38;5;2m${supportedLocales.first}[0m');
           return supportedLocales.first;
         },
       ),
