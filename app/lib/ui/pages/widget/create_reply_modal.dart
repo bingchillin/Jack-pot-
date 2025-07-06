@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import '../../../bloc/comment/comment_list_bloc.dart';
+import '../../../bloc/comment/comment_replies_bloc.dart';
+import '../../../bloc/comment/comment_replies_event.dart';
+import '../../../bloc/comment/comment_replies_state.dart';
 import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/comment_service.dart';
@@ -234,7 +237,10 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
         parentCommentId: widget.parentComment.idComment,
         token: token!,
       );
-      context.read<CommentListBloc>().add(LoadComments());
+      // Rafraîchir les réponses du commentaire parent
+      context.read<CommentRepliesBloc>().add(RefreshReplies(widget.parentComment.idComment));
+      // Rafraîchir aussi la liste des commentaires pour mettre à jour le replyCount
+      context.read<CommentListBloc>().add(RefreshComments());
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Réponse publiée !')),

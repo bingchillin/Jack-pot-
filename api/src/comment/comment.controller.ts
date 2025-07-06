@@ -21,6 +21,8 @@ export class CommentController {
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 404, description: 'Commentaire parent non trouvé' })
   create(@Body() createCommentDto: CreateCommentDto, @Request() req) {
+    console.log('Controller create - req.user:', req.user);
+    console.log('Controller create - userId:', req.user.idPerson);
     return this.commentService.create(createCommentDto, req.user.idPerson);
   }
 
