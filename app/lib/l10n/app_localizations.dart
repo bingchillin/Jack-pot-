@@ -807,6 +807,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try Again'**
   String get tryAgain;
+
+  /// Welcome page main title
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to the Future of Plant Care'**
+  String get welcomeToJackPot;
+
+  /// App tagline on welcome page
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Plant Care Made Simple'**
+  String get smartPlantCareSimple;
+
+  /// Welcome page description
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor your plants with IoT sensors, get smart care recommendations, and join a community of plant enthusiasts.'**
+  String get welcomeDescription;
+
+  /// Feature card title
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Monitoring'**
+  String get smartMonitoring;
+
+  /// Feature card description
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time sensor data'**
+  String get smartMonitoringDesc;
+
+  /// Feature card title
+  ///
+  /// In en, this message translates to:
+  /// **'Auto Care'**
+  String get autoCare;
+
+  /// Feature card description
+  ///
+  /// In en, this message translates to:
+  /// **'Remote plant control'**
+  String get autoCareDesc;
+
+  /// Feature card title
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get community;
+
+  /// Feature card description
+  ///
+  /// In en, this message translates to:
+  /// **'Share & learn together'**
+  String get communityDesc;
+
+  /// Feature card title
+  ///
+  /// In en, this message translates to:
+  /// **'Health Analytics'**
+  String get healthAnalytics;
+
+  /// Feature card description
+  ///
+  /// In en, this message translates to:
+  /// **'Track plant progress'**
+  String get healthAnalyticsDesc;
+
+  /// Primary CTA button text on welcome page
+  ///
+  /// In en, this message translates to:
+  /// **'Create an Account'**
+  String get createAccountFree;
+
+  /// Secondary button text on welcome page
+  ///
+  /// In en, this message translates to:
+  /// **'I Already Have an Account'**
+  String get alreadyHaveAccountWelcome;
+
+  /// Guest mode section header
+  ///
+  /// In en, this message translates to:
+  /// **'Just want to explore?'**
+  String get justWantToExplore;
+
+  /// Guest mode button text
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Guest'**
+  String get continueAsGuest;
+
+  /// Legal disclaimer text
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our Terms of Service and Privacy Policy'**
+  String get termsAndPrivacy;
+
+  /// Demo mode banner title
+  ///
+  /// In en, this message translates to:
+  /// **'Demo Mode'**
+  String get demoMode;
+
+  /// Demo mode banner message
+  ///
+  /// In en, this message translates to:
+  /// **'These are sample plants. Sign up to add your own plants and access all features!'**
+  String get demoBannerMessage;
+
+  /// Demo plant banner title
+  ///
+  /// In en, this message translates to:
+  /// **'Demo Plant'**
+  String get demoPlant;
+
+  /// Demo plant detail page message
+  ///
+  /// In en, this message translates to:
+  /// **'This is a sample plant. Sign up to add your own plants and control them remotely!'**
+  String get demoPlantMessage;
+
+  /// Premium feature dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Feature'**
+  String get premiumFeature;
+
+  /// Plant controls restriction message
+  ///
+  /// In en, this message translates to:
+  /// **'Plant controls are available for registered users only. Sign up to control your plants remotely and access smart automation features!'**
+  String get plantControlsMessage;
+
+  /// Sign up required dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up Required'**
+  String get signUpRequired;
+
+  /// Add plants restriction message
+  ///
+  /// In en, this message translates to:
+  /// **'You need to sign up to add your own plants and access smart monitoring features. Join thousands of plant parents who trust Jack Pot!'**
+  String get addPlantsMessage;
+
+  /// Generic unlock feature message
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to unlock this feature'**
+  String get unlockAllFeatures;
+
+  /// Guest mode indicator in app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Mode'**
+  String get guestModeActive;
+
+  /// Encourage exploration in guest mode
+  ///
+  /// In en, this message translates to:
+  /// **'Explore all the amazing features below!'**
+  String get exploreFeatures;
 }
 
 class _AppLocalizationsDelegate

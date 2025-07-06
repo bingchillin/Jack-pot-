@@ -255,6 +255,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
               backgroundColor: Colors.white,
               child: CustomScrollView(
                 slivers: [
+                  
                   // Favorites Section
                   SliverToBoxAdapter(
                     child: _buildSectionHeader(

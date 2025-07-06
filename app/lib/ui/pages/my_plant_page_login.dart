@@ -266,7 +266,7 @@ class _MyPlantPageLoginState extends State<MyPlantPageLogin> with TickerProvider
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Demo Mode',
+                  localizations.demoMode,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -275,7 +275,7 @@ class _MyPlantPageLoginState extends State<MyPlantPageLogin> with TickerProvider
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'These are sample plants. Sign up to add your own plants and access all features!',
+                  localizations.demoBannerMessage,
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.blue[700],
@@ -296,9 +296,9 @@ class _MyPlantPageLoginState extends State<MyPlantPageLogin> with TickerProvider
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text(
-              'Sign Up',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            child: Text(
+              localizations.signUp,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -360,6 +360,7 @@ class _MyPlantPageLoginState extends State<MyPlantPageLogin> with TickerProvider
   }
 
   void _showAddPlantDialog() {
+    final localizations = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -368,17 +369,17 @@ class _MyPlantPageLoginState extends State<MyPlantPageLogin> with TickerProvider
           children: [
             Icon(Icons.lock_outline, color: Colors.orange[600]),
             const SizedBox(width: 8),
-            const Text('Sign Up Required'),
+            Text(localizations.signUpRequired),
           ],
         ),
-        content: const Text(
-          'You need to sign up to add your own plants and access smart monitoring features. Join thousands of plant parents who trust Jack Pot!',
+        content: Text(
+          localizations.addPlantsMessage,
           style: TextStyle(height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
+            child: Text(localizations.cancel, style: TextStyle(color: Colors.grey[600])),
           ),
           ElevatedButton(
             onPressed: () {
@@ -389,7 +390,7 @@ class _MyPlantPageLoginState extends State<MyPlantPageLogin> with TickerProvider
               backgroundColor: Colors.green[600],
               foregroundColor: Colors.white,
             ),
-            child: const Text('Sign Up'),
+            child: Text(localizations.signUp),
           ),
         ],
       ),

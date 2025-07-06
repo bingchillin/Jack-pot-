@@ -24,6 +24,10 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Jack Pot'),
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.green[50],
+        surfaceTintColor: Colors.green[50],
+        elevation: 0,
+        scrolledUnderElevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.person),

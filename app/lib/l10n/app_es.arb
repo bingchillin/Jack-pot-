@@ -589,5 +589,140 @@
   "tryAgain": "Intentar de nuevo",
   "@tryAgain": {
     "description": "Button text to retry an action"
+  },
+
+  "welcomeToJackPot": "Bienvenido al Futuro del Cuidado de Plantas",
+  "@welcomeToJackPot": {
+    "description": "Welcome page main title"
+  },
+
+  "smartPlantCareSimple": "Cuidado Inteligente de Plantas Simplificado",
+  "@smartPlantCareSimple": {
+    "description": "App tagline on welcome page"
+  },
+
+  "welcomeDescription": "Monitorea tus plantas con sensores IoT, recibe recomendaciones inteligentes de cuidado y únete a una comunidad de entusiastas de las plantas.",
+  "@welcomeDescription": {
+    "description": "Welcome page description"
+  },
+
+  "smartMonitoring": "Monitoreo Inteligente",
+  "@smartMonitoring": {
+    "description": "Feature card title"
+  },
+
+  "smartMonitoringDesc": "Datos de sensores en tiempo real",
+  "@smartMonitoringDesc": {
+    "description": "Feature card description"
+  },
+
+  "autoCare": "Cuidado Automático",
+  "@autoCare": {
+    "description": "Feature card title"
+  },
+
+  "autoCareDesc": "Control remoto de plantas",
+  "@autoCareDesc": {
+    "description": "Feature card description"
+  },
+
+  "community": "Comunidad",
+  "@community": {
+    "description": "Feature card title"
+  },
+
+  "communityDesc": "Comparte y aprende juntos",
+  "@communityDesc": {
+    "description": "Feature card description"
+  },
+
+  "healthAnalytics": "Análisis de Salud",
+  "@healthAnalytics": {
+    "description": "Feature card title"
+  },
+
+  "healthAnalyticsDesc": "Rastrea el progreso de las plantas",
+  "@healthAnalyticsDesc": {
+    "description": "Feature card description"
+  },
+
+  "createAccountFree": "Crear una Cuenta",
+  "@createAccountFree": {
+    "description": "Primary CTA button text on welcome page"
+  },
+
+  "alreadyHaveAccountWelcome": "Ya Tengo una Cuenta",
+  "@alreadyHaveAccountWelcome": {
+    "description": "Secondary button text on welcome page"
+  },
+
+  "justWantToExplore": "¿Solo quieres explorar?",
+  "@justWantToExplore": {
+    "description": "Guest mode section header"
+  },
+
+  "continueAsGuest": "Continuar como Invitado",
+  "@continueAsGuest": {
+    "description": "Guest mode button text"
+  },
+
+  "termsAndPrivacy": "Al continuar, aceptas nuestros Términos de Servicio y Política de Privacidad",
+  "@termsAndPrivacy": {
+    "description": "Legal disclaimer text"
+  },
+
+  "demoMode": "Modo Demo",
+  "@demoMode": {
+    "description": "Demo mode banner title"
+  },
+
+  "demoBannerMessage": "Estas son plantas de muestra. ¡Regístrate para agregar tus propias plantas y acceder a todas las funciones!",
+  "@demoBannerMessage": {
+    "description": "Demo mode banner message"
+  },
+
+  "demoPlant": "Planta Demo",
+  "@demoPlant": {
+    "description": "Demo plant banner title"
+  },
+
+  "demoPlantMessage": "Esta es una planta de muestra. ¡Regístrate para agregar tus propias plantas y controlarlas remotamente!",
+  "@demoPlantMessage": {
+    "description": "Demo plant detail page message"
+  },
+
+  "premiumFeature": "Función Premium",
+  "@premiumFeature": {
+    "description": "Premium feature dialog title"
+  },
+
+  "plantControlsMessage": "Los controles de plantas están disponibles solo para usuarios registrados. ¡Regístrate para controlar tus plantas remotamente y acceder a funciones de automatización inteligente!",
+  "@plantControlsMessage": {
+    "description": "Plant controls restriction message"
+  },
+
+  "signUpRequired": "Registro Requerido",
+  "@signUpRequired": {
+    "description": "Sign up required dialog title"
+  },
+
+  "addPlantsMessage": "Necesitas registrarte para agregar tus propias plantas y acceder a las funciones de monitoreo inteligente. ¡Únete a miles de padres de plantas que confían en Jack Pot!",
+  "@addPlantsMessage": {
+    "description": "Add plants restriction message"
+  },
+
+  "unlockAllFeatures": "Inicia sesión para desbloquear esta función",
+  "@unlockAllFeatures": {
+    "description": "Generic unlock feature message"
+  },
+
+  "guestModeActive": "Modo Invitado",
+  "@guestModeActive": {
+    "description": "Guest mode indicator in app bar"
+  },
+
+  "exploreFeatures": "¡Explora todas las funciones increíbles a continuación!",
+  "@exploreFeatures": {
+    "description": "Encourage exploration in guest mode"
   }
 } 
