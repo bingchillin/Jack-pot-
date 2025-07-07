@@ -19,11 +19,26 @@ class CommentService {
       headers['Authorization'] = 'Bearer $token';
     }
     
+    // Log de l'URL complet utilisé
+    print('==== URL endpoint utilisé ====');
+    print(url.toString());
+    
     final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
-      return data.map((json) => Comment.fromJson(json)).toList();
+      // Log du JSON brut reçu
+      print('==== JSON BRUT /comments/timeline ====');
+      print(response.body);
+      try {
+        return data.map((json) => Comment.fromJson(json)).toList();
+      } catch (e, stack) {
+        print('Erreur lors du mapping d\'un commentaire : $e');
+        print('Stacktrace : $stack');
+        print('JSON fautif :');
+        print(data);
+        rethrow;
+      }
     } else {
       throw Exception('Erreur de chargement des commentaires: ${response.statusCode}');
     }

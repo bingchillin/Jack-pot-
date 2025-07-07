@@ -49,7 +49,11 @@ class Comment {
       content: json['content'],
       idPerson: json['idPerson'],
       person: person,
-      parentCommentId: json['parentCommentId'],
+      parentCommentId: json['parentCommentId'] is int
+          ? json['parentCommentId']
+          : (json['parentComment'] != null && json['parentComment']['idComment'] is int
+              ? json['parentComment']['idComment']
+              : null),
       isDeleted: json['isDeleted'] ?? false,
       deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
       createdAt: DateTime.parse(json['createdAt']),

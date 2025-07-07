@@ -1,7 +1,7 @@
 enum Environment { local, production }
 
 class EnvConfig {
-  static const Environment _currentEnv = Environment.production;
+  static const Environment _currentEnv = Environment.local;
   
   // API Configuration
   static const Map<Environment, String> _apiUrls = {

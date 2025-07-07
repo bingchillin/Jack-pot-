@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/comment/comment_detail_bloc.dart';
 import 'widget/comment_card.dart';
+import '../../providers/auth_provider.dart';
+import '../../models/comment_model.dart';
 
 class CommentDetailPage extends StatefulWidget {
   final int commentId;
@@ -97,6 +99,17 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
               }
 
               if (state is CommentDetailLoaded) {
+                // Trie les réponses : celles de l'utilisateur courant en premier
+                final currentUserId = context.read<AuthProvider>().userId;
+                List<Comment> sortedReplies = List.from(state.replies);
+                if (currentUserId != null) {
+                  sortedReplies.sort((a, b) {
+                    if (a.idPerson.toString() == currentUserId) return -1;
+                    if (b.idPerson.toString() == currentUserId) return 1;
+                    return 0;
+                  });
+                }
+
                 return CustomScrollView(
                   slivers: [
                     // Commentaire parent
@@ -117,7 +130,7 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
-                                '${state.replies.length} réponses',
+                                '${sortedReplies.length} réponses',
                                 style: TextStyle(
                                   color: Colors.grey.shade600,
                                   fontWeight: FontWeight.w500,
@@ -130,7 +143,7 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                       ),
                     ),
                     // Liste des réponses
-                    if (state.replies.isEmpty)
+                    if (sortedReplies.isEmpty)
                       SliverFillRemaining(
                         child: Center(
                           child: Column(
@@ -164,7 +177,7 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                       SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            final reply = state.replies[index];
+                            final reply = sortedReplies[index];
                             return Container(
                               margin: const EdgeInsets.only(left: 32),
                               child: CommentCard(
@@ -174,7 +187,7 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                               ),
                             );
                           },
-                          childCount: state.replies.length,
+                          childCount: sortedReplies.length,
                         ),
                       ),
                   ],
