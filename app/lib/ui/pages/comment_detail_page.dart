@@ -9,6 +9,8 @@ import '../../bloc/comment/comment_list_bloc.dart';
 import 'package:provider/provider.dart';
 import '../../services/comment_service.dart';
 import '../../bloc/comment/comment_item_bloc.dart';
+import '../../bloc/comment/comment_replies_bloc.dart';
+import '../../bloc/comment/comment_replies_event.dart';
 
 class CommentDetailPage extends StatefulWidget {
   final int commentId;
@@ -22,14 +24,18 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
   @override
   void initState() {
     super.initState();
-    context.read<CommentDetailBloc>().add(LoadCommentDetail(widget.commentId));
+    // Le Bloc est déjà initialisé avec les bonnes données via le BlocProvider
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        context.read<CommentListBloc>().add(RefreshComments());
+        final state = context.read<CommentDetailBloc>().state;
+        if (state is CommentDetailLoaded && state.parentComment.parentCommentId != null) {
+          // On est sur une page de détail d'une réponse
+          context.read<CommentRepliesBloc>().add(RefreshReplies(state.parentComment.parentCommentId!));
+        }
         return true;
       },
       child: BlocListener<CommentDetailBloc, CommentDetailState>(
@@ -135,10 +141,27 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                                 userId: userId,
                                 comment: state.parentComment,
                               ),
-                              child: CommentCard(
-                                comment: state.parentComment,
-                                replies: [],
-                                showReplies: false,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BlocProvider(
+                                        create: (_) => CommentDetailBloc(
+                                          commentService: CommentService(),
+                                          token: token,
+                                          navigatorKey: GlobalKey<NavigatorState>(),
+                                        )..add(LoadCommentDetail(state.parentComment.idComment)),
+                                        child: CommentDetailPage(commentId: state.parentComment.idComment),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: CommentCard(
+                                  comment: state.parentComment,
+                                  replies: [],
+                                  showReplies: false,
+                                ),
                               ),
                             );
                           },
@@ -213,10 +236,27 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                                     userId: userId,
                                     comment: reply,
                                   ),
-                                  child: CommentCard(
-                                    comment: reply,
-                                    replies: [],
-                                    showReplies: false,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => BlocProvider(
+                                            create: (_) => CommentDetailBloc(
+                                              commentService: CommentService(),
+                                              token: token,
+                                              navigatorKey: GlobalKey<NavigatorState>(),
+                                            )..add(LoadCommentDetail(reply.idComment)),
+                                            child: CommentDetailPage(commentId: reply.idComment),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: CommentCard(
+                                      comment: reply,
+                                      replies: [],
+                                      showReplies: false,
+                                    ),
                                   ),
                                 ),
                               );
