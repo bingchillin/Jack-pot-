@@ -96,11 +96,13 @@ class CommentService {
     required String content,
     int? parentCommentId,
     required String token,
+    String? userId,
   }) async {
     final url = Uri.parse('$baseUrl/comments');
     final body = {
       'content': content,
       if (parentCommentId != null) 'parentCommentId': parentCommentId,
+      if (userId != null) 'idPerson': int.tryParse(userId),
     };
 
     print('Flutter - Creating comment with body: $body');

@@ -4,6 +4,7 @@ import '../../bloc/comment/comment_detail_bloc.dart';
 import 'widget/comment_card.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/comment_model.dart';
+import 'widget/create_reply_modal.dart';
 
 class CommentDetailPage extends StatefulWidget {
   final int commentId;
@@ -199,6 +200,28 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
               );
             },
           ),
+        ),
+        floatingActionButton: BlocBuilder<CommentDetailBloc, CommentDetailState>(
+          builder: (context, state) {
+            if (state is CommentDetailLoaded) {
+              return FloatingActionButton.extended(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (context) => CreateReplyModal(parentComment: state.parentComment),
+                  );
+                },
+                backgroundColor: Colors.blue,
+                icon: const Icon(Icons.reply, color: Colors.white),
+                label: const Text('Répondre', style: TextStyle(color: Colors.white)),
+              );
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );
