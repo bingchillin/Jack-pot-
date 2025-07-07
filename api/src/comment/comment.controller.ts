@@ -22,6 +22,7 @@ import {
   import { CommentService } from './comment.service';
   import { CreateCommentDto } from './dto/create-comment.dto';
   import { UpdateCommentDto } from './dto/update-comment.dto';
+  import { ToggleLikeDto } from './dto/toggle-like.dto';
   import { Comment } from './entities/comment.entity';
   
   @ApiTags('comments')
@@ -231,5 +232,123 @@ import {
     @ApiResponse({ status: 404, description: 'Post/comment not found.' })
     async restore(@Param('id', ParseIntPipe) id: number): Promise<Comment> {
       return await this.commentService.restore(id);
+    }
+  
+    // ========== LIKE SYSTEM ENDPOINTS ==========
+  
+    @Post(':id/like')
+    @ApiOperation({ summary: 'Toggle like on a comment/post' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the comment/post to like/unlike',
+      example: 1,
+    })
+      @ApiResponse({
+    status: 200,
+    description: 'Like has been toggled successfully.',
+    schema: {
+      type: 'object',
+      properties: {
+        liked: { type: 'boolean', example: true },
+        likeCount: { type: 'number', example: 5 },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Comment/post not found.' })
+  async toggleLike(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() toggleLikeDto: ToggleLikeDto,
+  ): Promise<{ liked: boolean; likeCount: number }> {
+    return await this.commentService.toggleLike(id, toggleLikeDto.idPerson);
+  }
+  
+    @Get(':id/likes/count')
+    @ApiOperation({ summary: 'Get like count for a comment/post' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the comment/post',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return the like count.',
+      schema: {
+        type: 'object',
+        properties: {
+          likeCount: { type: 'number', example: 5 },
+        },
+      },
+    })
+    @ApiResponse({ status: 404, description: 'Comment/post not found.' })
+    async getLikeCount(
+      @Param('id', ParseIntPipe) id: number,
+    ): Promise<{ likeCount: number }> {
+      const count = await this.commentService.getLikeCount(id);
+      return { likeCount: count };
+    }
+  
+    @Get(':id/likes/me/:userId')
+    @ApiOperation({ summary: 'Check if a user has liked a comment/post' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the comment/post',
+      example: 1,
+    })
+    @ApiParam({
+      name: 'userId',
+      type: Number,
+      description: 'The ID of the user',
+      example: 1,
+    })
+      @ApiResponse({
+    status: 200,
+    description: 'Return whether the user has liked this comment/post.',
+    schema: {
+      type: 'object',
+      properties: {
+        liked: { type: 'boolean', example: true },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Comment/post not found.' })
+  async isLikedByUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<{ liked: boolean }> {
+    const liked = await this.commentService.isLikedByUser(id, userId);
+    return { liked };
+  }
+  
+    @Get(':id/likes')
+    @ApiOperation({ summary: 'Get all users who liked a comment/post' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the comment/post',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return all users who liked this comment/post.',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            idPerson: { type: 'number', example: 1 },
+            username: { type: 'string', example: 'john_doe' },
+            firstName: { type: 'string', example: 'John' },
+            lastName: { type: 'string', example: 'Doe' },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+      },
+    })
+    @ApiResponse({ status: 404, description: 'Comment/post not found.' })
+    async getLikers(@Param('id', ParseIntPipe) id: number): Promise<any[]> {
+      return await this.commentService.getLikers(id);
     }
   }

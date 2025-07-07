@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
+import { CommentLike } from './entities/comment-like.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
@@ -10,6 +11,8 @@ export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
+    @InjectRepository(CommentLike)
+    private commentLikeRepository: Repository<CommentLike>,
   ) {}
 
   async create(createCommentDto: CreateCommentDto): Promise<Comment> {
@@ -183,5 +186,116 @@ export class CommentService {
     }
 
     return comment;
+  }
+
+  // LIKE SYSTEM METHODS
+  
+  /**
+   * Toggle like on a comment - like if not liked, unlike if already liked
+   */
+  async toggleLike(commentId: number, personId: number): Promise<{ liked: boolean; likeCount: number }> {
+    // Verify comment exists
+    const comment = await this.findOne(commentId);
+    if (!comment) {
+      throw new NotFoundException(`Comment with ID ${commentId} not found`);
+    }
+
+    // Check if user already liked this comment
+    const existingLike = await this.commentLikeRepository.findOne({
+      where: {
+        idComment: commentId,
+        idPerson: personId,
+      },
+    });
+
+    if (existingLike) {
+      // Unlike - remove the like
+      await this.commentLikeRepository.remove(existingLike);
+      const likeCount = await this.getLikeCount(commentId);
+      return { liked: false, likeCount };
+    } else {
+      // Like - create new like
+      const newLike = this.commentLikeRepository.create({
+        idComment: commentId,
+        idPerson: personId,
+      });
+      await this.commentLikeRepository.save(newLike);
+      const likeCount = await this.getLikeCount(commentId);
+      return { liked: true, likeCount };
+    }
+  }
+
+  /**
+   * Get the number of likes for a comment
+   */
+  async getLikeCount(commentId: number): Promise<number> {
+    return await this.commentLikeRepository.count({
+      where: { idComment: commentId },
+    });
+  }
+
+  /**
+   * Check if a user has liked a specific comment
+   */
+  async isLikedByUser(commentId: number, personId: number): Promise<boolean> {
+    const like = await this.commentLikeRepository.findOne({
+      where: {
+        idComment: commentId,
+        idPerson: personId,
+      },
+    });
+    return !!like;
+  }
+
+  /**
+   * Get all users who liked a comment
+   */
+  async getLikers(commentId: number): Promise<CommentLike[]> {
+    return await this.commentLikeRepository.find({
+      where: { idComment: commentId },
+      relations: ['person'],
+      select: {
+        person: {
+          idPerson: true,
+          email: true,
+          firstname: true,
+          surname: true,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  /**
+   * Get comments with like statistics for a specific user
+   */
+  async getCommentsWithLikeStats(commentIds: number[], currentUserId?: number): Promise<any[]> {
+    const comments = await this.commentRepository.find({
+      where: commentIds.map(id => ({ idComment: id })),
+      relations: ['person'],
+      select: {
+        person: {
+          email: true,
+          firstname: true,
+          surname: true,
+        },
+      },
+    });
+
+    const result = [];
+    for (const comment of comments) {
+      const likeCount = await this.getLikeCount(comment.idComment);
+      const isLikedByCurrentUser = currentUserId 
+        ? await this.isLikedByUser(comment.idComment, currentUserId)
+        : false;
+
+      result.push({
+        ...comment,
+        likeCount,
+        isLikedByCurrentUser,
+      });
+    }
+
+    return result;
   }
 }
