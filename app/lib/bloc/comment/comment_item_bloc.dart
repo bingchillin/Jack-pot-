@@ -57,8 +57,9 @@ class CommentItemError extends CommentItemState {
 class CommentItemBloc extends Bloc<CommentItemEvent, CommentItemState> {
   final CommentService commentService;
   final String? token;
+  final String? userId;
   Comment comment;
-  CommentItemBloc({required this.commentService, required this.token, required this.comment}) : super(CommentItemInitial(comment)) {
+  CommentItemBloc({required this.commentService, required this.token, required this.userId, required this.comment}) : super(CommentItemInitial(comment)) {
     on<LikeComment>(_onLikeComment);
     on<EditComment>(_onEditComment);
     on<DeleteComment>(_onDeleteComment);
@@ -67,10 +68,10 @@ class CommentItemBloc extends Bloc<CommentItemEvent, CommentItemState> {
   Future<void> _onLikeComment(LikeComment event, Emitter<CommentItemState> emit) async {
     emit(CommentItemLiking());
     try {
-      final isLiked = await commentService.toggleLike(comment.idComment, token!);
+      final result = await commentService.toggleLike(comment.idComment, token!, userId!);
       final updatedComment = comment.copyWith(
-        likeCount: isLiked ? comment.likeCount + 1 : comment.likeCount - 1,
-        isLikedByCurrentUser: isLiked,
+        likeCount: result['likeCount'] ?? comment.likeCount,
+        isLikedByCurrentUser: result['liked'] ?? comment.isLikedByCurrentUser,
       );
       comment = updatedComment;
       emit(CommentItemLiked(updatedComment));
