@@ -22,7 +22,14 @@ class HomePageLogin extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Jack Pot - Guest Mode'),
+        title: const Text(
+          'Jack Pot - Guest Mode',
+          style: TextStyle(
+            fontFamily: '04B_30__',
+            fontSize: 20,
+            color: Colors.black87,
+          ),
+        ),
         automaticallyImplyLeading: false,
         backgroundColor: Colors.green[50],
         surfaceTintColor: Colors.green[50],

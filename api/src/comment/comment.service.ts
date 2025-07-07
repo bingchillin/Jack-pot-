@@ -36,22 +36,29 @@ export class CommentService {
 
   // Timeline: Get all posts (comments with no parent)
   async getTimeline(includeDeleted: boolean = false): Promise<Comment[]> {
-    const whereCondition = includeDeleted 
-      ? { parentComment: null } 
-      : { parentComment: null, isDeleted: false };
-    
-    return await this.commentRepository.find({
-      where: whereCondition,
-      relations: ['person'],
-      select: {
-        person: {
-          email: true,
-          firstname: true,
-          surname: true,
-        },
-      },
-      order: { createdAt: 'DESC' },
-    });
+    const queryBuilder = this.commentRepository.createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.person', 'person')
+      .select([
+        'comment.idComment',
+        'comment.content',
+        'comment.idPerson',
+        'comment.parentCommentId',
+        'comment.isDeleted',
+        'comment.deletedAt',
+        'comment.createdAt',
+        'comment.updatedAt',
+        'person.email',
+        'person.firstname',
+        'person.surname'
+      ])
+      .where('comment.parentCommentId IS NULL')
+      .orderBy('comment.createdAt', 'DESC');
+
+    if (!includeDeleted) {
+      queryBuilder.andWhere('comment.isDeleted = :isDeleted', { isDeleted: false });
+    }
+
+    return await queryBuilder.getMany();
   }
 
   // Post detail: Get original post + all its comments
