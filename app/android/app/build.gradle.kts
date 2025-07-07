@@ -13,6 +13,8 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
+    // Apply the Google services Gradle plugin
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -65,4 +67,18 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
+    
+    // Firebase Core (automatically included with BoM)
+    implementation("com.google.firebase:firebase-analytics")
+    
+    // Firebase Cloud Messaging for notifications
+    implementation("com.google.firebase:firebase-messaging")
+    
+    // Optional: Firebase Crashlytics for error reporting
+    implementation("com.google.firebase:firebase-crashlytics")
 }
