@@ -107,7 +107,15 @@ class _AdvisePageState extends State<AdvisePage> {
                   }
 
                   if (state is CommentListLoaded) {
-                    if (state.comments.isEmpty) {
+                    // Debug : affiche les ids et parentCommentId
+                    for (final comment in state.comments) {
+                      print('Comment id: [33m[1m[4m${comment.idComment}[0m, parentCommentId: [36m${comment.parentCommentId}[0m');
+                    }
+
+                    // Filtre temporaire : n'affiche que les parents
+                    final parentComments = state.comments.where((c) => c.parentCommentId == null).toList();
+
+                    if (parentComments.isEmpty) {
                       return SliverFillRemaining(
                         child: Center(
                           child: Column(
@@ -142,14 +150,14 @@ class _AdvisePageState extends State<AdvisePage> {
                     return SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final comment = state.comments[index];
+                          final comment = parentComments[index];
                           return CommentCard(
                             comment: comment,
                             replies: [],
                             showReplies: false,
                           );
                         },
-                        childCount: state.comments.length,
+                        childCount: parentComments.length,
                       ),
                     );
                   }

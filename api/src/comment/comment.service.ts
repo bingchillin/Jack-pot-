@@ -47,6 +47,7 @@ export class CommentService {
         'comment.deletedAt',
         'comment.createdAt',
         'comment.updatedAt',
+        'person.idPerson',
         'person.email',
         'person.firstname',
         'person.surname'
@@ -101,6 +102,7 @@ export class CommentService {
       relations: ['parentComment', 'person'],
       select: {
         person: {
+          idPerson: true,
           email: true,
           firstname: true,
           surname: true,
@@ -168,6 +170,7 @@ export class CommentService {
       relations: ['person'],
       select: {
         person: {
+          idPerson: true,
           email: true,
           firstname: true,
           surname: true,
