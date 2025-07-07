@@ -59,7 +59,7 @@ class Comment {
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
       likeCount: 0, // Non disponible dans l'API
-      replyCount: 0, // Non disponible dans l'API
+      replyCount: json['replyCount'] ?? 0,
       isLikedByCurrentUser: false, // Non disponible dans l'API
       replies: [], // Les réponses sont chargées séparément
     );
