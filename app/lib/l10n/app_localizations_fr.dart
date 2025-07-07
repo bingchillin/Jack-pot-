@@ -220,6 +220,25 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ajoutez vos plantes préférées à vos favoris';
 
   @override
+  String get addToFavorites => 'Ajouter aux favoris';
+
+  @override
+  String get removeFromFavorites => 'Retirer des favoris';
+
+  @override
+  String get addedToFavorites => 'Ajouté aux favoris';
+
+  @override
+  String get removedFromFavorites => 'Retiré des favoris';
+
+  @override
+  String get authenticationRequired => 'Authentification requise';
+
+  @override
+  String get pleaseSignInToAddFavorites =>
+      'Veuillez vous connecter pour ajouter des plantes à vos favoris';
+
+  @override
   String get noMyPlants => 'Aucune plante dans votre liste';
 
   @override
