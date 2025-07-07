@@ -292,8 +292,6 @@ class CommentReply extends StatelessWidget {
       if (parentCommentId != null) {
         context.read<CommentRepliesBloc>().add(RefreshReplies(parentCommentId));
       }
-      // Rafraîchir aussi la liste principale pour le replyCount
-      context.read<CommentListBloc>().add(RefreshComments());
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -325,8 +323,6 @@ class CommentReply extends StatelessWidget {
       if (parentCommentId != null) {
         context.read<CommentRepliesBloc>().add(RefreshReplies(parentCommentId));
       }
-      // Rafraîchir aussi la liste principale pour le replyCount
-      context.read<CommentListBloc>().add(RefreshComments());
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Réponse supprimée avec succès'),
