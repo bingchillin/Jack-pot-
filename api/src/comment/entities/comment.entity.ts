@@ -13,7 +13,7 @@ export class Comment {
   @Index()
   idPerson: number;
 
-  @ManyToOne(() => Person, person => person.comments, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Person, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_person' })
   person: Person;
 

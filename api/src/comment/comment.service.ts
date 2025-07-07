@@ -42,6 +42,14 @@ export class CommentService {
     
     return await this.commentRepository.find({
       where: whereCondition,
+      relations: ['person'],
+      select: {
+        person: {
+          email: true,
+          firstname: true,
+          surname: true,
+        },
+      },
       order: { createdAt: 'DESC' },
     });
   }
@@ -83,7 +91,14 @@ export class CommentService {
 
     return await this.commentRepository.find({
       where: whereCondition,
-      relations: ['parentComment'],
+      relations: ['parentComment', 'person'],
+      select: {
+        person: {
+          email: true,
+          firstname: true,
+          surname: true,
+        },
+      },
       order: { createdAt: 'ASC' },
     });
   }
@@ -133,5 +148,30 @@ export class CommentService {
     comment.isDeleted = false;
     comment.deletedAt = null;
     return await this.commentRepository.save(comment);
+  }
+
+  // Get a single parent comment (comment with no parent)
+  async getParentComment(commentId: number, includeDeleted: boolean = false): Promise<Comment> {
+    const whereCondition = includeDeleted 
+      ? { idComment: commentId, parentComment: null } 
+      : { idComment: commentId, parentComment: null, isDeleted: false };
+
+    const comment = await this.commentRepository.findOne({
+      where: whereCondition,
+      relations: ['person'],
+      select: {
+        person: {
+          email: true,
+          firstname: true,
+          surname: true,
+        },
+      },
+    });
+
+    if (!comment) {
+      throw new NotFoundException(`Parent comment with ID ${commentId} not found`);
+    }
+
+    return comment;
   }
 }
