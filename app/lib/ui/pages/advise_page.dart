@@ -5,6 +5,8 @@ import 'widget/comment_card.dart';
 import 'widget/create_post_modal.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../bloc/comment/comment_item_bloc.dart';
+import '../../services/comment_service.dart';
 
 class AdvisePage extends StatefulWidget {
   const AdvisePage({super.key});
@@ -38,7 +40,6 @@ class _AdvisePageState extends State<AdvisePage> {
         backgroundColor: Colors.grey.shade50,
         body: RefreshIndicator(
           onRefresh: () async {
-            context.read<CommentListBloc>().add(RefreshComments());
             await Future.delayed(const Duration(milliseconds: 500));
           },
           child: CustomScrollView(
@@ -154,10 +155,16 @@ class _AdvisePageState extends State<AdvisePage> {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final comment = parentComments[index];
-                          return CommentCard(
-                            comment: comment,
-                            replies: [],
-                            showReplies: false,
+                          final token = Provider.of<AuthProvider>(context, listen: false).accessToken;
+                          final userId = Provider.of<AuthProvider>(context, listen: false).userId;
+                          return BlocProvider(
+                            create: (_) => CommentItemBloc(
+                              commentService: CommentService(),
+                              token: token,
+                              userId: userId,
+                              comment: comment,
+                            ),
+                            child: CommentCard(comment: comment, replies: [], showReplies: false),
                           );
                         },
                         childCount: parentComments.length,
