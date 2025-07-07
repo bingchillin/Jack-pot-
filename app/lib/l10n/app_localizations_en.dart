@@ -21,7 +21,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get password => 'Password';
 
   @override
-  String get signIn => 'Sign in';
+  String get signIn => 'Sign In';
 
   @override
   String get forgotPassword => 'Forgot password?';
@@ -216,6 +216,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get addFavoritePlantsDescription =>
       'Add your favorite plants to favorites';
+
+  @override
+  String get addToFavorites => 'Add to favorites';
+
+  @override
+  String get removeFromFavorites => 'Remove from favorites';
+
+  @override
+  String get addedToFavorites => 'Added to favorites';
+
+  @override
+  String get removedFromFavorites => 'Removed from favorites';
+
+  @override
+  String get authenticationRequired => 'Authentication Required';
+
+  @override
+  String get pleaseSignInToAddFavorites =>
+      'Please sign in to add plants to your favorites';
 
   @override
   String get noMyPlants => 'No plants in your list';

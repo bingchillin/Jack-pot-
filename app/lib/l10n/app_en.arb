@@ -341,6 +341,46 @@
     "description": "Empty state description for favorites"
   },
 
+  "addToFavorites": "Add to favorites",
+  "@addToFavorites": {
+    "description": "Tooltip for adding plant to favorites"
+  },
+
+  "removeFromFavorites": "Remove from favorites",
+  "@removeFromFavorites": {
+    "description": "Tooltip for removing plant from favorites"
+  },
+
+  "addedToFavorites": "Added to favorites",
+  "@addedToFavorites": {
+    "description": "Message when plant is added to favorites"
+  },
+
+  "removedFromFavorites": "Removed from favorites",
+  "@removedFromFavorites": {
+    "description": "Message when plant is removed from favorites"
+  },
+
+  "authenticationRequired": "Authentication Required",
+  "@authenticationRequired": {
+    "description": "Title for auth required dialog"
+  },
+
+  "pleaseSignInToAddFavorites": "Please sign in to add plants to your favorites",
+  "@pleaseSignInToAddFavorites": {
+    "description": "Message asking user to sign in for favorites"
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+
+  "signIn": "Sign In",
+  "@signIn": {
+    "description": "Sign in button text"
+  },
+
   "noMyPlants": "No plants in your list",
   "@noMyPlants": {
     "description": "Empty state message for my plants list"

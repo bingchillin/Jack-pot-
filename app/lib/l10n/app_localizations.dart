@@ -127,7 +127,7 @@ abstract class AppLocalizations {
   /// Sign in button text
   ///
   /// In en, this message translates to:
-  /// **'Sign in'**
+  /// **'Sign In'**
   String get signIn;
 
   /// Forgot password link text
@@ -507,6 +507,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add your favorite plants to favorites'**
   String get addFavoritePlantsDescription;
+
+  /// Tooltip for adding plant to favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favorites'**
+  String get addToFavorites;
+
+  /// Tooltip for removing plant from favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favorites'**
+  String get removeFromFavorites;
+
+  /// Message when plant is added to favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Added to favorites'**
+  String get addedToFavorites;
+
+  /// Message when plant is removed from favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from favorites'**
+  String get removedFromFavorites;
+
+  /// Title for auth required dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication Required'**
+  String get authenticationRequired;
+
+  /// Message asking user to sign in for favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in to add plants to your favorites'**
+  String get pleaseSignInToAddFavorites;
 
   /// Empty state message for my plants list
   ///
