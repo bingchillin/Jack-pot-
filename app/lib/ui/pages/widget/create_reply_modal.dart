@@ -232,10 +232,12 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.accessToken;
+      final userId = authProvider.userId;
       await CommentService().createComment(
         content: content,
         parentCommentId: widget.parentComment.idComment,
         token: token!,
+        userId: userId,
       );
       // Rafraîchir les réponses du commentaire parent
       context.read<CommentRepliesBloc>().add(RefreshReplies(widget.parentComment.idComment));

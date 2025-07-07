@@ -178,7 +178,8 @@ class _CreatePostModalState extends State<CreatePostModal> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.accessToken;
-      await CommentService().createComment(content: content, token: token!);
+      final userId = authProvider.userId;
+      await CommentService().createComment(content: content, token: token!, userId: userId);
       // Rafraîchir la liste des commentaires après la création
       context.read<CommentListBloc>().add(LoadComments());
       Navigator.pop(context);
