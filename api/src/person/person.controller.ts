@@ -1,12 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ClassSerializerInterceptor, UseInterceptors, Query, ParseIntPipe } from '@nestjs/common';
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { CreatePersonResponseDto } from './dto/create-person-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiBody, ApiExcludeEndpoint, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiExcludeEndpoint, ApiResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @UseInterceptors(ClassSerializerInterceptor)
+@ApiTags('person')
 @Controller('person')
 export class PersonController {
     constructor(private readonly personService: PersonService) {}
@@ -57,7 +58,17 @@ export class PersonController {
     findObjectsProfileByPersonIdFavoris(@Param('id') id: string) {
         return this.personService.findObjectsProfileByPersonIdFavoris(+id);
     }
-   
+
+    @Get(':id/parent-comments')
+    async getParentCommentsByPersonId(
+        @Param('id', ParseIntPipe) id: number,
+        @Query('userId') userId?: string,
+    ): Promise<any[]> {
+        return await this.personService.getParentCommentsByPersonId(
+            id,
+            userId ? Number(userId) : undefined
+        );
+    }
 
     @Patch(':id')
     @UseGuards(JwtAuthGuard)
