@@ -6,6 +6,9 @@ import '../../providers/auth_provider.dart';
 import '../../models/comment_model.dart';
 import 'widget/create_reply_modal.dart';
 import '../../bloc/comment/comment_list_bloc.dart';
+import 'package:provider/provider.dart';
+import '../../services/comment_service.dart';
+import '../../bloc/comment/comment_item_bloc.dart';
 
 class CommentDetailPage extends StatefulWidget {
   final int commentId;
@@ -26,7 +29,6 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // Rafraîchir la liste principale à la sortie
         context.read<CommentListBloc>().add(RefreshComments());
         return true;
       },
@@ -122,10 +124,24 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                     slivers: [
                       // Commentaire parent
                       SliverToBoxAdapter(
-                        child: CommentCard(
-                          comment: state.parentComment,
-                          replies: [],
-                          showReplies: false,
+                        child: Builder(
+                          builder: (context) {
+                            final token = Provider.of<AuthProvider>(context, listen: false).accessToken;
+                            final userId = Provider.of<AuthProvider>(context, listen: false).userId;
+                            return BlocProvider(
+                              create: (_) => CommentItemBloc(
+                                commentService: CommentService(),
+                                token: token,
+                                userId: userId,
+                                comment: state.parentComment,
+                              ),
+                              child: CommentCard(
+                                comment: state.parentComment,
+                                replies: [],
+                                showReplies: false,
+                              ),
+                            );
+                          },
                         ),
                       ),
                       // Séparateur
@@ -186,12 +202,22 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               final reply = sortedReplies[index];
+                              final token = Provider.of<AuthProvider>(context, listen: false).accessToken;
+                              final userId = Provider.of<AuthProvider>(context, listen: false).userId;
                               return Container(
                                 margin: const EdgeInsets.only(left: 32),
-                                child: CommentCard(
-                                  comment: reply,
-                                  replies: [],
-                                  showReplies: false,
+                                child: BlocProvider(
+                                  create: (_) => CommentItemBloc(
+                                    commentService: CommentService(),
+                                    token: token,
+                                    userId: userId,
+                                    comment: reply,
+                                  ),
+                                  child: CommentCard(
+                                    comment: reply,
+                                    replies: [],
+                                    showReplies: false,
+                                  ),
                                 ),
                               );
                             },

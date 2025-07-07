@@ -8,6 +8,7 @@ import 'widget/comment_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/comment/user_profile_comments_bloc.dart';
 import 'package:flutter/scheduler.dart';
+import '../../bloc/comment/comment_item_bloc.dart';
 
 class UserProfilePage extends StatefulWidget {
   final int userId;
@@ -159,7 +160,18 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
                             padding: const EdgeInsets.only(top: 8),
                             itemCount: posts.length,
                             itemBuilder: (context, index) {
-                              return CommentCard(comment: posts[index]);
+                              final comment = posts[index];
+                              final token = Provider.of<AuthProvider>(context, listen: false).accessToken;
+                              final userId = Provider.of<AuthProvider>(context, listen: false).userId;
+                              return BlocProvider(
+                                create: (_) => CommentItemBloc(
+                                  commentService: CommentService(),
+                                  token: token,
+                                  userId: userId,
+                                  comment: comment,
+                                ),
+                                child: CommentCard(comment: comment),
+                              );
                             },
                           ),
                         );

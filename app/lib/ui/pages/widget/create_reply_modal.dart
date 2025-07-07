@@ -242,8 +242,6 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
       );
       // Rafraîchir les réponses du commentaire parent
       context.read<CommentRepliesBloc>().add(RefreshReplies(widget.parentComment.idComment));
-      // Rafraîchir aussi la liste des commentaires pour mettre à jour le replyCount
-      context.read<CommentListBloc>().add(RefreshComments());
       // Rafraîchir la page de détail pour afficher la nouvelle réponse
       context.read<CommentDetailBloc>().add(RefreshCommentDetail(widget.parentComment.idComment));
       Navigator.pop(context);
