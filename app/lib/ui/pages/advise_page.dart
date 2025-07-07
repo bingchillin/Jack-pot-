@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import '../../bloc/comment/comment_list_bloc.dart';
-import '../../models/comment_model.dart';
-import '../../providers/auth_provider.dart';
-import '../../services/comment_service.dart';
 import 'widget/comment_card.dart';
 
 class AdvisePage extends StatefulWidget {

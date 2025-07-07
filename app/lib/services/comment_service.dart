@@ -170,4 +170,23 @@ class CommentService {
       throw Exception('Erreur de modification: ${response.statusCode}');
     }
   }
+
+  // Récupérer un commentaire par son id (parent ou réponse)
+  Future<Comment> fetchCommentById(int commentId, String? token) async {
+    final url = Uri.parse('$baseUrl/comments/$commentId');
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    final response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      return Comment.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 404) {
+      throw Exception('Commentaire non trouvé');
+    } else {
+      throw Exception('Erreur de chargement du commentaire: ${response.statusCode}');
+    }
+  }
 } 
