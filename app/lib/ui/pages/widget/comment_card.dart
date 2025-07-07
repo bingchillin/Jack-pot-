@@ -9,6 +9,7 @@ import '../../../bloc/comment/comment_list_bloc.dart';
 import '../user_profile_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../bloc/comment/comment_item_bloc.dart';
+import '../../../bloc/comment/comment_detail_bloc.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
@@ -50,10 +51,18 @@ class _CommentCardState extends State<CommentCard> {
         }
         return GestureDetector(
           onTap: () {
+            final token = Provider.of<AuthProvider>(context, listen: false).accessToken;
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CommentDetailPage(commentId: displayComment.idComment),
+                builder: (context) => BlocProvider(
+                  create: (_) => CommentDetailBloc(
+                    commentService: CommentService(),
+                    token: token,
+                    navigatorKey: GlobalKey<NavigatorState>(),
+                  )..add(LoadCommentDetail(displayComment.idComment)),
+                  child: CommentDetailPage(commentId: displayComment.idComment),
+                ),
               ),
             );
           },

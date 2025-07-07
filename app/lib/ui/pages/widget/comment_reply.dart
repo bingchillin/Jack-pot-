@@ -286,7 +286,8 @@ class CommentReply extends StatelessWidget {
       }
 
       final commentService = CommentService();
-      await commentService.toggleLike(comment.idComment, token);
+      final userId = authProvider.userId;
+      await commentService.toggleLike(comment.idComment, token, userId!);
       // Rafraîchir les réponses du parent
       final parentCommentId = comment.parentCommentId;
       if (parentCommentId != null) {
