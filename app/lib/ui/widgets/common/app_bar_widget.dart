@@ -24,11 +24,6 @@ class AppBarWidget {
           : null,
       title: Text(
         title,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.grey[800],
-        ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -55,14 +50,7 @@ class AppBarWidget {
       leading: automaticallyImplyLeading
           ? CustomBackButton(onPressed: onBackPressed)
           : null,
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
-        ),
-      ),
+      title: Text(title),
       centerTitle: centerTitle,
       actions: actions,
     );
@@ -88,11 +76,7 @@ class AppBarWidget {
           : null,
       title: Text(
         title,
-        style: const TextStyle(
-          color: Colors.green,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(color: Colors.green),
       ),
       centerTitle: centerTitle,
       actions: actions,
@@ -117,11 +101,6 @@ class AppBarWidget {
       leading: CustomBackButton(onPressed: onBackPressed),
       title: Text(
         title,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.grey[800],
-        ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
