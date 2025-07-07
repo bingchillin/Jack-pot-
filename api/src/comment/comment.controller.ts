@@ -55,11 +55,36 @@ import {
     @ApiResponse({
       status: 200,
       description: 'Return timeline of posts.',
-      type: [Comment],
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            idComment: { type: 'number' },
+            content: { type: 'string' },
+            idPerson: { type: 'number' },
+            parentCommentId: { type: 'number', nullable: true },
+            isDeleted: { type: 'boolean' },
+            deletedAt: { type: 'string', format: 'date-time', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+            person: {
+              type: 'object',
+              properties: {
+                idPerson: { type: 'number' },
+                email: { type: 'string' },
+                firstname: { type: 'string' },
+                surname: { type: 'string' },
+              },
+            },
+            replyCount: { type: 'number' },
+          },
+        },
+      },
     })
     async getTimeline(
       @Query('includeDeleted', new ParseBoolPipe({ optional: true })) includeDeleted?: boolean,
-    ): Promise<Comment[]> {
+    ): Promise<any[]> {
       return await this.commentService.getTimeline(includeDeleted || false);
     }
   

@@ -38,7 +38,7 @@ export class CommentService {
   }
 
   // Timeline: Get all posts (comments with no parent)
-  async getTimeline(includeDeleted: boolean = false): Promise<Comment[]> {
+  async getTimeline(includeDeleted: boolean = false): Promise<any[]> {
     const queryBuilder = this.commentRepository.createQueryBuilder('comment')
       .leftJoinAndSelect('comment.person', 'person')
       .select([
@@ -62,7 +62,25 @@ export class CommentService {
       queryBuilder.andWhere('comment.isDeleted = :isDeleted', { isDeleted: false });
     }
 
-    return await queryBuilder.getMany();
+    const comments = await queryBuilder.getMany();
+
+    // Pour chaque commentaire parent, compter les réponses directes
+    const commentIds = comments.map(c => c.idComment);
+    const replyCounts = await this.commentRepository
+      .createQueryBuilder('reply')
+      .select('reply.parentCommentId', 'parentCommentId')
+      .addSelect('COUNT(*)', 'count')
+      .where('reply.parentCommentId IN (:...ids)', { ids: commentIds })
+      .andWhere('reply.isDeleted = false')
+      .groupBy('reply.parentCommentId')
+      .getRawMany();
+    const replyCountMap = Object.fromEntries(replyCounts.map(r => [Number(r.parentCommentId), Number(r.count)]));
+
+    // Ajouter replyCount à chaque commentaire
+    return comments.map(comment => ({
+      ...comment,
+      replyCount: replyCountMap[comment.idComment] || 0,
+    }));
   }
 
   // Post detail: Get original post + all its comments

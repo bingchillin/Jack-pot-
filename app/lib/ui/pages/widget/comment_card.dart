@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/comment_model.dart';
 import '../comment_detail_page.dart';
+import 'create_reply_modal.dart';
 
 class CommentCard extends StatelessWidget {
   final Comment comment;
@@ -96,6 +97,54 @@ class CommentCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+            // Ligne d'actions (icône répondre)
+            Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.chat_bubble_outline, color: Colors.blue),
+                        tooltip: 'Répondre',
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                            ),
+                            builder: (context) => CreateReplyModal(parentComment: comment),
+                          );
+                        },
+                      ),
+                      if (comment.replyCount > 0)
+                        Positioned(
+                          right: 4,
+                          top: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '${comment.replyCount}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
