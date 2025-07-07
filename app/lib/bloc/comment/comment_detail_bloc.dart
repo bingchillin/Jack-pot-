@@ -84,6 +84,7 @@ class CommentDetailBloc extends Bloc<CommentDetailEvent, CommentDetailState> {
       final comments = await commentService.fetchPostWithComments(commentId, token, userId: userId);
       // parent = celui dont parentCommentId == null
       final parentComment = comments.firstWhere((c) => c.parentCommentId == null, orElse: () => comments.first);
+      
       final replies = comments.where((c) => c.parentCommentId == parentComment.idComment).toList();
       emit(CommentDetailLoaded(parentComment, replies));
     } catch (e) {
