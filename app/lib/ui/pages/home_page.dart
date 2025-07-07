@@ -22,7 +22,14 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Jack Pot'),
+        title: const Text(
+          'Jack Pot',
+          style: TextStyle(
+            fontFamily: '04B_30__',
+            fontSize: 20,
+            color: Colors.black87,
+          ),
+        ),
         automaticallyImplyLeading: false,
         backgroundColor: Colors.green[50],
         surfaceTintColor: Colors.green[50],

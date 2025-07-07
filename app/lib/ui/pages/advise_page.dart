@@ -49,8 +49,9 @@ class _AdvisePageState extends State<AdvisePage> {
                 title: const Text(
                   '💬 Forum Communautaire',
                   style: TextStyle(
+                    fontFamily: '04B_30__',
+                    fontSize: 20,
                     color: Colors.black87,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
