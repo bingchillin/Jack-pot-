@@ -62,6 +62,34 @@ import {
       return await this.commentService.getTimeline(includeDeleted || false);
     }
   
+    @Get('parent/:id')
+    @ApiOperation({ summary: 'Get a single parent comment by ID' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the parent comment',
+      example: 1,
+    })
+    @ApiQuery({
+      name: 'includeDeleted',
+      required: false,
+      type: Boolean,
+      description: 'Include deleted content in the results',
+      example: false,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return the parent comment.',
+      type: Comment,
+    })
+    @ApiResponse({ status: 404, description: 'Parent comment not found.' })
+    async getParentComment(
+      @Param('id', ParseIntPipe) id: number,
+      @Query('includeDeleted', new ParseBoolPipe({ optional: true })) includeDeleted?: boolean,
+    ): Promise<Comment> {
+      return await this.commentService.getParentComment(id, includeDeleted || false);
+    }
+  
     @Get(':id')
     @ApiOperation({ summary: 'Get a single post or comment by ID' })
     @ApiParam({

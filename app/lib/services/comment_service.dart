@@ -6,9 +6,9 @@ import '../app_config.dart';
 class CommentService {
   final String baseUrl = AppConfig.baseUrl;
 
-  // Récupérer tous les commentaires principaux
+  // Récupérer tous les commentaires principaux (timeline)
   Future<List<Comment>> fetchMainComments(String? token) async {
-    final url = Uri.parse('$baseUrl/comments');
+    final url = Uri.parse('$baseUrl/comments/timeline');
     
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -29,9 +29,33 @@ class CommentService {
     }
   }
 
+  // Récupérer un seul commentaire parent
+  Future<Comment> fetchParentComment(int commentId, String? token) async {
+    final url = Uri.parse('$baseUrl/comments/parent/$commentId');
+    
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Ajouter le token seulement s'il est valide
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      return Comment.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 404) {
+      throw Exception('Commentaire parent non trouvé');
+    } else {
+      throw Exception('Erreur de chargement du commentaire: ${response.statusCode}');
+    }
+  }
+
   // Récupérer les réponses d'un commentaire
   Future<List<Comment>> fetchReplies(int commentId, String? token) async {
-    final url = Uri.parse('$baseUrl/comments/replies/$commentId');
+    final url = Uri.parse('$baseUrl/comments/getCommentsByParentId/$commentId');
     
     Map<String, String> headers = {
       'Content-Type': 'application/json',

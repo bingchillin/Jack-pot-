@@ -26,7 +26,6 @@ import { PlantType } from './plant-type/entities/plant-type.entity';
 import { Product } from './product/entities/product.entity';
 import { Order } from './order/entities/order.entity';
 import { OrderItem } from './order/entities/order-item.entity';
-import { Comment } from './comment/entities/comment.entity';
 
 // Module imports
 import { RoleModule } from './role/role.module';
@@ -48,7 +47,6 @@ import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { StripeModule } from './stripe/stripe.module';
 import { CommentModule } from './comment/comment.module';
-import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -87,12 +85,17 @@ import { UploadModule } from './upload/upload.module';
             PlantType,
             Product,
             Order,
-            OrderItem,
-            Comment,
+            OrderItem
           ],
           synchronize: true,
           autoLoadEntities: true,
         };
+        console.log('Database Configuration:', {
+          host: config.host,
+          port: config.port,
+          username: config.username,
+          database: config.database,
+        });
         return config;
       },
       inject: [ConfigService],
@@ -118,8 +121,7 @@ import { UploadModule } from './upload/upload.module';
     ProductModule,
     OrderModule,
     StripeModule,
-    CommentModule,
-    UploadModule
+    CommentModule
   ],
   controllers: [AppController],
   providers: [AppService],

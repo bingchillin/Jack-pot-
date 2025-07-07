@@ -23,29 +23,41 @@ class Comment {
     this.deletedAt,
     required this.createdAt,
     required this.updatedAt,
-    required this.likeCount,
-    required this.replyCount,
-    required this.isLikedByCurrentUser,
-    required this.replies,
+    this.likeCount = 0,
+    this.replyCount = 0,
+    this.isLikedByCurrentUser = false,
+    this.replies = const [],
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
+    // Créer un objet Person par défaut si les informations ne sont pas disponibles
+    Person person;
+    if (json['person'] != null) {
+      person = Person.fromJson(json['person']);
+    } else {
+      // Créer un objet Person par défaut avec les informations disponibles
+      person = Person(
+        idPerson: json['idPerson'],
+        firstname: 'Utilisateur',
+        surname: json['idPerson'].toString(),
+        email: '',
+      );
+    }
+
     return Comment(
       idComment: json['idComment'],
       content: json['content'],
       idPerson: json['idPerson'],
-      person: Person.fromJson(json['person']),
+      person: person,
       parentCommentId: json['parentCommentId'],
-      isDeleted: json['isDeleted'],
+      isDeleted: json['isDeleted'] ?? false,
       deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      likeCount: json['likeCount'],
-      replyCount: json['replyCount'],
-      isLikedByCurrentUser: json['isLikedByCurrentUser'],
-      replies: json['replies'] != null 
-          ? (json['replies'] as List).map((reply) => Comment.fromJson(reply)).toList()
-          : [],
+      likeCount: 0, // Non disponible dans l'API
+      replyCount: 0, // Non disponible dans l'API
+      isLikedByCurrentUser: false, // Non disponible dans l'API
+      replies: [], // Les réponses sont chargées séparément
     );
   }
 
@@ -98,11 +110,11 @@ class Person {
   factory Person.fromJson(Map<String, dynamic> json) {
     return Person(
       idPerson: json['idPerson'],
-      firstname: json['firstname'],
-      surname: json['surname'],
-      email: json['email'],
+      firstname: json['firstname'] ?? '',
+      surname: json['surname'] ?? '',
+      email: json['email'] ?? '',
     );
   }
 
-  String get displayName => '$firstname $surname';
+  String get displayName => '$firstname $surname'.trim();
 } 
