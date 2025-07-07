@@ -95,16 +95,24 @@ class _CommentCardState extends State<CommentCard> {
               child: Row(
                 children: [
                   // Avatar
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.blue.shade100,
-                    child: Text(
-                      _comment.person.firstname.isNotEmpty 
-                          ? _comment.person.firstname[0].toUpperCase()
-                          : 'U',
-                      style: TextStyle(
-                        color: Colors.blue.shade700,
-                        fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Profil de l’utilisateur #${_comment.person.idPerson}')),
+                      );
+                      // TODO: Naviguer vers la page profil si besoin
+                    },
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.blue.shade100,
+                      child: Text(
+                        _comment.person.firstname.isNotEmpty 
+                            ? _comment.person.firstname[0].toUpperCase()
+                            : 'U',
+                        style: TextStyle(
+                          color: Colors.blue.shade700,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
