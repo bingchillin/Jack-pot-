@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'bloc/object_profile/object_profile_event.dart';
 import 'routes/app_routes.dart';
@@ -19,10 +21,26 @@ import 'bloc/comment/comment_list_bloc.dart';
 import 'bloc/comment/comment_replies_bloc.dart';
 import 'bloc/comment/comment_detail_bloc.dart';
 import 'services/comment_service.dart';
+import 'services/notification_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() {
+// Top-level background message handler
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('🔥 Background message: ${message.messageId}');
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
+  await Firebase.initializeApp();
+  
+  // Set background message handler
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  
   runApp(
     MultiProvider(
       providers: [
@@ -48,6 +66,9 @@ class _RootAppState extends State<RootApp> {
     // Écoute des changements AuthProvider pour rebuild
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     authProvider.addListener(_onAuthChanged);
+    
+    // Initialize notification service
+    _initializeNotifications();
   }
 
   @override
@@ -59,6 +80,26 @@ class _RootAppState extends State<RootApp> {
   void _onAuthChanged() {
     // Force le rebuild quand login/signup change l'état
     setState(() {});
+  }
+
+  /// Initialize notification service
+  Future<void> _initializeNotifications() async {
+    final notificationService = NotificationService();
+    
+    // Set up notification tap handler
+    notificationService.onNotificationTapped = (String? route) {
+      if (route != null && route.isNotEmpty) {
+        // Navigate to specific route when notification is tapped
+        navigatorKey.currentState?.pushNamed(route);
+      }
+    };
+    
+    // Initialize the service
+    await notificationService.initialize();
+    
+    // Subscribe to plant care topics
+    await notificationService.subscribeToTopic('plant_care');
+    await notificationService.subscribeToTopic('watering_reminders');
   }
 
   @override
