@@ -314,6 +314,7 @@ export class PersonService {
             .andWhere('comment.isDeleted = false')
             .groupBy('comment.idComment')
             .addGroupBy('person.idPerson')
+            .addGroupBy('userLike.id_comment_like')
             .orderBy('comment.createdAt', 'DESC');
 
         // Add current user like status if provided

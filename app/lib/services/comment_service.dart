@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/comment_model.dart';
 import '../app_config.dart';
+import '../models/user_profile_model.dart';
 
 class CommentService {
   final String baseUrl = AppConfig.baseUrl;
@@ -230,6 +231,43 @@ class CommentService {
       return data.map((json) => Comment.fromJson(json)).toList();
     } else {
       throw Exception('Erreur de chargement du post: \\${response.statusCode}');
+    }
+  }
+
+  // Récupérer le profil d'un utilisateur
+  Future<UserProfile> fetchUserProfile(int userId, String? token) async {
+    final url = Uri.parse('${AppConfig.baseUrl}/person/$userId');
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    final response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      return UserProfile.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Erreur de chargement du profil utilisateur: \\${response.statusCode}');
+    }
+  }
+
+  // Récupérer les posts principaux d'un utilisateur
+  Future<List<Comment>> fetchUserMainComments(int userId, String? token, {String? currentUserId}) async {
+    final url = Uri.parse(currentUserId != null && currentUserId.isNotEmpty
+      ? '${AppConfig.baseUrl}/person/$userId/parent-comments?userId=$currentUserId'
+      : '${AppConfig.baseUrl}/person/$userId/parent-comments');
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    final response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      List data = json.decode(response.body);
+      return data.map((json) => Comment.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur de chargement des posts utilisateur: \\${response.statusCode}');
     }
   }
 } 

@@ -6,6 +6,7 @@ import '../../../services/comment_service.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../bloc/comment/comment_list_bloc.dart';
+import '../user_profile_page.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
@@ -97,10 +98,12 @@ class _CommentCardState extends State<CommentCard> {
                   // Avatar
                   GestureDetector(
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Profil de l’utilisateur #${_comment.person.idPerson}')),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserProfilePage(userId: _comment.person.idPerson),
+                        ),
                       );
-                      // TODO: Naviguer vers la page profil si besoin
                     },
                     child: CircleAvatar(
                       radius: 20,
