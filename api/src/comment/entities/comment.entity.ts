@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, ManyToMany, JoinTable, Index, DeleteDateColumn } from 'typeorm';
 import { Person } from '../../person/entities/person.entity';
+import { CommentLike } from './comment-like.entity';
 
 @Entity('comment')
 export class Comment {
@@ -26,6 +27,9 @@ export class Comment {
 
   @OneToMany(() => Comment, comment => comment.parentComment)
   replies: Comment[];
+
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.comment)
+  likes: CommentLike[];
 
   @Column({ name: 'is_deleted', default: false })
   isDeleted: boolean;
