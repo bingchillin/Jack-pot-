@@ -52,6 +52,13 @@ import {
       description: 'Include deleted posts in the results',
       example: false,
     })
+    @ApiQuery({
+      name: 'userId',
+      required: false,
+      type: Number,
+      description: 'Current user id for like status',
+      example: 1,
+    })
     @ApiResponse({
       status: 200,
       description: 'Return timeline of posts.',
@@ -78,14 +85,17 @@ import {
               },
             },
             replyCount: { type: 'number' },
+            likeCount: { type: 'number' },
+            isLikedByCurrentUser: { type: 'boolean' },
           },
         },
       },
     })
     async getTimeline(
       @Query('includeDeleted', new ParseBoolPipe({ optional: true })) includeDeleted?: boolean,
+      @Query('userId') userId?: string,
     ): Promise<any[]> {
-      return await this.commentService.getTimeline(includeDeleted || false);
+      return await this.commentService.getTimeline(includeDeleted || false, userId ? Number(userId) : undefined);
     }
   
     @Get('parent/:id')
@@ -159,17 +169,51 @@ import {
       description: 'Include deleted content in the results',
       example: false,
     })
+    @ApiQuery({
+      name: 'userId',
+      required: false,
+      type: Number,
+      description: 'Current user id for like status',
+      example: 1,
+    })
     @ApiResponse({
       status: 200,
       description: 'Return the post with all its comments as a flat array.',
-      type: [Comment],
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            idComment: { type: 'number' },
+            content: { type: 'string' },
+            idPerson: { type: 'number' },
+            parentCommentId: { type: 'number', nullable: true },
+            isDeleted: { type: 'boolean' },
+            deletedAt: { type: 'string', format: 'date-time', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+            person: {
+              type: 'object',
+              properties: {
+                idPerson: { type: 'number' },
+                email: { type: 'string' },
+                firstname: { type: 'string' },
+                surname: { type: 'string' },
+              },
+            },
+            likeCount: { type: 'number' },
+            isLikedByCurrentUser: { type: 'boolean' },
+          },
+        },
+      },
     })
     @ApiResponse({ status: 404, description: 'Post not found.' })
     async getPostWithComments(
       @Param('id', ParseIntPipe) id: number,
       @Query('includeDeleted', new ParseBoolPipe({ optional: true })) includeDeleted?: boolean,
-    ): Promise<Comment[]> {
-      return await this.commentService.getPostWithComments(id, includeDeleted || false);
+      @Query('userId') userId?: string,
+    ): Promise<any[]> {
+      return await this.commentService.getPostWithComments(id, includeDeleted || false, userId ? Number(userId) : undefined);
     }
   
     @Get('getCommentsByParentId/:parentId')

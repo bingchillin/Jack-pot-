@@ -7,8 +7,10 @@ class CommentService {
   final String baseUrl = AppConfig.baseUrl;
 
   // Récupérer tous les commentaires principaux (timeline)
-  Future<List<Comment>> fetchMainComments(String? token) async {
-    final url = Uri.parse('$baseUrl/comments/timeline');
+  Future<List<Comment>> fetchMainComments(String? token, {String? userId}) async {
+    final url = Uri.parse(userId != null && userId.isNotEmpty
+      ? '$baseUrl/comments/timeline?userId=$userId'
+      : '$baseUrl/comments/timeline');
     
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -129,7 +131,7 @@ class CommentService {
   }
 
   // Liker/Unliker un commentaire
-  Future<bool> toggleLike(int commentId, String token) async {
+  Future<Map<String, dynamic>> toggleLike(int commentId, String token, String userId) async {
     final url = Uri.parse('$baseUrl/comments/$commentId/like');
     final response = await http.post(
       url,
@@ -137,11 +139,15 @@ class CommentService {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
+      body: jsonEncode({'idPerson': int.parse(userId)}),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body);
-      return data['liked'];
+      return {
+        'liked': data['liked'],
+        'likeCount': data['likeCount'],
+      };
     } else {
       throw Exception('Erreur de like/unlike: ${response.statusCode}');
     }
@@ -204,6 +210,26 @@ class CommentService {
       throw Exception('Commentaire non trouvé');
     } else {
       throw Exception('Erreur de chargement du commentaire: ${response.statusCode}');
+    }
+  }
+
+  // Récupérer un post (commentaire parent) + toutes ses réponses (détail)
+  Future<List<Comment>> fetchPostWithComments(int postId, String? token, {String? userId}) async {
+    final url = Uri.parse(userId != null && userId.isNotEmpty
+      ? '$baseUrl/comments/$postId/withComments?userId=$userId'
+      : '$baseUrl/comments/$postId/withComments');
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    final response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      List data = json.decode(response.body);
+      return data.map((json) => Comment.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur de chargement du post: \\${response.statusCode}');
     }
   }
 } 

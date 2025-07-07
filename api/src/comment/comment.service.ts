@@ -38,7 +38,7 @@ export class CommentService {
   }
 
   // Timeline: Get all posts (comments with no parent)
-  async getTimeline(includeDeleted: boolean = false): Promise<any[]> {
+  async getTimeline(includeDeleted: boolean = false, currentUserId?: number): Promise<any[]> {
     const queryBuilder = this.commentRepository.createQueryBuilder('comment')
       .leftJoinAndSelect('comment.person', 'person')
       .select([
@@ -76,15 +76,37 @@ export class CommentService {
       .getRawMany();
     const replyCountMap = Object.fromEntries(replyCounts.map(r => [Number(r.parentCommentId), Number(r.count)]));
 
-    // Ajouter replyCount à chaque commentaire
+    // Pour chaque commentaire parent, compter les likes
+    const likeCounts = await this.commentLikeRepository
+      .createQueryBuilder('like')
+      .select('like.idComment', 'idComment')
+      .addSelect('COUNT(*)', 'count')
+      .where('like.idComment IN (:...ids)', { ids: commentIds })
+      .groupBy('like.idComment')
+      .getRawMany();
+    const likeCountMap = Object.fromEntries(likeCounts.map(l => [Number(l.idComment), Number(l.count)]));
+
+    // Ajouter replyCount, likeCount et isLikedByCurrentUser à chaque commentaire
+    let likedMap: Record<number, boolean> = {};
+    if (currentUserId) {
+      const liked = await this.commentLikeRepository
+        .createQueryBuilder('like')
+        .select('like.idComment', 'idComment')
+        .where('like.idComment IN (:...ids)', { ids: commentIds })
+        .andWhere('like.idPerson = :userId', { userId: currentUserId })
+        .getRawMany();
+      likedMap = Object.fromEntries(liked.map(l => [Number(l.idComment), true]));
+    }
     return comments.map(comment => ({
       ...comment,
       replyCount: replyCountMap[comment.idComment] || 0,
+      likeCount: likeCountMap[comment.idComment] || 0,
+      isLikedByCurrentUser: likedMap[comment.idComment] || false,
     }));
   }
 
   // Post detail: Get original post + all its comments
-  async getPostWithComments(postId: number, includeDeleted: boolean = false): Promise<Comment[]> {
+  async getPostWithComments(postId: number, includeDeleted: boolean = false, currentUserId?: number): Promise<any[]> {
     const whereConditions = includeDeleted 
       ? [
           { idComment: postId }, // The original post
@@ -97,7 +119,7 @@ export class CommentService {
 
     const comments = await this.commentRepository.find({
       where: whereConditions,
-      relations: ['parentComment'],
+      relations: ['parentComment', 'person'],
       order: { createdAt: 'ASC' },
     });
     
@@ -105,11 +127,35 @@ export class CommentService {
       throw new NotFoundException(`Post with ID ${postId} not found`);
     }
 
-    // Ensure the original post is first, then all comments
-    const originalPost = comments.find(c => c.idComment === postId);
-    const replies = comments.filter(c => c.idComment !== postId);
-    
-    return originalPost ? [originalPost, ...replies] : comments;
+    // Pour chaque commentaire, compter les likes
+    const commentIds = comments.map(c => c.idComment);
+    const likeCounts = await this.commentLikeRepository
+      .createQueryBuilder('like')
+      .select('like.idComment', 'idComment')
+      .addSelect('COUNT(*)', 'count')
+      .where('like.idComment IN (:...ids)', { ids: commentIds })
+      .groupBy('like.idComment')
+      .getRawMany();
+    const likeCountMap = Object.fromEntries(likeCounts.map(l => [Number(l.idComment), Number(l.count)]));
+
+    // Pour chaque commentaire, savoir si liké par l'utilisateur courant
+    let likedMap: Record<number, boolean> = {};
+    if (currentUserId) {
+      const liked = await this.commentLikeRepository
+        .createQueryBuilder('like')
+        .select('like.idComment', 'idComment')
+        .where('like.idComment IN (:...ids)', { ids: commentIds })
+        .andWhere('like.idPerson = :userId', { userId: currentUserId })
+        .getRawMany();
+      likedMap = Object.fromEntries(liked.map(l => [Number(l.idComment), true]));
+    }
+
+    // Retourne les commentaires enrichis
+    return comments.map(comment => ({
+      ...comment,
+      likeCount: likeCountMap[comment.idComment] || 0,
+      isLikedByCurrentUser: likedMap[comment.idComment] || false,
+    }));
   }
 
   // Get all comments for a specific parent (useful for lazy loading)

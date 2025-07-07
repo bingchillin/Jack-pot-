@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import '../../../models/comment_model.dart';
 import '../comment_detail_page.dart';
 import 'create_reply_modal.dart';
+import '../../../services/comment_service.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../bloc/comment/comment_list_bloc.dart';
 
-class CommentCard extends StatelessWidget {
+class CommentCard extends StatefulWidget {
   final Comment comment;
   final List<Comment> replies;
   final bool showReplies;
@@ -16,13 +20,55 @@ class CommentCard extends StatelessWidget {
   });
 
   @override
+  State<CommentCard> createState() => _CommentCardState();
+}
+
+class _CommentCardState extends State<CommentCard> {
+  late Comment _comment;
+
+  @override
+  void initState() {
+    super.initState();
+    _comment = widget.comment;
+  }
+
+  Future<void> _handleLike() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    final userId = authProvider.userId;
+    if (token == null || userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Connectez-vous pour liker')),
+      );
+      return;
+    }
+    try {
+      final result = await CommentService().toggleLike(_comment.idComment, token, userId);
+      setState(() {
+        _comment = _comment.copyWith(
+          likeCount: result['likeCount'] ?? _comment.likeCount,
+          isLikedByCurrentUser: result['liked'] ?? _comment.isLikedByCurrentUser,
+        );
+      });
+      if (mounted) {
+        context.read<CommentListBloc>().add(RefreshComments());
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors du like: $e')),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isAuthenticated = Provider.of<AuthProvider>(context, listen: false).isAuthenticated;
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CommentDetailPage(commentId: comment.idComment),
+            builder: (context) => CommentDetailPage(commentId: _comment.idComment),
           ),
         );
       },
@@ -53,8 +99,8 @@ class CommentCard extends StatelessWidget {
                     radius: 20,
                     backgroundColor: Colors.blue.shade100,
                     child: Text(
-                      comment.person.firstname.isNotEmpty 
-                          ? comment.person.firstname[0].toUpperCase()
+                      _comment.person.firstname.isNotEmpty 
+                          ? _comment.person.firstname[0].toUpperCase()
                           : 'U',
                       style: TextStyle(
                         color: Colors.blue.shade700,
@@ -69,14 +115,14 @@ class CommentCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          comment.person.displayName,
+                          _comment.person.displayName,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
                         Text(
-                          _formatTimeAgo(comment.createdAt),
+                          _formatTimeAgo(_comment.createdAt),
                           style: TextStyle(
                             color: Colors.grey.shade600,
                             fontSize: 14,
@@ -92,7 +138,7 @@ class CommentCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                comment.content,
+                _comment.content,
                 style: const TextStyle(fontSize: 16, height: 1.4),
               ),
             ),
@@ -109,18 +155,33 @@ class CommentCard extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.chat_bubble_outline, color: Colors.blue),
                         tooltip: 'Répondre',
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                            ),
-                            builder: (context) => CreateReplyModal(parentComment: comment),
-                          );
-                        },
+                        color: isAuthenticated ? Colors.blue : Colors.grey.shade400,
+                        onPressed: isAuthenticated
+                            ? () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                  ),
+                                  builder: (context) => CreateReplyModal(parentComment: _comment),
+                                );
+                              }
+                            : () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text('Connectez-vous pour répondre'),
+                                    action: SnackBarAction(
+                                      label: 'Se connecter',
+                                      onPressed: () {
+                                        Navigator.pushNamed(context, '/login');
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
                       ),
-                      if (comment.replyCount > 0)
+                      if (_comment.replyCount > 0)
                         Positioned(
                           right: 4,
                           top: 8,
@@ -131,7 +192,7 @@ class CommentCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
-                              '${comment.replyCount}',
+                              '${_comment.replyCount}',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -140,6 +201,29 @@ class CommentCard extends StatelessWidget {
                             ),
                           ),
                         ),
+                    ],
+                  ),
+                  const SizedBox(width: 8),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          _comment.isLikedByCurrentUser ? Icons.favorite : Icons.favorite_border,
+                          color: _comment.isLikedByCurrentUser ? Colors.red : Colors.grey.shade600,
+                          size: 22,
+                        ),
+                        tooltip: _comment.isLikedByCurrentUser ? 'Retirer le like' : 'Liker',
+                        onPressed: _handleLike,
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${_comment.likeCount}',
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
                     ],
                   ),
                 ],

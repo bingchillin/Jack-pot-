@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/comment/comment_list_bloc.dart';
 import 'widget/comment_card.dart';
 import 'widget/create_post_modal.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 
 class AdvisePage extends StatefulWidget {
   const AdvisePage({super.key});
@@ -173,20 +175,26 @@ class _AdvisePageState extends State<AdvisePage> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              builder: (context) => const CreatePostModal(),
+        floatingActionButton: Builder(
+          builder: (context) {
+            final isAuthenticated = Provider.of<AuthProvider>(context, listen: false).isAuthenticated;
+            if (!isAuthenticated) return const SizedBox.shrink();
+            return FloatingActionButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (context) => const CreatePostModal(),
+                );
+              },
+              backgroundColor: Colors.blue,
+              child: const Icon(Icons.add_comment_rounded, color: Colors.white),
+              tooltip: 'Nouveau post',
             );
           },
-          backgroundColor: Colors.blue,
-          child: const Icon(Icons.add_comment_rounded, color: Colors.white),
-          tooltip: 'Nouveau post',
         ),
       ),
     );
