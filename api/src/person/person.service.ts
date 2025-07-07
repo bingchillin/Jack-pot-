@@ -2,6 +2,8 @@ import { Injectable, ConflictException, NotFoundException, Logger, Inject, forwa
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindManyOptions } from 'typeorm';
 import { Person } from './entities/person.entity';
+import { Comment } from '../comment/entities/comment.entity';
+import { CommentLike } from '../comment/entities/comment-like.entity';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { CreatePersonResponseDto } from './dto/create-person-response.dto';
@@ -18,6 +20,10 @@ export class PersonService {
     constructor(
         @InjectRepository(Person)
         private personRepository: Repository<Person>,
+        @InjectRepository(Comment)
+        private commentRepository: Repository<Comment>,
+        @InjectRepository(CommentLike)
+        private commentLikeRepository: Repository<CommentLike>,
         private roleService: RoleService,
         @Inject(forwardRef(() => StripeService))
         private stripeService: StripeService,
@@ -289,5 +295,57 @@ export class PersonService {
 
         this.logger.log(`Batch Stripe customer creation completed: ${success} success, ${failed} failed`);
         return { success, failed, errors };
+    }
+    
+    async getParentCommentsByPersonId(personId: number, currentUserId?: number): Promise<any[]> {
+        // First verify that the person exists
+        const person = await this.findOne(personId);
+        if (!person) {
+            throw new NotFoundException(`Person with ID ${personId} not found`);
+        }
+
+        const queryBuilder = this.commentRepository
+            .createQueryBuilder('comment')
+            .leftJoinAndSelect('comment.person', 'person')
+            .leftJoin('comment.likes', 'likes')
+            .addSelect('COUNT(likes.idCommentLike) as likeCount')
+            .where('comment.idPerson = :personId', { personId })
+            .andWhere('comment.parentCommentId IS NULL')
+            .andWhere('comment.isDeleted = false')
+            .groupBy('comment.idComment')
+            .addGroupBy('person.idPerson')
+            .orderBy('comment.createdAt', 'DESC');
+
+        // Add current user like status if provided
+        if (currentUserId) {
+            queryBuilder
+                .leftJoin('comment.likes', 'userLike', 'userLike.idPerson = :currentUserId', { currentUserId })
+                .addSelect('CASE WHEN userLike.idCommentLike IS NOT NULL THEN true ELSE false END as isLikedByCurrentUser');
+        }
+
+        const rawResults = await queryBuilder.getRawAndEntities();
+
+        // Format the results with like statistics
+        return rawResults.entities.map((comment, index) => {
+            const rawResult = rawResults.raw[index];
+            return {
+                idComment: comment.idComment,
+                content: comment.content,
+                idPerson: comment.idPerson,
+                parentCommentId: comment.parentCommentId,
+                isDeleted: comment.isDeleted,
+                deletedAt: comment.deletedAt,
+                createdAt: comment.createdAt,
+                updatedAt: comment.updatedAt,
+                person: {
+                    idPerson: comment.person.idPerson,
+                    email: comment.person.email,
+                    firstname: comment.person.firstname,
+                    surname: comment.person.surname,
+                },
+                likeCount: parseInt(rawResult.likeCount) || 0,
+                ...(currentUserId && { isLikedByCurrentUser: rawResult.isLikedByCurrentUser === '1' || rawResult.isLikedByCurrentUser === true }),
+            };
+        });
     }
 } 
