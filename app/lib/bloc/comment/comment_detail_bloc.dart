@@ -2,6 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/comment_model.dart';
 import '../../services/comment_service.dart';
 import 'package:equatable/equatable.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+import '../../providers/auth_provider.dart';
 
 // Events
 abstract class CommentDetailEvent extends Equatable {
@@ -51,8 +54,9 @@ class CommentDetailError extends CommentDetailState {
 class CommentDetailBloc extends Bloc<CommentDetailEvent, CommentDetailState> {
   final CommentService commentService;
   final String? token;
+  final GlobalKey<NavigatorState> navigatorKey;
   
-  CommentDetailBloc({required this.commentService, required this.token}) 
+  CommentDetailBloc({required this.commentService, required this.token, required this.navigatorKey}) 
       : super(CommentDetailInitial()) {
     on<LoadCommentDetail>(_onLoadCommentDetail);
     on<RefreshCommentDetail>(_onLoadCommentDetail);
@@ -70,11 +74,18 @@ class CommentDetailBloc extends Bloc<CommentDetailEvent, CommentDetailState> {
         emit(CommentDetailError('Événement non reconnu'));
         return;
       }
-      // Charger le commentaire cliqué (parent ou réponse)
-      final comment = await commentService.fetchCommentById(commentId, token);
-      // Charger les réponses
-      final replies = await commentService.fetchReplies(commentId, token);
-      emit(CommentDetailLoaded(comment, replies));
+      // Récupérer le userId depuis le provider (si possible)
+      String? userId;
+      if (navigatorKey.currentContext != null) {
+        final authProvider = Provider.of<AuthProvider>(navigatorKey.currentContext!, listen: false);
+        userId = authProvider.userId;
+      }
+      // Appel unique à l'API enrichie
+      final comments = await commentService.fetchPostWithComments(commentId, token, userId: userId);
+      // parent = celui dont parentCommentId == null
+      final parentComment = comments.firstWhere((c) => c.parentCommentId == null, orElse: () => comments.first);
+      final replies = comments.where((c) => c.parentCommentId == parentComment.idComment).toList();
+      emit(CommentDetailLoaded(parentComment, replies));
     } catch (e) {
       emit(CommentDetailError(e.toString()));
     }

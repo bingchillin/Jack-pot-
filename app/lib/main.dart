@@ -20,6 +20,8 @@ import 'bloc/comment/comment_replies_bloc.dart';
 import 'bloc/comment/comment_detail_bloc.dart';
 import 'services/comment_service.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() {
   runApp(
     MultiProvider(
@@ -86,6 +88,7 @@ class _RootAppState extends State<RootApp> {
           create: (_) => CommentListBloc(
             commentService: CommentService(),
             token: token,
+            navigatorKey: navigatorKey,
           )..add(LoadComments()),
         ),
         BlocProvider<CommentRepliesBloc>(
@@ -98,6 +101,7 @@ class _RootAppState extends State<RootApp> {
           create: (_) => CommentDetailBloc(
             commentService: CommentService(),
             token: token,
+            navigatorKey: navigatorKey,
           ),
         ),
       ],
@@ -107,6 +111,7 @@ class _RootAppState extends State<RootApp> {
         routes: appRoutes,
         initialRoute: '/',
         debugShowCheckedModeBanner: false,
+        navigatorKey: navigatorKey,
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

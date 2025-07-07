@@ -8,6 +8,7 @@ import '../../../bloc/comment/comment_replies_state.dart';
 import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/comment_service.dart';
+import '../../../bloc/comment/comment_detail_bloc.dart';
 
 class CreateReplyModal extends StatefulWidget {
   final Comment parentComment;
@@ -243,6 +244,8 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
       context.read<CommentRepliesBloc>().add(RefreshReplies(widget.parentComment.idComment));
       // Rafraîchir aussi la liste des commentaires pour mettre à jour le replyCount
       context.read<CommentListBloc>().add(RefreshComments());
+      // Rafraîchir la page de détail pour afficher la nouvelle réponse
+      context.read<CommentDetailBloc>().add(RefreshCommentDetail(widget.parentComment.idComment));
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Réponse publiée !')),

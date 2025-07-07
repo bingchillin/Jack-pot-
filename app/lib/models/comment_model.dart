@@ -58,9 +58,9 @@ class Comment {
       deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      likeCount: 0, // Non disponible dans l'API
+      likeCount: json['likeCount'] ?? 0,
       replyCount: json['replyCount'] ?? 0,
-      isLikedByCurrentUser: false, // Non disponible dans l'API
+      isLikedByCurrentUser: json['isLikedByCurrentUser'] ?? false,
       replies: [], // Les réponses sont chargées séparément
     );
   }
