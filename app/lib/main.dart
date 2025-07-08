@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:jackpote/app_config.dart';
 import 'package:jackpote/providers/plant_provider_my_List.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +32,12 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('🔥 Background message: ${message.messageId}');
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   
   // Initialize Firebase
   await Firebase.initializeApp();

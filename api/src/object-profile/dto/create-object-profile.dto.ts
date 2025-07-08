@@ -22,8 +22,11 @@ export class CreateObjectProfileDto {
 
     @ApiProperty({ description: 'The ID of the object', required: false })
     @IsNumber()
-    @IsOptional()
     idObject?: number;
+
+    @ApiProperty({ description: 'The ID of the object', required: false })
+    @IsNumber()
+    idPerson?: number;
 
     @ApiProperty({ description: 'The ID of the plant type', required: false })
     @IsNumber()

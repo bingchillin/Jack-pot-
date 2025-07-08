@@ -4,6 +4,8 @@ API:
 
 - L'api n'est dispo qu'en local
 - Modification update pour un retour dans l'app plus precis au niv détails de ma plante (pourquoi pas ajouter un table dans bdd)
+- cron pour si la plante n'a plus de connexion
+- plant_type se retrouve sans jwt
 
 APP Mobile
 
@@ -13,10 +15,14 @@ APP Mobile
 - Les avatar sont pas ouf, modifier les avatar en fonction de l'etat
 - Refresh du token pas encore implémenté
 - notifications push
+- les state des card ne sont pas respecter
+- La partie descriptif de l'object_profile n'est pas dynamique, a modifier
+- affichage des liste doivent toujours etre pareil... la ce n'est pas le cas
 
 Electronique:
 
 - Ajouter une batterie pour la consommation
+- Sécurité de création car on peut "volé" ton pot
 
 
 Front:

@@ -3,7 +3,7 @@
 #include <WiFi.h>
 
 #include <Preferences.h>
-Preferences prefs;
+
 
 #define SERVICE_UUID        "12345678-1234-1234-1234-1234567890ab"
 #define WRITE_CHAR_UUID     "abcdef02-1234-1234-1234-abcdefabcdef"
@@ -15,14 +15,19 @@ Preferences prefs;
 volatile bool startBLERequested = false;
 bool bleStarted = false;
 
-unsigned long lastActivity = 0; // 🕒 Temps du dernier message reçu
-const unsigned long BLE_TIMEOUT = 300000; // 30 sec d'inactivité
+unsigned long lastActivity = 0; 
+const unsigned long BLE_TIMEOUT = 120000; 
 
 NimBLECharacteristic* notifyChr;
+
+String json_id_op_url = "";
+
 int id_object = 1;
+String id_object_profile = "";
 
 String wifi_ssid = "";
 String wifi_password = "";
+String base_url = "";
 
 ////var blink led //
 volatile bool ledBlinking = false; 
@@ -35,6 +40,7 @@ void IRAM_ATTR onButtonPressed() {
 }
 
 /////////////BLE ///////////////////
+
 
 // ==== BLE CALLBACK ====
 class MyCallbacks : public NimBLECharacteristicCallbacks {
@@ -51,12 +57,17 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
     } else if (value == "led_stop") {
       ledBlinking = false;
       digitalWrite(LED_PIN, LOW);
+    } else if (value == "stopBle") {
+        //stopBLE();
     } else {
+      
       // On tente de parser comme un JSON
-      StaticJsonDocument<256> doc;
+      StaticJsonDocument<512> doc;
       DeserializationError error = deserializeJson(doc, value);
 
       if (!error) {
+        Preferences prefs;
+        
         if (doc.containsKey("wifi_user") && doc.containsKey("wifi_password")) {
           wifi_ssid = doc["wifi_user"].as<String>();
           wifi_password = doc["wifi_password"].as<String>();
@@ -65,27 +76,68 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
           Serial.println("SSID: " + wifi_ssid);
           Serial.println("Password: " + wifi_password);
 
-          // Sauvegarde en NVS
-          prefs.begin("wifi_creds", false); // false = écriture
-          prefs.putString("ssid", wifi_ssid);
-          prefs.putString("pass", wifi_password);
-          prefs.end();
-
-          Serial.println("💾 Identifiants sauvegardés dans la mémoire !");
 
           bool wifiOk = testWiFiConnection(wifi_ssid, wifi_password);
 
           String result = wifiOk ? "wifi_ok" : "wifi_fail";
+
+          if (result == "wifi_ok"){
+            // Sauvegarde en NVS
+            prefs.begin("save_data", false); // false = écriture
+            prefs.putString("ssid", wifi_ssid);
+            prefs.putString("pass", wifi_password);
+            prefs.end();
+
+            Preferences prefs;
+            prefs.begin("save_data", true);
+            wifi_ssid = prefs.getString("ssid", "");
+            wifi_password = prefs.getString("pass", "");
+            prefs.end();
+
+            
+          }
+
+          if (result == "wifi_ok" && id_object_profile != ""){
+            Serial.println("id----: " + result);
+            result = "{ \"id_object_profile\": \"" + id_object_profile + "\" }";
+            Serial.println("id----: " + result);
+          }
+          
           notifyChr->setValue(result.c_str());
           notifyChr->notify();
+
+          
         }
-      } else {
+        
+        // Dans le callback BLE
+        if (doc.containsKey("id_object_profile") && doc.containsKey("base_url")) {
+            
+            String jsonString;
+            serializeJson(doc, jsonString);
+            prefs.begin("save_data", false);
+            prefs.putString("json_id_op_url", jsonString); 
+            prefs.end();
+
+            id_object_profile = doc["id_object_profile"].as<String>();
+            base_url = doc["base_url"].as<String>();
+           
+   
+        
+            Serial.println("💾 Données sauvegardées avec succès !");
+            
+            String result = String(id_object);
+            notifyChr->setValue(result.c_str());
+            notifyChr->notify();
+        }
+      }else {
         Serial.println("❌ Erreur de parsing JSON");
       }
     }
 
   }
 };
+
+
 
 // ==== BLE START ====
 void startBLE() {
@@ -134,6 +186,7 @@ void stopBLE() {
   Serial.println("🛑 Désactivation du BLE (inactivité)");
   NimBLEDevice::getAdvertising()->stop();
   NimBLEDevice::deinit(true);
+  ledBlinking = false;
   digitalWrite(LED_PIN, LOW);
   bleStarted = false;
 }
@@ -157,18 +210,42 @@ void taskBleUse(void * parameter) {
 
 /////////////////////////////
 
+void loadPreferences() {
+  Preferences prefs;
+
+  prefs.begin("save_data", true);
+  wifi_ssid = prefs.getString("ssid", "");
+  wifi_password = prefs.getString("pass", "");
+  json_id_op_url = prefs.getString("json_id_op_url", "");
+  prefs.end();
+
+  StaticJsonDocument<512> doc;
+  DeserializationError error = deserializeJson(doc, json_id_op_url); // ✅ ici c'est json_id_op_url
+
+  if (!error) {
+    if (doc.containsKey("id_object_profile")) {
+      id_object_profile = doc["id_object_profile"].as<String>();
+    }
+    if (doc.containsKey("base_url")) {
+      base_url = doc["base_url"].as<String>();
+    }
+  } else {
+    Serial.println("❌ Erreur de parsing JSON depuis la mémoire");
+  }
+}
+
+
 // ==== SETUP ====
 void setup() {
   Serial.begin(115200);
 
-  prefs.begin("wifi_creds", true); // true = lecture seule
-  wifi_ssid = prefs.getString("ssid", "");
-  wifi_password = prefs.getString("pass", "");
-  prefs.end();
+  loadPreferences();
 
-  Serial.println("📂 WiFi chargé depuis la mémoire :");
+  Serial.println("📂 Données chargées depuis la mémoire :");
   Serial.println("SSID: " + wifi_ssid);
   Serial.println("Password: " + wifi_password);
+  Serial.println("ID Object Profile: " + id_object_profile);
+  Serial.println("Base URL: " + base_url);
 
 
   pinMode(LED_PIN, OUTPUT);
@@ -179,6 +256,8 @@ void setup() {
   xTaskCreate(taskBleUse, "BLE Task", 4096, NULL, 1, NULL);
 
   xTaskCreate(taskLedBlink, "LED Blink Task", 2048, NULL, 1, NULL);
+
+  xTaskCreate(taskPushIdObject, "Push id object Task", 2048, NULL, 1, NULL);
 }
 
 
@@ -187,14 +266,38 @@ void setup() {
 /// LED //////////
 
 void taskLedBlink(void *parameter) {
+  bool previousBlinkState = false;
+
   while (1) {
     if (ledBlinking) {
-        digitalWrite(LED_PIN, ledBlinkingVar);
-        ledBlinkingVar = !ledBlinkingVar;   
+      digitalWrite(LED_PIN, ledBlinkingVar);
+      ledBlinkingVar = !ledBlinkingVar;
+    } else if (previousBlinkState) {
+      // On vient de passer de ON à OFF, on éteint proprement la LED
+      digitalWrite(LED_PIN, LOW);
+      ledBlinkingVar = false;  // Réinitialise la variable
     }
+
+    previousBlinkState = ledBlinking;
     vTaskDelay(500 / portTICK_PERIOD_MS);
   }
 }
+
+/// Push id_object //////////
+
+void taskPushIdObject(void *parameter) {
+  while (1) {
+    if (bleStarted) {
+      String msg = String(id_object);
+      notifyChr->setValue(msg.c_str());
+      notifyChr->notify();
+      Serial.println("📤 Envoyé : " + msg);
+    }
+    
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+  }
+}
+
 
 ////////////////////
 
@@ -228,15 +331,5 @@ bool testWiFiConnection(const String& ssid, const String& password) {
 
 // ==== LOOP ====
 void loop() {
-  static unsigned long last = 0;
-  if (bleStarted && millis() - last > 5000) {
-    String msg = String(id_object);
-    notifyChr->setValue(msg.c_str());
-    notifyChr->notify();
-    Serial.println("📤 Envoyé : " + msg);
-    last = millis();
 
-     Serial.println("SSID: " + wifi_ssid);
-     Serial.println("Password: " + wifi_password);
-  }
 }

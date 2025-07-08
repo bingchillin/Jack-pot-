@@ -27,6 +27,56 @@ class ObjectProfileService {
   static final StreamController<int> _plantUpdateController = StreamController<int>.broadcast();
   static Stream<int> get plantUpdateStream => _plantUpdateController.stream;
 
+
+  Future<ObjectProfile> createObjectProfile({
+    required String token,
+    String title = "Watering Can Profile",
+    required String userId,
+    int? idPlantType,
+    int? idObject,
+  }) async {
+    final url = Uri.parse(AppConfig.objectProfilesPostEndpoint());
+
+    final body = {
+      "title": title,
+      "idPerson": userId,
+      if (idObject != null) "idObject": idObject,
+      if (idPlantType != null) "idPlantType": idPlantType,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return ObjectProfile.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Échec de la création du profil: ${response.statusCode}');
+    }
+  }
+
+
+  Future<List<ObjectProfile>> fetchProfilesAll(String token) async {
+    final url = Uri.parse(AppConfig.objectProfilesAllEndpoint());
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      List data = json.decode(response.body);
+      return data.map((json) => ObjectProfile.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur de chargement: ${response.statusCode}');
+    }
+  }
+
+
   Future<List<ObjectProfile>> fetchProfiles(String personId, String token) async {
     final url = Uri.parse(AppConfig.objectProfilesEndpoint(personId));
     final response = await http.get(url, headers: {

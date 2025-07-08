@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:jackpote/models/plant_type.dart';
 import 'package:jackpote/services/plant_service.dart';
@@ -6,7 +7,10 @@ import '../../models/avatar.dart';
 import 'choose_plant_detail_page.dart';
 
 class ChooseYourPlantPage extends StatefulWidget {
-  const ChooseYourPlantPage({super.key});
+  final String? plantName;
+  final String? idObject;
+
+  const ChooseYourPlantPage({Key? key, this.plantName, this.idObject}) : super(key: key);
 
   @override
   State<ChooseYourPlantPage> createState() => _ChooseYourPlantPageState();
@@ -20,6 +24,29 @@ class _ChooseYourPlantPageState extends State<ChooseYourPlantPage> {
   Timer? _debounce;
   bool _isLoading = false;
 
+  String? _plantName;
+  String? _idObject;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+
+      setState(() {
+        if (args != null && args is Map<String, dynamic>) {
+          _plantName = args["plantName"];
+          _idObject = args["idObject"];
+        } else {
+          _plantName = widget.plantName;
+          _idObject = widget.idObject;
+        }
+      });
+    });
+  }
+
+
+
   @override
   void dispose() {
     _debounce?.cancel();
@@ -30,7 +57,7 @@ class _ChooseYourPlantPageState extends State<ChooseYourPlantPage> {
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
 
-    _debounce = Timer(const Duration(milliseconds: 400), () {
+    _debounce = Timer(const Duration(milliseconds: 1000), () {
       FocusScope.of(context).unfocus(); // Fermer le clavier
       if (query.isNotEmpty) {
         _fetchResults(query);
@@ -74,7 +101,9 @@ class _ChooseYourPlantPageState extends State<ChooseYourPlantPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Choisir une plante")),
+      appBar: AppBar(
+        title: Text("Choisir une plante pour ${_plantName ?? '...'}"),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -113,7 +142,11 @@ class _ChooseYourPlantPageState extends State<ChooseYourPlantPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    ChoosePlantDetailPage(plant: plant),
+                                    ChoosePlantDetailPage(
+                                        plant: plant,
+                                        plantName: _plantName,
+                                        idObject: _idObject
+                                    ),
                               ),
                             );
                           },
@@ -140,6 +173,14 @@ class _ChooseYourPlantPageState extends State<ChooseYourPlantPage> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/choose_your_plant_picture');
+        },
+        tooltip: 'Prendre une photo',
+        child: Icon(Icons.camera_alt),
+      ),
+
     );
   }
 }

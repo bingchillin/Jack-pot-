@@ -91,8 +91,8 @@ class PlantOverviewTab extends StatelessWidget {
     final stateColor = _getStateColor(plant.state);
     final healthScore = _getHealthScore();
     final healthColor = _getHealthColor();
-    final imageUrl = plant.plantType.pathPicture != null
-        ? Uri.parse(AppConfig.baseUrl).resolve(plant.plantType.pathPicture!).toString()
+    final imageUrl = plant.plantType?.pathPicture != null
+        ? Uri.parse(AppConfig.baseUrl).resolve(plant.plantType!.pathPicture!).toString()
         : null;
 
     return SingleChildScrollView(

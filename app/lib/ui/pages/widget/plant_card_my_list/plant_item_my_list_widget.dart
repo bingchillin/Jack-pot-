@@ -66,7 +66,7 @@ class PlantItemMyListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final pathPicture = plant.plantType.pathPicture;
+    final pathPicture = plant.plantType?.pathPicture;
     final stateColor = _getStateColor(plant.state);
 
     return Container(
@@ -176,7 +176,7 @@ class PlantItemMyListWidget extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          plant.plantType.title ?? localizations.unknownType,
+                          plant.plantType?.title ?? localizations.unknownType,
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
