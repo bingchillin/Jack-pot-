@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, ClassSerializerInterceptor, UseInterceptors, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, ClassSerializerInterceptor, UseInterceptors, Request, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { NotificationService } from './notification.service';
@@ -8,6 +8,8 @@ import { RegisterFcmTokenDto } from './dto/register-fcm-token.dto';
 import { SendPlantNotificationDto } from './dto/send-plant-notification.dto';
 import { Notification } from './entities/notification.entity';
 import { FirebaseService } from '../firebase/firebase.service';
+import { BadRequestException } from '@nestjs/common';
+import { PersonService } from '../person/person.service';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(ClassSerializerInterceptor)
@@ -18,6 +20,7 @@ export class NotificationController {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly firebaseService: FirebaseService,
+    private readonly personService: PersonService,
   ) {}
 
   @Post('register-token')
@@ -201,5 +204,26 @@ export class NotificationController {
   @ApiExcludeEndpoint()
   remove(@Param('id') id: string): Promise<void> {
     return this.notificationService.remove(+id);
+  }
+
+  @Delete('remove-token')
+  async removeToken(@Body() removeTokenDto: { fcmToken: string }, @Req() req: any) {
+    try {
+      const userId = req.user.userId;
+      
+      // Remove token from user's record
+      await this.personService.removeFcmToken(userId);
+      
+      return {
+        success: true,
+        message: 'FCM token removed successfully'
+      };
+    } catch (error) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Failed to remove FCM token',
+        error: error.message
+      });
+    }
   }
 } 

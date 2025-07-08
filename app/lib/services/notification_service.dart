@@ -188,7 +188,7 @@ class NotificationService {
     }
   }
 
-  /// Unsubscribe from topic
+  /// Unsubscribe from a topic
   Future<void> unsubscribeFromTopic(String topic) async {
     try {
       await _firebaseMessaging.unsubscribeFromTopic(topic);
@@ -199,6 +199,93 @@ class NotificationService {
       if (kDebugMode) {
         print('❌ Error unsubscribing from topic $topic: $e');
       }
+    }
+  }
+
+  /// Remove FCM token from backend (for logout)
+  Future<bool> removeTokenFromBackend({
+    required String baseUrl,
+    required String authToken,
+  }) async {
+    try {
+      String? fcmToken = await getDeviceToken();
+      if (fcmToken == null) {
+        if (kDebugMode) {
+          print('❌ No FCM token to remove');
+        }
+        return false;
+      }
+
+      final response = await http.delete(
+        Uri.parse('$baseUrl/notifications/remove-token'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+        body: json.encode({
+          'fcmToken': fcmToken,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          print('✅ FCM token removed from backend successfully');
+        }
+        return true;
+      } else {
+        if (kDebugMode) {
+          print('❌ Failed to remove FCM token from backend: ${response.statusCode}');
+        }
+        return false;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ Error removing FCM token from backend: $e');
+      }
+      return false;
+    }
+  }
+
+  /// Send plant care notification
+  Future<bool> sendPlantCareNotification({
+    required String baseUrl,
+    required String authToken,
+    required String plantName,
+    required String alertType,
+    String? message,
+    Map<String, dynamic>? sensorData,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/notifications/send-plant-notification'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+        body: json.encode({
+          'plantName': plantName,
+          'alertType': alertType,
+          'message': message,
+          'sensorData': sensorData,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (kDebugMode) {
+          print('✅ Plant care notification sent successfully');
+        }
+        return true;
+      } else {
+        if (kDebugMode) {
+          print('❌ Failed to send plant care notification: ${response.statusCode}');
+        }
+        return false;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ Error sending plant care notification: $e');
+      }
+      return false;
     }
   }
 
