@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import 'widget/comment_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/comment/comment_bloc.dart';
+import '../widgets/friend_request_button.dart';
 
 class UserProfilePage extends StatefulWidget {
   final int userId;
@@ -103,6 +104,15 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
                           style: const TextStyle(fontSize: 14, color: Colors.black45),
                         ),
                       ),
+                    const SizedBox(height: 16),
+                    // Bouton d'ajout d'ami
+                    FriendRequestButton(
+                      targetUserId: widget.userId,
+                      onStatusChanged: () {
+                        // Optionnel : rafraîchir quelque chose si nécessaire
+                        print('Statut d\'ami changé pour l\'utilisateur ${widget.userId}');
+                      },
+                    ),
                   ],
                 ),
               ),
