@@ -7,6 +7,7 @@ import 'widget/create_post_modal.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../widgets/feed_toggle_header.dart';
+import '../../main.dart';
 
 class AdvisePage extends StatefulWidget {
   const AdvisePage({super.key});
@@ -31,6 +32,12 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // S'abonner au RouteObserver
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+    
     // Détecter quand on revient à cette page
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final currentState = context.read<CommentBloc>().state;
@@ -39,6 +46,22 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
         context.read<CommentBloc>().add(const EmitMainCommentsState());
       }
     });
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  // Méthode appelée quand la page devient visible (retour depuis une autre page)
+  @override
+  void didPopNext() {
+    super.didPopNext();
+    // Rafraîchir les commentaires quand on revient sur cette page
+    // (utile après des changements comme déblocage d'utilisateurs)
+    print('🔄 Advise page: Returning from another page, refreshing feed');
+    _loadCurrentFeed();
   }
 
   void _loadCurrentFeed() {

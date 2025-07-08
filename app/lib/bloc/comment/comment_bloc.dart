@@ -147,7 +147,11 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   Future<void> _onLoadMainComments(LoadMainComments event, Emitter<CommentState> emit) async {
     emit(CommentLoading());
     try {
-      final comments = await commentService.fetchMainComments(token, userId: event.userId);
+      // Utiliser la méthode avec filtrage des utilisateurs bloqués (toujours frais)
+      final comments = await commentService.fetchMainCommentsWithoutBlocked(
+        token, 
+        userId: event.userId,
+      );
       _mainComments = comments;
       emit(CommentMainLoaded(comments));
     } catch (e) {
@@ -269,6 +273,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   }
   
   Future<void> _onRefreshComments(RefreshComments event, Emitter<CommentState> emit) async {
+    // Forcer le rechargement avec le filtrage des utilisateurs bloqués
     if (_currentThreadHierarchy.isNotEmpty) {
       add(LoadCommentDetail(_currentThreadHierarchy.first.idComment, userId: event.userId));
     } else {

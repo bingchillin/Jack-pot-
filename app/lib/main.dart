@@ -22,6 +22,7 @@ import 'services/comment_service.dart';
 import 'services/notification_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 // Top-level background message handler
 @pragma('vm:entry-point')
@@ -138,6 +139,7 @@ class _RootAppState extends State<RootApp> {
         initialRoute: '/',
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
+        navigatorObservers: [routeObserver],
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

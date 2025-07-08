@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/comment_model.dart';
+import '../models/contact_model.dart';
 import '../app_config.dart';
 import '../models/user_profile_model.dart';
 import 'contact_service.dart';
@@ -272,13 +273,13 @@ class CommentService {
     }
   }
 
-  // Récupérer uniquement les commentaires des amis
+  // Récupérer uniquement les commentaires des amis (avec filtrage des bloqués)
   Future<List<Comment>> fetchFriendsComments(String token, int userId) async {
     try {
       print('Flutter - Loading friends comments for user $userId');
       
-      // D'abord, récupérer tous les commentaires
-      final allComments = await fetchMainComments(token, userId: userId.toString());
+      // D'abord, récupérer tous les commentaires avec filtrage des bloqués
+      final allComments = await fetchMainCommentsWithoutBlocked(token, userId: userId.toString());
       
       // Ensuite, récupérer la liste des amis
       final contactService = ContactService();
@@ -303,6 +304,114 @@ class CommentService {
     } catch (e) {
       print('Error loading friends comments: $e');
       throw Exception('Error loading friends comments: $e');
+    }
+  }
+
+  // Filtrer les commentaires en excluant les utilisateurs bloqués
+  Future<List<Comment>> _filterBlockedUsers(List<Comment> comments, String token, int currentUserId) async {
+    try {
+      print('🔍 Flutter - Filtering blocked users for user $currentUserId');
+      
+      // Toujours récupérer les contacts frais (pas de cache)
+      print('🔄 Flutter - Fetching fresh contacts data');
+      final contactService = ContactService();
+      
+      // Récupérer TOUS les types de contacts (acceptés, en attente, envoyés, bloqués)
+      final myContacts = await contactService.getMyContacts(token: token);
+      final pendingRequests = await contactService.getPendingRequests(token: token);
+      final sentRequests = await contactService.getSentRequests(token: token);
+      final blockedContacts = await contactService.getBlockedContacts(token: token);
+      
+      // Combiner tous les contacts
+      final allContacts = [...myContacts, ...pendingRequests, ...sentRequests, ...blockedContacts];
+      
+              print('📞 Flutter - Found ${allContacts.length} total contacts');
+      
+      // Debug détaillé de tous les contacts
+      for (var contact in allContacts) {
+        print('📱 Contact ${contact.id}: status=${contact.status.value}, requester=${contact.requesterId}, receiver=${contact.receiverId}, blockedBy=${contact.blockedBy}');
+      }
+      
+      // Obtenir les IDs des utilisateurs bloqués
+      final filteredBlockedContacts = allContacts.where((contact) {
+        try {
+          return contact.isBlocked;
+        } catch (e) {
+          print('Error checking if contact is blocked: $e');
+          return false;
+        }
+      }).toList();
+      print('🚫 Flutter - Blocked contacts: ${filteredBlockedContacts.length}');
+      
+      for (var contact in filteredBlockedContacts) {
+        try {
+          final otherUser = contact.getOtherUser(currentUserId);
+          print('👤 Blocked user: ${otherUser?.id} (${otherUser?.displayName})');
+        } catch (e) {
+          print('Error getting other user: $e');
+        }
+      }
+      
+      final blockedUserIds = <int>{};
+      for (var contact in filteredBlockedContacts) {
+        try {
+          final otherUser = contact.getOtherUser(currentUserId);
+          if (otherUser?.id != null) {
+            blockedUserIds.add(otherUser!.id);
+          }
+        } catch (e) {
+          print('Error getting blocked user ID: $e');
+        }
+      }
+      
+      print('🎯 Flutter - Final blocked user IDs: $blockedUserIds');
+      
+      // Debug des commentaires à filtrer
+      print('💬 Comments to filter: ${comments.map((c) => 'Comment from user ${c.idPerson}')}');
+      
+      // Filtrer les commentaires pour exclure ceux des utilisateurs bloqués
+      final filteredComments = comments
+          .where((comment) => !blockedUserIds.contains(comment.idPerson))
+          .toList();
+          
+      print('✅ Flutter - Filtered ${comments.length - filteredComments.length} comments from blocked users');
+      print('📝 Remaining comments: ${filteredComments.map((c) => 'Comment from user ${c.idPerson}')}');
+      
+      return filteredComments;
+    } catch (e) {
+      print('❌ Error filtering blocked users: $e');
+      // En cas d'erreur, retourner la liste originale
+      return comments;
+    }
+  }
+
+
+
+  // Récupérer tous les commentaires principaux avec filtrage des utilisateurs bloqués
+  Future<List<Comment>> fetchMainCommentsWithoutBlocked(String? token, {String? userId}) async {
+    if (token == null || userId == null) {
+      // Si pas connecté, utiliser la méthode normale
+      return fetchMainComments(token, userId: userId);
+    }
+
+    try {
+      // Récupérer tous les commentaires
+      final allComments = await fetchMainComments(token, userId: userId);
+      
+      // Filtrer les utilisateurs bloqués (toujours avec des données fraîches)
+      final filteredComments = await _filterBlockedUsers(
+        allComments, 
+        token, 
+        int.parse(userId)
+      );
+      
+      print('Filtered ${allComments.length - filteredComments.length} comments from blocked users');
+      
+      return filteredComments;
+    } catch (e) {
+      print('Error loading comments without blocked users: $e');
+      // En cas d'erreur, retourner la méthode normale
+      return fetchMainComments(token, userId: userId);
     }
   }
 } 

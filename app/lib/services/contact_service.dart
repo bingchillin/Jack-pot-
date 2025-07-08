@@ -151,6 +151,8 @@ class ContactService {
     required String token,
   }) async {
     final url = Uri.parse('$baseUrl/contacts/my-contacts');
+    
+    print('🌐 ContactService - Requesting: ${url.toString()}');
 
     final response = await http.get(
       url,
@@ -160,9 +162,19 @@ class ContactService {
       },
     );
 
+    print('📡 ContactService - Response status: ${response.statusCode}');
+    print('📡 ContactService - Response body: ${response.body}');
+
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
-      return data.map((json) => Contact.fromJson(json)).toList();
+      final contacts = data.map((json) => Contact.fromJson(json)).toList();
+      
+      print('📋 ContactService - Parsed ${contacts.length} contacts');
+      for (var contact in contacts) {
+        print('📋 Contact: id=${contact.id}, status=${contact.status.value}, requester=${contact.requesterId}, receiver=${contact.receiverId}');
+      }
+      
+      return contacts;
     } else {
       throw Exception('Erreur de chargement des contacts: ${response.statusCode}');
     }
@@ -212,6 +224,40 @@ class ContactService {
     }
   }
 
+  // Récupérer les contacts bloqués
+  Future<List<Contact>> getBlockedContacts({
+    required String token,
+  }) async {
+    final url = Uri.parse('$baseUrl/contacts/blocked');
+    
+    print('🌐 ContactService - Requesting blocked: ${url.toString()}');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    print('📡 ContactService - Blocked response status: ${response.statusCode}');
+    print('📡 ContactService - Blocked response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      List data = json.decode(response.body);
+      final contacts = data.map((json) => Contact.fromJson(json)).toList();
+      
+      print('📋 ContactService - Parsed ${contacts.length} blocked contacts');
+      for (var contact in contacts) {
+        print('📋 Blocked Contact: id=${contact.id}, status=${contact.status.value}, requester=${contact.requesterId}, receiver=${contact.receiverId}');
+      }
+      
+      return contacts;
+    } else {
+      throw Exception('Erreur de chargement des contacts bloqués: ${response.statusCode}');
+    }
+  }
+
   // Vérifier le statut de relation avec un utilisateur
   Future<Contact?> getContactStatus({
     required int userId,
@@ -219,13 +265,13 @@ class ContactService {
   }) async {
     try {
       // On récupère tous les contacts et on filtre côté client
-      // Note: L'API ne semble pas avoir d'endpoint spécifique pour ça
       final myContacts = await getMyContacts(token: token);
       final pendingRequests = await getPendingRequests(token: token);
       final sentRequests = await getSentRequests(token: token);
+      final blockedContacts = await getBlockedContacts(token: token);
 
       // Rechercher dans tous les types de relations
-      final allRelations = [...myContacts, ...pendingRequests, ...sentRequests];
+      final allRelations = [...myContacts, ...pendingRequests, ...sentRequests, ...blockedContacts];
       
       for (final contact in allRelations) {
         if (contact.requesterId == userId || contact.receiverId == userId) {

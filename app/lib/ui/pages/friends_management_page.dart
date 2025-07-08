@@ -4,6 +4,7 @@ import '../../models/contact_model.dart';
 import '../../services/contact_service.dart';
 import '../../providers/auth_provider.dart';
 import 'user_profile_page.dart';
+import 'blocked_users_page.dart';
 
 class FriendsManagementPage extends StatefulWidget {
   const FriendsManagementPage({Key? key}) : super(key: key);
@@ -197,6 +198,18 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.block),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BlockedUsersPage(),
+                ),
+              );
+            },
+            tooltip: 'Utilisateurs bloqués',
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadAllContacts,
