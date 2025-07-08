@@ -6,6 +6,7 @@ import 'widget/comment_card.dart';
 import 'widget/create_post_modal.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../widgets/feed_toggle_header.dart';
 
 class AdvisePage extends StatefulWidget {
   const AdvisePage({super.key});
@@ -15,14 +16,15 @@ class AdvisePage extends StatefulWidget {
 }
 
 class _AdvisePageState extends State<AdvisePage> with RouteAware {
+  FeedType _currentFeed = FeedType.forYou;
+
   @override
   void initState() {
     super.initState();
     // Charger les commentaires au démarrage si pas déjà chargés
     final currentState = context.read<CommentBloc>().state;
     if (currentState is CommentInitial) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      context.read<CommentBloc>().add(LoadMainComments(userId: authProvider.userId));
+      _loadCurrentFeed();
     }
   }
   
@@ -37,6 +39,52 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
         context.read<CommentBloc>().add(const EmitMainCommentsState());
       }
     });
+  }
+
+  void _loadCurrentFeed() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userId = authProvider.userId;
+    
+    if (_currentFeed == FeedType.forYou) {
+      context.read<CommentBloc>().add(LoadMainComments(userId: userId));
+    } else {
+      // Pour les amis, on a besoin d'être connecté
+      if (authProvider.isAuthenticated && authProvider.currentUser?.idPerson != null) {
+        context.read<CommentBloc>().add(LoadFriendsComments(authProvider.currentUser!.idPerson));
+      } else {
+        // Si pas connecté, revenir au feed "Pour toi"
+        setState(() {
+          _currentFeed = FeedType.forYou;
+        });
+        context.read<CommentBloc>().add(LoadMainComments(userId: userId));
+      }
+    }
+  }
+
+  void _onFeedChanged(FeedType newFeed) {
+    if (newFeed == _currentFeed) return;
+    
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    // Vérifier l'authentification pour le feed des amis
+    if (newFeed == FeedType.friends && !authProvider.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Connectez-vous pour voir les posts de vos amis'),
+          action: SnackBarAction(
+            label: 'Se connecter',
+            onPressed: () => Navigator.pushNamed(context, '/login'),
+          ),
+        ),
+      );
+      return;
+    }
+    
+    setState(() {
+      _currentFeed = newFeed;
+    });
+    
+    _loadCurrentFeed();
   }
 
   @override
@@ -56,8 +104,7 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
         backgroundColor: Colors.grey.shade50,
         body: RefreshIndicator(
           onRefresh: () async {
-            final authProvider = Provider.of<AuthProvider>(context, listen: false);
-            context.read<CommentBloc>().add(LoadMainComments(userId: authProvider.userId));
+            _loadCurrentFeed();
           },
           child: CustomScrollView(
             slivers: [
@@ -74,6 +121,14 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                     fontSize: 20,
                     color: Colors.black87,
                   ),
+                ),
+              ),
+              // Header avec toggle Pour toi / Amis
+              SliverToBoxAdapter(
+                child: FeedToggleHeader(
+                  currentFeed: _currentFeed,
+                  onFeedChanged: _onFeedChanged,
+                  hasUnreadFriends: false, // TODO: implémenter la logique de notifications
                 ),
               ),
               // Liste des commentaires
@@ -117,8 +172,7 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                             const SizedBox(height: 16),
                             ElevatedButton(
                               onPressed: () {
-                                final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                                context.read<CommentBloc>().add(LoadMainComments(userId: authProvider.userId));
+                                _loadCurrentFeed();
                               },
                               child: const Text('Réessayer'),
                             ),
@@ -145,13 +199,15 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.chat_bubble_outline,
+                              _currentFeed == FeedType.friends ? Icons.people_outline : Icons.chat_bubble_outline,
                               size: 64,
                               color: Colors.grey.shade400,
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'Aucun post pour le moment',
+                              _currentFeed == FeedType.friends 
+                                  ? 'Aucun post de vos amis'
+                                  : 'Aucun post pour le moment',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey.shade600,
@@ -159,11 +215,22 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Soyez le premier à partager !',
+                              _currentFeed == FeedType.friends 
+                                  ? 'Vos amis n\'ont pas encore posté'
+                                  : 'Soyez le premier à partager !',
                               style: TextStyle(
                                 color: Colors.grey.shade500,
                               ),
                             ),
+                            if (_currentFeed == FeedType.friends) ...[
+                              const SizedBox(height: 16),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/friends-management');
+                                },
+                                child: const Text('Gérer mes amis'),
+                              ),
+                            ],
                           ],
                         ),
                       ),

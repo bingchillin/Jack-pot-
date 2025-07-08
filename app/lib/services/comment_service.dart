@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/comment_model.dart';
 import '../app_config.dart';
 import '../models/user_profile_model.dart';
+import 'contact_service.dart';
 
 class CommentService {
   final String baseUrl = AppConfig.baseUrl;
@@ -268,6 +269,40 @@ class CommentService {
       return data.map((json) => Comment.fromJson(json)).toList();
     } else {
       throw Exception('Erreur de chargement des posts utilisateur: \\${response.statusCode}');
+    }
+  }
+
+  // Récupérer uniquement les commentaires des amis
+  Future<List<Comment>> fetchFriendsComments(String token, int userId) async {
+    try {
+      print('Flutter - Loading friends comments for user $userId');
+      
+      // D'abord, récupérer tous les commentaires
+      final allComments = await fetchMainComments(token, userId: userId.toString());
+      
+      // Ensuite, récupérer la liste des amis
+      final contactService = ContactService();
+      final friends = await contactService.getMyContacts(token: token);
+      
+      // Extraire les IDs des amis (contacts acceptés)
+      final friendIds = friends
+          .where((contact) => contact.isAccepted)
+          .map((contact) => contact.getOtherUser(userId)?.id)
+          .where((id) => id != null)
+          .cast<int>()
+          .toSet();
+      
+      // Filtrer les commentaires pour ne garder que ceux des amis
+      final friendsComments = allComments
+          .where((comment) => friendIds.contains(comment.idPerson))
+          .toList();
+      
+      print('Flutter - Found ${friendsComments.length} comments from ${friendIds.length} friends');
+      
+      return friendsComments;
+    } catch (e) {
+      print('Error loading friends comments: $e');
+      throw Exception('Error loading friends comments: $e');
     }
   }
 } 
