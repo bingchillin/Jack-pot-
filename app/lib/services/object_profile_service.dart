@@ -125,4 +125,31 @@ class ObjectProfileService {
     _plantUpdateController.add(-1); // -1 means "refresh all"
     print('📢 Notified all listeners to refresh all plant data');
   }
+
+  /// Toggle favorite status for a plant
+  /// If favoris is null, set it to 1 (add to favorites)
+  /// If favoris is not null, set it to null (remove from favorites)
+  Future<bool> toggleFavorite({
+    required int plantId,
+    required String token,
+    int? currentFavorisValue,
+  }) async {
+    try {
+      final newFavorisValue = currentFavorisValue == null ? 1 : null;
+      
+      await updateObjectProfile(
+        id: plantId.toString(),
+        body: {'favoris': newFavorisValue},
+        token: token,
+      );
+
+      print('✅ Successfully toggled favorite for plant $plantId: ${newFavorisValue != null ? 'added' : 'removed'}');
+      
+      // Return the new favorite status
+      return newFavorisValue != null;
+    } catch (e) {
+      print('❌ Error toggling favorite for plant $plantId: $e');
+      throw Exception('Failed to toggle favorite: $e');
+    }
+  }
 }

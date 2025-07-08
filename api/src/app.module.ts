@@ -47,6 +47,8 @@ import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { StripeModule } from './stripe/stripe.module';
 import { CommentModule } from './comment/comment.module';
+import { FirebaseModule } from './firebase/firebase.module';
+import { SensorsModule } from './sensors/sensors.module';
 
 @Module({
   imports: [
@@ -121,7 +123,9 @@ import { CommentModule } from './comment/comment.module';
     ProductModule,
     OrderModule,
     StripeModule,
-    CommentModule
+    CommentModule,
+    FirebaseModule,
+    SensorsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -66,6 +66,19 @@ export class Person {
   @Index()
   stripeCustomerId: string;
 
+  // Firebase Cloud Messaging token for push notifications
+  @Column({ name: 'fcm_token', length: 500, nullable: true })
+  @Index()
+  fcmToken: string;
+
+  // Device platform (ios, android, web)
+  @Column({ name: 'device_platform', length: 20, nullable: true })
+  devicePlatform: string;
+
+  // When the FCM token was last updated
+  @Column({ name: 'fcm_token_updated_at', nullable: true })
+  fcmTokenUpdatedAt: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

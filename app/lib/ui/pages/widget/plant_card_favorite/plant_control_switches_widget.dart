@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../../models/object_profile.dart';
 import '../../../../services/object_profile_service.dart';
 import '../../../../providers/auth_provider.dart';
+import '../../../../services/notification_service.dart';
+import '../../../../app_config.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class PlantControlSwitches extends StatefulWidget {
@@ -18,6 +20,7 @@ class PlantControlSwitches extends StatefulWidget {
 class _PlantControlSwitchesState extends State<PlantControlSwitches> {
   late bool isAutomatic;
   late bool isWillWatering;
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
@@ -61,6 +64,9 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
       
       print('✅ Successfully updated $field to $value');
       
+      // Send notification about plant control change
+      await _sendPlantControlNotification(field, value);
+      
       // Small delay to ensure the global notification is sent
       await Future.delayed(const Duration(milliseconds: 100));
       
@@ -70,6 +76,45 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
         if (field == "isAutomatic") isAutomatic = !value;
         if (field == "isWillWatering") isWillWatering = !value;
       });
+    }
+  }
+
+  Future<void> _sendPlantControlNotification(String field, bool value) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('access_token');
+      
+      if (token == null) return;
+
+      final plantName = widget.plant.title ?? 'Plant';
+      final String alertType;
+      final String message;
+
+      if (field == "isAutomatic") {
+        alertType = value ? 'auto_mode_enabled' : 'auto_mode_disabled';
+        message = value 
+          ? '$plantName is now in automatic mode 🤖' 
+          : '$plantName automatic mode disabled 🔧';
+      } else if (field == "isWillWatering") {
+        alertType = value ? 'watering_enabled' : 'watering_disabled';
+        message = value 
+          ? '$plantName watering system activated 💧' 
+          : '$plantName watering system deactivated 🚱';
+      } else {
+        return; // Unknown field
+      }
+
+      await _notificationService.sendPlantCareNotification(
+        baseUrl: AppConfig.baseUrl,
+        authToken: token,
+        plantName: plantName,
+        alertType: alertType,
+        message: message,
+      );
+      
+      print('✅ Plant control notification sent: $alertType');
+    } catch (e) {
+      print('❌ Error sending plant control notification: $e');
     }
   }
 

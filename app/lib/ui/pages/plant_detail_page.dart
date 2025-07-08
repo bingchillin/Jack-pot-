@@ -14,6 +14,8 @@ import '../../l10n/app_localizations.dart';
 import 'plant_detail/plant_overview_tab.dart';
 import 'plant_detail/plant_sensors_tab.dart';
 import 'plant_detail/plant_care_tab.dart';
+import 'widget/favorite_toggle_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PlantDetailPage extends StatefulWidget {
   final int plantId;
@@ -297,6 +299,24 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
           overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
+        actions: [
+          // Add favorite toggle button to the AppBar
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: FavoriteToggleButton(
+              plantId: plant.idObjectProfile,
+              currentFavorisValue: plant.favoris,
+              onFavoriteChanged: (isFavorite) async {
+                // Get token from shared preferences to refresh plant detail
+                final prefs = await SharedPreferences.getInstance();
+                final token = prefs.getString('access_token');
+                if (token != null && mounted) {
+                  context.read<PlantDetailBloc>().add(LoadPlantDetail(widget.plantId, token));
+                }
+              },
+            ),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Container(

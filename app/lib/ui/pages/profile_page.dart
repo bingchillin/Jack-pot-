@@ -199,6 +199,38 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             indent: 60,
           ),
           
+          // Notification Settings Line
+          _buildActionLine(
+            icon: Icons.notifications,
+            title: 'Notification Settings',
+            onTap: () {
+              Navigator.pushNamed(context, '/notification-settings');
+            },
+          ),
+          
+          // Divider
+          Divider(
+            height: 1,
+            color: Colors.grey[200],
+            indent: 60,
+          ),
+          
+          // Notification Testing Line
+          _buildActionLine(
+            icon: Icons.bug_report,
+            title: 'Notification Testing',
+            onTap: () {
+              Navigator.pushNamed(context, '/notification-test');
+            },
+          ),
+          
+          // Divider
+          Divider(
+            height: 1,
+            color: Colors.grey[200],
+            indent: 60,
+          ),
+          
           // Logout Line
           _buildActionLine(
             icon: Icons.logout,

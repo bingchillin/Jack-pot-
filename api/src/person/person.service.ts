@@ -270,6 +270,56 @@ export class PersonService {
         });
     }
 
+    /**
+     * Update FCM token for push notifications
+     */
+    async updateFcmToken(
+        personId: number, 
+        fcmToken: string, 
+        platform: 'ios' | 'android' | 'web'
+    ): Promise<Person> {
+        const person = await this.findOne(personId);
+        
+        person.fcmToken = fcmToken;
+        person.devicePlatform = platform;
+        person.fcmTokenUpdatedAt = new Date();
+        
+        return await this.personRepository.save(person);
+    }
+
+    /**
+     * Remove FCM token (for logout or token invalidation)
+     */
+    async removeFcmToken(personId: number): Promise<Person> {
+        const person = await this.findOne(personId);
+        
+        person.fcmToken = null;
+        person.devicePlatform = null;
+        person.fcmTokenUpdatedAt = null;
+        
+        return await this.personRepository.save(person);
+    }
+
+    /**
+     * Find users by FCM token
+     */
+    async findByFcmToken(fcmToken: string): Promise<Person[]> {
+        return await this.personRepository.find({
+            where: { fcmToken },
+            relations: ['role']
+        });
+    }
+
+    /**
+     * Get all users with FCM tokens for broadcast notifications
+     */
+    async findUsersWithFcmTokens(): Promise<Person[]> {
+        return await this.personRepository.find({
+            where: { fcmToken: 'NOT NULL' as any },
+            relations: ['role']
+        });
+    }
+
     async createMissingStripeCustomers(): Promise<{ success: number; failed: number; errors: any[] }> {
         const personsWithoutStripe = await this.findPersonsWithoutStripeCustomer();
         let success = 0;
