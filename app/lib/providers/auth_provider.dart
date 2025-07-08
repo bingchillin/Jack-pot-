@@ -6,6 +6,11 @@ import 'package:http/http.dart' as http;
 
 import 'package:jackpote/app_config.dart';
 
+class CurrentUser {
+  final int idPerson;
+  CurrentUser({required this.idPerson});
+}
+
 class AuthProvider extends ChangeNotifier {
   bool _isAuthenticated = false;
   String? _accessToken;
@@ -27,6 +32,11 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoggedIn => _isAuthenticated;
   bool get isLoadingUser => _isLoadingUser;
   bool get isGuestMode => _isGuestMode;
+  
+  // Current user avec idPerson pour les blocs
+  CurrentUser? get currentUser => _userData != null 
+    ? CurrentUser(idPerson: int.parse(_userId!))
+    : null;
 
   String? _firstName;
   String? get firstName => _firstName;

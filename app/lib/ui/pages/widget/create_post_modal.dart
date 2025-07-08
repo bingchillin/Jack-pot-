@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import '../../../bloc/comment/comment_list_bloc.dart';
+import '../../../bloc/comment/comment_bloc.dart';
 import '../../../providers/auth_provider.dart';
-import '../../../services/comment_service.dart';
 
 class CreatePostModal extends StatefulWidget {
   const CreatePostModal({Key? key}) : super(key: key);
@@ -36,102 +35,119 @@ class _CreatePostModalState extends State<CreatePostModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.6,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          // En-tête de la modal
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-                const Expanded(
-                  child: Text(
-                    'Nouveau post',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: _isSubmitting ? null : _submitPost,
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text(
-                          'Publier',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
-              ],
-            ),
-          ),
-          // Zone de saisie
-          Expanded(
-            child: Padding(
+    return BlocListener<CommentBloc, CommentState>(
+      listener: (context, state) {
+        if (state is CommentCreated) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Post publié !')),
+          );
+        } else if (state is CommentError) {
+          setState(() {
+            _isSubmitting = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur: ${state.message}')),
+          );
+        }
+      },
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.6,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // En-tête de la modal
+            Container(
               padding: const EdgeInsets.all(16),
-              child: Column(
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+              ),
+              child: Row(
                 children: [
-                  const Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.blue,
-                        child: Icon(Icons.person, color: Colors.white),
-                      ),
-                      SizedBox(width: 12),
-                      Text(
-                        'Partagez votre expérience...',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: const InputDecoration(
-                        hintText: 'Que souhaitez-vous partager avec la communauté ?\n\nConseils, questions, expériences...',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                          height: 1.5,
-                        ),
+                  const Expanded(
+                    child: Text(
+                      'Nouveau post',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      style: const TextStyle(fontSize: 16, height: 1.5),
                     ),
+                  ),
+                  TextButton(
+                    onPressed: _isSubmitting ? null : _submitPost,
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text(
+                            'Publier',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            // Zone de saisie
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    const Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.blue,
+                          child: Icon(Icons.person, color: Colors.white),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Partagez votre expérience...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        maxLines: null,
+                        expands: true,
+                        textAlignVertical: TextAlignVertical.top,
+                        decoration: const InputDecoration(
+                          hintText: 'Que souhaitez-vous partager avec la communauté ?\n\nConseils, questions, expériences...',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                            height: 1.5,
+                          ),
+                        ),
+                        style: const TextStyle(fontSize: 16, height: 1.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -151,7 +167,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
           textColor: Colors.white,
           onPressed: (){
             Navigator.pushNamed(context, '/login');
-          }, // TODO: Ajouter navigation vers login
+          },
         ),
       ),
     );
@@ -175,25 +191,12 @@ class _CreatePostModalState extends State<CreatePostModal> {
       _isSubmitting = true;
     });
 
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final token = authProvider.accessToken;
-      final userId = authProvider.userId;
-      await CommentService().createComment(content: content, token: token!, userId: userId);
-      // Rafraîchir la liste des commentaires après la création
-      context.read<CommentListBloc>().add(LoadComments());
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Post publié !')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $e')),
-      );
-    } finally {
-      setState(() {
-        _isSubmitting = false;
-      });
-    }
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    context.read<CommentBloc>().add(
+      CreateComment(
+        content,
+        userId: authProvider.currentUser!.idPerson.toString(),
+      ),
+    );
   }
 } 

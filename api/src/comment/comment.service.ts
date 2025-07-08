@@ -105,23 +105,25 @@ export class CommentService {
     }));
   }
 
-  // Post detail: Get original post + all its comments
+  // Post detail: Get original post + all its comments (including nested replies)
   async getPostWithComments(postId: number, includeDeleted: boolean = false, currentUserId?: number): Promise<any[]> {
-    const whereConditions = includeDeleted 
-      ? [
-          { idComment: postId }, // The original post
-          { parentComment: { idComment: postId } } // All comments on that post
-        ]
-      : [
-          { idComment: postId, isDeleted: false },
-          { parentComment: { idComment: postId }, isDeleted: false }
-        ];
-
-    const comments = await this.commentRepository.find({
-      where: whereConditions,
-      relations: ['parentComment', 'person'],
-      order: { createdAt: 'ASC' },
+    // First, get the original post to verify it exists
+    const originalPost = await this.commentRepository.findOne({
+      where: includeDeleted 
+        ? { idComment: postId }
+        : { idComment: postId, isDeleted: false },
+      relations: ['person'],
     });
+    
+    if (!originalPost) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
+
+    // Get all comments in the thread recursively
+    const allComments = await this.getAllCommentsInThread(postId, includeDeleted);
+    
+    // Add the original post at the beginning
+    const comments = [originalPost, ...allComments];
     
     if (comments.length === 0) {
       throw new NotFoundException(`Post with ID ${postId} not found`);
@@ -156,6 +158,45 @@ export class CommentService {
       likeCount: likeCountMap[comment.idComment] || 0,
       isLikedByCurrentUser: likedMap[comment.idComment] || false,
     }));
+  }
+
+  // Get all comments in a thread recursively (for nested replies)
+  async getAllCommentsInThread(rootCommentId: number, includeDeleted: boolean = false): Promise<Comment[]> {
+    const allComments: Comment[] = [];
+    const processedIds = new Set<number>();
+    
+    const collectCommentsRecursively = async (parentId: number) => {
+      const whereCondition = includeDeleted 
+        ? { parentComment: { idComment: parentId } }
+        : { parentComment: { idComment: parentId }, isDeleted: false };
+
+      const directReplies = await this.commentRepository.find({
+        where: whereCondition,
+        relations: ['parentComment', 'person'],
+        select: {
+          person: {
+            idPerson: true,
+            email: true,
+            firstname: true,
+            surname: true,
+          },
+        },
+        order: { createdAt: 'ASC' },
+      });
+
+      for (const reply of directReplies) {
+        if (!processedIds.has(reply.idComment)) {
+          processedIds.add(reply.idComment);
+          allComments.push(reply);
+          
+          // Recursively get replies to this reply
+          await collectCommentsRecursively(reply.idComment);
+        }
+      }
+    };
+
+    await collectCommentsRecursively(rootCommentId);
+    return allComments;
   }
 
   // Get all comments for a specific parent (useful for lazy loading)
