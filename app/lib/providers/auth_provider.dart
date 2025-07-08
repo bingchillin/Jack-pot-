@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:jackpote/app_config.dart';
+import '../services/notification_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool _isAuthenticated = false;
@@ -16,6 +17,9 @@ class AuthProvider extends ChangeNotifier {
   bool _isLoadingUser = true;
   bool _isGuestMode = false;
   Timer? _refreshTimer;
+
+  // Notification service instance
+  final NotificationService _notificationService = NotificationService();
 
   // Getters
   bool get isAuthenticated => _isAuthenticated;
@@ -194,6 +198,9 @@ class AuthProvider extends ChangeNotifier {
         // Disable guest mode when user logs in
         disableGuestMode();
 
+        // Register FCM token with backend after successful login
+        await _registerFCMTokenAfterAuth();
+
         notifyListeners();
         print('✅ Login successful - persistent auth enabled');
         return true;
@@ -263,6 +270,9 @@ class AuthProvider extends ChangeNotifier {
 
         // Disable guest mode when user signs up
         disableGuestMode();
+
+        // Register FCM token with backend after successful signup
+        await _registerFCMTokenAfterAuth();
 
         _isLoadingUser = false;
         notifyListeners();
@@ -344,7 +354,11 @@ class AuthProvider extends ChangeNotifier {
 
   // Logout
   Future<void> logout() async {
-    print('🚪 Logging out...');
+    print('�� Logging out...');
+    
+    // Remove FCM token from backend before clearing auth data
+    await _removeFCMTokenFromBackend();
+    
     await _clearAuthData();
     notifyListeners();
   }
@@ -528,5 +542,54 @@ class AuthProvider extends ChangeNotifier {
     _isGuestMode = false;
     notifyListeners();
     print('🏠 Reset to welcome page');
+  }
+
+  // Register FCM token with backend after authentication
+  Future<void> _registerFCMTokenAfterAuth() async {
+    try {
+      if (_accessToken != null && _accessToken!.isNotEmpty) {
+        final success = await _notificationService.registerTokenWithBackend(
+          baseUrl: AppConfig.baseUrl,
+          authToken: _accessToken!,
+        );
+        
+        if (success) {
+          print('✅ FCM token registered successfully after auth');
+          
+          // Subscribe to plant care topics
+          await _notificationService.subscribeToTopic('plant_care');
+          await _notificationService.subscribeToTopic('watering_reminders');
+          await _notificationService.subscribeToTopic('plant_health_alerts');
+          
+          print('✅ Subscribed to plant care notification topics');
+        } else {
+          print('❌ Failed to register FCM token after auth');
+        }
+      }
+    } catch (e) {
+      print('❌ Error registering FCM token after auth: $e');
+    }
+  }
+
+  // Remove FCM token from backend before logout
+  Future<void> _removeFCMTokenFromBackend() async {
+    try {
+      if (_accessToken != null && _accessToken!.isNotEmpty) {
+        // Remove token from backend
+        await _notificationService.removeTokenFromBackend(
+          baseUrl: AppConfig.baseUrl,
+          authToken: _accessToken!,
+        );
+        
+        // Unsubscribe from topics
+        await _notificationService.unsubscribeFromTopic('plant_care');
+        await _notificationService.unsubscribeFromTopic('watering_reminders');
+        await _notificationService.unsubscribeFromTopic('plant_health_alerts');
+        
+        print('✅ FCM token removed and unsubscribed from notification topics');
+      }
+    } catch (e) {
+      print('❌ Error removing FCM token: $e');
+    }
   }
 }

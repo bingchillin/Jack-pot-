@@ -14,6 +14,8 @@ import '../ui/pages/login_page.dart';
 import '../ui/pages/reset_password_page.dart';
 import '../ui/pages/signup_page.dart';
 import '../ui/pages/welcome_page.dart';
+import '../ui/pages/notification_settings_page.dart';
+import '../ui/pages/notification_test_page.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
   '/': (context) => const AuthWrapper(),
@@ -24,6 +26,8 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/event': (_) => const EventPage(),
   '/profile': (_) => const ProfilePage(),
   '/edit-profile': (_) => const EditProfilePage(),
+  '/notification-settings': (_) => const NotificationSettingsPage(),
+  '/notification-test': (_) => const NotificationTestPage(),
   '/login': (_) => const LoginPage(),
   '/forgot_password': (_) => const ForgotPasswordPage(),
   '/signup': (_) => const SignupPage(),
