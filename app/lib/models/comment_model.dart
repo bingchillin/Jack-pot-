@@ -12,6 +12,10 @@ class Comment {
   final int replyCount;
   final bool isLikedByCurrentUser;
   final List<Comment> replies;
+  
+  // Threading properties
+  final int level;
+  final List<Comment> children;
 
   Comment({
     required this.idComment,
@@ -27,7 +31,24 @@ class Comment {
     this.replyCount = 0,
     this.isLikedByCurrentUser = false,
     this.replies = const [],
+    this.level = 0,
+    this.children = const [],
   });
+
+  // Threading getters
+  bool get canReply => level < 3; // Maximum 4 niveaux (0, 1, 2, 3)
+  bool get isRootComment => parentCommentId == null;
+  bool get hasChildren => children.isNotEmpty;
+  int get totalRepliesInThread => _countAllReplies(children);
+
+  // Méthode privée pour compter récursivement toutes les réponses
+  int _countAllReplies(List<Comment> comments) {
+    int count = comments.length;
+    for (Comment comment in comments) {
+      count += _countAllReplies(comment.children);
+    }
+    return count;
+  }
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     // Créer un objet Person par défaut si les informations ne sont pas disponibles
@@ -79,6 +100,8 @@ class Comment {
     int? replyCount,
     bool? isLikedByCurrentUser,
     List<Comment>? replies,
+    int? level,
+    List<Comment>? children,
   }) {
     return Comment(
       idComment: idComment ?? this.idComment,
@@ -94,6 +117,8 @@ class Comment {
       replyCount: replyCount ?? this.replyCount,
       isLikedByCurrentUser: isLikedByCurrentUser ?? this.isLikedByCurrentUser,
       replies: replies ?? this.replies,
+      level: level ?? this.level,
+      children: children ?? this.children,
     );
   }
 }

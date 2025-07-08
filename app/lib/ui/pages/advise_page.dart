@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../bloc/comment/comment_list_bloc.dart';
+import '../../bloc/comment/comment_bloc.dart';
+import '../../models/comment_model.dart';
 import 'widget/comment_card.dart';
 import 'widget/create_post_modal.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
-import '../../bloc/comment/comment_item_bloc.dart';
-import '../../services/comment_service.dart';
 
 class AdvisePage extends StatefulWidget {
   const AdvisePage({super.key});
@@ -15,19 +14,36 @@ class AdvisePage extends StatefulWidget {
   State<AdvisePage> createState() => _AdvisePageState();
 }
 
-class _AdvisePageState extends State<AdvisePage> {
+class _AdvisePageState extends State<AdvisePage> with RouteAware {
   @override
   void initState() {
     super.initState();
-    // Charger les commentaires au démarrage
-    context.read<CommentListBloc>().add(LoadComments());
+    // Charger les commentaires au démarrage si pas déjà chargés
+    final currentState = context.read<CommentBloc>().state;
+    if (currentState is CommentInitial) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      context.read<CommentBloc>().add(LoadMainComments(userId: authProvider.userId));
+    }
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Détecter quand on revient à cette page
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final currentState = context.read<CommentBloc>().state;
+      if (currentState is CommentThreadLoaded) {
+        // On revient d'une page détail, forcer l'affichage de la liste principale
+        context.read<CommentBloc>().add(const EmitMainCommentsState());
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<CommentListBloc, CommentListState>(
+    return BlocListener<CommentBloc, CommentState>(
       listener: (context, state) {
-        if (state is CommentListError) {
+        if (state is CommentError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -40,7 +56,8 @@ class _AdvisePageState extends State<AdvisePage> {
         backgroundColor: Colors.grey.shade50,
         body: RefreshIndicator(
           onRefresh: () async {
-            await Future.delayed(const Duration(milliseconds: 500));
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            context.read<CommentBloc>().add(LoadMainComments(userId: authProvider.userId));
           },
           child: CustomScrollView(
             slivers: [
@@ -60,9 +77,9 @@ class _AdvisePageState extends State<AdvisePage> {
                 ),
               ),
               // Liste des commentaires
-              BlocBuilder<CommentListBloc, CommentListState>(
+              BlocBuilder<CommentBloc, CommentState>(
                 builder: (context, state) {
-                  if (state is CommentListLoading) {
+                  if (state is CommentLoading) {
                     return const SliverFillRemaining(
                       child: Center(
                         child: CircularProgressIndicator(),
@@ -70,7 +87,7 @@ class _AdvisePageState extends State<AdvisePage> {
                     );
                   }
 
-                  if (state is CommentListError) {
+                  if (state is CommentError) {
                     return SliverFillRemaining(
                       child: Center(
                         child: Column(
@@ -100,7 +117,8 @@ class _AdvisePageState extends State<AdvisePage> {
                             const SizedBox(height: 16),
                             ElevatedButton(
                               onPressed: () {
-                                context.read<CommentListBloc>().add(LoadComments());
+                                final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                                context.read<CommentBloc>().add(LoadMainComments(userId: authProvider.userId));
                               },
                               child: const Text('Réessayer'),
                             ),
@@ -110,71 +128,58 @@ class _AdvisePageState extends State<AdvisePage> {
                     );
                   }
 
-                  if (state is CommentListLoaded) {
-                    // Debug : affiche les ids et parentCommentId
-                    for (final comment in state.comments) {
-                      print('Comment id: [33m[1m[4m${comment.idComment}[0m, parentCommentId: [36m${comment.parentCommentId}[0m');
-                    }
+                  // Afficher les commentaires pour les états CommentMainLoaded ET CommentDetailLoaded
+                  List<Comment> commentsToShow = [];
+                  if (state is CommentMainLoaded) {
+                    commentsToShow = state.comments;
+                  } else if (state is CommentThreadLoaded) {
+                    // Si on est en état détail, on affiche quand même la liste principale depuis le cache
+                    final bloc = context.read<CommentBloc>();
+                    commentsToShow = bloc.mainComments;
+                  }
 
-                    // Filtre temporaire : n'affiche que les parents
-                    final parentComments = state.comments.where((c) => c.parentCommentId == null).toList();
-
-                    if (parentComments.isEmpty) {
-                      return SliverFillRemaining(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.chat_bubble_outline,
-                                size: 64,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Aucun post pour le moment',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Soyez le premier à partager !',
-                                style: TextStyle(
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final comment = parentComments[index];
-                          final token = Provider.of<AuthProvider>(context, listen: false).accessToken;
-                          final userId = Provider.of<AuthProvider>(context, listen: false).userId;
-                          return BlocProvider(
-                            create: (_) => CommentItemBloc(
-                              commentService: CommentService(),
-                              token: token,
-                              userId: userId,
-                              comment: comment,
+                  if (commentsToShow.isEmpty) {
+                    return SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.chat_bubble_outline,
+                              size: 64,
+                              color: Colors.grey.shade400,
                             ),
-                            child: CommentCard(comment: comment, replies: [], showReplies: false),
-                          );
-                        },
-                        childCount: parentComments.length,
+                            const SizedBox(height: 16),
+                            Text(
+                              'Aucun post pour le moment',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Soyez le premier à partager !',
+                              style: TextStyle(
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
 
-                  return const SliverFillRemaining(
-                    child: Center(
-                      child: Text('Aucune donnée'),
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final comment = commentsToShow[index];
+                        return CommentCard(
+                          comment: comment,
+                          showReplies: false,
+                        );
+                      },
+                      childCount: commentsToShow.length,
                     ),
                   );
                 },

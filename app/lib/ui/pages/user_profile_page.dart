@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_profile_model.dart';
-import '../../models/comment_model.dart';
 import '../../services/comment_service.dart';
 import '../../providers/auth_provider.dart';
 import 'widget/comment_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../bloc/comment/user_profile_comments_bloc.dart';
-import 'package:flutter/scheduler.dart';
-import '../../bloc/comment/comment_item_bloc.dart';
+import '../../bloc/comment/comment_bloc.dart';
+import '../widgets/friend_request_button.dart';
 
 class UserProfilePage extends StatefulWidget {
   final int userId;
@@ -20,7 +18,7 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
   late Future<UserProfile> _profileFuture;
-  late Future<List<Comment>> _postsFuture;
+  late CommentBloc _commentBloc;
 
   @override
   void initState() {
@@ -28,49 +26,27 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final token = authProvider.accessToken;
     final currentUserId = authProvider.userId;
+    
     _profileFuture = CommentService().fetchUserProfile(widget.userId, token);
-    _postsFuture = CommentService().fetchUserMainComments(widget.userId, token, currentUserId: currentUserId);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // S'abonner à la navigation pour détecter le retour
-    final route = ModalRoute.of(context);
-    if (route is PageRoute) {
-      RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
-      routeObserver.subscribe(this, route);
-    }
+    
+    // Créer un bloc dédié pour ce profil utilisateur
+    _commentBloc = CommentBloc(
+      commentService: CommentService(),
+      token: token,
+    );
+    
+    // Charger les commentaires de l'utilisateur
+    _commentBloc.add(LoadMainComments(userId: currentUserId));
   }
 
   @override
   void dispose() {
-    // Se désabonner
-    final route = ModalRoute.of(context);
-    if (route is PageRoute) {
-      RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
-      routeObserver.unsubscribe(this);
-    }
+    _commentBloc.close();
     super.dispose();
   }
 
   @override
-  void didPopNext() {
-    // Rafraîchir les commentaires quand on revient de la page détail
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final currentUserId = authProvider.userId;
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<UserProfileCommentsBloc>().add(RefreshUserProfileComments(widget.userId, currentUserId: currentUserId));
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final token = authProvider.accessToken;
-    final currentUserId = authProvider.userId;
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
@@ -86,7 +62,7 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur: \\${snapshot.error}'));
+            return Center(child: Text('Erreur: ${snapshot.error}'));
           }
           final profile = snapshot.data!;
           return Column(
@@ -124,54 +100,52 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                          'Inscrit le \\${profile.createdAt!.day}/\\${profile.createdAt!.month}/\\${profile.createdAt!.year}',
+                          'Inscrit le ${profile.createdAt!.day}/${profile.createdAt!.month}/${profile.createdAt!.year}',
                           style: const TextStyle(fontSize: 14, color: Colors.black45),
                         ),
                       ),
+                    const SizedBox(height: 16),
+                    // Bouton d'ajout d'ami
+                    FriendRequestButton(
+                      targetUserId: widget.userId,
+                      onStatusChanged: () {
+                        // Optionnel : rafraîchir quelque chose si nécessaire
+                        print('Statut d\'ami changé pour l\'utilisateur ${widget.userId}');
+                      },
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: BlocProvider(
-                  create: (_) => UserProfileCommentsBloc(
-                    commentService: CommentService(),
-                    token: token,
-                  )..add(LoadUserProfileComments(widget.userId, currentUserId: currentUserId)),
-                  child: BlocBuilder<UserProfileCommentsBloc, UserProfileCommentsState>(
+                child: BlocProvider.value(
+                  value: _commentBloc,
+                  child: BlocBuilder<CommentBloc, CommentState>(
                     builder: (context, state) {
-                      if (state is UserProfileCommentsLoading) {
+                      if (state is CommentLoading) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      if (state is UserProfileCommentsError) {
-                        return Center(child: Text('Erreur: \\${state.message}'));
+                      if (state is CommentError) {
+                        return Center(child: Text('Erreur: ${state.message}'));
                       }
-                      if (state is UserProfileCommentsLoaded) {
-                        final posts = state.comments;
-                        if (posts.isEmpty) {
+                      if (state is CommentMainLoaded) {
+                        // Filtrer les commentaires de cet utilisateur
+                        final userComments = state.comments.where((comment) => comment.idPerson == widget.userId).toList();
+                        
+                        if (userComments.isEmpty) {
                           return const Center(child: Text('Aucun post pour cet utilisateur.'));
                         }
                         return RefreshIndicator(
                           onRefresh: () async {
-                            context.read<UserProfileCommentsBloc>().add(RefreshUserProfileComments(widget.userId, currentUserId: currentUserId));
-                            await Future.delayed(const Duration(milliseconds: 500));
+                            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                            _commentBloc.add(LoadMainComments(userId: authProvider.userId));
                           },
                           child: ListView.builder(
                             padding: const EdgeInsets.only(top: 8),
-                            itemCount: posts.length,
+                            itemCount: userComments.length,
                             itemBuilder: (context, index) {
-                              final comment = posts[index];
-                              final token = Provider.of<AuthProvider>(context, listen: false).accessToken;
-                              final userId = Provider.of<AuthProvider>(context, listen: false).userId;
-                              return BlocProvider(
-                                create: (_) => CommentItemBloc(
-                                  commentService: CommentService(),
-                                  token: token,
-                                  userId: userId,
-                                  comment: comment,
-                                ),
-                                child: CommentCard(comment: comment),
-                              );
+                              final comment = userComments[index];
+                              return CommentCard(comment: comment);
                             },
                           ),
                         );

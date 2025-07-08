@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../providers/auth_provider.dart';
 import '../../l10n/app_localizations.dart';
+import 'friends_management_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -75,6 +76,15 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.people),
+            onPressed: () {
+              Navigator.pushNamed(context, '/friends-management');
+            },
+            tooltip: 'Gérer mes amis',
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -189,6 +199,22 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             title: localizations.editProfile,
             onTap: () {
               Navigator.pushNamed(context, '/edit-profile');
+            },
+          ),
+          
+          // Divider
+          Divider(
+            height: 1,
+            color: Colors.grey[200],
+            indent: 60,
+          ),
+          
+          // Friends Management Line
+          _buildActionLine(
+            icon: Icons.people,
+            title: 'Mes Amis',
+            onTap: () {
+              Navigator.pushNamed(context, '/friends-management');
             },
           ),
           

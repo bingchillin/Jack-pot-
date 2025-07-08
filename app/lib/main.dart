@@ -17,9 +17,7 @@ import 'bloc/object_profile/object_profile_bloc.dart';
 import 'bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
 import 'bloc/object_profile_my_list/object_profile_my_list_event.dart';
 import 'l10n/app_localizations.dart';
-import 'bloc/comment/comment_list_bloc.dart';
-import 'bloc/comment/comment_replies_bloc.dart';
-import 'bloc/comment/comment_detail_bloc.dart';
+import 'bloc/comment/comment_bloc.dart';
 import 'services/comment_service.dart';
 import 'services/notification_service.dart';
 
@@ -125,24 +123,11 @@ class _RootAppState extends State<RootApp> {
             )..add(LoadProfilesMyList()),
           ),
         ],
-        BlocProvider<CommentListBloc>(
-          create: (_) => CommentListBloc(
+        // Bloc global pour les commentaires - remplace tous les anciens blocs
+        BlocProvider<CommentBloc>(
+          create: (_) => CommentBloc(
             commentService: CommentService(),
             token: token,
-            navigatorKey: navigatorKey,
-          )..add(LoadComments()),
-        ),
-        BlocProvider<CommentRepliesBloc>(
-          create: (_) => CommentRepliesBloc(
-            commentService: CommentService(),
-            token: token,
-          ),
-        ),
-        BlocProvider<CommentDetailBloc>(
-          create: (_) => CommentDetailBloc(
-            commentService: CommentService(),
-            token: token,
-            navigatorKey: navigatorKey,
           ),
         ),
       ],
@@ -178,7 +163,7 @@ class _RootAppState extends State<RootApp> {
             }
           }
           // If not supported, return the first supported locale (English)
-          print('🌍 Falling back to: [38;5;2m${supportedLocales.first}[0m');
+          print('🌍 Falling back to: [38;5;2m${supportedLocales.first}[0m');
           return supportedLocales.first;
         },
       ),
