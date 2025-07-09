@@ -57,36 +57,36 @@ class _CreatePostModalState extends State<CreatePostModal> {
         }
       },
       child: Container(
-      height: MediaQuery.of(context).size.height * 0.6,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          // En-tête de la modal
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-                const Expanded(
-                  child: Text(
-                    'Nouveau post',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+        height: MediaQuery.of(context).size.height * 0.6,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // En-tête de la modal
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      'Nouveau post',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                TextButton(
+                  TextButton(
                     onPressed: (_isSubmitting || _isUploadingImage) ? null : _submitPost,
                     child: (_isSubmitting || _isUploadingImage)
                       ? const SizedBox(
@@ -101,66 +101,10 @@ class _CreatePostModalState extends State<CreatePostModal> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                ),
-              ],
-            ),
-          ),
-          // Zone de saisie
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  const Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.blue,
-                        child: Icon(Icons.person, color: Colors.white),
-                      ),
-                      SizedBox(width: 12),
-                      Text(
-                        'Partagez votre expérience...',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: const InputDecoration(
-                        hintText: 'Que souhaitez-vous partager avec la communauté ?\n\nConseils, questions, expériences...',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                          height: 1.5,
-                        ),
-                      ),
-                      style: const TextStyle(fontSize: 16, height: 1.5),
-                    ),
-                  ),
-                    // Widget de sélection d'image (avec fallback)
-                    SimpleImagePickerWidget(
-                      onImageSelected: (File? image) {
-                        setState(() {
-                          _selectedImage = image;
-                        });
-                      },
-                      initialImage: _selectedImage,
-                    ),
                 ],
               ),
             ),
-          ),
-        ],
             // Zone de saisie
             Expanded(
               child: Padding(

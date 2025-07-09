@@ -10,8 +10,18 @@ class CommentImageWidget extends StatelessWidget {
     this.maxHeight = 300,
   }) : super(key: key);
 
+  /// Convert localhost URLs to Android emulator-compatible URLs
+  String _convertUrlForAndroid(String url) {
+    if (url.startsWith('http://localhost:')) {
+      return url.replaceFirst('http://localhost:', 'http://10.0.2.2:');
+    }
+    return url;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final convertedUrl = _convertUrlForAndroid(imageUrl);
+    
     return Container(
       margin: const EdgeInsets.only(top: 8),
       constraints: BoxConstraints(
@@ -27,7 +37,7 @@ class CommentImageWidget extends StatelessWidget {
         child: GestureDetector(
           onTap: () => _showFullScreenImage(context),
           child: Image.network(
-            imageUrl,
+            convertedUrl,
             fit: BoxFit.cover,
             width: double.infinity,
             loadingBuilder: (context, child, loadingProgress) {
@@ -98,8 +108,18 @@ class FullScreenImageViewer extends StatelessWidget {
     required this.imageUrl,
   }) : super(key: key);
 
+  /// Convert localhost URLs to Android emulator-compatible URLs
+  String _convertUrlForAndroid(String url) {
+    if (url.startsWith('http://localhost:')) {
+      return url.replaceFirst('http://localhost:', 'http://10.0.2.2:');
+    }
+    return url;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final convertedUrl = _convertUrlForAndroid(imageUrl);
+    
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -110,7 +130,7 @@ class FullScreenImageViewer extends StatelessWidget {
       body: Center(
         child: InteractiveViewer(
           child: Image.network(
-            imageUrl,
+            convertedUrl,
             fit: BoxFit.contain,
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;

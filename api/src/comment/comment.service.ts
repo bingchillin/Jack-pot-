@@ -16,6 +16,9 @@ export class CommentService {
   ) {}
 
   async create(createCommentDto: CreateCommentDto): Promise<Comment> {
+    console.log('Backend - Creating comment with data:', createCommentDto);
+    console.log('Backend - ImageUrl received:', createCommentDto.imageUrl);
+    
     const { parentCommentId, ...commentData } = createCommentDto;
 
     // If parentCommentId is provided, verify the parent comment exists
@@ -34,7 +37,11 @@ export class CommentService {
       parentComment: parentCommentId ? { idComment: parentCommentId } : null,
     });
 
-    return await this.commentRepository.save(comment);
+    console.log('Backend - Comment before save:', comment);
+    const savedComment = await this.commentRepository.save(comment);
+    console.log('Backend - Comment after save:', savedComment);
+    
+    return savedComment;
   }
 
   // Timeline: Get all posts (comments with no parent)
@@ -98,12 +105,17 @@ export class CommentService {
         .getRawMany();
       likedMap = Object.fromEntries(liked.map(l => [Number(l.idComment), true]));
     }
-    return comments.map(comment => ({
-      ...comment,
-      replyCount: replyCountMap[comment.idComment] || 0,
-      likeCount: likeCountMap[comment.idComment] || 0,
-      isLikedByCurrentUser: likedMap[comment.idComment] || false,
-    }));
+    const result = comments.map(comment => {
+      console.log(`Backend - Comment ${comment.idComment}: imageUrl = "${comment.imageUrl}"`);
+      return {
+        ...comment,
+        replyCount: replyCountMap[comment.idComment] || 0,
+        likeCount: likeCountMap[comment.idComment] || 0,
+        isLikedByCurrentUser: likedMap[comment.idComment] || false,
+      };
+    });
+    
+    return result;
   }
 
   // Post detail: Get original post + all its comments (including nested replies)
