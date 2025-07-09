@@ -1,8 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ClassSerializerInterceptor, UseInterceptors, Query, Logger } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiBody, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ObjectProfileService } from './object-profile.service';
-import { SensorDataService, SensorData } from './sensor-data.service';
-import { SmartControlService } from '../smart-control/smart-control.service';
+import { PlantCareService } from '../plant-care/plant-care.service';
 import { CreateObjectProfileDto } from './dto/create-object-profile.dto';
 import { UpdateObjectProfileDto } from './dto/update-object-profile.dto';
 import { SensorDataDto } from './dto/sensor-data.dto';
@@ -16,57 +15,34 @@ export class ObjectProfileElecController {
 
     constructor(
         private readonly objectProfileService: ObjectProfileService,
-        private readonly sensorDataService: SensorDataService,
-        private readonly smartControlService: SmartControlService,
+        private readonly plantCareService: PlantCareService,
     ) {}
 
     @Patch(':id/sensor-data')
     @ApiExcludeEndpoint()
-    @ApiOperation({ summary: 'Process ESP32 sensor data and trigger notifications' })
+    @ApiOperation({ summary: 'Process ESP32 sensor data with unified plant care system' })
     @ApiBody({ type: SensorDataDto })
     async processSensorData(
         @Param('id') id: string, 
-        @Body() sensorData: SensorDataDto
+        @Body() sensorData: any
     ) {
         this.logger.log(`📡 Received sensor data for object ${id}`);
         
         try {
-            // Validate sensor data
-            if (!this.sensorDataService.validateSensorData(sensorData)) {
-                this.logger.warn(`⚠️ Invalid sensor data received for object ${id}`);
-                return {
-                    success: false,
-                    error: 'Invalid sensor data received',
-                    timestamp: new Date().toISOString(),
-                };
-            }
-
-            // Process sensor data and trigger notifications
-            const result = await this.sensorDataService.processSensorData(+id, sensorData);
+            // Use unified plant care service
+            const result = await this.plantCareService.processPlantCare(+id, sensorData);
             
-            // Trigger smart control analysis after sensor data is processed
-            try {
-                const controlCommands = await this.smartControlService.processSensorDataUpdate(+id);
-                this.logger.log(`🤖 Smart control analysis completed for object ${id}:`, {
-                    watering: controlCommands.isWillWatering,
-                    lighting: controlCommands.lightSensor,
-                    health: controlCommands.healthIndicator,
-                });
-            } catch (smartControlError) {
-                this.logger.error(`❌ Smart control analysis failed for object ${id}: ${smartControlError.message}`);
-                // Don't fail the entire request if smart control fails
-            }
+            this.logger.log(`✅ Plant care processed for object ${id}:`, {
+                health: result.analysis.plantHealth,
+                watering: result.controlCommands.isWillWatering,
+                lighting: result.controlCommands.lightSensor,
+                alerts: result.alertsSent.length,
+            });
             
-            this.logger.log(`✅ Sensor data processed for object ${id} - ${result.alertsSent.length} alerts sent`);
-            
-            return {
-                ...result,
-                timestamp: new Date().toISOString(),
-                objectId: +id,
-            };
+            return result;
             
         } catch (error) {
-            this.logger.error(`❌ Error processing sensor data for object ${id}: ${error.message}`);
+            this.logger.error(`❌ Error processing plant care for object ${id}: ${error.message}`);
             return {
                 success: false,
                 error: error.message,
