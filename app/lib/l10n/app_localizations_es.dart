@@ -477,4 +477,75 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get exploreFeatures =>
       '¡Explora todas las funciones increíbles a continuación!';
+
+  @override
+  String get notificationUrgent => '¡Urgente!';
+
+  @override
+  String get notificationNeedsCare => 'Necesita cuidado';
+
+  @override
+  String notificationMultipleIssues(int count) {
+    return '$count problemas';
+  }
+
+  @override
+  String get notificationNeedsWaterUrgently => '¡Necesita agua urgentemente!';
+
+  @override
+  String get notificationTimeToWater => 'Hora de regar';
+
+  @override
+  String get notificationLightIssue => 'Problema de luz detectado';
+
+  @override
+  String get notificationTemperatureProblem => 'Problema de temperatura';
+
+  @override
+  String get notificationLowNutrients => 'Bajos nutrientes del suelo';
+
+  @override
+  String get notificationWaterLevelIssue => 'Problema de nivel de agua';
+
+  @override
+  String get notificationSensorAlert => 'Alerta de sensor';
+
+  @override
+  String notificationIssuesDetected(int count) {
+    return '$count problemas detectados';
+  }
+
+  @override
+  String notificationUrgentIssues(int count) {
+    return '¡$count problemas urgentes!';
+  }
+
+  @override
+  String notificationIssuesWithUrgent(int total, int urgent) {
+    return '$total problemas ($urgent urgentes)';
+  }
+
+  @override
+  String get notificationAdviceCheckMoisture =>
+      'Verifica la humedad del suelo y riega si es necesario';
+
+  @override
+  String get notificationAdviceAdjustLight =>
+      'Ajusta la posición de la planta para una exposición óptima a la luz';
+
+  @override
+  String get notificationAdviceTemperature =>
+      'Mueve la planta a un entorno con temperatura más adecuada';
+
+  @override
+  String get notificationAdviceNutrients =>
+      'Considera agregar fertilizante para mejorar los nutrientes del suelo';
+
+  @override
+  String get notificationAdviceWaterLevel =>
+      'Verifica el depósito de agua y el sistema de drenaje';
+
+  @override
+  String get notificationAdviceGeneral =>
+      'Por favor verifica la salud general de tu planta y su entorno.';
 }

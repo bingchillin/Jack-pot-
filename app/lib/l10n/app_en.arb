@@ -764,5 +764,128 @@
   "exploreFeatures": "Explore all the amazing features below!",
   "@exploreFeatures": {
     "description": "Encourage exploration in guest mode"
+  },
+
+  "notificationUrgent": "Urgent!",
+  "@notificationUrgent": {
+    "description": "Urgent notification indicator"
+  },
+
+  "notificationNeedsCare": "Needs care",
+  "@notificationNeedsCare": {
+    "description": "Plant needs care notification"
+  },
+
+  "notificationMultipleIssues": "{count} issues",
+  "@notificationMultipleIssues": {
+    "description": "Multiple issues notification",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+
+  "notificationNeedsWaterUrgently": "Needs water urgently!",
+  "@notificationNeedsWaterUrgently": {
+    "description": "Urgent watering notification"
+  },
+
+  "notificationTimeToWater": "Time to water",
+  "@notificationTimeToWater": {
+    "description": "Normal watering notification"
+  },
+
+  "notificationLightIssue": "Light issue detected",
+  "@notificationLightIssue": {
+    "description": "Light sensor issue notification"
+  },
+
+  "notificationTemperatureProblem": "Temperature problem",
+  "@notificationTemperatureProblem": {
+    "description": "Temperature sensor issue notification"
+  },
+
+  "notificationLowNutrients": "Low soil nutrients",
+  "@notificationLowNutrients": {
+    "description": "Low nutrients notification"
+  },
+
+  "notificationWaterLevelIssue": "Water level issue",
+  "@notificationWaterLevelIssue": {
+    "description": "Water level sensor issue notification"
+  },
+
+  "notificationSensorAlert": "Sensor alert",
+  "@notificationSensorAlert": {
+    "description": "Generic sensor alert notification"
+  },
+
+  "notificationIssuesDetected": "{count} issues detected",
+  "@notificationIssuesDetected": {
+    "description": "Multiple issues detected notification",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+
+  "notificationUrgentIssues": "{count} urgent issues!",
+  "@notificationUrgentIssues": {
+    "description": "Urgent issues notification",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+
+  "notificationIssuesWithUrgent": "{total} issues ({urgent} urgent)",
+  "@notificationIssuesWithUrgent": {
+    "description": "Issues with urgent count notification",
+    "placeholders": {
+      "total": {
+        "type": "int",
+        "example": "5"
+      },
+      "urgent": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+
+  "notificationAdviceCheckMoisture": "Check soil moisture and water if needed",
+  "@notificationAdviceCheckMoisture": {
+    "description": "Advice for moisture issues"
+  },
+
+  "notificationAdviceAdjustLight": "Adjust plant position for optimal light exposure",
+  "@notificationAdviceAdjustLight": {
+    "description": "Advice for light issues"
+  },
+
+  "notificationAdviceTemperature": "Move plant to a more suitable temperature environment",
+  "@notificationAdviceTemperature": {
+    "description": "Advice for temperature issues"
+  },
+
+  "notificationAdviceNutrients": "Consider adding fertilizer to improve soil nutrients",
+  "@notificationAdviceNutrients": {
+    "description": "Advice for nutrient issues"
+  },
+
+  "notificationAdviceWaterLevel": "Check water reservoir and drainage system",
+  "@notificationAdviceWaterLevel": {
+    "description": "Advice for water level issues"
+  },
+
+  "notificationAdviceGeneral": "Please check your plant's overall health and environment.",
+  "@notificationAdviceGeneral": {
+    "description": "General plant care advice"
   }
 } 

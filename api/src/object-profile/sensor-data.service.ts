@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { NotificationService } from '../notification/notification.service';
+import { NotificationLocalizationService } from '../notification/notification-localization.service';
 import { PersonService } from '../person/person.service';
 import { ObjectProfileService } from './object-profile.service';
 
@@ -32,6 +33,7 @@ export class SensorDataService {
 
   constructor(
     private readonly notificationService: NotificationService,
+    private readonly notificationLocalizationService: NotificationLocalizationService,
     private readonly personService: PersonService,
     private readonly objectProfileService: ObjectProfileService,
   ) {}
@@ -309,25 +311,32 @@ export class SensorDataService {
   ): Promise<void> {
     for (const user of users) {
       try {
+        // Get user's preferred locale (default to 'en')
+        const userLocale = user.preferredLanguage || 'en';
+        
         // Determine the overall alert level (highest priority wins)
         const alertLevel = this.determineOverallAlertLevel(alerts);
         
-        // Create the consolidated title and description
-        const { title, description, advise } = this.createConsolidatedContent(processedData.plantName, alerts);
+        // Create localized notification content
+        const localizedContent = this.createLocalizedNotificationContent(
+          userLocale,
+          processedData.plantName,
+          alerts
+        );
         
         // Send the consolidated notification
         await this.notificationService.createPlantCareNotification(
           user.idPerson,
           objectId,
-          title,
-          description,
-          advise,
+          localizedContent.title,
+          localizedContent.body,
+          localizedContent.advice,
           processedData.plantName,
           'sensor_consolidated',
           alertLevel,
         );
         
-        this.logger.log(`✅ Consolidated alert sent to user ${user.idPerson} with ${alerts.length} issues`);
+        this.logger.log(`✅ Localized consolidated alert sent to user ${user.idPerson} (${userLocale}) with ${alerts.length} issues`);
       } catch (error) {
         this.logger.error(`❌ Failed to send consolidated alert to user ${user.idPerson}: ${error.message}`);
       }
@@ -446,6 +455,50 @@ export class SensorDataService {
       'water_level': '💧',
     };
     return emojis[type] || '⚠️';
+  }
+
+  /**
+   * Create localized notification content using the localization service
+   */
+  private createLocalizedNotificationContent(
+    locale: string,
+    plantName: string,
+    alerts: Array<{ type: string; level: string; message: string }>
+  ): { title: string; body: string; advice: string } {
+    const alertCount = alerts.length;
+    const urgentCount = alerts.filter(a => a.level === 'urgent').length;
+    
+    // Convert alert types to sensor types for localization
+    const issues = alerts.map(alert => {
+      switch (alert.type) {
+        case 'watering': return 'moisture';
+        case 'light': return 'light';
+        case 'temperature': return 'temperature';
+        case 'nutrients': return 'nutrients';
+        case 'water_level': return 'water_level';
+        default: return 'sensor';
+      }
+    });
+    
+    // Create localized notification data
+    const notificationData = {
+      urgentCount,
+      totalCount: alertCount,
+      issues,
+      plantName,
+    };
+    
+    // Get localized content
+    const localizedContent = this.notificationLocalizationService.getLocalizedNotification(
+      locale,
+      notificationData
+    );
+    
+    return {
+      title: localizedContent.title,
+      body: localizedContent.body,
+      advice: localizedContent.advice || this.createComprehensiveAdvice(alerts),
+    };
   }
 
   /**
