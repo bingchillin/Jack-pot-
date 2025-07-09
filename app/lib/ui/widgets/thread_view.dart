@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/comment_model.dart';
+import 'comment_image_widget.dart';
+import 'tag_selector_widget.dart';
 
 class ThreadView extends StatelessWidget {
   final List<Comment> threadHierarchy;
@@ -64,13 +66,21 @@ class ThreadView extends StatelessWidget {
                     const SizedBox(height: 12),
                     
                     // Contenu
-                    Text(
-                      comment.content,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        height: 1.4,
+                    if (comment.content.isNotEmpty)
+                      Text(
+                        comment.content,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          height: 1.4,
+                        ),
                       ),
-                    ),
+                    
+                    // Affichage de l'image si présente
+                    if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      CommentImageWidget(imageUrl: comment.imageUrl!),
+                    ],
+                    
                     const SizedBox(height: 16),
                     
                     // Actions
@@ -131,6 +141,15 @@ class ThreadView extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
+                  // Affichage du tag si présent (seulement pour les posts principaux)
+                  if (comment.tag != null && comment.level == 0) ...[
+                    const SizedBox(width: 8),
+                    TagDisplayWidget(
+                      tag: comment.tag!,
+                      isSmall: true,
+                    ),
+                  ],
+                  // Badge de niveau pour les réponses
                   if (comment.level > 0) ...[
                     const SizedBox(width: 8),
                     Container(

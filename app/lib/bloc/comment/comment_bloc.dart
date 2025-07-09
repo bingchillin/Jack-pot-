@@ -47,11 +47,12 @@ class LikeComment extends CommentEvent {
 class CreateComment extends CommentEvent {
   final String content;
   final String? imageUrl;
+  final String? tag;
   final int? parentCommentId;
   final String userId;
-  const CreateComment(this.content, {this.imageUrl, this.parentCommentId, required this.userId});
+  const CreateComment(this.content, {this.imageUrl, this.tag, this.parentCommentId, required this.userId});
   @override
-  List<Object?> get props => [content, imageUrl, parentCommentId, userId];
+  List<Object?> get props => [content, imageUrl, tag, parentCommentId, userId];
 }
 
 class RefreshComments extends CommentEvent {
@@ -242,9 +243,13 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   
   Future<void> _onCreateComment(CreateComment event, Emitter<CommentState> emit) async {
     try {
+      // Don't send tag if this is a reply (tags are only for main posts)
+      final tagToSend = event.parentCommentId != null ? null : event.tag;
+      
       final comment = await commentService.createComment(
         content: event.content,
         imageUrl: event.imageUrl,
+        tag: tagToSend,
         parentCommentId: event.parentCommentId,
         token: token!,
         userId: event.userId,

@@ -13,6 +13,9 @@ export class Comment {
   @Column({ name: 'image_url', nullable: true })
   imageUrl: string;
 
+  @Column({ name: 'tag', nullable: true })
+  tag: string;
+
   @Column({ name: 'id_person' })
   @Index()
   idPerson: number;

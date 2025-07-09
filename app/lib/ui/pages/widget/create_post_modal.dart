@@ -6,6 +6,7 @@ import '../../../bloc/comment/comment_bloc.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/upload_service.dart';
 import '../../widgets/simple_image_picker_widget.dart';
+import '../../widgets/tag_selector_widget.dart';
 
 class CreatePostModal extends StatefulWidget {
   const CreatePostModal({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
   bool _isSubmitting = false;
   File? _selectedImage;
   bool _isUploadingImage = false;
+  String? _selectedTag;
 
   @override
   void initState() {
@@ -57,7 +59,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
         }
       },
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.6,
+        height: MediaQuery.of(context).size.height * 0.7,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -127,6 +129,16 @@ class _CreatePostModalState extends State<CreatePostModal> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Sélecteur de tag
+                    TagSelectorWidget(
+                      selectedTag: _selectedTag,
+                      onTagSelected: (tag) {
+                        setState(() {
+                          _selectedTag = tag;
+                        });
+                      },
                     ),
                     const SizedBox(height: 16),
                     Expanded(
@@ -226,11 +238,12 @@ class _CreatePostModalState extends State<CreatePostModal> {
         });
       }
 
-      // Créer le commentaire avec ou sans image
+      // Créer le commentaire avec ou sans image et avec le tag sélectionné
       context.read<CommentBloc>().add(
         CreateComment(
           content,
           imageUrl: imageUrl,
+          tag: _selectedTag,
           userId: authProvider.currentUser!.idPerson.toString(),
         ),
       );

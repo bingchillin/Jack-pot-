@@ -285,7 +285,7 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
         });
       }
 
-      // Créer la réponse avec ou sans image
+      // Créer la réponse avec ou sans image (pas de tag pour les réponses)
       context.read<CommentBloc>().add(
         CreateComment(
           content,

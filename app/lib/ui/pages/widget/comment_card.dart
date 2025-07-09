@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../services/contact_service.dart';
 import '../../../services/comment_service.dart';
 import '../../widgets/comment_image_widget.dart';
+import '../../widgets/tag_selector_widget.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
@@ -122,12 +123,23 @@ class _CommentCardState extends State<CommentCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          comment.person.displayName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              comment.person.displayName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            if (comment.tag != null) ...[
+                              const SizedBox(width: 8),
+                              TagDisplayWidget(
+                                tag: comment.tag!,
+                                isSmall: true,
+                              ),
+                            ],
+                          ],
                         ),
                         Text(
                           _formatTimeAgo(comment.createdAt),
@@ -139,49 +151,44 @@ class _CommentCardState extends State<CommentCard> {
                       ],
                     ),
                   ),
-                  // Menu d'options (bloquer/débloquer, signaler, etc.)
-                  if (isAuthenticated && authProvider.currentUser?.idPerson != comment.person.idPerson)
+                  // Menu d'options
+                  if (isAuthenticated)
                     PopupMenuButton<String>(
-                      icon: Icon(
-                        Icons.more_horiz,
-                        color: _isUserBlocked ? Colors.red.shade300 : Colors.grey.shade600,
-                        size: 20,
-                      ),
-                      onSelected: (value) => _handleMenuAction(context, value),
+                      onSelected: (value) {
+                        _handleMenuAction(context, value);
+                      },
                       itemBuilder: (context) => [
-                        if (_isUserBlocked)
-                          const PopupMenuItem(
-                            value: 'unblock',
+                        PopupMenuItem(
+                          value: 'report',
+                          child: Row(
+                            children: [
+                              Icon(Icons.flag, size: 18, color: Colors.red.shade600),
+                              const SizedBox(width: 8),
+                              const Text('Signaler'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'block',
+                          child: Row(
+                            children: [
+                              Icon(Icons.block, size: 18, color: Colors.red.shade600),
+                              const SizedBox(width: 8),
+                              Text(_isUserBlocked ? 'Débloquer' : 'Bloquer'),
+                            ],
+                          ),
+                        ),
+                        if (authProvider.currentUser?.idPerson == comment.person.idPerson)
+                          PopupMenuItem(
+                            value: 'delete',
                             child: Row(
                               children: [
-                                Icon(Icons.check_circle, color: Colors.green, size: 20),
-                                SizedBox(width: 8),
-                                Text('Débloquer cet utilisateur'),
-                              ],
-                            ),
-                          )
-                        else ...[
-                          const PopupMenuItem(
-                            value: 'block',
-                            child: Row(
-                              children: [
-                                Icon(Icons.block, color: Colors.red, size: 20),
-                                SizedBox(width: 8),
-                                Text('Bloquer cet utilisateur'),
+                                Icon(Icons.delete, size: 18, color: Colors.red.shade600),
+                                const SizedBox(width: 8),
+                                const Text('Supprimer'),
                               ],
                             ),
                           ),
-                          const PopupMenuItem(
-                            value: 'report',
-                            child: Row(
-                              children: [
-                                Icon(Icons.flag, color: Colors.orange, size: 20),
-                                SizedBox(width: 8),
-                                Text('Signaler le contenu'),
-                              ],
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                 ],

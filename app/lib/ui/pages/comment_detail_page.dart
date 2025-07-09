@@ -108,10 +108,6 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header avec statistiques
-                      _buildThreadStats(state.threadHierarchy),
-                      const SizedBox(height: 16),
-                      
                       // Thread hiérarchique
                       ThreadView(
                         threadHierarchy: state.threadHierarchy,
@@ -133,77 +129,9 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
     );
   }
 
-  Widget _buildThreadStats(List<Comment> threadHierarchy) {
-    if (threadHierarchy.isEmpty) return const SizedBox.shrink();
-    
-    final totalComments = _countTotalComments(threadHierarchy);
-    final maxLevel = _getMaxLevel(threadHierarchy);
-    
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue[200]!),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.account_tree, color: Colors.blue[600], size: 24),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Thread de discussion',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.blue[800],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '$totalComments commentaires • ${maxLevel + 1} niveaux',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.blue[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  int _countTotalComments(List<Comment> comments) {
-    int count = 0;
-    for (Comment comment in comments) {
-      count += 1;
-      if (comment.hasChildren) {
-        count += _countTotalComments(comment.children);
-      }
-    }
-    return count;
-  }
 
-  int _getMaxLevel(List<Comment> comments) {
-    int maxLevel = 0;
-    for (Comment comment in comments) {
-      if (comment.level > maxLevel) {
-        maxLevel = comment.level;
-      }
-      if (comment.hasChildren) {
-        int childMaxLevel = _getMaxLevel(comment.children);
-        if (childMaxLevel > maxLevel) {
-          maxLevel = childMaxLevel;
-        }
-      }
-    }
-    return maxLevel;
-  }
+
 
   void _handleLike(Comment comment) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);

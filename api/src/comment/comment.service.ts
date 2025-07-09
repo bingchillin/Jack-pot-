@@ -32,6 +32,12 @@ export class CommentService {
       }
     }
 
+    // If this is a reply (has parentCommentId), remove the tag as tags are only for main posts
+    if (parentCommentId) {
+      commentData.tag = null;
+      console.log('Backend - Removing tag from reply, tags are only allowed on main posts');
+    }
+
     const comment = this.commentRepository.create({
       ...commentData,
       parentComment: parentCommentId ? { idComment: parentCommentId } : null,
@@ -52,6 +58,7 @@ export class CommentService {
         'comment.idComment',
         'comment.content',
         'comment.imageUrl',
+        // 'comment.tag', // TODO: Uncomment after DB migration
         'comment.idPerson',
         'comment.parentCommentId',
         'comment.isDeleted',
