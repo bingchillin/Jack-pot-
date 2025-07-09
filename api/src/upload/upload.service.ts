@@ -27,7 +27,8 @@ export class UploadService {
     fs.writeFileSync(filePath, file.buffer);
     
     // Return the URL that can be used to access the file
-    const baseUrl = this.configService.get('NEXT_PUBLIC_API_URL') || 'http://localhost:3000';
+    // Use 10.0.2.2 for Android emulator compatibility
+    const baseUrl = this.configService.get('NEXT_PUBLIC_API_URL') || 'http://10.0.2.2:3000';
     return `${baseUrl}/uploads/${filename}`;
   }
 

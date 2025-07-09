@@ -5,7 +5,7 @@ class EnvConfig {
   
   // API Configuration
   static const Map<Environment, String> _apiUrls = {
-    Environment.local: 'http://10.0.2.2:3000', // Changed for Android emulator
+    Environment.local: 'http://10.0.2.2:3000', // Correct for Android emulator
     Environment.production: 'https://jacquespote.duckdns.org',
   };
   

@@ -99,6 +99,7 @@ class CommentService {
   // Créer un nouveau commentaire
   Future<Comment> createComment({
     required String content,
+    String? imageUrl,
     int? parentCommentId,
     required String token,
     String? userId,
@@ -106,6 +107,7 @@ class CommentService {
     final url = Uri.parse('$baseUrl/comments');
     final body = {
       'content': content,
+      if (imageUrl != null) 'imageUrl': imageUrl,
       if (parentCommentId != null) 'parentCommentId': parentCommentId,
       if (userId != null) 'idPerson': int.tryParse(userId),
     };

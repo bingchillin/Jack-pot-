@@ -44,6 +44,7 @@ export class CommentService {
       .select([
         'comment.idComment',
         'comment.content',
+        'comment.imageUrl',
         'comment.idPerson',
         'comment.parentCommentId',
         'comment.isDeleted',

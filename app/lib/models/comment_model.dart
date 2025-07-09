@@ -1,6 +1,7 @@
 class Comment {
   final int idComment;
   final String content;
+  final String? imageUrl;
   final int idPerson;
   final Person person;
   final int? parentCommentId;
@@ -20,6 +21,7 @@ class Comment {
   Comment({
     required this.idComment,
     required this.content,
+    this.imageUrl,
     required this.idPerson,
     required this.person,
     this.parentCommentId,
@@ -68,6 +70,7 @@ class Comment {
     return Comment(
       idComment: json['idComment'],
       content: json['content'],
+      imageUrl: json['imageUrl'],
       idPerson: json['idPerson'],
       person: person,
       parentCommentId: json['parentCommentId'] is int
@@ -89,6 +92,7 @@ class Comment {
   Comment copyWith({
     int? idComment,
     String? content,
+    String? imageUrl,
     int? idPerson,
     Person? person,
     int? parentCommentId,
@@ -106,6 +110,7 @@ class Comment {
     return Comment(
       idComment: idComment ?? this.idComment,
       content: content ?? this.content,
+      imageUrl: imageUrl ?? this.imageUrl,
       idPerson: idPerson ?? this.idPerson,
       person: person ?? this.person,
       parentCommentId: parentCommentId ?? this.parentCommentId,

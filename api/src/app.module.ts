@@ -49,6 +49,7 @@ import { StripeModule } from './stripe/stripe.module';
 import { CommentModule } from './comment/comment.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { SensorsModule } from './sensors/sensors.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -126,6 +127,7 @@ import { SensorsModule } from './sensors/sensors.module';
     CommentModule,
     FirebaseModule,
     SensorsModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

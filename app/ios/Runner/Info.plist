@@ -6,6 +6,14 @@
     <string>Votre description</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Votre description</string>
+    
+    <!-- Permissions pour appareil photo et galerie -->
+    <key>NSCameraUsageDescription</key>
+    <string>Cette application a besoin d'accéder à votre appareil photo pour prendre des photos et les ajouter à vos commentaires.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Cette application a besoin d'accéder à votre galerie photo pour sélectionner des images et les ajouter à vos commentaires.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Cette application a besoin d'accéder à votre galerie photo pour sauvegarder des images.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
