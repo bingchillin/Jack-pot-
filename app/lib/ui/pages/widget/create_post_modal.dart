@@ -161,6 +161,62 @@ class _CreatePostModalState extends State<CreatePostModal> {
             ),
           ),
         ],
+            // Zone de saisie
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    const Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.blue,
+                          child: Icon(Icons.person, color: Colors.white),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Partagez votre expérience...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        maxLines: null,
+                        expands: true,
+                        textAlignVertical: TextAlignVertical.top,
+                        decoration: const InputDecoration(
+                          hintText: 'Que souhaitez-vous partager avec la communauté ?\n\nConseils, questions, expériences...',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                            height: 1.5,
+                          ),
+                        ),
+                        style: const TextStyle(fontSize: 16, height: 1.5),
+                      ),
+                    ),
+                    // Widget de sélection d'image (avec fallback)
+                    SimpleImagePickerWidget(
+                      onImageSelected: (File? image) {
+                        setState(() {
+                          _selectedImage = image;
+                        });
+                      },
+                      initialImage: _selectedImage,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
