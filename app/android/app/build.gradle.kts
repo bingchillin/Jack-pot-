@@ -21,7 +21,7 @@ plugins {
 
 android {
     namespace = "com.jackpot.app"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -37,8 +37,8 @@ android {
 
     defaultConfig {
         applicationId = "com.jackpote.jackpoteapp"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 21
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

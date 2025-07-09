@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import '../../../bloc/comment/comment_bloc.dart';
 import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/upload_service.dart';
+import '../../widgets/simple_image_picker_widget.dart';
 
 class CreateReplyModal extends StatefulWidget {
   final Comment parentComment;
@@ -20,6 +23,8 @@ class CreateReplyModal extends StatefulWidget {
 class _CreateReplyModalState extends State<CreateReplyModal> {
   final TextEditingController _controller = TextEditingController();
   bool _isSubmitting = false;
+  File? _selectedImage;
+  bool _isUploadingImage = false;
 
   @override
   void initState() {
@@ -88,8 +93,8 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
                     ),
                   ),
                   TextButton(
-                    onPressed: _isSubmitting ? null : _submitReply,
-                    child: _isSubmitting
+                    onPressed: (_isSubmitting || _isUploadingImage) ? null : _submitReply,
+                    child: (_isSubmitting || _isUploadingImage)
                         ? const SizedBox(
                             width: 20,
                             height: 20,
@@ -170,17 +175,32 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: TextField(
-                  controller: _controller,
-                  maxLines: null,
-                  expands: true,
-                  textAlignVertical: TextAlignVertical.top,
-                  decoration: const InputDecoration(
-                    hintText: 'Écrivez votre réponse...',
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(color: Colors.grey),
-                  ),
-                  style: const TextStyle(fontSize: 16),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        maxLines: null,
+                        expands: true,
+                        textAlignVertical: TextAlignVertical.top,
+                        decoration: const InputDecoration(
+                          hintText: 'Écrivez votre réponse...',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(color: Colors.grey),
+                        ),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    // Widget de sélection d'image (simplifié)
+                    SimpleImagePickerWidget(
+                      onImageSelected: (File? image) {
+                        setState(() {
+                          _selectedImage = image;
+                        });
+                      },
+                      initialImage: _selectedImage,
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -233,9 +253,9 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
     }
 
     final content = _controller.text.trim();
-    if (content.isEmpty) {
+    if (content.isEmpty && _selectedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez écrire une réponse')),
+        const SnackBar(content: Text('Veuillez écrire une réponse ou ajouter une image')),
       );
       return;
     }
@@ -244,13 +264,48 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
       _isSubmitting = true;
     });
 
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    context.read<CommentBloc>().add(
-      CreateComment(
-        content,
-        parentCommentId: widget.parentComment.idComment,
-        userId: authProvider.currentUser!.idPerson.toString(),
-      ),
-    );
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      String? imageUrl;
+      
+      // Upload de l'image si sélectionnée
+      if (_selectedImage != null) {
+        setState(() {
+          _isUploadingImage = true;
+        });
+        
+        final uploadService = UploadService();
+        imageUrl = await uploadService.uploadImage(
+          _selectedImage!,
+          token: authProvider.accessToken,
+        );
+        
+        setState(() {
+          _isUploadingImage = false;
+        });
+      }
+
+      // Créer la réponse avec ou sans image
+      context.read<CommentBloc>().add(
+        CreateComment(
+          content,
+          imageUrl: imageUrl,
+          parentCommentId: widget.parentComment.idComment,
+          userId: authProvider.currentUser!.idPerson.toString(),
+        ),
+      );
+    } catch (e) {
+      setState(() {
+        _isSubmitting = false;
+        _isUploadingImage = false;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de l\'upload: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 } 

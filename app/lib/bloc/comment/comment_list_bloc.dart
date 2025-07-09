@@ -64,10 +64,5 @@ class CommentListBloc extends Bloc<CommentListEvent, CommentListState> {
     }
   }
 
-  Future<String?> _getUserIdFromToken(String? token) async {
-    // Si tu as déjà le userId dans le provider, tu peux l'utiliser directement ici
-    // Sinon, décode le JWT ou adapte selon ton système d'auth
-    // Pour l'instant, retourne null si non dispo
-    return null;
-  }
+
 } 

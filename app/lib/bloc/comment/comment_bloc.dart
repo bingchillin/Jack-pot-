@@ -46,11 +46,12 @@ class LikeComment extends CommentEvent {
 
 class CreateComment extends CommentEvent {
   final String content;
+  final String? imageUrl;
   final int? parentCommentId;
   final String userId;
-  const CreateComment(this.content, {this.parentCommentId, required this.userId});
+  const CreateComment(this.content, {this.imageUrl, this.parentCommentId, required this.userId});
   @override
-  List<Object?> get props => [content, parentCommentId, userId];
+  List<Object?> get props => [content, imageUrl, parentCommentId, userId];
 }
 
 class RefreshComments extends CommentEvent {
@@ -243,6 +244,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     try {
       final comment = await commentService.createComment(
         content: event.content,
+        imageUrl: event.imageUrl,
         parentCommentId: event.parentCommentId,
         token: token!,
         userId: event.userId,

@@ -9,6 +9,7 @@ import '../user_profile_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../services/contact_service.dart';
 import '../../../services/comment_service.dart';
+import '../../widgets/comment_image_widget.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
@@ -189,9 +190,18 @@ class _CommentCardState extends State<CommentCard> {
             // Contenu du commentaire
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                comment.content,
-                style: const TextStyle(fontSize: 16, height: 1.4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (comment.content.isNotEmpty)
+                    Text(
+                      comment.content,
+                      style: const TextStyle(fontSize: 16, height: 1.4),
+                    ),
+                  // Affichage de l'image si présente
+                  if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty)
+                    CommentImageWidget(imageUrl: comment.imageUrl!),
+                ],
               ),
             ),
             const SizedBox(height: 16),

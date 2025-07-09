@@ -10,6 +10,9 @@ export class Comment {
   @Column({ type: 'text' })
   content: string;
 
+  @Column({ name: 'image_url', nullable: true })
+  imageUrl: string;
+
   @Column({ name: 'id_person' })
   @Index()
   idPerson: number;
