@@ -7,12 +7,14 @@ import { ObjectProfileElecController } from './object-profile-elec.controller';
 import { ObjectProfile } from './entities/object-profile.entity';
 import { NotificationModule } from '../notification/notification.module';
 import { PersonModule } from '../person/person.module';
+import { SmartControlModule } from '../smart-control/smart-control.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([ObjectProfile]),
         NotificationModule,
         PersonModule,
+        SmartControlModule,
     ],
     controllers: [ObjectProfileController, ObjectProfileElecController],
     providers: [ObjectProfileService, SensorDataService],

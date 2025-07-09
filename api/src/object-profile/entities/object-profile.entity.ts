@@ -90,6 +90,9 @@ export class ObjectProfile {
   @Column({ nullable: true })
   updated_watering: Date;
 
+  @Column({ name: 'last_watering_time', nullable: true })
+  lastWateringTime: Date;
+
   @OneToMany(() => Plant, plant => plant.objectProfile)
   plants: Plant[];
 }
