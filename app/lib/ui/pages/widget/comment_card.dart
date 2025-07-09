@@ -9,8 +9,10 @@ import '../user_profile_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../services/contact_service.dart';
 import '../../../services/comment_service.dart';
+import '../../../services/comment_flag_service.dart';
 import '../../widgets/comment_image_widget.dart';
 import '../../widgets/tag_selector_widget.dart';
+import '../../widgets/flag_reason_dialog.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
@@ -392,17 +394,52 @@ class _CommentCardState extends State<CommentCard> {
   void _showReportDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Signaler le contenu'),
-        content: const Text('Cette fonctionnalité sera bientôt disponible.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
+      builder: (context) => FlagReasonDialog(
+        onFlag: (reason, details) {
+          _flagComment(context, reason, details);
+        },
       ),
     );
+  }
+
+  Future<void> _flagComment(BuildContext context, String reason, String? details) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    final userId = authProvider.currentUser?.idPerson;
+    
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    
+    if (token == null || userId == null) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('Vous devez être connecté pour signaler un commentaire')),
+      );
+      return;
+    }
+
+    try {
+      final commentFlagService = CommentFlagService();
+      final result = await commentFlagService.flagComment(
+        commentId: widget.comment.idComment,
+        idPerson: userId,
+        reason: reason,
+        details: details,
+        token: token,
+      );
+      
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Commentaire signalé (${result['flagCount']} signalement${result['flagCount'] > 1 ? 's' : ''})'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Erreur: ${e.toString().replaceAll('Exception: ', '')}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _showDeleteDialog(BuildContext context) {

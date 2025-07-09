@@ -22,8 +22,10 @@ import {
   import { CommentService } from './comment.service';
   import { CreateCommentDto } from './dto/create-comment.dto';
   import { UpdateCommentDto } from './dto/update-comment.dto';
+  import { CreateCommentFlagDto } from './dto/create-comment-flag.dto';
   import { ToggleLikeDto } from './dto/toggle-like.dto';
   import { Comment } from './entities/comment.entity';
+  import { CommentFlag } from './entities/comment-flag.entity';
   
   @ApiTags('comments')
   @Controller('comments')
@@ -419,5 +421,170 @@ import {
     @ApiResponse({ status: 404, description: 'Comment/post not found.' })
     async getLikers(@Param('id', ParseIntPipe) id: number): Promise<any[]> {
       return await this.commentService.getLikers(id);
+    }
+
+    // ========== FLAG SYSTEM ENDPOINTS ==========
+
+    @Post(':id/flag')
+    @ApiOperation({ summary: 'Flag a comment as inappropriate' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the comment to flag',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 201,
+      description: 'Comment has been flagged successfully.',
+      schema: {
+        type: 'object',
+        properties: {
+          flagged: { type: 'boolean', example: true },
+          flagCount: { type: 'number', example: 1 },
+        },
+      },
+    })
+    @ApiResponse({ status: 400, description: 'Bad Request - Already flagged or invalid data.' })
+    @ApiResponse({ status: 404, description: 'Comment not found.' })
+    async flagComment(
+      @Param('id', ParseIntPipe) id: number,
+      @Body() createCommentFlagDto: Omit<CreateCommentFlagDto, 'idComment'>,
+    ): Promise<{ flagged: boolean; flagCount: number }> {
+      const flagDto = { ...createCommentFlagDto, idComment: id };
+      return await this.commentService.flagComment(flagDto);
+    }
+
+    @Get(':id/flags/count')
+    @ApiOperation({ summary: 'Get flag count for a comment' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the comment',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return the flag count.',
+      schema: {
+        type: 'object',
+        properties: {
+          flagCount: { type: 'number', example: 3 },
+        },
+      },
+    })
+    async getFlagCount(
+      @Param('id', ParseIntPipe) id: number,
+    ): Promise<{ flagCount: number }> {
+      const count = await this.commentService.getFlagCount(id);
+      return { flagCount: count };
+    }
+
+    @Get(':id/flags/me/:userId')
+    @ApiOperation({ summary: 'Check if a user has flagged a comment' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the comment',
+      example: 1,
+    })
+    @ApiParam({
+      name: 'userId',
+      type: Number,
+      description: 'The ID of the user',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return whether the user has flagged this comment.',
+      schema: {
+        type: 'object',
+        properties: {
+          flagged: { type: 'boolean', example: false },
+        },
+      },
+    })
+    async isFlaggedByUser(
+      @Param('id', ParseIntPipe) id: number,
+      @Param('userId', ParseIntPipe) userId: number,
+    ): Promise<{ flagged: boolean }> {
+      const flagged = await this.commentService.isFlaggedByUser(id, userId);
+      return { flagged };
+    }
+
+    @Get(':id/flags')
+    @ApiOperation({ summary: 'Get all flags for a comment (admin only)' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the comment',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return all flags for this comment.',
+      type: [CommentFlag],
+    })
+    async getCommentFlags(@Param('id', ParseIntPipe) id: number): Promise<CommentFlag[]> {
+      return await this.commentService.getCommentFlags(id);
+    }
+
+    @Get('moderation/flagged')
+    @ApiOperation({ summary: 'Get all flagged comments (admin only)' })
+    @ApiResponse({
+      status: 200,
+      description: 'Return all flagged comments.',
+      schema: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            idComment: { type: 'number' },
+            content: { type: 'string' },
+            imageUrl: { type: 'string' },
+            tag: { type: 'string' },
+            flagCount: { type: 'number' },
+            person: {
+              type: 'object',
+              properties: {
+                idPerson: { type: 'number' },
+                email: { type: 'string' },
+                firstname: { type: 'string' },
+                surname: { type: 'string' },
+              },
+            },
+          },
+        },
+      },
+    })
+    async getFlaggedComments(): Promise<any[]> {
+      return await this.commentService.getFlaggedComments();
+    }
+
+    @Delete('flags/:flagId')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOperation({ summary: 'Remove a flag (admin only or own flag)' })
+    @ApiParam({
+      name: 'flagId',
+      type: Number,
+      description: 'The ID of the flag to remove',
+      example: 1,
+    })
+    @ApiQuery({
+      name: 'userId',
+      required: false,
+      type: Number,
+      description: 'User ID if removing own flag',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 204,
+      description: 'Flag has been successfully removed.',
+    })
+    @ApiResponse({ status: 404, description: 'Flag not found.' })
+    async removeFlag(
+      @Param('flagId', ParseIntPipe) flagId: number,
+      @Query('userId') userId?: string,
+    ): Promise<void> {
+      await this.commentService.removeFlag(flagId, userId ? Number(userId) : undefined);
     }
   }

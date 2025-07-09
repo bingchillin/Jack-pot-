@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, ManyToMany, JoinTable, Index, DeleteDateColumn } from 'typeorm';
 import { Person } from '../../person/entities/person.entity';
 import { CommentLike } from './comment-like.entity';
+import { CommentFlag } from './comment-flag.entity';
 
 @Entity('comment')
 export class Comment {
@@ -36,6 +37,9 @@ export class Comment {
 
   @OneToMany(() => CommentLike, (commentLike) => commentLike.comment)
   likes: CommentLike[];
+
+  @OneToMany(() => CommentFlag, (commentFlag) => commentFlag.comment)
+  flags: CommentFlag[];
 
   @Column({ name: 'is_deleted', default: false })
   isDeleted: boolean;
