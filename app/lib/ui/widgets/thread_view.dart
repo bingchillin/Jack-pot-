@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import '../../models/comment_model.dart';
 import 'comment_image_widget.dart';
 import 'tag_selector_widget.dart';
+import 'comment_options_menu.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../bloc/comment/comment_bloc.dart';
 
 class ThreadView extends StatelessWidget {
   final List<Comment> threadHierarchy;
@@ -180,6 +185,28 @@ class ThreadView extends StatelessWidget {
               ),
             ],
           ),
+        ),
+        
+        // Menu d'options
+        Builder(
+          builder: (context) {
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            final currentUserId = authProvider.currentUser?.idPerson;
+            
+            return CommentOptionsMenu(
+              comment: comment,
+              currentUserId: currentUserId,
+              onDelete: () {
+                context.read<CommentBloc>().add(DeleteComment(comment.idComment));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Commentaire supprimé'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+            );
+          },
         ),
       ],
     );

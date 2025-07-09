@@ -136,6 +136,30 @@ class ThreadBuilderService {
     }).toList();
   }
 
+  /// Supprime un commentaire de la hiérarchie par son ID
+  static List<Comment> removeCommentFromHierarchy(
+    List<Comment> hierarchy,
+    int commentId,
+  ) {
+    List<Comment> filteredHierarchy = [];
+    
+    for (Comment comment in hierarchy) {
+      if (comment.idComment == commentId) {
+        // Ignorer ce commentaire (le supprimer)
+        continue;
+      } else if (comment.hasChildren) {
+        // Supprimer récursivement dans les enfants
+        List<Comment> updatedChildren = removeCommentFromHierarchy(comment.children, commentId);
+        filteredHierarchy.add(comment.copyWith(children: updatedChildren));
+      } else {
+        // Garder le commentaire tel quel
+        filteredHierarchy.add(comment);
+      }
+    }
+    
+    return filteredHierarchy;
+  }
+
   /// Obtient tous les commentaires de la hiérarchie dans l'ordre d'affichage
   static List<Comment> flattenHierarchy(List<Comment> hierarchy) {
     List<Comment> flattened = [];

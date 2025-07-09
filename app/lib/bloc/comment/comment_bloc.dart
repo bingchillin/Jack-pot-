@@ -55,6 +55,13 @@ class CreateComment extends CommentEvent {
   List<Object?> get props => [content, imageUrl, tag, parentCommentId, userId];
 }
 
+class DeleteComment extends CommentEvent {
+  final int commentId;
+  const DeleteComment(this.commentId);
+  @override
+  List<Object?> get props => [commentId];
+}
+
 class RefreshComments extends CommentEvent {
   final String? userId;
   const RefreshComments({this.userId});
@@ -110,6 +117,13 @@ class CommentCreated extends CommentState {
   List<Object?> get props => [comment];
 }
 
+class CommentDeleted extends CommentState {
+  final int commentId;
+  const CommentDeleted(this.commentId);
+  @override
+  List<Object?> get props => [commentId];
+}
+
 class CommentError extends CommentState {
   final String message;
   const CommentError(this.message);
@@ -142,6 +156,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     on<LoadCommentDetail>(_onLoadCommentDetail);
     on<LikeComment>(_onLikeComment);
     on<CreateComment>(_onCreateComment);
+    on<DeleteComment>(_onDeleteComment);
     on<RefreshComments>(_onRefreshComments);
     on<EmitMainCommentsState>(_onEmitMainCommentsState);
   }
@@ -273,6 +288,34 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
         emit(CommentMainLoaded(_mainComments));
       } else if (_currentThreadHierarchy.isNotEmpty) {
         emit(CommentThreadLoaded(_currentThreadHierarchy));
+      }
+    } catch (e) {
+      emit(CommentError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteComment(DeleteComment event, Emitter<CommentState> emit) async {
+    try {
+      await commentService.deleteComment(event.commentId, token!);
+      
+      // Supprimer du cache local
+      _mainComments.removeWhere((comment) => comment.idComment == event.commentId);
+      
+      // Supprimer de la hiérarchie de threading si elle existe
+      if (_currentThreadHierarchy.isNotEmpty) {
+        _currentThreadHierarchy = ThreadBuilderService.removeCommentFromHierarchy(
+          _currentThreadHierarchy,
+          event.commentId,
+        );
+      }
+      
+      emit(CommentDeleted(event.commentId));
+      
+      // Re-émettre l'état approprié
+      if (_currentThreadHierarchy.isNotEmpty) {
+        emit(CommentThreadLoaded(_currentThreadHierarchy));
+      } else {
+        emit(CommentMainLoaded(_mainComments));
       }
     } catch (e) {
       emit(CommentError(e.toString()));

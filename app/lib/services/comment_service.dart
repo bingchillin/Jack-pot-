@@ -171,7 +171,7 @@ class CommentService {
       },
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode != 204 && response.statusCode != 200) {
       throw Exception('Erreur de suppression: ${response.statusCode}');
     }
   }

@@ -329,6 +329,9 @@ class _CommentCardState extends State<CommentCard> {
       case 'report':
         _showReportDialog(context);
         break;
+      case 'delete':
+        _showDeleteDialog(context);
+        break;
     }
   }
 
@@ -400,6 +403,63 @@ class _CommentCardState extends State<CommentCard> {
         ],
       ),
     );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Supprimer le commentaire'),
+        content: const Text(
+          'Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action est irréversible.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteComment(context);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteComment(BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final commentBloc = context.read<CommentBloc>();
+    
+    if (!authProvider.isAuthenticated) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('Vous devez être connecté pour supprimer un commentaire')),
+      );
+      return;
+    }
+
+    try {
+      commentBloc.add(DeleteComment(widget.comment.idComment));
+      
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Commentaire supprimé'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la suppression: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> _blockUser(BuildContext context) async {

@@ -121,6 +121,13 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
               backgroundColor: Colors.red,
             ),
           );
+        } else if (state is CommentDeleted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Commentaire supprimé'),
+              backgroundColor: Colors.green,
+            ),
+          );
         }
       },
       child: Scaffold(
