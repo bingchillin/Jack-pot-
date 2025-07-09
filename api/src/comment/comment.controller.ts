@@ -26,11 +26,17 @@ import {
   import { ToggleLikeDto } from './dto/toggle-like.dto';
   import { Comment } from './entities/comment.entity';
   import { CommentFlag } from './entities/comment-flag.entity';
+  import { CommentMention } from './entities/comment-mention.entity';
+  import { MentionService } from './mention.service';
+  import { Person } from '../person/entities/person.entity';
   
   @ApiTags('comments')
   @Controller('comments')
   export class CommentController {
-    constructor(private readonly commentService: CommentService) {}
+    constructor(
+      private readonly commentService: CommentService,
+      private readonly mentionService: MentionService,
+    ) {}
   
     @Post()
     @ApiOperation({ summary: 'Create a new post or comment' })
@@ -586,5 +592,57 @@ import {
       @Query('userId') userId?: string,
     ): Promise<void> {
       await this.commentService.removeFlag(flagId, userId ? Number(userId) : undefined);
+    }
+
+    // ============================================================================
+    // MENTION ENDPOINTS
+    // ============================================================================
+
+    @Get(':id/mentions')
+    @ApiOperation({ summary: 'Get all mentions for a comment' })
+    @ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The ID of the comment',
+      example: 1,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return all mentions for the comment.',
+      type: [CommentMention],
+    })
+    @ApiResponse({ status: 404, description: 'Comment not found.' })
+    async getCommentMentions(@Param('id', ParseIntPipe) id: number): Promise<CommentMention[]> {
+      return await this.mentionService.getCommentMentions(id);
+    }
+
+    @Get('users/search')
+    @ApiOperation({ summary: 'Search users for mention autocomplete' })
+    @ApiQuery({
+      name: 'q',
+      type: String,
+      description: 'Search query (minimum 2 characters)',
+      example: 'john',
+    })
+    @ApiQuery({
+      name: 'limit',
+      required: false,
+      type: Number,
+      description: 'Maximum number of results',
+      example: 10,
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'Return users matching the search query.',
+      type: [Person],
+    })
+    async searchUsersForMention(
+      @Query('q') query: string,
+      @Query('limit') limit?: string,
+    ): Promise<Person[]> {
+      return await this.mentionService.searchUsersForMention(
+        query,
+        limit ? Number(limit) : 10,
+      );
     }
   }

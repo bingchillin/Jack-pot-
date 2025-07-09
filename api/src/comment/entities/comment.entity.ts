@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { Person } from '../../person/entities/person.entity';
 import { CommentLike } from './comment-like.entity';
 import { CommentFlag } from './comment-flag.entity';
+import { CommentMention } from './comment-mention.entity';
 
 @Entity('comment')
 export class Comment {
@@ -40,6 +41,9 @@ export class Comment {
 
   @OneToMany(() => CommentFlag, (commentFlag) => commentFlag.comment)
   flags: CommentFlag[];
+
+  @OneToMany(() => CommentMention, (commentMention) => commentMention.comment)
+  mentions: CommentMention[];
 
   @Column({ name: 'is_deleted', default: false })
   isDeleted: boolean;

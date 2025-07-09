@@ -4,9 +4,11 @@ import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 import { CommentLike } from './entities/comment-like.entity';
 import { CommentFlag } from './entities/comment-flag.entity';
+import { CommentMention } from './entities/comment-mention.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CreateCommentFlagDto } from './dto/create-comment-flag.dto';
+import { MentionService } from './mention.service';
 
 @Injectable()
 export class CommentService {
@@ -17,6 +19,9 @@ export class CommentService {
     private commentLikeRepository: Repository<CommentLike>,
     @InjectRepository(CommentFlag)
     private commentFlagRepository: Repository<CommentFlag>,
+    @InjectRepository(CommentMention)
+    private commentMentionRepository: Repository<CommentMention>,
+    private mentionService: MentionService,
   ) {}
 
   async create(createCommentDto: CreateCommentDto): Promise<Comment> {
@@ -50,6 +55,19 @@ export class CommentService {
     console.log('Backend - Comment before save:', comment);
     const savedComment = await this.commentRepository.save(comment);
     console.log('Backend - Comment after save:', savedComment);
+    
+    // Process mentions after comment is saved
+    try {
+      await this.mentionService.processMentionsForComment(
+        savedComment.content,
+        savedComment.idComment,
+        savedComment.idPerson,
+      );
+      console.log('Backend - Mentions processed successfully for comment:', savedComment.idComment);
+    } catch (error) {
+      console.error('Backend - Error processing mentions:', error);
+      // Don't fail the comment creation if mention processing fails
+    }
     
     return savedComment;
   }
