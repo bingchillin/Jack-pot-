@@ -100,6 +100,7 @@ class CommentService {
   Future<Comment> createComment({
     required String content,
     String? imageUrl,
+    String? tag,
     int? parentCommentId,
     required String token,
     String? userId,
@@ -108,6 +109,7 @@ class CommentService {
     final body = {
       'content': content,
       if (imageUrl != null) 'imageUrl': imageUrl,
+      if (tag != null) 'tag': tag,
       if (parentCommentId != null) 'parentCommentId': parentCommentId,
       if (userId != null) 'idPerson': int.tryParse(userId),
     };
@@ -169,7 +171,7 @@ class CommentService {
       },
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode != 204 && response.statusCode != 200) {
       throw Exception('Erreur de suppression: ${response.statusCode}');
     }
   }

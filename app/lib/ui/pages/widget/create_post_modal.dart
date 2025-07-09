@@ -6,6 +6,7 @@ import '../../../bloc/comment/comment_bloc.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/upload_service.dart';
 import '../../widgets/simple_image_picker_widget.dart';
+import '../../widgets/tag_selector_widget.dart';
 
 class CreatePostModal extends StatefulWidget {
   const CreatePostModal({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
   bool _isSubmitting = false;
   File? _selectedImage;
   bool _isUploadingImage = false;
+  String? _selectedTag;
 
   @override
   void initState() {
@@ -57,36 +59,36 @@ class _CreatePostModalState extends State<CreatePostModal> {
         }
       },
       child: Container(
-      height: MediaQuery.of(context).size.height * 0.6,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          // En-tête de la modal
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-                const Expanded(
-                  child: Text(
-                    'Nouveau post',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // En-tête de la modal
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      'Nouveau post',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                TextButton(
+                  TextButton(
                     onPressed: (_isSubmitting || _isUploadingImage) ? null : _submitPost,
                     child: (_isSubmitting || _isUploadingImage)
                       ? const SizedBox(
@@ -101,66 +103,10 @@ class _CreatePostModalState extends State<CreatePostModal> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                ),
-              ],
-            ),
-          ),
-          // Zone de saisie
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  const Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.blue,
-                        child: Icon(Icons.person, color: Colors.white),
-                      ),
-                      SizedBox(width: 12),
-                      Text(
-                        'Partagez votre expérience...',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: const InputDecoration(
-                        hintText: 'Que souhaitez-vous partager avec la communauté ?\n\nConseils, questions, expériences...',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                          height: 1.5,
-                        ),
-                      ),
-                      style: const TextStyle(fontSize: 16, height: 1.5),
-                    ),
-                  ),
-                    // Widget de sélection d'image (avec fallback)
-                    SimpleImagePickerWidget(
-                      onImageSelected: (File? image) {
-                        setState(() {
-                          _selectedImage = image;
-                        });
-                      },
-                      initialImage: _selectedImage,
-                    ),
                 ],
               ),
             ),
-          ),
-        ],
             // Zone de saisie
             Expanded(
               child: Padding(
@@ -183,6 +129,16 @@ class _CreatePostModalState extends State<CreatePostModal> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Sélecteur de tag
+                    TagSelectorWidget(
+                      selectedTag: _selectedTag,
+                      onTagSelected: (tag) {
+                        setState(() {
+                          _selectedTag = tag;
+                        });
+                      },
                     ),
                     const SizedBox(height: 16),
                     Expanded(
@@ -282,11 +238,12 @@ class _CreatePostModalState extends State<CreatePostModal> {
         });
       }
 
-      // Créer le commentaire avec ou sans image
+      // Créer le commentaire avec ou sans image et avec le tag sélectionné
       context.read<CommentBloc>().add(
         CreateComment(
           content,
           imageUrl: imageUrl,
+          tag: _selectedTag,
           userId: authProvider.currentUser!.idPerson.toString(),
         ),
       );
