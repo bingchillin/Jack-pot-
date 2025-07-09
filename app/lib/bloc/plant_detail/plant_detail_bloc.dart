@@ -97,7 +97,7 @@ class PlantDetailBloc extends Bloc<PlantDetailEvent, PlantDetailState> {
         oldP.temperatureSensorGround != newP.temperatureSensorGround ||
         oldP.temperatureSensorExtern != newP.temperatureSensorExtern ||
         oldP.expositionTimeSun != newP.expositionTimeSun ||
-        oldP.plantType.pathPicture != newP.plantType.pathPicture;
+        oldP.plantType?.pathPicture != newP.plantType?.pathPicture;
   }
 
 

@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:jackpote/app_config.dart';
 import 'package:jackpote/providers/plant_provider_my_List.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ import 'services/comment_service.dart';
 import 'services/notification_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 // Top-level background message handler
 @pragma('vm:entry-point')
@@ -30,8 +32,12 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('🔥 Background message: ${message.messageId}');
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   
   // Initialize Firebase
   await Firebase.initializeApp();
@@ -138,6 +144,7 @@ class _RootAppState extends State<RootApp> {
         initialRoute: '/',
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
+        navigatorObservers: [routeObserver],
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

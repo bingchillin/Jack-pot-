@@ -1,8 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:jackpote/providers/auth_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../services/my_bluetooth_service.dart';
+import '../../services/object_profile_service.dart';
 import 'dart:convert';
 
 const instructionText = '''
@@ -30,11 +34,13 @@ enum ScanState {
 
 class _AddMyObjectPageState extends State<AddMyObjectPage> {
   BluetoothDevice? targetDevice;
-  BluetoothCharacteristic? writeChar;
-  BluetoothCharacteristic? notifyChar;
 
   String statusMessage = instructionText;
   String? idObject;
+  String? idObjectSave;
+
+  bool isSending = false;
+  bool hasHandledResponse = false;
 
   bool waitingForWifiResult = false;
 
@@ -85,8 +91,8 @@ class _AddMyObjectPageState extends State<AddMyObjectPage> {
       statusMessage =
       "🔍 Recherche du pot en cours… Appuyer longtemps sur le bouton bleu. Assurez-vous que la led bleu est allumée. Veuillez rester proche de votre appareil.";
       targetDevice = null;
-      writeChar = null;
-      notifyChar = null;
+      MyBluetoothService.instance.writeChar = null;
+      MyBluetoothService.instance.notifyChar = null;
       idObject = null;
       waitingForWifiResult = false;
     });
@@ -152,15 +158,16 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
       for (var char in service.characteristics) {
         String charUuid = char.uuid.toString().toLowerCase();
         if (charUuid == writeCharUUID) {
-          writeChar = char;
+          MyBluetoothService.instance.writeChar = char;
         }
         if (charUuid == notifyCharUUID) {
-          notifyChar = char;
+          MyBluetoothService.instance.notifyChar = char;
           await char.setNotifyValue(true);
           notifySubscription?.cancel();
           notifySubscription = char.value.listen((value) {
             String data = utf8.decode(value);
             setState(() {
+              idObjectSave = data;
               idObject = data;
               scanState = ScanState.connected;
               statusMessage = "✅ Pot détecté et prêt à être configuré.";
@@ -170,11 +177,11 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
       }
     }
 
-    if (writeChar != null) {
-      await writeChar!.write(utf8.encode("led_blink"));
+    if (MyBluetoothService.instance.writeChar != null) {
+      await MyBluetoothService.instance.writeChar!.write(utf8.encode("led_blink"));
     }
 
-    if (writeChar == null || notifyChar == null) {
+    if (MyBluetoothService.instance.writeChar == null || MyBluetoothService.instance.notifyChar == null) {
       setState(() {
         statusMessage =
         "❌ Échec : le pot ne répond pas correctement. Vérifiez sa configuration.";
@@ -184,45 +191,129 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
   }
 
   void sendData() async {
-    if (writeChar == null || notifyChar == null) return;
+    if (isSending || MyBluetoothService.instance.writeChar == null || MyBluetoothService.instance.notifyChar == null) {
+      return;
+    }
+
+    isSending = true;
+    hasHandledResponse = false;
 
     setState(() {
       waitingForWifiResult = true;
     });
 
-    Map<String, String> data = {
+    final data = {
       "wifi_user": wifiUserController.text,
       "wifi_password": wifiPassController.text,
-      "plant_name":
-      plantNameController.text.isEmpty ? "PlanteSansNom" : plantNameController.text,
+      "plant_name": plantNameController.text.isEmpty
+          ? "PlanteSansNom"
+          : plantNameController.text,
     };
 
-    String jsonString = jsonEncode(data);
-    await writeChar!.write(utf8.encode(jsonString));
+    await MyBluetoothService.instance.writeChar!
+        .write(utf8.encode(jsonEncode(data)));
 
     notifySubscription?.cancel();
-    notifySubscription = notifyChar!.value.listen((value) {
-      String response = utf8.decode(value);
-      print("🛰️ Réponse du pot : $response");
 
-      if (response == "wifi_ok") {
-        notifySubscription?.cancel();
-        setState(() => waitingForWifiResult = false);
-        Navigator.pushNamed(context, '/choose_your_plant');
-      } else if (response == "wifi_fail") {
-        notifySubscription?.cancel();
-        setState(() {
-          waitingForWifiResult = false;
-          statusMessage = "❌ Connexion Wi-Fi échouée. Veuillez réessayer.";
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-              Text("❌ Échec de connexion au Wi-Fi. Veuillez vérifier les identifiants.")),
+    notifySubscription = MyBluetoothService.instance.notifyChar!.value.listen((value) async {
+      if (hasHandledResponse) return;
+
+      final responseRaw = utf8.decode(value).trim();
+      print("🛰️ Réponse brute du pot : '$responseRaw'");
+
+      if (responseRaw != "wifi_ok" && responseRaw != "wifi_fail") {
+        try {
+          final jsonResponse = jsonDecode(responseRaw);
+          if (jsonResponse is! Map || !jsonResponse.containsKey('id_object_profile')) {
+            return;
+          }
+        } catch (e) {
+          print("❌ Donnée ignorée (erreur de parsing JSON): $e");
+          return;
+        }
+      }
+
+      hasHandledResponse = true;
+      notifySubscription?.cancel();
+      setState(() {
+        waitingForWifiResult = false;
+        isSending = false;
+      });
+
+      if (responseRaw == "wifi_ok") {
+        Navigator.pushNamed(
+          context,
+          '/choose_your_plant',
+          arguments: {
+            "plantName": plantNameController.text,
+            "idObject": idObjectSave,
+          },
         );
+        return;
+      }
+
+      if (responseRaw == "wifi_fail") {
+        setState(() => statusMessage =
+        "❌ Connexion Wi‑Fi échouée. Veuillez réessayer.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "❌ Échec de connexion au Wi‑Fi. Veuillez vérifier les identifiants.",
+            ),
+          ),
+        );
+        await Future.delayed(Duration(seconds: 2));
+        return;
+      }
+
+      // Traitement JSO
+      try {
+        final jsonResponse = jsonDecode(responseRaw);
+        final idStr = jsonResponse['id_object_profile'];
+        final id = int.tryParse(idStr.toString());
+
+        if (id == null) throw FormatException("ID non convertible en entier");
+
+        try {
+          print("qjzefhlke");
+          final profile = await ObjectProfileService().fetchObjectProfileDetails(
+              id, context.read<AuthProvider>().accessToken!);
+          print("kjsnfksenfj");
+
+          if (profile.idObjectProfile != 0) {
+            print("kl,lgkq:");
+            print(profile);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("✅ Le Wi‑Fi de cet objet a bien été modifié."),
+                duration: Duration(seconds: 3),
+              ),
+            );
+            //await Future.delayed(Duration(seconds: 2));
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/',
+                  (Route<dynamic> route) => false,
+            );
+          }
+        } catch (e) {
+          print("Erreur lors du fetch du profil: $e");
+          Navigator.pushNamed(
+            context,
+            '/choose_your_plant',
+            arguments: {
+              "plantName": plantNameController.text,
+              "idObject": idObjectSave,
+            },
+          );
+        }
+      } catch (e) {
+        print("Pas un JSON valide ou erreur parsing JSON (après filtre): $e");
       }
     });
+
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -303,8 +394,6 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("📦 Identifiant du pot : $idObject"),
-                SizedBox(height: 16),
                 Text("📝 Veuillez configurer votre pot :"),
                 SizedBox(height: 8),
                 Text(

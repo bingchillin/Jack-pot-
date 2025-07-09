@@ -21,6 +21,13 @@ class LoadMainComments extends CommentEvent {
   List<Object?> get props => [userId];
 }
 
+class LoadFriendsComments extends CommentEvent {
+  final int userId;
+  const LoadFriendsComments(this.userId);
+  @override
+  List<Object?> get props => [userId];
+}
+
 class LoadCommentDetail extends CommentEvent {
   final int commentId;
   final String? userId;
@@ -129,6 +136,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     required this.token,
   }) : super(CommentInitial()) {
     on<LoadMainComments>(_onLoadMainComments);
+    on<LoadFriendsComments>(_onLoadFriendsComments);
     on<LoadCommentDetail>(_onLoadCommentDetail);
     on<LikeComment>(_onLikeComment);
     on<CreateComment>(_onCreateComment);
@@ -139,8 +147,27 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   Future<void> _onLoadMainComments(LoadMainComments event, Emitter<CommentState> emit) async {
     emit(CommentLoading());
     try {
-      final comments = await commentService.fetchMainComments(token, userId: event.userId);
+      // Utiliser la méthode avec filtrage des utilisateurs bloqués (toujours frais)
+      final comments = await commentService.fetchMainCommentsWithoutBlocked(
+        token, 
+        userId: event.userId,
+      );
       _mainComments = comments;
+      emit(CommentMainLoaded(comments));
+    } catch (e) {
+      emit(CommentError(e.toString()));
+    }
+  }
+  
+  Future<void> _onLoadFriendsComments(LoadFriendsComments event, Emitter<CommentState> emit) async {
+    emit(CommentLoading());
+    try {
+      if (token == null || token!.isEmpty) {
+        throw Exception('Token requis pour charger les commentaires des amis');
+      }
+      
+      final comments = await commentService.fetchFriendsComments(token!, event.userId);
+      _mainComments = comments; // Mettre à jour le cache avec les commentaires des amis
       emit(CommentMainLoaded(comments));
     } catch (e) {
       emit(CommentError(e.toString()));
@@ -246,6 +273,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   }
   
   Future<void> _onRefreshComments(RefreshComments event, Emitter<CommentState> emit) async {
+    // Forcer le rechargement avec le filtrage des utilisateurs bloqués
     if (_currentThreadHierarchy.isNotEmpty) {
       add(LoadCommentDetail(_currentThreadHierarchy.first.idComment, userId: event.userId));
     } else {

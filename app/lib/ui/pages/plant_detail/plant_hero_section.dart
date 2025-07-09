@@ -64,8 +64,8 @@ class PlantHeroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final stateColor = _getStateColor(plant.state);
-    final imageUrl = plant.plantType.pathPicture != null
-        ? Uri.parse(AppConfig.baseUrl).resolve(plant.plantType.pathPicture!).toString()
+    final imageUrl = plant.plantType?.pathPicture != null
+        ? Uri.parse(AppConfig.baseUrl).resolve(plant.plantType!.pathPicture!).toString()
         : null;
 
     return Container(
@@ -239,7 +239,7 @@ class PlantHeroSection extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                plant.plantType.title ?? localizations.unknownType,
+                                plant.plantType?.title ?? localizations.unknownType,
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey[600],
@@ -259,8 +259,8 @@ class PlantHeroSection extends StatelessWidget {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                title: Text(plant.plantType.title ?? localizations.unknownType),
-                                content: Text(plant.plantType.description ?? localizations.notAvailable),
+                                title: Text(plant.plantType?.title ?? localizations.unknownType),
+                                content: Text(plant.plantType?.description ?? localizations.notAvailable),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),

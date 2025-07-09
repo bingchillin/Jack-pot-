@@ -19,9 +19,9 @@ class PlantDetailContent extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           } else if (state is PlantDetailLoaded) {
             final plant = state.plant;
-            final imageUrl = plant.plantType.pathPicture != null
+            final imageUrl = plant.plantType?.pathPicture != null
                 ? Uri.parse(AppConfig.baseUrl)
-                .resolve(plant.plantType.pathPicture!)
+                .resolve(plant.plantType!.pathPicture!)
                 .toString()
                 : null;
 
@@ -45,9 +45,9 @@ class PlantDetailContent extends StatelessWidget {
                           showDialog(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: Text(plant.plantType.title),
+                              title: Text(plant.plantType!.title),
                               content: Text(
-                                  plant.plantType.description ?? "Pas de description"),
+                                  plant.plantType?.description ?? "Pas de description"),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),

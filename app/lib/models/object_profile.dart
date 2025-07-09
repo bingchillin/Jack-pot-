@@ -10,8 +10,8 @@ class ObjectProfile {
   final int? state;
   final bool? isAutomatic;
   final bool? isWillWatering;
-  final ObjectModel object;
-  final PlantType plantType;
+  final ObjectModel? object;
+  final PlantType? plantType;
   final double? humidityAirSensor;
   final double? humidityGroundSensor;
   final double? phGroundSensor;
@@ -45,6 +45,9 @@ class ObjectProfile {
   });
 
   factory ObjectProfile.fromJson(Map<String, dynamic> json) {
+    if (json == null || json is! Map<String, dynamic>) {
+      throw FormatException("Objet JSON invalide : $json");
+    }
     try {
       return ObjectProfile(
         idObjectProfile: parseInt(json['idObjectProfile']) ?? 0,
@@ -55,8 +58,8 @@ class ObjectProfile {
         state: parseInt(json['state']),
         isAutomatic: json['isAutomatic'],
         isWillWatering: json['isWillWatering'],
-        object: ObjectModel.fromJson(json['object']),
-        plantType: PlantType.fromJson(json['plantType']),
+        object: json['object'] != null ? ObjectModel.fromJson(json['object']) : null,
+        plantType: json['plantType'] != null ? PlantType.fromJson(json['plantType']) : null,
         humidityAirSensor: parseDouble(json['humidityAirSensor']),
         humidityGroundSensor: parseDouble(json['humidityGroundSensor']),
         phGroundSensor: parseDouble(json['phGroundSensor']),
