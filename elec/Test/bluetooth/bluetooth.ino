@@ -35,7 +35,7 @@ bool ledBlinkingVar = false;
 
 
 // ==== ISR ====
-void IRAM_ATTR onButtonPressed() {
+void IRAM_ATTR onButtonPressedBluetooth() {
   startBLERequested = true; 
 }
 
@@ -58,7 +58,7 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
       ledBlinking = false;
       digitalWrite(LED_PIN, LOW);
     } else if (value == "stopBle") {
-        //stopBLE();
+        stopBLE();
     } else {
       
       // On tente de parser comme un JSON
@@ -128,6 +128,9 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
             String result = String(id_object);
             notifyChr->setValue(result.c_str());
             notifyChr->notify();
+
+            ledBlinking = false;
+            digitalWrite(LED_PIN, LOW);
         }
       }else {
         Serial.println("❌ Erreur de parsing JSON");
@@ -251,7 +254,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), onButtonPressed, FALLING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), onButtonPressedBluetooth, FALLING);
   
   xTaskCreate(taskBleUse, "BLE Task", 4096, NULL, 1, NULL);
 
@@ -294,7 +297,7 @@ void taskPushIdObject(void *parameter) {
       Serial.println("📤 Envoyé : " + msg);
     }
     
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    vTaskDelay(3000 / portTICK_PERIOD_MS);
   }
 }
 
@@ -331,5 +334,5 @@ bool testWiFiConnection(const String& ssid, const String& password) {
 
 // ==== LOOP ====
 void loop() {
-
+  delay(1000);
 }

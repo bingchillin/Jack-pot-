@@ -17,7 +17,8 @@ APP Mobile
 - notifications push
 - les state des card ne sont pas respecter
 - La partie descriptif de l'object_profile n'est pas dynamique, a modifier
-- affichage des liste doivent toujours etre pareil... la ce n'est pas le cas
+- retour à la page home sans laisser la possibilité de retour
+- A la création d'une plante parfois id_object == null
 
 Electronique:
 
