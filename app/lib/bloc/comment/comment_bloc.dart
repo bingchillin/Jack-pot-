@@ -221,11 +221,12 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       // Mettre à jour le cache local
       _updateCommentInCache(event.commentId, result['liked'], result['likeCount']);
       
+      // Émettre toujours CommentLikeUpdated pour une mise à jour immédiate de l'UI
+      emit(CommentLikeUpdated(event.commentId, result['liked'], result['likeCount']));
+      
       // Re-émettre l'état approprié avec les données mises à jour
       if (_currentThreadHierarchy.isNotEmpty) {
-        // Mode thread - émettre d'abord le like update puis la hiérarchie
-        emit(CommentLikeUpdated(event.commentId, result['liked'], result['likeCount']));
-        
+        // Mode thread - mettre à jour la hiérarchie
         final existingComment = ThreadBuilderService.findCommentInHierarchy(
           _currentThreadHierarchy, 
           event.commentId
@@ -250,7 +251,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
           emit(CommentMainLoaded(_mainComments));
         }
       } else {
-        // Mode timeline - émettre directement la liste mise à jour sans passer par CommentLikeUpdated
+        // Mode timeline - émettre la liste mise à jour
         print('Debug: Updating main comments list with ${_mainComments.length} comments');
         emit(CommentMainLoaded(_mainComments));
       }

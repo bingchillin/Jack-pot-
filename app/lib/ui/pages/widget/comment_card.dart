@@ -31,12 +31,22 @@ class CommentCard extends StatefulWidget {
 }
 
 class _CommentCardState extends State<CommentCard> {
+  late Comment _currentComment;
   bool _isUserBlocked = false;
-  
+
   @override
   void initState() {
     super.initState();
+    _currentComment = widget.comment;
     _checkIfUserIsBlocked();
+  }
+
+  @override
+  void didUpdateWidget(CommentCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.comment != widget.comment) {
+      _currentComment = widget.comment;
+    }
   }
   
   Future<void> _checkIfUserIsBlocked() async {
@@ -47,10 +57,10 @@ class _CommentCardState extends State<CommentCard> {
     if (token != null && currentUserId != null) {
       try {
         final contactService = ContactService();
-        final existingContact = await contactService.getContactStatus(
-          userId: widget.comment.person.idPerson,
-          token: token,
-        );
+              final existingContact = await contactService.getContactStatus(
+        userId: _currentComment.person.idPerson,
+        token: token,
+      );
         
         if (mounted) {
           setState(() {
@@ -65,256 +75,268 @@ class _CommentCardState extends State<CommentCard> {
 
   @override
   Widget build(BuildContext context) {
-    final comment = widget.comment;
+    final comment = _currentComment;
     final isAuthenticated = Provider.of<AuthProvider>(context, listen: false).isAuthenticated;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    return GestureDetector(
-      onTap: () {
-        _navigateToDetail(context);
+    return BlocListener<CommentBloc, CommentState>(
+      listener: (context, state) {
+        if (state is CommentLikeUpdated && state.commentId == comment.idComment) {
+          setState(() {
+            _currentComment = _currentComment.copyWith(
+              isLikedByCurrentUser: state.isLiked,
+              likeCount: state.likeCount,
+            );
+          });
+        }
       },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // En-tête du commentaire
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  // Avatar
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UserProfilePage(userId: comment.person.idPerson),
-                        ),
-                      );
-                    },
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.blue.shade100,
-                      child: Text(
-                        comment.person.firstname.isNotEmpty 
-                            ? comment.person.firstname[0].toUpperCase()
-                            : 'U',
-                        style: TextStyle(
-                          color: Colors.blue.shade700,
-                          fontWeight: FontWeight.bold,
+      child: GestureDetector(
+        onTap: () {
+          _navigateToDetail(context);
+        },
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 3,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // En-tête du commentaire
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    // Avatar
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserProfilePage(userId: comment.person.idPerson),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.blue.shade100,
+                        child: Text(
+                          comment.person.firstname.isNotEmpty 
+                              ? comment.person.firstname[0].toUpperCase()
+                              : 'U',
+                          style: TextStyle(
+                            color: Colors.blue.shade700,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Informations utilisateur
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              comment.person.displayName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                    const SizedBox(width: 12),
+                    // Informations utilisateur
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                comment.person.displayName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              if (comment.tag != null) ...[
+                                const SizedBox(width: 8),
+                                TagDisplayWidget(
+                                  tag: comment.tag!,
+                                  isSmall: true,
+                                ),
+                              ],
+                            ],
+                          ),
+                          Text(
+                            _formatTimeAgo(comment.createdAt),
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Menu d'options
+                    if (isAuthenticated)
+                      PopupMenuButton<String>(
+                        onSelected: (value) {
+                          _handleMenuAction(context, value);
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'report',
+                            child: Row(
+                              children: [
+                                Icon(Icons.flag, size: 18, color: Colors.red.shade600),
+                                const SizedBox(width: 8),
+                                const Text('Signaler'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'block',
+                            child: Row(
+                              children: [
+                                Icon(Icons.block, size: 18, color: Colors.red.shade600),
+                                const SizedBox(width: 8),
+                                Text(_isUserBlocked ? 'Débloquer' : 'Bloquer'),
+                              ],
+                            ),
+                          ),
+                          if (authProvider.currentUser?.idPerson == comment.person.idPerson)
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete, size: 18, color: Colors.red.shade600),
+                                  const SizedBox(width: 8),
+                                  const Text('Supprimer'),
+                                ],
                               ),
                             ),
-                            if (comment.tag != null) ...[
-                              const SizedBox(width: 8),
-                              TagDisplayWidget(
-                                tag: comment.tag!,
-                                isSmall: true,
-                              ),
-                            ],
-                          ],
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+              // Contenu du commentaire
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (comment.content.isNotEmpty)
+                      MentionRichText(
+                        text: comment.content,
+                        mentions: comment.mentions,
+                        textStyle: const TextStyle(fontSize: 16, height: 1.4),
+                        onMentionTap: (userId) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserProfilePage(userId: userId),
+                            ),
+                          );
+                        },
+                      ),
+                    // Affichage de l'image si présente
+                    if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty)
+                      CommentImageWidget(imageUrl: comment.imageUrl!),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Ligne d'actions
+              Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    // Bouton répondre
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chat_bubble_outline, color: Colors.blue),
+                          tooltip: 'Répondre',
+                          color: isAuthenticated ? Colors.blue : Colors.grey.shade400,
+                          onPressed: isAuthenticated
+                              ? () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                    ),
+                                    builder: (context) => CreateReplyModal(parentComment: _currentComment),
+                                  );
+                                }
+                              : () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Connectez-vous pour répondre')),
+                                  );
+                                },
                         ),
+                        if (comment.replyCount > 0)
+                          Positioned(
+                            right: 4,
+                            top: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${comment.replyCount}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(width: 8),
+                    // Bouton like
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            comment.isLikedByCurrentUser ? Icons.favorite : Icons.favorite_border,
+                            color: comment.isLikedByCurrentUser ? Colors.red : Colors.grey.shade600,
+                            size: 22,
+                          ),
+                          tooltip: comment.isLikedByCurrentUser ? 'Retirer le like' : 'Liker',
+                          onPressed: isAuthenticated
+                              ? () {
+                                  context.read<CommentBloc>().add(
+                                    LikeComment(comment.idComment, authProvider.currentUser!.idPerson.toString()),
+                                  );
+                                  widget.onLikeChanged?.call();
+                                }
+                              : () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Connectez-vous pour liker')),
+                                  );
+                                },
+                        ),
+                        const SizedBox(width: 2),
                         Text(
-                          _formatTimeAgo(comment.createdAt),
+                          '${comment.likeCount}',
                           style: TextStyle(
-                            color: Colors.grey.shade600,
+                            color: Colors.grey.shade700,
+                            fontWeight: FontWeight.w500,
                             fontSize: 14,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  // Menu d'options
-                  if (isAuthenticated)
-                    PopupMenuButton<String>(
-                      onSelected: (value) {
-                        _handleMenuAction(context, value);
-                      },
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 'report',
-                          child: Row(
-                            children: [
-                              Icon(Icons.flag, size: 18, color: Colors.red.shade600),
-                              const SizedBox(width: 8),
-                              const Text('Signaler'),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'block',
-                          child: Row(
-                            children: [
-                              Icon(Icons.block, size: 18, color: Colors.red.shade600),
-                              const SizedBox(width: 8),
-                              Text(_isUserBlocked ? 'Débloquer' : 'Bloquer'),
-                            ],
-                          ),
-                        ),
-                        if (authProvider.currentUser?.idPerson == comment.person.idPerson)
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete, size: 18, color: Colors.red.shade600),
-                                const SizedBox(width: 8),
-                                const Text('Supprimer'),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            // Contenu du commentaire
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (comment.content.isNotEmpty)
-                    MentionRichText(
-                      text: comment.content,
-                      mentions: comment.mentions,
-                      textStyle: const TextStyle(fontSize: 16, height: 1.4),
-                      onMentionTap: (userId) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserProfilePage(userId: userId),
-                          ),
-                        );
-                      },
-                    ),
-                  // Affichage de l'image si présente
-                  if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty)
-                    CommentImageWidget(imageUrl: comment.imageUrl!),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Ligne d'actions
-            Padding(
-              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  // Bouton répondre
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.chat_bubble_outline, color: Colors.blue),
-                        tooltip: 'Répondre',
-                        color: isAuthenticated ? Colors.blue : Colors.grey.shade400,
-                        onPressed: isAuthenticated
-                            ? () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                  ),
-                                  builder: (context) => CreateReplyModal(parentComment: widget.comment),
-                                );
-                              }
-                            : () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Connectez-vous pour répondre')),
-                                );
-                              },
-                      ),
-                      if (comment.replyCount > 0)
-                        Positioned(
-                          right: 4,
-                          top: 8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              '${comment.replyCount}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(width: 8),
-                  // Bouton like
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          comment.isLikedByCurrentUser ? Icons.favorite : Icons.favorite_border,
-                          color: comment.isLikedByCurrentUser ? Colors.red : Colors.grey.shade600,
-                          size: 22,
-                        ),
-                        tooltip: comment.isLikedByCurrentUser ? 'Retirer le like' : 'Liker',
-                        onPressed: isAuthenticated
-                            ? () {
-                                context.read<CommentBloc>().add(
-                                  LikeComment(comment.idComment, authProvider.currentUser!.idPerson.toString()),
-                                );
-                                widget.onLikeChanged?.call();
-                              }
-                            : () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Connectez-vous pour liker')),
-                                );
-                              },
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        '${comment.likeCount}',
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -324,7 +346,7 @@ class _CommentCardState extends State<CommentCard> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CommentDetailPage(commentId: widget.comment.idComment),
+        builder: (context) => CommentDetailPage(commentId: _currentComment.idComment),
       ),
     );
   }
@@ -352,7 +374,7 @@ class _CommentCardState extends State<CommentCard> {
       builder: (context) => AlertDialog(
         title: const Text('Bloquer cet utilisateur'),
         content: Text(
-          'Êtes-vous sûr de vouloir bloquer ${widget.comment.person.displayName} ?\n\n'
+          'Êtes-vous sûr de vouloir bloquer ${_currentComment.person.displayName} ?\n\n'
           'Vous ne verrez plus ses commentaires et il ne pourra plus vous contacter.',
         ),
         actions: [
@@ -379,7 +401,7 @@ class _CommentCardState extends State<CommentCard> {
       builder: (context) => AlertDialog(
         title: const Text('Débloquer cet utilisateur'),
         content: Text(
-          'Êtes-vous sûr de vouloir débloquer ${widget.comment.person.displayName} ?\n\n'
+          'Êtes-vous sûr de vouloir débloquer ${_currentComment.person.displayName} ?\n\n'
           'Vous pourrez à nouveau voir ses commentaires et il pourra vous contacter.',
         ),
         actions: [
@@ -428,7 +450,7 @@ class _CommentCardState extends State<CommentCard> {
     try {
       final commentFlagService = CommentFlagService();
       final result = await commentFlagService.flagComment(
-        commentId: widget.comment.idComment,
+        commentId: _currentComment.idComment,
         idPerson: userId,
         reason: reason,
         details: details,
@@ -490,7 +512,7 @@ class _CommentCardState extends State<CommentCard> {
     }
 
     try {
-      commentBloc.add(DeleteComment(widget.comment.idComment));
+      commentBloc.add(DeleteComment(_currentComment.idComment));
       
       scaffoldMessenger.showSnackBar(
         const SnackBar(
@@ -532,7 +554,7 @@ class _CommentCardState extends State<CommentCard> {
       
       // D'abord, vérifier s'il y a déjà une relation
       final existingContact = await contactService.getContactStatus(
-        userId: widget.comment.person.idPerson,
+        userId: _currentComment.person.idPerson,
         token: token,
       );
 
@@ -553,7 +575,7 @@ class _CommentCardState extends State<CommentCard> {
         // Envoyer d'abord une demande puis la bloquer immédiatement
         try {
           final newContact = await contactService.sendFriendRequest(
-            receiverId: widget.comment.person.idPerson,
+            receiverId: _currentComment.person.idPerson,
             token: token,
           );
           
@@ -575,14 +597,14 @@ class _CommentCardState extends State<CommentCard> {
         if (isAlreadyBlocked) {
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: Text('${widget.comment.person.displayName} est déjà bloqué'),
+              content: Text('${_currentComment.person.displayName} est déjà bloqué'),
               backgroundColor: Colors.orange,
             ),
           );
         } else {
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: Text('${widget.comment.person.displayName} a été bloqué'),
+              content: Text('${_currentComment.person.displayName} a été bloqué'),
               backgroundColor: Colors.green,
             ),
           );
@@ -602,7 +624,7 @@ class _CommentCardState extends State<CommentCard> {
           if (e.toString().contains('user is blocked') || e.toString().contains('403')) {
             scaffoldMessenger.showSnackBar(
               SnackBar(
-                content: Text('${widget.comment.person.displayName} est déjà bloqué'),
+                content: Text('${_currentComment.person.displayName} est déjà bloqué'),
                 backgroundColor: Colors.orange,
               ),
             );
@@ -644,7 +666,7 @@ class _CommentCardState extends State<CommentCard> {
       
       // Récupérer le contact existant
       final existingContact = await contactService.getContactStatus(
-        userId: widget.comment.person.idPerson,
+        userId: _currentComment.person.idPerson,
         token: token,
       );
 
@@ -671,7 +693,7 @@ class _CommentCardState extends State<CommentCard> {
         if (mounted) {
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: Text('${widget.comment.person.displayName} a été débloqué'),
+              content: Text('${_currentComment.person.displayName} a été débloqué'),
               backgroundColor: Colors.green,
             ),
           );
@@ -691,7 +713,7 @@ class _CommentCardState extends State<CommentCard> {
         if (mounted) {
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: Text('${widget.comment.person.displayName} n\'est pas bloqué'),
+              content: Text('${_currentComment.person.displayName} n\'est pas bloqué'),
               backgroundColor: Colors.orange,
             ),
           );
