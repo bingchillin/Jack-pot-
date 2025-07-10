@@ -7,6 +7,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../services/upload_service.dart';
 import '../../widgets/simple_image_picker_widget.dart';
 import '../../widgets/tag_selector_widget.dart';
+import '../../widgets/mention_text_field.dart';
 
 class CreatePostModal extends StatefulWidget {
   const CreatePostModal({Key? key}) : super(key: key);
@@ -142,21 +143,15 @@ class _CreatePostModalState extends State<CreatePostModal> {
                     ),
                     const SizedBox(height: 16),
                     Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        maxLines: null,
-                        expands: true,
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: const InputDecoration(
-                          hintText: 'Que souhaitez-vous partager avec la communauté ?\n\nConseils, questions, expériences...',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                            height: 1.5,
-                          ),
-                        ),
-                        style: const TextStyle(fontSize: 16, height: 1.5),
+                      child: Consumer<AuthProvider>(
+                        builder: (context, authProvider, child) {
+                          return MentionTextField(
+                            controller: _controller,
+                            token: authProvider.accessToken ?? '',
+                            hintText: 'Que souhaitez-vous partager avec la communauté ?\n\nConseils, questions, expériences...\n\nUtilisez @ pour mentionner des utilisateurs',
+                            maxLines: null,
+                          );
+                        },
                       ),
                     ),
                     // Widget de sélection d'image (avec fallback)

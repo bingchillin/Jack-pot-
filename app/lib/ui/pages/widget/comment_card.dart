@@ -8,11 +8,11 @@ import '../../../bloc/comment/comment_bloc.dart';
 import '../user_profile_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../services/contact_service.dart';
-import '../../../services/comment_service.dart';
 import '../../../services/comment_flag_service.dart';
 import '../../widgets/comment_image_widget.dart';
 import '../../widgets/tag_selector_widget.dart';
 import '../../widgets/flag_reason_dialog.dart';
+import '../../widgets/user_mention_suggestions.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
@@ -203,9 +203,18 @@ class _CommentCardState extends State<CommentCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (comment.content.isNotEmpty)
-                    Text(
-                      comment.content,
-                      style: const TextStyle(fontSize: 16, height: 1.4),
+                    MentionRichText(
+                      text: comment.content,
+                      mentions: comment.mentions,
+                      textStyle: const TextStyle(fontSize: 16, height: 1.4),
+                      onMentionTap: (userId) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserProfilePage(userId: userId),
+                          ),
+                        );
+                      },
                     ),
                   // Affichage de l'image si présente
                   if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty)

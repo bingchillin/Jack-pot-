@@ -1,3 +1,6 @@
+// Import nécessaire pour CommentMention
+import 'comment_mention_model.dart';
+
 class Comment {
   final int idComment;
   final String content;
@@ -18,6 +21,9 @@ class Comment {
   // Threading properties
   final int level;
   final List<Comment> children;
+  
+  // Mention properties
+  final List<CommentMention> mentions;
 
   Comment({
     required this.idComment,
@@ -37,6 +43,7 @@ class Comment {
     this.replies = const [],
     this.level = 0,
     this.children = const [],
+    this.mentions = const [],
   });
 
   // Threading getters
@@ -89,6 +96,9 @@ class Comment {
       replyCount: json['replyCount'] ?? 0,
       isLikedByCurrentUser: json['isLikedByCurrentUser'] ?? false,
       replies: [], // Les réponses sont chargées séparément
+      mentions: (json['mentions'] as List<dynamic>?)
+          ?.map((mentionJson) => CommentMention.fromJson(mentionJson))
+          .toList() ?? [],
     );
   }
 
@@ -110,6 +120,7 @@ class Comment {
     List<Comment>? replies,
     int? level,
     List<Comment>? children,
+    List<CommentMention>? mentions,
   }) {
     return Comment(
       idComment: idComment ?? this.idComment,
@@ -129,6 +140,7 @@ class Comment {
       replies: replies ?? this.replies,
       level: level ?? this.level,
       children: children ?? this.children,
+      mentions: mentions ?? this.mentions,
     );
   }
 }
@@ -156,4 +168,14 @@ class Person {
   }
 
   String get displayName => '$firstname $surname'.trim();
-} 
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'idPerson': idPerson,
+      'firstname': firstname,
+      'surname': surname,
+      'email': email,
+    };
+  }
+}
+

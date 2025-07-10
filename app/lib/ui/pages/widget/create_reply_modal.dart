@@ -7,6 +7,8 @@ import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/upload_service.dart';
 import '../../widgets/simple_image_picker_widget.dart';
+import '../../widgets/mention_text_field.dart';
+import '../../widgets/user_mention_suggestions.dart';
 
 class CreateReplyModal extends StatefulWidget {
   final Comment parentComment;
@@ -164,9 +166,10 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    widget.parentComment.content,
-                    style: const TextStyle(fontSize: 14),
+                  MentionRichText(
+                    text: widget.parentComment.content,
+                    mentions: widget.parentComment.mentions,
+                    textStyle: const TextStyle(fontSize: 14),
                   ),
                 ],
               ),
@@ -178,17 +181,15 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
                 child: Column(
                   children: [
                     Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        maxLines: null,
-                        expands: true,
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: const InputDecoration(
-                          hintText: 'Écrivez votre réponse...',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(color: Colors.grey),
-                        ),
-                        style: const TextStyle(fontSize: 16),
+                      child: Consumer<AuthProvider>(
+                        builder: (context, authProvider, child) {
+                          return MentionTextField(
+                            controller: _controller,
+                            token: authProvider.accessToken ?? '',
+                            hintText: 'Écrivez votre réponse... (utilisez @ pour mentionner)',
+                            maxLines: null,
+                          );
+                        },
                       ),
                     ),
                     // Widget de sélection d'image (simplifié)

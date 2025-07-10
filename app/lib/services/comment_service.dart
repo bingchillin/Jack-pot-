@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/comment_model.dart';
-import '../models/contact_model.dart';
 import '../app_config.dart';
 import '../models/user_profile_model.dart';
 import 'contact_service.dart';
