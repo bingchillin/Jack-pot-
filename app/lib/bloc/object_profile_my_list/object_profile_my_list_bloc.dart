@@ -3,7 +3,6 @@ import 'package:jackpote/providers/plant_provider_my_List.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart'; // pour listEquals
 import '../../models/object_profile.dart';
-import '../../providers/plant_provider_my_List.dart';
 import '../../services/object_profile_service.dart';
 import 'object_profile_my_list_event.dart';
 import 'object_profile_my_list_state.dart';

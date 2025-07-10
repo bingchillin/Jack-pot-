@@ -476,4 +476,76 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get exploreFeatures =>
       'Explorez toutes les fonctionnalités incroyables ci-dessous !';
+
+  @override
+  String get notificationUrgent => 'Urgent !';
+
+  @override
+  String get notificationNeedsCare => 'Nécessite des soins';
+
+  @override
+  String notificationMultipleIssues(int count) {
+    return '$count problèmes';
+  }
+
+  @override
+  String get notificationNeedsWaterUrgently =>
+      'Nécessite de l\'eau d\'urgence !';
+
+  @override
+  String get notificationTimeToWater => 'Il est temps d\'arroser';
+
+  @override
+  String get notificationLightIssue => 'Problème de lumière détecté';
+
+  @override
+  String get notificationTemperatureProblem => 'Problème de température';
+
+  @override
+  String get notificationLowNutrients => 'Faibles nutriments du sol';
+
+  @override
+  String get notificationWaterLevelIssue => 'Problème de niveau d\'eau';
+
+  @override
+  String get notificationSensorAlert => 'Alerte capteur';
+
+  @override
+  String notificationIssuesDetected(int count) {
+    return '$count problèmes détectés';
+  }
+
+  @override
+  String notificationUrgentIssues(int count) {
+    return '$count problèmes urgents !';
+  }
+
+  @override
+  String notificationIssuesWithUrgent(int total, int urgent) {
+    return '$total problèmes ($urgent urgents)';
+  }
+
+  @override
+  String get notificationAdviceCheckMoisture =>
+      'Vérifiez l\'humidité du sol et arrosez si nécessaire';
+
+  @override
+  String get notificationAdviceAdjustLight =>
+      'Ajustez la position de la plante pour une exposition optimale à la lumière';
+
+  @override
+  String get notificationAdviceTemperature =>
+      'Déplacez la plante vers un environnement à température plus appropriée';
+
+  @override
+  String get notificationAdviceNutrients =>
+      'Envisagez d\'ajouter de l\'engrais pour améliorer les nutriments du sol';
+
+  @override
+  String get notificationAdviceWaterLevel =>
+      'Vérifiez le réservoir d\'eau et le système de drainage';
+
+  @override
+  String get notificationAdviceGeneral =>
+      'Veuillez vérifier la santé générale de votre plante et son environnement.';
 }

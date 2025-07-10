@@ -3,8 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 import { CommentLike } from './entities/comment-like.entity';
+import { CommentFlag } from './entities/comment-flag.entity';
+import { CommentMention } from './entities/comment-mention.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { CreateCommentFlagDto } from './dto/create-comment-flag.dto';
+import { MentionService } from './mention.service';
 
 @Injectable()
 export class CommentService {
@@ -13,9 +17,17 @@ export class CommentService {
     private commentRepository: Repository<Comment>,
     @InjectRepository(CommentLike)
     private commentLikeRepository: Repository<CommentLike>,
+    @InjectRepository(CommentFlag)
+    private commentFlagRepository: Repository<CommentFlag>,
+    @InjectRepository(CommentMention)
+    private commentMentionRepository: Repository<CommentMention>,
+    private mentionService: MentionService,
   ) {}
 
   async create(createCommentDto: CreateCommentDto): Promise<Comment> {
+    console.log('Backend - Creating comment with data:', createCommentDto);
+    console.log('Backend - ImageUrl received:', createCommentDto.imageUrl);
+    
     const { parentCommentId, ...commentData } = createCommentDto;
 
     // If parentCommentId is provided, verify the parent comment exists
@@ -29,12 +41,35 @@ export class CommentService {
       }
     }
 
+    // If this is a reply (has parentCommentId), remove the tag as tags are only for main posts
+    if (parentCommentId) {
+      commentData.tag = null;
+      console.log('Backend - Removing tag from reply, tags are only allowed on main posts');
+    }
+
     const comment = this.commentRepository.create({
       ...commentData,
       parentComment: parentCommentId ? { idComment: parentCommentId } : null,
     });
 
-    return await this.commentRepository.save(comment);
+    console.log('Backend - Comment before save:', comment);
+    const savedComment = await this.commentRepository.save(comment);
+    console.log('Backend - Comment after save:', savedComment);
+    
+    // Process mentions after comment is saved
+    try {
+      await this.mentionService.processMentionsForComment(
+        savedComment.content,
+        savedComment.idComment,
+        savedComment.idPerson,
+      );
+      console.log('Backend - Mentions processed successfully for comment:', savedComment.idComment);
+    } catch (error) {
+      console.error('Backend - Error processing mentions:', error);
+      // Don't fail the comment creation if mention processing fails
+    }
+    
+    return savedComment;
   }
 
   // Timeline: Get all posts (comments with no parent)
@@ -44,6 +79,8 @@ export class CommentService {
       .select([
         'comment.idComment',
         'comment.content',
+        'comment.imageUrl',
+        'comment.tag',
         'comment.idPerson',
         'comment.parentCommentId',
         'comment.isDeleted',
@@ -97,12 +134,17 @@ export class CommentService {
         .getRawMany();
       likedMap = Object.fromEntries(liked.map(l => [Number(l.idComment), true]));
     }
-    return comments.map(comment => ({
-      ...comment,
-      replyCount: replyCountMap[comment.idComment] || 0,
-      likeCount: likeCountMap[comment.idComment] || 0,
-      isLikedByCurrentUser: likedMap[comment.idComment] || false,
-    }));
+    const result = comments.map(comment => {
+      console.log(`Backend - Comment ${comment.idComment}: imageUrl = "${comment.imageUrl}"`);
+      return {
+        ...comment,
+        replyCount: replyCountMap[comment.idComment] || 0,
+        likeCount: likeCountMap[comment.idComment] || 0,
+        isLikedByCurrentUser: likedMap[comment.idComment] || false,
+      };
+    });
+    
+    return result;
   }
 
   // Post detail: Get original post + all its comments (including nested replies)
@@ -402,5 +444,139 @@ export class CommentService {
     }
 
     return result;
+  }
+
+  // FLAG SYSTEM METHODS
+  
+  /**
+   * Flag a comment as inappropriate
+   */
+  async flagComment(createCommentFlagDto: CreateCommentFlagDto): Promise<{ flagged: boolean; flagCount: number }> {
+    // Verify comment exists and is not deleted
+    const comment = await this.findOne(createCommentFlagDto.idComment);
+    if (!comment) {
+      throw new NotFoundException(`Comment with ID ${createCommentFlagDto.idComment} not found`);
+    }
+
+    // Check if user has already flagged this comment
+    const existingFlag = await this.commentFlagRepository.findOne({
+      where: {
+        idComment: createCommentFlagDto.idComment,
+        idPerson: createCommentFlagDto.idPerson,
+      },
+    });
+
+    if (existingFlag) {
+      throw new BadRequestException('You have already flagged this comment');
+    }
+
+    // Create new flag
+    const newFlag = this.commentFlagRepository.create(createCommentFlagDto);
+    await this.commentFlagRepository.save(newFlag);
+    
+    const flagCount = await this.getFlagCount(createCommentFlagDto.idComment);
+    
+    // Auto-hide comment if it has too many flags (e.g., 5 flags)
+    if (flagCount >= 5) {
+      await this.remove(createCommentFlagDto.idComment);
+    }
+    
+    return { flagged: true, flagCount };
+  }
+
+  /**
+   * Get the number of flags for a comment
+   */
+  async getFlagCount(commentId: number): Promise<number> {
+    return await this.commentFlagRepository.count({
+      where: { idComment: commentId },
+    });
+  }
+
+  /**
+   * Check if a user has flagged a specific comment
+   */
+  async isFlaggedByUser(commentId: number, personId: number): Promise<boolean> {
+    const flag = await this.commentFlagRepository.findOne({
+      where: {
+        idComment: commentId,
+        idPerson: personId,
+      },
+    });
+    return !!flag;
+  }
+
+  /**
+   * Get all flags for a comment (admin only)
+   */
+  async getCommentFlags(commentId: number): Promise<CommentFlag[]> {
+    return await this.commentFlagRepository.find({
+      where: { idComment: commentId },
+      relations: ['person'],
+      select: {
+        person: {
+          idPerson: true,
+          email: true,
+          firstname: true,
+          surname: true,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  /**
+   * Get all flagged comments (admin only)
+   */
+  async getFlaggedComments(): Promise<any[]> {
+    const flaggedComments = await this.commentRepository.createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.person', 'person')
+      .leftJoin('comment.flags', 'flag')
+      .select([
+        'comment.idComment',
+        'comment.content',
+        'comment.imageUrl',
+        'comment.tag',
+        'comment.idPerson',
+        'comment.parentCommentId',
+        'comment.isDeleted',
+        'comment.createdAt',
+        'comment.updatedAt',
+        'person.idPerson',
+        'person.email',
+        'person.firstname',
+        'person.surname'
+      ])
+      .addSelect('COUNT(flag.idCommentFlag)', 'flagCount')
+      .groupBy('comment.idComment, person.idPerson')
+      .having('COUNT(flag.idCommentFlag) > 0')
+      .orderBy('COUNT(flag.idCommentFlag)', 'DESC')
+      .addOrderBy('comment.createdAt', 'DESC')
+      .getRawAndEntities();
+
+    // Transform the result to include flagCount
+    return flaggedComments.entities.map((comment, index) => ({
+      ...comment,
+      flagCount: parseInt(flaggedComments.raw[index].flagCount) || 0,
+    }));
+  }
+
+  /**
+   * Remove a flag (admin only or if user wants to remove their own flag)
+   */
+  async removeFlag(flagId: number, personId?: number): Promise<void> {
+    const whereCondition = personId 
+      ? { idCommentFlag: flagId, idPerson: personId }
+      : { idCommentFlag: flagId };
+
+    const flag = await this.commentFlagRepository.findOne({
+      where: whereCondition,
+    });
+
+    if (!flag) {
+      throw new NotFoundException('Flag not found');
+    }
+
+    await this.commentFlagRepository.remove(flag);
   }
 }

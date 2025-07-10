@@ -76,6 +76,9 @@ export class ObjectProfileService {
             relations: ['object', 'plantType', 'person', 'plants'],
             select: {
                 idObjectProfile: true,
+                idPerson: true, // Add this field
+                idObject: true, // Add this field
+                idPlantType: true, // Add this field
                 title: true,
                 description: true,
                 advise: true,
@@ -105,8 +108,7 @@ export class ObjectProfileService {
                     idPlantType: true,
                     title: true,
                     description: true,
-                    advise: true,
-                    pathPicture: true
+                    advise: true
                 },
                 person: {
                     idPerson: true,

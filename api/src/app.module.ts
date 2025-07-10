@@ -26,6 +26,10 @@ import { PlantType } from './plant-type/entities/plant-type.entity';
 import { Product } from './product/entities/product.entity';
 import { Order } from './order/entities/order.entity';
 import { OrderItem } from './order/entities/order-item.entity';
+import { Comment } from './comment/entities/comment.entity';
+import { CommentLike } from './comment/entities/comment-like.entity';
+import { CommentFlag } from './comment/entities/comment-flag.entity';
+import { CommentMention } from './comment/entities/comment-mention.entity';
 
 // Module imports
 import { RoleModule } from './role/role.module';
@@ -49,6 +53,7 @@ import { StripeModule } from './stripe/stripe.module';
 import { CommentModule } from './comment/comment.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { SensorsModule } from './sensors/sensors.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -87,7 +92,11 @@ import { SensorsModule } from './sensors/sensors.module';
             PlantType,
             Product,
             Order,
-            OrderItem
+            OrderItem,
+            Comment,
+            CommentLike,
+            CommentFlag,
+            CommentMention
           ],
           synchronize: true,
           autoLoadEntities: true,
@@ -126,6 +135,7 @@ import { SensorsModule } from './sensors/sensors.module';
     CommentModule,
     FirebaseModule,
     SensorsModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

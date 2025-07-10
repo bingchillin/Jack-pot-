@@ -9,6 +9,10 @@ import '../user_profile_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../services/contact_service.dart';
 import '../../../services/comment_service.dart';
+import '../../../services/comment_flag_service.dart';
+import '../../widgets/comment_image_widget.dart';
+import '../../widgets/tag_selector_widget.dart';
+import '../../widgets/flag_reason_dialog.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
@@ -121,12 +125,23 @@ class _CommentCardState extends State<CommentCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          comment.person.displayName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              comment.person.displayName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            if (comment.tag != null) ...[
+                              const SizedBox(width: 8),
+                              TagDisplayWidget(
+                                tag: comment.tag!,
+                                isSmall: true,
+                              ),
+                            ],
+                          ],
                         ),
                         Text(
                           _formatTimeAgo(comment.createdAt),
@@ -138,49 +153,44 @@ class _CommentCardState extends State<CommentCard> {
                       ],
                     ),
                   ),
-                  // Menu d'options (bloquer/débloquer, signaler, etc.)
-                  if (isAuthenticated && authProvider.currentUser?.idPerson != comment.person.idPerson)
+                  // Menu d'options
+                  if (isAuthenticated)
                     PopupMenuButton<String>(
-                      icon: Icon(
-                        Icons.more_horiz,
-                        color: _isUserBlocked ? Colors.red.shade300 : Colors.grey.shade600,
-                        size: 20,
-                      ),
-                      onSelected: (value) => _handleMenuAction(context, value),
+                      onSelected: (value) {
+                        _handleMenuAction(context, value);
+                      },
                       itemBuilder: (context) => [
-                        if (_isUserBlocked)
-                          const PopupMenuItem(
-                            value: 'unblock',
+                        PopupMenuItem(
+                          value: 'report',
+                          child: Row(
+                            children: [
+                              Icon(Icons.flag, size: 18, color: Colors.red.shade600),
+                              const SizedBox(width: 8),
+                              const Text('Signaler'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'block',
+                          child: Row(
+                            children: [
+                              Icon(Icons.block, size: 18, color: Colors.red.shade600),
+                              const SizedBox(width: 8),
+                              Text(_isUserBlocked ? 'Débloquer' : 'Bloquer'),
+                            ],
+                          ),
+                        ),
+                        if (authProvider.currentUser?.idPerson == comment.person.idPerson)
+                          PopupMenuItem(
+                            value: 'delete',
                             child: Row(
                               children: [
-                                Icon(Icons.check_circle, color: Colors.green, size: 20),
-                                SizedBox(width: 8),
-                                Text('Débloquer cet utilisateur'),
-                              ],
-                            ),
-                          )
-                        else ...[
-                          const PopupMenuItem(
-                            value: 'block',
-                            child: Row(
-                              children: [
-                                Icon(Icons.block, color: Colors.red, size: 20),
-                                SizedBox(width: 8),
-                                Text('Bloquer cet utilisateur'),
+                                Icon(Icons.delete, size: 18, color: Colors.red.shade600),
+                                const SizedBox(width: 8),
+                                const Text('Supprimer'),
                               ],
                             ),
                           ),
-                          const PopupMenuItem(
-                            value: 'report',
-                            child: Row(
-                              children: [
-                                Icon(Icons.flag, color: Colors.orange, size: 20),
-                                SizedBox(width: 8),
-                                Text('Signaler le contenu'),
-                              ],
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                 ],
@@ -189,9 +199,18 @@ class _CommentCardState extends State<CommentCard> {
             // Contenu du commentaire
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                comment.content,
-                style: const TextStyle(fontSize: 16, height: 1.4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (comment.content.isNotEmpty)
+                    Text(
+                      comment.content,
+                      style: const TextStyle(fontSize: 16, height: 1.4),
+                    ),
+                  // Affichage de l'image si présente
+                  if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty)
+                    CommentImageWidget(imageUrl: comment.imageUrl!),
+                ],
               ),
             ),
             const SizedBox(height: 16),
@@ -312,6 +331,9 @@ class _CommentCardState extends State<CommentCard> {
       case 'report':
         _showReportDialog(context);
         break;
+      case 'delete':
+        _showDeleteDialog(context);
+        break;
     }
   }
 
@@ -372,17 +394,109 @@ class _CommentCardState extends State<CommentCard> {
   void _showReportDialog(BuildContext context) {
     showDialog(
       context: context,
+      builder: (context) => FlagReasonDialog(
+        onFlag: (reason, details) {
+          _flagComment(context, reason, details);
+        },
+      ),
+    );
+  }
+
+  Future<void> _flagComment(BuildContext context, String reason, String? details) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    final userId = authProvider.currentUser?.idPerson;
+    
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    
+    if (token == null || userId == null) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('Vous devez être connecté pour signaler un commentaire')),
+      );
+      return;
+    }
+
+    try {
+      final commentFlagService = CommentFlagService();
+      final result = await commentFlagService.flagComment(
+        commentId: widget.comment.idComment,
+        idPerson: userId,
+        reason: reason,
+        details: details,
+        token: token,
+      );
+      
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Commentaire signalé (${result['flagCount']} signalement${result['flagCount'] > 1 ? 's' : ''})'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Erreur: ${e.toString().replaceAll('Exception: ', '')}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Signaler le contenu'),
-        content: const Text('Cette fonctionnalité sera bientôt disponible.'),
+        title: const Text('Supprimer le commentaire'),
+        content: const Text(
+          'Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action est irréversible.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteComment(context);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Supprimer'),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _deleteComment(BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final commentBloc = context.read<CommentBloc>();
+    
+    if (!authProvider.isAuthenticated) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('Vous devez être connecté pour supprimer un commentaire')),
+      );
+      return;
+    }
+
+    try {
+      commentBloc.add(DeleteComment(widget.comment.idComment));
+      
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Commentaire supprimé'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la suppression: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> _blockUser(BuildContext context) async {

@@ -472,4 +472,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exploreFeatures => 'Explore all the amazing features below!';
+
+  @override
+  String get notificationUrgent => 'Urgent!';
+
+  @override
+  String get notificationNeedsCare => 'Needs care';
+
+  @override
+  String notificationMultipleIssues(int count) {
+    return '$count issues';
+  }
+
+  @override
+  String get notificationNeedsWaterUrgently => 'Needs water urgently!';
+
+  @override
+  String get notificationTimeToWater => 'Time to water';
+
+  @override
+  String get notificationLightIssue => 'Light issue detected';
+
+  @override
+  String get notificationTemperatureProblem => 'Temperature problem';
+
+  @override
+  String get notificationLowNutrients => 'Low soil nutrients';
+
+  @override
+  String get notificationWaterLevelIssue => 'Water level issue';
+
+  @override
+  String get notificationSensorAlert => 'Sensor alert';
+
+  @override
+  String notificationIssuesDetected(int count) {
+    return '$count issues detected';
+  }
+
+  @override
+  String notificationUrgentIssues(int count) {
+    return '$count urgent issues!';
+  }
+
+  @override
+  String notificationIssuesWithUrgent(int total, int urgent) {
+    return '$total issues ($urgent urgent)';
+  }
+
+  @override
+  String get notificationAdviceCheckMoisture =>
+      'Check soil moisture and water if needed';
+
+  @override
+  String get notificationAdviceAdjustLight =>
+      'Adjust plant position for optimal light exposure';
+
+  @override
+  String get notificationAdviceTemperature =>
+      'Move plant to a more suitable temperature environment';
+
+  @override
+  String get notificationAdviceNutrients =>
+      'Consider adding fertilizer to improve soil nutrients';
+
+  @override
+  String get notificationAdviceWaterLevel =>
+      'Check water reservoir and drainage system';
+
+  @override
+  String get notificationAdviceGeneral =>
+      'Please check your plant\'s overall health and environment.';
 }

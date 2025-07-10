@@ -1005,6 +1005,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Explore all the amazing features below!'**
   String get exploreFeatures;
+
+  /// Urgent notification indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent!'**
+  String get notificationUrgent;
+
+  /// Plant needs care notification
+  ///
+  /// In en, this message translates to:
+  /// **'Needs care'**
+  String get notificationNeedsCare;
+
+  /// Multiple issues notification
+  ///
+  /// In en, this message translates to:
+  /// **'{count} issues'**
+  String notificationMultipleIssues(int count);
+
+  /// Urgent watering notification
+  ///
+  /// In en, this message translates to:
+  /// **'Needs water urgently!'**
+  String get notificationNeedsWaterUrgently;
+
+  /// Normal watering notification
+  ///
+  /// In en, this message translates to:
+  /// **'Time to water'**
+  String get notificationTimeToWater;
+
+  /// Light sensor issue notification
+  ///
+  /// In en, this message translates to:
+  /// **'Light issue detected'**
+  String get notificationLightIssue;
+
+  /// Temperature sensor issue notification
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature problem'**
+  String get notificationTemperatureProblem;
+
+  /// Low nutrients notification
+  ///
+  /// In en, this message translates to:
+  /// **'Low soil nutrients'**
+  String get notificationLowNutrients;
+
+  /// Water level sensor issue notification
+  ///
+  /// In en, this message translates to:
+  /// **'Water level issue'**
+  String get notificationWaterLevelIssue;
+
+  /// Generic sensor alert notification
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor alert'**
+  String get notificationSensorAlert;
+
+  /// Multiple issues detected notification
+  ///
+  /// In en, this message translates to:
+  /// **'{count} issues detected'**
+  String notificationIssuesDetected(int count);
+
+  /// Urgent issues notification
+  ///
+  /// In en, this message translates to:
+  /// **'{count} urgent issues!'**
+  String notificationUrgentIssues(int count);
+
+  /// Issues with urgent count notification
+  ///
+  /// In en, this message translates to:
+  /// **'{total} issues ({urgent} urgent)'**
+  String notificationIssuesWithUrgent(int total, int urgent);
+
+  /// Advice for moisture issues
+  ///
+  /// In en, this message translates to:
+  /// **'Check soil moisture and water if needed'**
+  String get notificationAdviceCheckMoisture;
+
+  /// Advice for light issues
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust plant position for optimal light exposure'**
+  String get notificationAdviceAdjustLight;
+
+  /// Advice for temperature issues
+  ///
+  /// In en, this message translates to:
+  /// **'Move plant to a more suitable temperature environment'**
+  String get notificationAdviceTemperature;
+
+  /// Advice for nutrient issues
+  ///
+  /// In en, this message translates to:
+  /// **'Consider adding fertilizer to improve soil nutrients'**
+  String get notificationAdviceNutrients;
+
+  /// Advice for water level issues
+  ///
+  /// In en, this message translates to:
+  /// **'Check water reservoir and drainage system'**
+  String get notificationAdviceWaterLevel;
+
+  /// General plant care advice
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your plant\'s overall health and environment.'**
+  String get notificationAdviceGeneral;
 }
 
 class _AppLocalizationsDelegate

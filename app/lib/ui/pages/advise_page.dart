@@ -7,6 +7,7 @@ import 'widget/create_post_modal.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../widgets/feed_toggle_header.dart';
+import '../widgets/tag_filter_widget.dart';
 import '../../main.dart';
 
 class AdvisePage extends StatefulWidget {
@@ -18,6 +19,7 @@ class AdvisePage extends StatefulWidget {
 
 class _AdvisePageState extends State<AdvisePage> with RouteAware {
   FeedType _currentFeed = FeedType.forYou;
+  TagFilter _selectedTagFilter = TagFilter.all;
 
   @override
   void initState() {
@@ -110,6 +112,24 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
     _loadCurrentFeed();
   }
 
+  void _onTagFilterChanged(TagFilter newFilter) {
+    setState(() {
+      _selectedTagFilter = newFilter;
+    });
+  }
+
+  List<Comment> _filterCommentsByTag(List<Comment> comments) {
+    if (_selectedTagFilter == TagFilter.all) {
+      return comments;
+    }
+    
+    return comments.where((comment) {
+      // Filtrer par tag
+      final tagValue = _selectedTagFilter.tagValue;
+      return comment.tag == tagValue;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<CommentBloc, CommentState>(
@@ -119,6 +139,13 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
             SnackBar(
               content: Text(state.message),
               backgroundColor: Colors.red,
+            ),
+          );
+        } else if (state is CommentDeleted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Commentaire supprimé'),
+              backgroundColor: Colors.green,
             ),
           );
         }
@@ -152,6 +179,13 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                   currentFeed: _currentFeed,
                   onFeedChanged: _onFeedChanged,
                   hasUnreadFriends: false, // TODO: implémenter la logique de notifications
+                ),
+              ),
+              // Filtre par tags
+              SliverToBoxAdapter(
+                child: TagFilterWidget(
+                  selectedFilter: _selectedTagFilter,
+                  onFilterChanged: _onTagFilterChanged,
                 ),
               ),
               // Liste des commentaires
@@ -215,6 +249,9 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                     commentsToShow = bloc.mainComments;
                   }
 
+                  // Appliquer le filtre par tag
+                  commentsToShow = _filterCommentsByTag(commentsToShow);
+
                   if (commentsToShow.isEmpty) {
                     return SliverFillRemaining(
                       child: Center(
@@ -222,15 +259,19 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              _currentFeed == FeedType.friends ? Icons.people_outline : Icons.chat_bubble_outline,
+                              _selectedTagFilter != TagFilter.all 
+                                  ? Icons.filter_list_off
+                                  : (_currentFeed == FeedType.friends ? Icons.people_outline : Icons.chat_bubble_outline),
                               size: 64,
                               color: Colors.grey.shade400,
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              _currentFeed == FeedType.friends 
-                                  ? 'Aucun post de vos amis'
-                                  : 'Aucun post pour le moment',
+                              _selectedTagFilter != TagFilter.all
+                                  ? 'Aucun post "${_selectedTagFilter.displayName}"'
+                                  : (_currentFeed == FeedType.friends 
+                                      ? 'Aucun post de vos amis'
+                                      : 'Aucun post pour le moment'),
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey.shade600,
@@ -238,14 +279,27 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              _currentFeed == FeedType.friends 
-                                  ? 'Vos amis n\'ont pas encore posté'
-                                  : 'Soyez le premier à partager !',
+                              _selectedTagFilter != TagFilter.all
+                                  ? 'Essayez de changer le filtre ou créez un nouveau post'
+                                  : (_currentFeed == FeedType.friends 
+                                      ? 'Vos amis n\'ont pas encore posté'
+                                      : 'Soyez le premier à partager !'),
                               style: TextStyle(
                                 color: Colors.grey.shade500,
                               ),
+                              textAlign: TextAlign.center,
                             ),
-                            if (_currentFeed == FeedType.friends) ...[
+                            if (_selectedTagFilter != TagFilter.all) ...[
+                              const SizedBox(height: 16),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedTagFilter = TagFilter.all;
+                                  });
+                                },
+                                child: const Text('Afficher tous les posts'),
+                              ),
+                            ] else if (_currentFeed == FeedType.friends) ...[
                               const SizedBox(height: 16),
                               TextButton(
                                 onPressed: () {

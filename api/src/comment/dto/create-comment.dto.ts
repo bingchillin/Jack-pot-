@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsIn, ValidateIf } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateCommentDto {
@@ -9,6 +9,25 @@ export class CreateCommentDto {
   @IsString()
   @IsNotEmpty()
   content: string;
+
+  @ApiPropertyOptional({
+    description: 'URL of the image attached to the comment',
+    example: 'http://localhost:3000/uploads/1234567890-abc123.jpg',
+  })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
+
+  @ApiPropertyOptional({
+    description: 'Tag to categorize the comment (only allowed for main posts, not replies)',
+    example: 'Conversation',
+    enum: ['Conversation', 'Conseil'],
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['Conversation', 'Conseil'])
+  @ValidateIf((obj) => obj.parentCommentId === null || obj.parentCommentId === undefined)
+  tag?: string;
 
   @ApiProperty({
     description: 'The ID of the person creating the comment',

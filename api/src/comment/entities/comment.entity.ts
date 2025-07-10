@@ -1,6 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, ManyToMany, JoinTable, Index, DeleteDateColumn } from 'typeorm';
 import { Person } from '../../person/entities/person.entity';
 import { CommentLike } from './comment-like.entity';
+import { CommentFlag } from './comment-flag.entity';
+import { CommentMention } from './comment-mention.entity';
 
 @Entity('comment')
 export class Comment {
@@ -9,6 +11,12 @@ export class Comment {
 
   @Column({ type: 'text' })
   content: string;
+
+  @Column({ name: 'image_url', nullable: true })
+  imageUrl: string;
+
+  @Column({ name: 'tag', nullable: true })
+  tag: string;
 
   @Column({ name: 'id_person' })
   @Index()
@@ -30,6 +38,12 @@ export class Comment {
 
   @OneToMany(() => CommentLike, (commentLike) => commentLike.comment)
   likes: CommentLike[];
+
+  @OneToMany(() => CommentFlag, (commentFlag) => commentFlag.comment)
+  flags: CommentFlag[];
+
+  @OneToMany(() => CommentMention, (commentMention) => commentMention.comment)
+  mentions: CommentMention[];
 
   @Column({ name: 'is_deleted', default: false })
   isDeleted: boolean;
