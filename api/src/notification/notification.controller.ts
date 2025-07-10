@@ -133,6 +133,37 @@ export class NotificationController {
     };
   }
 
+  // ===============================
+  // SOCIAL NOTIFICATIONS ENDPOINTS
+  // ===============================
+
+  @Get('social')
+  @ApiOperation({ summary: 'Get social notifications (likes, mentions, replies)' })
+  @ApiResponse({ status: 200, description: 'Social notifications retrieved successfully' })
+  async getSocialNotifications(@Request() req): Promise<Notification[]> {
+    const userId = req.user.idPerson;
+    return await this.notificationService.getSocialNotifications(userId);
+  }
+
+  @Get('all')
+  @ApiOperation({ summary: 'Get all notifications for current user' })
+  @ApiResponse({ status: 200, description: 'All notifications retrieved successfully' })
+  async getAllNotifications(@Request() req): Promise<Notification[]> {
+    const userId = req.user.idPerson;
+    return await this.notificationService.getAllNotificationsForUser(userId);
+  }
+
+  @Get('by-type/:type')
+  @ApiOperation({ summary: 'Get notifications by type for current user' })
+  @ApiResponse({ status: 200, description: 'Notifications by type retrieved successfully' })
+  async getNotificationsByType(
+    @Request() req, 
+    @Param('type') type: string,
+  ): Promise<Notification[]> {
+    const userId = req.user.idPerson;
+    return await this.notificationService.getNotificationsByType(userId, type);
+  }
+
   @Post()
   @ApiExcludeEndpoint()
   create(@Body() createNotificationDto: CreateNotificationDto): Promise<Notification> {

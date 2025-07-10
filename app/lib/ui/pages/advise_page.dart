@@ -239,12 +239,16 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                     );
                   }
 
-                  // Afficher les commentaires pour les états CommentMainLoaded ET CommentDetailLoaded
+                  // Afficher les commentaires pour les états CommentMainLoaded, CommentDetailLoaded et CommentLikeUpdated
                   List<Comment> commentsToShow = [];
                   if (state is CommentMainLoaded) {
                     commentsToShow = state.comments;
                   } else if (state is CommentThreadLoaded) {
                     // Si on est en état détail, on affiche quand même la liste principale depuis le cache
+                    final bloc = context.read<CommentBloc>();
+                    commentsToShow = bloc.mainComments;
+                  } else if (state is CommentLikeUpdated) {
+                    // Si c'est une mise à jour de like, afficher la liste principale depuis le cache
                     final bloc = context.read<CommentBloc>();
                     commentsToShow = bloc.mainComments;
                   }

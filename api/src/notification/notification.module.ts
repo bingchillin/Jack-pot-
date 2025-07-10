@@ -4,12 +4,13 @@ import { NotificationService } from './notification.service';
 import { NotificationController } from './notification.controller';
 import { NotificationLocalizationService } from './notification-localization.service';
 import { Notification } from './entities/notification.entity';
+import { Person } from '../person/entities/person.entity';
 import { FirebaseModule } from '../firebase/firebase.module';
 import { PersonModule } from '../person/person.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Notification]),
+    TypeOrmModule.forFeature([Notification, Person]),
     forwardRef(() => FirebaseModule),
     forwardRef(() => PersonModule),
   ],

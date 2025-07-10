@@ -5,12 +5,15 @@ import { Notification } from './entities/notification.entity';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { FirebaseService } from '../firebase/firebase.service';
+import { Person } from '../person/entities/person.entity';
 
 @Injectable()
 export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
+    @InjectRepository(Person)
+    private readonly personRepository: Repository<Person>,
     private readonly firebaseService: FirebaseService,
   ) {}
 
@@ -253,5 +256,183 @@ export class NotificationService {
 
   async count(options?: FindManyOptions<Notification>): Promise<number> {
     return await this.notificationRepository.count(options);
+  }
+
+  // ===============================
+  // SOCIAL NOTIFICATIONS METHODS
+  // ===============================
+
+  /**
+   * Create like notification when someone likes a comment
+   */
+  async createLikeNotification(
+    commentId: number,
+    commentAuthorId: number,
+    likerId: number,
+    commentContent: string,
+  ): Promise<Notification | null> {
+    // Don't notify if user likes their own comment
+    if (commentAuthorId === likerId) {
+      return null;
+    }
+
+    // Get liker info for the notification
+    const liker = await this.personRepository.findOne({
+      where: { idPerson: likerId },
+    });
+
+    if (!liker) {
+      return null;
+    }
+
+    const likerName = liker.firstname && liker.surname 
+      ? `${liker.firstname} ${liker.surname}`
+      : liker.email.split('@')[0];
+
+    const title = `${likerName} a aimé votre commentaire`;
+    const description = commentContent.length > 100 
+      ? `"${commentContent.substring(0, 100)}..."` 
+      : `"${commentContent}"`;
+
+    const notification = await this.create({
+      idPerson: commentAuthorId,
+      title,
+      description,
+      notificationType: 'comment_like',
+      idComment: commentId,
+      idTriggeringPerson: likerId,
+    });
+
+    // Note: Push notification is already sent by create() method
+    return notification;
+  }
+
+  /**
+   * Create mention notification when someone is mentioned in a comment
+   */
+  async createMentionNotification(
+    commentId: number,
+    mentionedPersonId: number,
+    mentionerId: number,
+    commentContent: string,
+  ): Promise<Notification | null> {
+    // Don't notify if user mentions themselves
+    if (mentionedPersonId === mentionerId) {
+      return null;
+    }
+
+    // Get mentioner info for the notification
+    const mentioner = await this.personRepository.findOne({
+      where: { idPerson: mentionerId },
+    });
+
+    if (!mentioner) {
+      return null;
+    }
+
+    const mentionerName = mentioner.firstname && mentioner.surname 
+      ? `${mentioner.firstname} ${mentioner.surname}`
+      : mentioner.email.split('@')[0];
+
+    const title = `${mentionerName} vous a mentionné`;
+    const description = commentContent.length > 100 
+      ? `"${commentContent.substring(0, 100)}..."` 
+      : `"${commentContent}"`;
+
+    const notification = await this.create({
+      idPerson: mentionedPersonId,
+      title,
+      description,
+      notificationType: 'comment_mention',
+      idComment: commentId,
+      idTriggeringPerson: mentionerId,
+    });
+
+    // Note: Push notification is already sent by create() method
+    return notification;
+  }
+
+  /**
+   * Create reply notification when someone replies to a comment
+   */
+  async createReplyNotification(
+    parentCommentId: number,
+    parentCommentAuthorId: number,
+    replierId: number,
+    replyContent: string,
+  ): Promise<Notification | null> {
+    // Don't notify if user replies to their own comment
+    if (parentCommentAuthorId === replierId) {
+      return null;
+    }
+
+    // Get replier info for the notification
+    const replier = await this.personRepository.findOne({
+      where: { idPerson: replierId },
+    });
+
+    if (!replier) {
+      return null;
+    }
+
+    const replierName = replier.firstname && replier.surname 
+      ? `${replier.firstname} ${replier.surname}`
+      : replier.email.split('@')[0];
+
+    const title = `${replierName} a répondu à votre commentaire`;
+    const description = replyContent.length > 100 
+      ? `"${replyContent.substring(0, 100)}..."` 
+      : `"${replyContent}"`;
+
+    const notification = await this.create({
+      idPerson: parentCommentAuthorId,
+      title,
+      description,
+      notificationType: 'comment_reply',
+      idComment: parentCommentId,
+      idTriggeringPerson: replierId,
+    });
+
+    // Note: Push notification is already sent by create() method
+    return notification;
+  }
+
+  /**
+   * Get social notifications for a user (likes, mentions, replies)
+   */
+  async getSocialNotifications(personId: number): Promise<Notification[]> {
+    return await this.notificationRepository.find({
+      where: { 
+        idPerson: personId,
+        notificationType: ['comment_like', 'comment_mention', 'comment_reply'] as any,
+      },
+      relations: ['triggeringPerson'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  /**
+   * Get all notifications by type for a user
+   */
+  async getNotificationsByType(personId: number, type: string): Promise<Notification[]> {
+    return await this.notificationRepository.find({
+      where: { 
+        idPerson: personId,
+        notificationType: type,
+      },
+      relations: ['triggeringPerson', 'person', 'object'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  /**
+   * Get mixed notifications (social + plant care) for a user
+   */
+  async getAllNotificationsForUser(personId: number): Promise<Notification[]> {
+    return await this.notificationRepository.find({
+      where: { idPerson: personId },
+      relations: ['triggeringPerson', 'person', 'object'],
+      order: { createdAt: 'DESC' },
+    });
   }
 } 

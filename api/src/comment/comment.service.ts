@@ -9,6 +9,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CreateCommentFlagDto } from './dto/create-comment-flag.dto';
 import { MentionService } from './mention.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class CommentService {
@@ -22,6 +23,7 @@ export class CommentService {
     @InjectRepository(CommentMention)
     private commentMentionRepository: Repository<CommentMention>,
     private mentionService: MentionService,
+    private notificationService: NotificationService,
   ) {}
 
   async create(createCommentDto: CreateCommentDto): Promise<Comment> {
@@ -58,15 +60,51 @@ export class CommentService {
     
     // Process mentions after comment is saved
     try {
-      await this.mentionService.processMentionsForComment(
+      const mentions = await this.mentionService.processMentionsForComment(
         savedComment.content,
         savedComment.idComment,
         savedComment.idPerson,
       );
+      
+      // Send mention notifications
+      for (const mention of mentions) {
+        try {
+          await this.notificationService.createMentionNotification(
+            savedComment.idComment,
+            mention.idPersonMentioned,
+            savedComment.idPerson,
+            savedComment.content,
+          );
+        } catch (notifError) {
+          console.error('Backend - Error sending mention notification:', notifError);
+        }
+      }
+      
       console.log('Backend - Mentions processed successfully for comment:', savedComment.idComment);
     } catch (error) {
       console.error('Backend - Error processing mentions:', error);
       // Don't fail the comment creation if mention processing fails
+    }
+
+    // Send reply notification if this is a reply
+    if (parentCommentId) {
+      try {
+        // Get parent comment to find the author
+        const parentComment = await this.commentRepository.findOne({
+          where: { idComment: parentCommentId },
+        });
+        
+        if (parentComment) {
+          await this.notificationService.createReplyNotification(
+            parentCommentId,
+            parentComment.idPerson,
+            savedComment.idPerson,
+            savedComment.content,
+          );
+        }
+      } catch (notifError) {
+        console.error('Backend - Error sending reply notification:', notifError);
+      }
     }
     
     return savedComment;
@@ -367,6 +405,19 @@ export class CommentService {
         idPerson: personId,
       });
       await this.commentLikeRepository.save(newLike);
+      
+      // Send like notification
+      try {
+        await this.notificationService.createLikeNotification(
+          commentId,
+          comment.idPerson,
+          personId,
+          comment.content,
+        );
+      } catch (notifError) {
+        console.error('Backend - Error sending like notification:', notifError);
+      }
+      
       const likeCount = await this.getLikeCount(commentId);
       return { liked: true, likeCount };
     }

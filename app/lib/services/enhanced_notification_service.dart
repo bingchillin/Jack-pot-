@@ -1,0 +1,149 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../models/notification_model.dart';
+import '../app_config.dart';
+
+class EnhancedNotificationService {
+  static const String baseUrl = AppConfig.apiUrl;
+
+  /// Get all notifications for current user
+  Future<List<NotificationModel>> getAllNotifications(String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/notifications/all'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.map((json) => NotificationModel.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load notifications: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching notifications: $e');
+    }
+  }
+
+  /// Get social notifications (likes, mentions, replies)
+  Future<List<NotificationModel>> getSocialNotifications(String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/notifications/social'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.map((json) => NotificationModel.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load social notifications: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching social notifications: $e');
+    }
+  }
+
+  /// Get notifications by type
+  Future<List<NotificationModel>> getNotificationsByType(String token, String type) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/notifications/by-type/$type'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.map((json) => NotificationModel.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load notifications by type: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching notifications by type: $e');
+    }
+  }
+
+  /// Mark notification as read
+  Future<bool> markAsRead(String token, int notificationId) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/notifications/$notificationId/read'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error marking notification as read: $e');
+      return false;
+    }
+  }
+
+  /// Mark all notifications as read
+  Future<bool> markAllAsRead(String token) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/notifications/read-all'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error marking all notifications as read: $e');
+      return false;
+    }
+  }
+
+  /// Get unread notification count
+  Future<int> getUnreadCount(String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/notifications/unread-count'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['count'] ?? 0;
+      } else {
+        return 0;
+      }
+    } catch (e) {
+      print('Error getting unread count: $e');
+      return 0;
+    }
+  }
+
+  /// Navigate to comment from notification
+  String getCommentRoute(NotificationModel notification) {
+    if (notification.idComment != null) {
+      return '/comment/${notification.idComment}';
+    }
+    return '/notifications';
+  }
+
+  /// Get plant route from notification
+  String getPlantRoute(NotificationModel notification) {
+    if (notification.idObject != null) {
+      return '/plant/${notification.idObject}';
+    }
+    return '/plants';
+  }
+} 

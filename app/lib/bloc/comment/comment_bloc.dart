@@ -221,12 +221,11 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       // Mettre à jour le cache local
       _updateCommentInCache(event.commentId, result['liked'], result['likeCount']);
       
-      // Émettre l'état mis à jour
-      emit(CommentLikeUpdated(event.commentId, result['liked'], result['likeCount']));
-      
       // Re-émettre l'état approprié avec les données mises à jour
       if (_currentThreadHierarchy.isNotEmpty) {
-        // Trouver le commentaire existant dans la hiérarchie
+        // Mode thread - émettre d'abord le like update puis la hiérarchie
+        emit(CommentLikeUpdated(event.commentId, result['liked'], result['likeCount']));
+        
         final existingComment = ThreadBuilderService.findCommentInHierarchy(
           _currentThreadHierarchy, 
           event.commentId
@@ -246,12 +245,17 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
           );
           
           emit(CommentThreadLoaded(_currentThreadHierarchy));
+        } else {
+          // Comment not found in hierarchy, fallback to main list
+          emit(CommentMainLoaded(_mainComments));
         }
       } else {
-        // Mettre à jour la liste principale
+        // Mode timeline - émettre directement la liste mise à jour sans passer par CommentLikeUpdated
+        print('Debug: Updating main comments list with ${_mainComments.length} comments');
         emit(CommentMainLoaded(_mainComments));
       }
     } catch (e) {
+      print('Debug: Error in like comment: $e');
       emit(CommentError(e.toString()));
     }
   }
@@ -339,14 +343,21 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   
   void _updateCommentInCache(int commentId, bool isLiked, int likeCount) {
     // Mettre à jour dans la liste principale
+    bool found = false;
     for (int i = 0; i < _mainComments.length; i++) {
       if (_mainComments[i].idComment == commentId) {
         _mainComments[i] = _mainComments[i].copyWith(
           isLikedByCurrentUser: isLiked,
           likeCount: likeCount,
         );
+        found = true;
+        print('Debug: Updated comment $commentId in main cache - liked: $isLiked, count: $likeCount');
         break;
       }
+    }
+    
+    if (!found) {
+      print('Debug: Comment $commentId not found in main cache (${_mainComments.length} comments)');
     }
     
     // La mise à jour de la hiérarchie est gérée dans _onLikeComment

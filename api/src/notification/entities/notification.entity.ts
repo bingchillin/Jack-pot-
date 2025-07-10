@@ -34,6 +34,28 @@ export class Notification {
   @Index()
   isRead: boolean;
 
+  // New fields for social notifications
+  @Column({ 
+    name: 'notification_type', 
+    type: 'varchar', 
+    length: 50, 
+    default: 'plant_care'
+  })
+  @Index()
+  notificationType: string; // 'plant_care', 'comment_like', 'comment_mention', 'comment_reply'
+
+  @Column({ name: 'id_comment', nullable: true })
+  @Index()
+  idComment: number; // Reference to comment for social notifications
+
+  @Column({ name: 'id_triggering_person', nullable: true })
+  @Index()
+  idTriggeringPerson: number; // Person who triggered the notification (liker, mentioner, replier)
+
+  @ManyToOne(() => Person, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_triggering_person' })
+  triggeringPerson: Person;
+
   @CreateDateColumn()
   createdAt: Date;
 
