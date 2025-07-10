@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindManyOptions } from 'typeorm';
+import { Repository, FindManyOptions, In } from 'typeorm';
 import { Notification } from './entities/notification.entity';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
@@ -404,7 +404,7 @@ export class NotificationService {
     return await this.notificationRepository.find({
       where: { 
         idPerson: personId,
-        notificationType: ['comment_like', 'comment_mention', 'comment_reply'] as any,
+        notificationType: In(['comment_like', 'comment_mention', 'comment_reply']),
       },
       relations: ['triggeringPerson'],
       order: { createdAt: 'DESC' },

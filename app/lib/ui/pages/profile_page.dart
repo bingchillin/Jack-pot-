@@ -225,10 +225,26 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             indent: 60,
           ),
           
-          // Notification Settings Line
+          // Notifications Line
           _buildActionLine(
             icon: Icons.notifications,
-            title: 'Notification Settings',
+            title: 'Mes Notifications',
+            onTap: () {
+              Navigator.pushNamed(context, '/notifications');
+            },
+          ),
+          
+          // Divider
+          Divider(
+            height: 1,
+            color: Colors.grey[200],
+            indent: 60,
+          ),
+          
+          // Notification Settings Line
+          _buildActionLine(
+            icon: Icons.settings,
+            title: 'Paramètres Notifications',
             onTap: () {
               Navigator.pushNamed(context, '/notification-settings');
             },

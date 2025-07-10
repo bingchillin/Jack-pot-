@@ -37,6 +37,17 @@ class HomePage extends StatelessWidget {
         scrolledUnderElevation: 0,
         actions: [
           IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              if (authProvider.isAuthenticated) {
+                Navigator.pushNamed(context, '/notifications');
+              } else {
+                Navigator.pushNamed(context, '/login');
+              }
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
               if (authProvider.isAuthenticated) {

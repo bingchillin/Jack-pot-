@@ -4,7 +4,7 @@ import '../models/notification_model.dart';
 import '../app_config.dart';
 
 class EnhancedNotificationService {
-  static const String baseUrl = AppConfig.apiUrl;
+  static String get baseUrl => AppConfig.baseUrl;
 
   /// Get all notifications for current user
   Future<List<NotificationModel>> getAllNotifications(String token) async {

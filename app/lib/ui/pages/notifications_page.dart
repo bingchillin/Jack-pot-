@@ -56,17 +56,30 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
 
       final allNotifications = await _notificationService.getAllNotifications(token);
       
+      print('Debug: Loaded ${allNotifications.length} total notifications');
+      for (final notif in allNotifications) {
+        print('Debug: Notification type: ${notif.notificationType}, title: ${notif.title}');
+      }
+      
+      final socialNotifs = allNotifications
+          .where((n) => n.isSocialNotification)
+          .toList();
+          
+      final plantNotifs = allNotifications
+          .where((n) => n.isPlantNotification)
+          .toList();
+      
+      print('Debug: Found ${socialNotifs.length} social notifications');
+      print('Debug: Found ${plantNotifs.length} plant notifications');
+      
       setState(() {
         _allNotifications = allNotifications;
-        _socialNotifications = allNotifications
-            .where((n) => n.isSocialNotification)
-            .toList();
-        _plantNotifications = allNotifications
-            .where((n) => n.isPlantNotification)
-            .toList();
+        _socialNotifications = socialNotifs;
+        _plantNotifications = plantNotifs;
         _isLoading = false;
       });
     } catch (e) {
+      print('Debug: Error loading notifications: $e');
       setState(() {
         _error = e.toString();
         _isLoading = false;
