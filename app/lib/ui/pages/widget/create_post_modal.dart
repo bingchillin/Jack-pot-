@@ -150,6 +150,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                             token: authProvider.accessToken ?? '',
                             hintText: 'Que souhaitez-vous partager avec la communauté ?\n\nConseils, questions, expériences...\n\nUtilisez @ pour mentionner des utilisateurs',
                             maxLines: null,
+                            currentUserId: authProvider.currentUser?.idPerson,
                           );
                         },
                       ),

@@ -13,6 +13,7 @@ class MentionTextField extends StatefulWidget {
   final String token;
   final bool enabled;
   final FocusNode? focusNode;
+  final int? currentUserId; // ID de l'utilisateur actuel pour l'exclure
 
   const MentionTextField({
     Key? key,
@@ -24,6 +25,7 @@ class MentionTextField extends StatefulWidget {
     required this.token,
     this.enabled = true,
     this.focusNode,
+    this.currentUserId,
   }) : super(key: key);
 
   @override
@@ -153,8 +155,13 @@ class _MentionTextFieldState extends State<MentionTextField> {
       );
 
       if (mounted) {
+        // Filtrer l'utilisateur actuel des suggestions
+        final filteredUsers = widget.currentUserId != null 
+            ? users.where((user) => user.idPerson != widget.currentUserId).toList()
+            : users;
+            
         setState(() {
-          _suggestions = users;
+          _suggestions = filteredUsers;
           _isLoadingSuggestions = false;
         });
         _showOverlay();

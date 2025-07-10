@@ -188,6 +188,7 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
                             token: authProvider.accessToken ?? '',
                             hintText: 'Écrivez votre réponse... (utilisez @ pour mentionner)',
                             maxLines: null,
+                            currentUserId: authProvider.currentUser?.idPerson,
                           );
                         },
                       ),

@@ -40,7 +40,7 @@ class UserMentionSuggestions extends StatelessWidget {
 
     if (users.isEmpty && query.length >= 2) {
       return Container(
-        height: 60,
+        height: 80,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -53,12 +53,26 @@ class UserMentionSuggestions extends StatelessWidget {
           ],
         ),
         child: Center(
-          child: Text(
-            'Aucun utilisateur trouvé',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 14,
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Aucun utilisateur trouvé',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Vous ne pouvez pas vous mentionner',
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
         ),
       );
