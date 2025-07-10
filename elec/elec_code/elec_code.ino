@@ -97,6 +97,12 @@ bool isWillWateringData = false;
 bool isAutomaticData = true;
 int stateData = 0;
 
+// patch to database
+
+int lightSensorDataPatch = 0;
+bool isWillWateringDataPatch = false;
+
+
 // ======= CONFIGURATION  WIFI=======
 String wifi_ssid = "";
 String wifi_password = "";
@@ -317,12 +323,12 @@ void PatchDataBase(){
           payload += "\"humidityGroundSensor\":" + String(sensor_ground_humidity, 2) + ",";
           payload += "\"phGroundSensor\":" + String(ph_ground_sensor, 2) + ",";
           payload += "\"conductivityElectriqueFertilitySensor\":" + String(conductivity_electrolyte, 2) + ",";
-          payload += "\"lightSensor\":" + String(uv_led ? 1 : 0) + ",";
+          payload += "\"lightSensor\":" + String(lightSensorDataPatch ? 1 : 0) + ",";
           payload += "\"temperatureSensorGround\":" + String(sensor_temprature_ground, 2) + ",";
           payload += "\"temperatureSensorExtern\":" + String(sensor_extern_temperature, 2) + ",";
           payload += "\"expositionTimeSun\":" + String(exposition_time_sun) + ",";
           payload += "\"water_sensor\":" + String(sensor_water_level, 2)+ ",";
-          payload += "\"isWillWatering\":" + String(isWillWateringData ? "true" : "false");
+          payload += "\"isWillWatering\":" + String(isWillWateringDataPatch ? "true" : "false");
           payload += "}";
       
           sendPatchRequest("/object-profile-elec/" + id_object_profile, payload);
@@ -536,7 +542,7 @@ void taskGetMotor(void * parameter) {
 void handleGetMotor() {
 
   if(isWillWateringData){
-    isWillWateringData = false;
+    isWillWateringDataPatch = false;
     Serial.println("💧 Début arrosage (déclenché par isWillWateringData)");
     PatchDataBase();
     motor = true;
@@ -642,12 +648,13 @@ void taskPatchDynamic(void* parameter) {
     if (isButtonPressedR){
       Serial.println("Enter task R");
       isButtonPressedR = false;
-      isWillWateringData = true;
+      isWillWateringDataPatch = true;
     }
+    
     if (isButtonPressedW){
       Serial.println("Enter task W");
       isButtonPressedW = false;
-      lightSensorData = !lightSensorData;
+      lightSensorDataPatch = !lightSensorDataPatch;
     }
     PatchDataBase();
 
