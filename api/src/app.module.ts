@@ -100,6 +100,7 @@ import { UploadModule } from './upload/upload.module';
           ],
           synchronize: true,
           autoLoadEntities: true,
+          timezone: 'Europe/Paris',
         };
         console.log('Database Configuration:', {
           host: config.host,

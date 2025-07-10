@@ -296,6 +296,17 @@ class _CreateReplyModalState extends State<CreateReplyModal> {
           userId: authProvider.currentUser!.idPerson.toString(),
         ),
       );
+      
+      // Fermer la modal après la création
+      Navigator.pop(context);
+      
+      // Réinitialiser l'état
+      setState(() {
+        _isSubmitting = false;
+        _isUploadingImage = false;
+        _selectedImage = null;
+        _controller.clear();
+      });
     } catch (e) {
       setState(() {
         _isSubmitting = false;

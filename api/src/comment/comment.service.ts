@@ -107,7 +107,11 @@ export class CommentService {
       }
     }
     
-    return savedComment;
+    // Return the comment with person relation loaded
+    return await this.commentRepository.findOne({
+      where: { idComment: savedComment.idComment },
+      relations: ['person'],
+    });
   }
 
   // Timeline: Get all posts (comments with no parent)
