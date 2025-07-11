@@ -895,7 +895,7 @@ abstract class AppLocalizations {
   /// Community section description
   ///
   /// In en, this message translates to:
-  /// **'Share & learn together'**
+  /// **'Connect with plant lovers'**
   String get communityDesc;
 
   /// Title for the comments/community page
@@ -907,7 +907,7 @@ abstract class AppLocalizations {
   /// Subtitle for the comments/community page
   ///
   /// In en, this message translates to:
-  /// **'Share & learn together'**
+  /// **'Connect with plant lovers'**
   String get commentsSubtitle;
 
   /// Feed toggle option for personalized content
@@ -964,11 +964,11 @@ abstract class AppLocalizations {
   /// **'No posts in \"{category}\"'**
   String noPostsFilter(String category);
 
-  /// Be first to share message
+  /// Encouragement message to create first post
   ///
   /// In en, this message translates to:
-  /// **'Be the first to share!'**
-  String get beFirstToShare;
+  /// **'Be the first to post!'**
+  String get beFirstToPost;
 
   /// Friends not posted message
   ///
@@ -1258,12 +1258,6 @@ abstract class AppLocalizations {
   /// **'Reply'**
   String get reply;
 
-  /// Share button text
-  ///
-  /// In en, this message translates to:
-  /// **'Share'**
-  String get share;
-
   /// Edit button text
   ///
   /// In en, this message translates to:
@@ -1515,6 +1509,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error submitting report'**
   String get reportError;
+
+  /// Be first to share message
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to share!'**
+  String get beFirstToShare;
 
   /// Delete post confirmation message
   ///

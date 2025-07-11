@@ -6,8 +6,8 @@ import 'widget/comment_card.dart';
 import 'widget/create_post_modal.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
-import '../widgets/feed_toggle_header.dart';
-import '../widgets/tag_filter_widget.dart';
+import '../widgets/twitter_feed_toggle.dart';
+import '../widgets/twitter_tag_filter.dart';
 import '../../main.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -98,8 +98,12 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(localizations.loginToSeeFriends),
+          backgroundColor: Colors.grey[800],
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           action: SnackBarAction(
             label: localizations.signIn,
+            textColor: Colors.green[400],
             onPressed: () => Navigator.pushNamed(context, '/login'),
           ),
         ),
@@ -142,109 +146,57 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.red[600],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           );
         } else if (state is CommentDeleted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(localizations.commentDeleted),
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.green[600],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           );
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.grey.shade50,
+        backgroundColor: Colors.green[50],
         body: RefreshIndicator(
           onRefresh: () async {
             _loadCurrentFeed();
           },
+          color: Colors.green[600],
           child: CustomScrollView(
             slivers: [
-              // Header avec titre et description
+              // Twitter-like header with feed toggle - removed SliverAppBar to eliminate spacing
               SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.green[50],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.forum,
-                              color: Colors.green[600],
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  localizations.commentsTitle,
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey[800],
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  localizations.commentsSubtitle,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Header avec toggle Pour toi / Amis
-              SliverToBoxAdapter(
-                child: FeedToggleHeader(
+                child: TwitterFeedToggle(
                   currentFeed: _currentFeed,
                   onFeedChanged: _onFeedChanged,
-                  hasUnreadFriends: false, // TODO: implémenter la logique de notifications
+                  hasUnreadFriends: false,
                 ),
               ),
-              // Filtre par tags
+              
+              // Tag filter chips
               SliverToBoxAdapter(
-                child: TagFilterWidget(
+                child: TwitterTagFilter(
                   selectedFilter: _selectedTagFilter,
                   onFilterChanged: _onTagFilterChanged,
                 ),
               ),
-              // Liste des commentaires
+              
+              // Comments list
               BlocBuilder<CommentBloc, CommentState>(
                 builder: (context, state) {
                   if (state is CommentLoading) {
-                    return const SliverFillRemaining(
+                    return SliverFillRemaining(
                       child: Center(
-                        child: CircularProgressIndicator(),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+                        ),
                       ),
                     );
                   }
@@ -258,29 +210,37 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                             Icon(
                               Icons.error_outline,
                               size: 64,
-                              color: Colors.grey.shade400,
+                              color: Colors.grey[400],
                             ),
                             const SizedBox(height: 16),
                             Text(
                               localizations.loadingError,
                               style: TextStyle(
                                 fontSize: 18,
-                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               state.message,
                               style: TextStyle(
-                                color: Colors.grey.shade500,
+                                color: Colors.grey[600],
+                                fontSize: 14,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 24),
                             ElevatedButton(
-                              onPressed: () {
-                                _loadCurrentFeed();
-                              },
+                              onPressed: () => _loadCurrentFeed(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green[600],
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
                               child: Text(localizations.retry),
                             ),
                           ],
@@ -296,11 +256,11 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                   } else if (state is CommentThreadLoaded) {
                     // Si on est en état détail, on affiche quand même la liste principale depuis le cache
                     final bloc = context.read<CommentBloc>();
-                    commentsToShow = bloc.mainComments;
+                    commentsToShow = _currentFeed == FeedType.friends ? bloc.friendsComments : bloc.mainComments;
                   } else if (state is CommentLikeUpdated) {
-                    // Si c'est une mise à jour de like, afficher la liste principale depuis le cache
+                    // Si c'est une mise à jour de like, afficher la liste appropriée depuis le cache
                     final bloc = context.read<CommentBloc>();
-                    commentsToShow = bloc.mainComments;
+                    commentsToShow = _currentFeed == FeedType.friends ? bloc.friendsComments : bloc.mainComments;
                   }
 
                   // Appliquer le filtre par tag
@@ -312,14 +272,21 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              _selectedTagFilter != TagFilter.all 
-                                  ? Icons.filter_list_off
-                                  : (_currentFeed == FeedType.friends ? Icons.people_outline : Icons.chat_bubble_outline),
-                              size: 64,
-                              color: Colors.grey.shade400,
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                _selectedTagFilter != TagFilter.all 
+                                    ? Icons.filter_list_off
+                                    : (_currentFeed == FeedType.friends ? Icons.people_outline : Icons.chat_bubble_outline),
+                                size: 48,
+                                color: Colors.grey[400],
+                              ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 24),
                             Text(
                               _selectedTagFilter != TagFilter.all
                                   ? localizations.noPostsFilter(_selectedTagFilter.getDisplayName(context))
@@ -327,9 +294,11 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                                       ? localizations.noPostsFriends
                                       : localizations.noPostsYet),
                               style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey.shade600,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
                               ),
+                              textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8),
                             Text(
@@ -337,28 +306,36 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                                   ? localizations.tryDifferentFilter
                                   : (_currentFeed == FeedType.friends 
                                       ? localizations.friendsNotPosted
-                                      : localizations.beFirstToShare),
+                                      : localizations.beFirstToPost),
                               style: TextStyle(
-                                color: Colors.grey.shade500,
+                                color: Colors.grey[600],
+                                fontSize: 14,
                               ),
                               textAlign: TextAlign.center,
                             ),
+                            const SizedBox(height: 24),
                             if (_selectedTagFilter != TagFilter.all) ...[
-                              const SizedBox(height: 16),
                               TextButton(
                                 onPressed: () {
                                   setState(() {
                                     _selectedTagFilter = TagFilter.all;
                                   });
                                 },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.green[600],
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                ),
                                 child: Text(localizations.showAllPosts),
                               ),
                             ] else if (_currentFeed == FeedType.friends) ...[
-                              const SizedBox(height: 16),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pushNamed(context, '/friends-management');
                                 },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.green[600],
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                ),
                                 child: Text(localizations.manageFriends),
                               ),
                             ],
@@ -372,9 +349,20 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         final comment = commentsToShow[index];
-                        return CommentCard(
-                          comment: comment,
-                          showReplies: false,
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.grey[100]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: CommentCard(
+                            comment: comment,
+                            showReplies: false,
+                          ),
                         );
                       },
                       childCount: commentsToShow.length,
@@ -389,20 +377,19 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
           builder: (context) {
             final isAuthenticated = Provider.of<AuthProvider>(context, listen: false).isAuthenticated;
             if (!isAuthenticated) return const SizedBox.shrink();
+            
             return FloatingActionButton(
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
+                  backgroundColor: Colors.transparent,
                   builder: (context) => const CreatePostModal(),
                 );
               },
               backgroundColor: Colors.green[600],
-              child: const Icon(Icons.add_comment_rounded, color: Colors.white),
-              tooltip: localizations.newPost,
+              elevation: 8,
+              child: const Icon(Icons.add, color: Colors.white, size: 28),
             );
           },
         ),

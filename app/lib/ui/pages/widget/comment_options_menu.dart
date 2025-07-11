@@ -140,17 +140,7 @@ class CommentOptionsMenu extends StatelessWidget {
                   },
                 ),
                 
-                // Share
-                _buildOptionTile(
-                  context: context,
-                  icon: Icons.share,
-                  title: localizations.share,
-                  color: Colors.grey[600]!,
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _shareComment(context);
-                  },
-                ),
+                
                 
                 // Copy text
                 _buildOptionTile(
@@ -266,21 +256,7 @@ class CommentOptionsMenu extends StatelessWidget {
     );
   }
 
-  void _shareComment(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-    final shareText = '${comment.person.displayName}: ${comment.content}';
-    
-    // For now, just copy to clipboard
-    Clipboard.setData(ClipboardData(text: shareText));
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Comment copied to clipboard'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
+  
 
   void _copyCommentText(BuildContext context) {
     Clipboard.setData(ClipboardData(text: comment.content));

@@ -412,13 +412,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get community => 'Community';
 
   @override
-  String get communityDesc => 'Share & learn together';
+  String get communityDesc => 'Connect with plant lovers';
 
   @override
   String get commentsTitle => 'Community';
 
   @override
-  String get commentsSubtitle => 'Share & learn together';
+  String get commentsSubtitle => 'Connect with plant lovers';
 
   @override
   String get feedForYou => 'For You';
@@ -450,7 +450,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get beFirstToShare => 'Be the first to share!';
+  String get beFirstToPost => 'Be the first to post!';
 
   @override
   String get friendsNotPosted => 'Your friends haven\'t shared anything yet';
@@ -617,9 +617,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reply => 'Reply';
 
   @override
-  String get share => 'Share';
-
-  @override
   String get edit => 'Edit';
 
   @override
@@ -744,6 +741,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportError => 'Error submitting report';
+
+  @override
+  String get beFirstToShare => 'Be the first to share!';
 
   @override
   String get deletePostConfirmation =>

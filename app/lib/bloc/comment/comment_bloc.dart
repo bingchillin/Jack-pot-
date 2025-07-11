@@ -141,10 +141,12 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   
   // Cache local pour synchronisation
   List<Comment> _mainComments = [];
+  List<Comment> _friendsComments = [];
   List<Comment> _currentThreadHierarchy = [];
   
   // Getters pour accéder au cache
   List<Comment> get mainComments => _mainComments;
+  List<Comment> get friendsComments => _friendsComments;
   List<Comment> get currentThreadHierarchy => _currentThreadHierarchy;
   
   CommentBloc({
@@ -162,7 +164,13 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   }
   
   Future<void> _onLoadMainComments(LoadMainComments event, Emitter<CommentState> emit) async {
-    emit(CommentLoading());
+    // Si on a déjà des commentaires en cache, les afficher immédiatement
+    if (_mainComments.isNotEmpty) {
+      emit(CommentMainLoaded(_mainComments));
+    } else {
+      emit(CommentLoading());
+    }
+    
     try {
       // Utiliser la méthode avec filtrage des utilisateurs bloqués (toujours frais)
       final comments = await commentService.fetchMainCommentsWithoutBlocked(
@@ -177,14 +185,20 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   }
   
   Future<void> _onLoadFriendsComments(LoadFriendsComments event, Emitter<CommentState> emit) async {
-    emit(CommentLoading());
+    // Si on a déjà des commentaires d'amis en cache, les afficher immédiatement
+    if (_friendsComments.isNotEmpty) {
+      emit(CommentMainLoaded(_friendsComments));
+    } else {
+      emit(CommentLoading());
+    }
+    
     try {
       if (token == null || token!.isEmpty) {
         throw Exception('Token requis pour charger les commentaires des amis');
       }
       
       final comments = await commentService.fetchFriendsComments(token!, event.userId);
-      _mainComments = comments; // Mettre à jour le cache avec les commentaires des amis
+      _friendsComments = comments; // Mettre à jour le cache des amis
       emit(CommentMainLoaded(comments));
     } catch (e) {
       emit(CommentError(e.toString()));
@@ -252,8 +266,23 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
         }
       } else {
         // Mode timeline - émettre la liste mise à jour
-        print('Debug: Updating main comments list with ${_mainComments.length} comments');
-        emit(CommentMainLoaded(_mainComments));
+        // Déterminer quelle liste afficher basée sur le dernier état
+        final currentState = state;
+        if (currentState is CommentMainLoaded) {
+          // Vérifier si le commentaire est dans la liste des amis
+          final isInFriends = _friendsComments.any((c) => c.idComment == event.commentId);
+          if (isInFriends) {
+            print('Debug: Updating friends comments list with ${_friendsComments.length} comments');
+            emit(CommentMainLoaded(_friendsComments));
+          } else {
+            print('Debug: Updating main comments list with ${_mainComments.length} comments');
+            emit(CommentMainLoaded(_mainComments));
+          }
+        } else {
+          // Fallback vers la liste principale
+          print('Debug: Fallback to main comments list with ${_mainComments.length} comments');
+          emit(CommentMainLoaded(_mainComments));
+        }
       }
     } catch (e) {
       print('Debug: Error in like comment: $e');
@@ -278,6 +307,9 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       // Ajouter au cache local
       if (event.parentCommentId == null) {
         _mainComments.insert(0, comment);
+        // Si l'utilisateur est dans la liste des amis, ajouter aussi au cache des amis
+        // (pour simplifier, on l'ajoute toujours - il sera filtré côté serveur lors du prochain refresh)
+        _friendsComments.insert(0, comment);
       } else if (_currentThreadHierarchy.isNotEmpty) {
         // Ajouter à la hiérarchie de threading
         _currentThreadHierarchy = ThreadBuilderService.addCommentToHierarchy(
@@ -305,6 +337,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       
       // Supprimer du cache local
       _mainComments.removeWhere((comment) => comment.idComment == event.commentId);
+      _friendsComments.removeWhere((comment) => comment.idComment == event.commentId);
       
       // Supprimer de la hiérarchie de threading si elle existe
       if (_currentThreadHierarchy.isNotEmpty) {
@@ -344,21 +377,35 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   
   void _updateCommentInCache(int commentId, bool isLiked, int likeCount) {
     // Mettre à jour dans la liste principale
-    bool found = false;
+    bool foundInMain = false;
     for (int i = 0; i < _mainComments.length; i++) {
       if (_mainComments[i].idComment == commentId) {
         _mainComments[i] = _mainComments[i].copyWith(
           isLikedByCurrentUser: isLiked,
           likeCount: likeCount,
         );
-        found = true;
+        foundInMain = true;
         print('Debug: Updated comment $commentId in main cache - liked: $isLiked, count: $likeCount');
         break;
       }
     }
     
-    if (!found) {
-      print('Debug: Comment $commentId not found in main cache (${_mainComments.length} comments)');
+    // Mettre à jour dans la liste des amis
+    bool foundInFriends = false;
+    for (int i = 0; i < _friendsComments.length; i++) {
+      if (_friendsComments[i].idComment == commentId) {
+        _friendsComments[i] = _friendsComments[i].copyWith(
+          isLikedByCurrentUser: isLiked,
+          likeCount: likeCount,
+        );
+        foundInFriends = true;
+        print('Debug: Updated comment $commentId in friends cache - liked: $isLiked, count: $likeCount');
+        break;
+      }
+    }
+    
+    if (!foundInMain && !foundInFriends) {
+      print('Debug: Comment $commentId not found in any cache (main: ${_mainComments.length}, friends: ${_friendsComments.length})');
     }
     
     // La mise à jour de la hiérarchie est gérée dans _onLikeComment

@@ -414,13 +414,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get community => 'Communauté';
 
   @override
-  String get communityDesc => 'Partager et apprendre ensemble';
+  String get communityDesc => 'Connectez-vous avec les amoureux des plantes';
 
   @override
   String get commentsTitle => 'Communauté';
 
   @override
-  String get commentsSubtitle => 'Partager et apprendre ensemble';
+  String get commentsSubtitle => 'Connectez-vous avec les amoureux des plantes';
 
   @override
   String get feedForYou => 'Pour toi';
@@ -452,7 +452,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get beFirstToShare => 'Soyez le premier à partager !';
+  String get beFirstToPost => 'Soyez le premier à poster !';
 
   @override
   String get friendsNotPosted => 'Vos amis n\'ont rien partagé pour le moment';
@@ -623,9 +623,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reply => 'Répondre';
 
   @override
-  String get share => 'Partager';
-
-  @override
   String get edit => 'Modifier';
 
   @override
@@ -753,6 +750,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reportError => 'Erreur lors de la soumission du signalement';
+
+  @override
+  String get beFirstToShare => 'Soyez le premier à partager !';
 
   @override
   String get deletePostConfirmation =>

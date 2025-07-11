@@ -246,15 +246,7 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
                               onTap: () => _handleReply(context),
                             ),
                             
-                            const SizedBox(width: 20),
                             
-                            // Share button
-                            _buildActionButton(
-                              icon: Icons.share,
-                              label: '',
-                              color: Colors.grey[600]!,
-                              onTap: () => _handleShare(context),
-                            ),
                             
                             const Spacer(),
                             
@@ -382,20 +374,7 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
     );
   }
 
-  void _handleShare(BuildContext context) {
-    final shareText = '${widget.reply.person.displayName}: ${widget.reply.content}';
-    
-    // For now, just copy to clipboard
-    Clipboard.setData(ClipboardData(text: shareText));
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Reply copied to clipboard'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
+  
 
   void _showOptionsMenu(BuildContext context) {
     showModalBottomSheet(

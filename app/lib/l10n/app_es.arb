@@ -670,7 +670,7 @@
   "@community": {
     "description": "Community section title"
   },
-  "communityDesc": "Comparte y aprende juntos",
+  "communityDesc": "Conéctate con amantes de las plantas",
   "@communityDesc": {
     "description": "Community section description"
   },
@@ -679,7 +679,7 @@
   "@commentsTitle": {
     "description": "Title for the comments/community page"
   },
-  "commentsSubtitle": "Comparte y aprende juntos",
+  "commentsSubtitle": "Conéctate con amantes de las plantas",
   "@commentsSubtitle": {
     "description": "Subtitle for the comments/community page"
   },
@@ -725,8 +725,8 @@
       }
     }
   },
-  "beFirstToShare": "¡Sé el primero en compartir!",
-  "@beFirstToShare": {
+  "beFirstToPost": "¡Sé el primero en publicar!",
+  "@beFirstToPost": {
     "description": "Encouragement message to create first post"
   },
   "friendsNotPosted": "Tus amigos aún no han publicado",
@@ -998,10 +998,7 @@
     "description": "Reply button text"
   },
 
-  "share": "Compartir",
-  "@share": {
-    "description": "Share button text"
-  },
+
 
   "edit": "Editar",
   "@edit": {

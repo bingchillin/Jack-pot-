@@ -341,14 +341,7 @@ class _CommentCardState extends State<CommentCard> with TickerProviderStateMixin
                            color: Colors.grey[600]!,
                            onTap: () => _handleReply(context),
                          ),
-                         const SizedBox(width: 24),
-                         // Share button
-                         _buildActionButton(
-                           icon: Icons.share,
-                           label: '',
-                           color: Colors.grey[600]!,
-                           onTap: () => _handleShare(context),
-                         ),
+
                       ],
                     ),
                   ),
@@ -455,15 +448,7 @@ class _CommentCardState extends State<CommentCard> with TickerProviderStateMixin
     );
   }
 
-  void _handleShare(BuildContext context) {
-    // Implement share functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Share functionality coming soon!'),
-        backgroundColor: Colors.blue,
-      ),
-    );
-  }
+  
 
   void _handleMenuAction(BuildContext context, String action) {
     final localizations = AppLocalizations.of(context)!;
