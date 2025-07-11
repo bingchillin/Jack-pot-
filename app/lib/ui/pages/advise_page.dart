@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../widgets/twitter_feed_toggle.dart';
 import '../widgets/twitter_tag_filter.dart';
+import '../widgets/comment_card_shimmer.dart';
 import '../../main.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -25,6 +26,9 @@ class _AdvisePageState extends State<AdvisePage>
   
   // Scroll controller for the feed list
   final ScrollController _scrollController = ScrollController();
+  
+  // Track if this is initial loading (show shimmer) vs tab switching (show cached data)
+  bool _isInitialLoading = true;
 
   @override
   void initState() {
@@ -134,6 +138,7 @@ class _AdvisePageState extends State<AdvisePage>
     
     setState(() {
       _currentFeed = newFeed;
+      _isInitialLoading = false; // No longer initial loading when switching tabs
     });
     
     // Set the current feed type in the bloc BEFORE loading
@@ -230,12 +235,11 @@ class _AdvisePageState extends State<AdvisePage>
               // Comments list
               BlocBuilder<CommentBloc, CommentState>(
                 builder: (context, state) {
-                  if (state is CommentLoading) {
-                    return SliverFillRemaining(
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
-                        ),
+                  if (state is CommentLoading && _isInitialLoading) {
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => const CommentCardShimmer(),
+                        childCount: 6, // Show 6 shimmer cards
                       ),
                     );
                   }
@@ -306,8 +310,8 @@ class _AdvisePageState extends State<AdvisePage>
                   } else if (state is CommentLikeUpdated) {
                     // Si c'est une mise à jour de like, afficher la liste appropriée depuis le cache
                     commentsToShow = _currentFeed == FeedType.friends ? bloc.friendsComments : bloc.mainComments;
-                  } else if (state is CommentLoading) {
-                    // Pendant le chargement, afficher le cache approprié si disponible
+                  } else if (state is CommentLoading && !_isInitialLoading) {
+                    // Pendant le chargement (non-initial), afficher le cache approprié si disponible
                     commentsToShow = _currentFeed == FeedType.friends ? bloc.friendsComments : bloc.mainComments;
                   }
 
@@ -315,18 +319,15 @@ class _AdvisePageState extends State<AdvisePage>
                   commentsToShow = _filterCommentsByTag(commentsToShow);
 
                   if (commentsToShow.isEmpty) {
-                    // Si on est en état de chargement et qu'on n'a pas de cache, afficher le loading
+                    // Si on est en état de chargement et qu'on n'a pas de cache, afficher le shimmer
                     if (state is CommentLoading) {
-                      return SliverFillRemaining(
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
-                          ),
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => const CommentCardShimmer(),
+                          childCount: 6, // Show 6 shimmer cards
                         ),
                       );
                     }
-                    
-
                     
                     return SliverFillRemaining(
                       child: Center(
