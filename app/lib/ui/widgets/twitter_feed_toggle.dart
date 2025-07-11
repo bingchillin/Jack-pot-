@@ -20,21 +20,19 @@ class TwitterFeedToggle extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.green[50],
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey[100]!,
-            width: 1,
-          ),
-        ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Main toggle buttons
           Container(
             height: 60,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
                   child: _buildToggleButton(

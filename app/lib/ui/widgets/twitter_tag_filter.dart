@@ -18,19 +18,16 @@ class TwitterTagFilter extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: Colors.green[50],
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey[100]!,
-            width: 1,
-          ),
-        ),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             _buildFilterChip(
               label: localizations.filterAll,

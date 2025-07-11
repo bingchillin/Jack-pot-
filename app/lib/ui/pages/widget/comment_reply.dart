@@ -16,7 +16,7 @@ class CommentReply extends StatefulWidget {
   final VoidCallback? onReport;
   final VoidCallback? onBlockUser;
   final bool isUserBlocked;
-  
+
   const CommentReply({
     super.key,
     required this.reply,
@@ -92,7 +92,7 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
             opacity: _fadeAnimation.value,
             child: Container(
               margin: const EdgeInsets.only(left: 40, top: 8, bottom: 8),
-              decoration: BoxDecoration(
+      decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.grey[200]!),
@@ -103,15 +103,15 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
                     offset: const Offset(0, 2),
                   ),
                 ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
                   // Header
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
-                      children: [
+            children: [
                         // User avatar
                         Container(
                           width: 32,
@@ -125,44 +125,44 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Center(
-                            child: Text(
+                child: Text(
                               widget.reply.person.firstname.isNotEmpty
                                   ? widget.reply.person.firstname[0].toUpperCase()
                                   : 'U',
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
-                            ),
-                          ),
-                        ),
+                  ),
+                ),
+              ),
                         
                         const SizedBox(width: 12),
                         
                         // User info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                                 widget.reply.person.displayName,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w600,
                                   color: Colors.grey[800],
-                                ),
-                              ),
-                              Text(
+                      ),
+                    ),
+                    Text(
                                 _formatTimeAgo(widget.reply.createdAt),
-                                style: TextStyle(
-                                  fontSize: 12,
+                      style: TextStyle(
+                        fontSize: 12,
                                   color: Colors.grey[500],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
                         
                         // Options menu
                         if (authProvider.isAuthenticated)
@@ -181,16 +181,16 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
                               ),
                             ),
                           ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
                   
                   // Content
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                        children: [
                         // Reply text
                         Text(
                           widget.reply.content,
@@ -266,18 +266,18 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
                                     color: Colors.grey[500],
                                     fontStyle: FontStyle.italic,
                                   ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
+                  ],
+                ),
+            ],
+          ),
                   ),
                   
                   const SizedBox(height: 16),
-                ],
+                  ],
+                ),
               ),
-            ),
           ),
         );
       },
@@ -298,27 +298,27 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
           color: Colors.grey[50],
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Row(
+                child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
+                  children: [
+                    Icon(
               icon,
               size: 18,
               color: color,
-            ),
+                    ),
             if (label.isNotEmpty) ...[
-              const SizedBox(width: 4),
-              Text(
+                    const SizedBox(width: 4),
+                    Text(
                 label,
-                style: TextStyle(
-                  fontSize: 12,
+                      style: TextStyle(
+                        fontSize: 12,
                   color: color,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ],
-        ),
+          ),
       ),
     );
   }
@@ -393,7 +393,7 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
   String _formatTimeAgo(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d';
     } else if (difference.inHours > 0) {

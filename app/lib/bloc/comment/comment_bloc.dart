@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/comment_model.dart';
 import '../../services/comment_service.dart';
 import '../../services/thread_builder_service.dart';
+import '../../ui/widgets/twitter_feed_toggle.dart';
 import 'package:equatable/equatable.dart';
 
 // ============================================================================
@@ -16,16 +17,18 @@ abstract class CommentEvent extends Equatable {
 
 class LoadMainComments extends CommentEvent {
   final String? userId;
-  const LoadMainComments({this.userId});
+  final String? requestId;
+  const LoadMainComments({this.userId, this.requestId});
   @override
-  List<Object?> get props => [userId];
+  List<Object?> get props => [userId, requestId];
 }
 
 class LoadFriendsComments extends CommentEvent {
   final int userId;
-  const LoadFriendsComments(this.userId);
+  final String? requestId;
+  const LoadFriendsComments(this.userId, {this.requestId});
   @override
-  List<Object?> get props => [userId];
+  List<Object?> get props => [userId, requestId];
 }
 
 class LoadCommentDetail extends CommentEvent {
@@ -71,6 +74,13 @@ class RefreshComments extends CommentEvent {
 
 class EmitMainCommentsState extends CommentEvent {
   const EmitMainCommentsState();
+}
+
+class SetCurrentFeedType extends CommentEvent {
+  final FeedType feedType;
+  const SetCurrentFeedType(this.feedType);
+  @override
+  List<Object?> get props => [feedType];
 }
 
 // ============================================================================
@@ -144,6 +154,13 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   List<Comment> _friendsComments = [];
   List<Comment> _currentThreadHierarchy = [];
   
+  // Request tracking pour éviter les race conditions
+  String? _currentMainRequestId;
+  String? _currentFriendsRequestId;
+  
+  // Track current feed type pour éviter les mauvais affichages
+  FeedType? _currentFeedType;
+  
   // Getters pour accéder au cache
   List<Comment> get mainComments => _mainComments;
   List<Comment> get friendsComments => _friendsComments;
@@ -161,12 +178,18 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     on<DeleteComment>(_onDeleteComment);
     on<RefreshComments>(_onRefreshComments);
     on<EmitMainCommentsState>(_onEmitMainCommentsState);
+    on<SetCurrentFeedType>(_onSetCurrentFeedType);
   }
   
   Future<void> _onLoadMainComments(LoadMainComments event, Emitter<CommentState> emit) async {
+    final requestId = event.requestId ?? DateTime.now().millisecondsSinceEpoch.toString();
+    _currentMainRequestId = requestId;
+    _currentFeedType = FeedType.forYou;
+    
     // Si on a déjà des commentaires en cache, les afficher immédiatement
-    if (_mainComments.isNotEmpty) {
+    if (_mainComments.isNotEmpty && _currentFeedType == FeedType.forYou) {
       emit(CommentMainLoaded(_mainComments));
+      print('Debug: Showing cached main comments immediately');
     } else {
       emit(CommentLoading());
     }
@@ -177,17 +200,51 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
         token, 
         userId: event.userId,
       );
-      _mainComments = comments;
-      emit(CommentMainLoaded(comments));
+      
+      // Vérifier si cette requête est toujours la plus récente
+      if (_currentMainRequestId == requestId) {
+        _mainComments = comments;
+        // Seulement émettre si on est toujours sur le feed "Pour toi"
+        if (_currentFeedType == FeedType.forYou) {
+          emit(CommentMainLoaded(comments));
+          print('Debug: Emitted main comments for ForYou feed - ${comments.length} comments');
+        } else {
+          print('Debug: Main comments loaded but current feed is $_currentFeedType, not emitting');
+        }
+      } else {
+        // Si ce n'est pas la requête la plus récente, ignorer complètement
+        print('Debug: Ignoring outdated main comments request $requestId (current: $_currentMainRequestId)');
+      }
     } catch (e) {
-      emit(CommentError(e.toString()));
+      // Seulement traiter l'erreur si c'est la requête la plus récente
+      if (_currentMainRequestId == requestId) {
+        print('Debug: Error in main comments request $requestId: $e');
+        // Seulement traiter l'erreur si on est sur le bon feed
+        if (_currentFeedType == FeedType.forYou) {
+          // Si on avait des données en cache, les garder affichées avec l'erreur
+          if (_mainComments.isNotEmpty) {
+            emit(CommentMainLoaded(_mainComments));
+          } else {
+            emit(CommentError(e.toString()));
+          }
+        } else {
+          print('Debug: Error in main comments but current feed is $_currentFeedType, not emitting');
+        }
+      } else {
+        print('Debug: Ignoring error from outdated main comments request $requestId');
+      }
     }
   }
   
   Future<void> _onLoadFriendsComments(LoadFriendsComments event, Emitter<CommentState> emit) async {
+    final requestId = event.requestId ?? DateTime.now().millisecondsSinceEpoch.toString();
+    _currentFriendsRequestId = requestId;
+    _currentFeedType = FeedType.friends;
+    
     // Si on a déjà des commentaires d'amis en cache, les afficher immédiatement
-    if (_friendsComments.isNotEmpty) {
+    if (_friendsComments.isNotEmpty && _currentFeedType == FeedType.friends) {
       emit(CommentMainLoaded(_friendsComments));
+      print('Debug: Showing cached friends comments immediately');
     } else {
       emit(CommentLoading());
     }
@@ -198,10 +255,39 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       }
       
       final comments = await commentService.fetchFriendsComments(token!, event.userId);
-      _friendsComments = comments; // Mettre à jour le cache des amis
-      emit(CommentMainLoaded(comments));
+      
+      // Vérifier si cette requête est toujours la plus récente
+      if (_currentFriendsRequestId == requestId) {
+        _friendsComments = comments; // Mettre à jour le cache des amis
+        // Seulement émettre si on est toujours sur le feed "Amis"
+        if (_currentFeedType == FeedType.friends) {
+          emit(CommentMainLoaded(comments));
+          print('Debug: Emitted friends comments for Friends feed - ${comments.length} comments');
+        } else {
+          print('Debug: Friends comments loaded but current feed is $_currentFeedType, not emitting');
+        }
+      } else {
+        // Si ce n'est pas la requête la plus récente, ignorer complètement
+        print('Debug: Ignoring outdated friends comments request $requestId (current: $_currentFriendsRequestId)');
+      }
     } catch (e) {
-      emit(CommentError(e.toString()));
+      // Seulement traiter l'erreur si c'est la requête la plus récente
+      if (_currentFriendsRequestId == requestId) {
+        print('Debug: Error in friends comments request $requestId: $e');
+        // Seulement traiter l'erreur si on est sur le bon feed
+        if (_currentFeedType == FeedType.friends) {
+          // Si on avait des données en cache, les garder affichées avec l'erreur
+          if (_friendsComments.isNotEmpty) {
+            emit(CommentMainLoaded(_friendsComments));
+          } else {
+            emit(CommentError(e.toString()));
+          }
+        } else {
+          print('Debug: Error in friends comments but current feed is $_currentFeedType, not emitting');
+        }
+      } else {
+        print('Debug: Ignoring error from outdated friends comments request $requestId');
+      }
     }
   }
   
@@ -265,22 +351,12 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
           emit(CommentMainLoaded(_mainComments));
         }
       } else {
-        // Mode timeline - émettre la liste mise à jour
-        // Déterminer quelle liste afficher basée sur le dernier état
-        final currentState = state;
-        if (currentState is CommentMainLoaded) {
-          // Vérifier si le commentaire est dans la liste des amis
-          final isInFriends = _friendsComments.any((c) => c.idComment == event.commentId);
-          if (isInFriends) {
-            print('Debug: Updating friends comments list with ${_friendsComments.length} comments');
-            emit(CommentMainLoaded(_friendsComments));
-          } else {
-            print('Debug: Updating main comments list with ${_mainComments.length} comments');
-            emit(CommentMainLoaded(_mainComments));
-          }
+        // Mode timeline - émettre la liste mise à jour basée sur le feed type actuel
+        if (_currentFeedType == FeedType.friends) {
+          print('Debug: Updating friends comments list with ${_friendsComments.length} comments');
+          emit(CommentMainLoaded(_friendsComments));
         } else {
-          // Fallback vers la liste principale
-          print('Debug: Fallback to main comments list with ${_mainComments.length} comments');
+          print('Debug: Updating main comments list with ${_mainComments.length} comments');
           emit(CommentMainLoaded(_mainComments));
         }
       }
@@ -372,6 +448,20 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   void _onEmitMainCommentsState(EmitMainCommentsState event, Emitter<CommentState> emit) {
     if (_mainComments.isNotEmpty) {
       emit(CommentMainLoaded(_mainComments));
+    }
+  }
+  
+  void _onSetCurrentFeedType(SetCurrentFeedType event, Emitter<CommentState> emit) {
+    _currentFeedType = event.feedType;
+    print('Debug: Feed type changed to $_currentFeedType');
+    
+    // Immediately show appropriate cached data if available
+    if (_currentFeedType == FeedType.forYou && _mainComments.isNotEmpty) {
+      emit(CommentMainLoaded(_mainComments));
+      print('Debug: Immediately showing cached main comments for ForYou');
+    } else if (_currentFeedType == FeedType.friends && _friendsComments.isNotEmpty) {
+      emit(CommentMainLoaded(_friendsComments));
+      print('Debug: Immediately showing cached friends comments for Friends');
     }
   }
   

@@ -18,13 +18,20 @@ class AdvisePage extends StatefulWidget {
   State<AdvisePage> createState() => _AdvisePageState();
 }
 
-class _AdvisePageState extends State<AdvisePage> with RouteAware {
+class _AdvisePageState extends State<AdvisePage> 
+    with RouteAware, TickerProviderStateMixin {
   FeedType _currentFeed = FeedType.forYou;
   TagFilter _selectedTagFilter = TagFilter.all;
+  
+  // Scroll controller for the feed list
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    
+    // No custom scroll listener needed
+    
     // Charger les commentaires au démarrage si pas déjà chargés
     final currentState = context.read<CommentBloc>().state;
     if (currentState is CommentInitial) {
@@ -53,9 +60,12 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     routeObserver.unsubscribe(this);
     super.dispose();
   }
+  
+  // No custom _onScroll needed as SliverAppBar handles show/hide
 
   // Méthode appelée quand la page devient visible (retour depuis une autre page)
   @override
@@ -70,19 +80,20 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
   void _loadCurrentFeed() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final userId = authProvider.userId;
+    final requestId = DateTime.now().millisecondsSinceEpoch.toString();
     
     if (_currentFeed == FeedType.forYou) {
-      context.read<CommentBloc>().add(LoadMainComments(userId: userId));
+      context.read<CommentBloc>().add(LoadMainComments(userId: userId, requestId: requestId));
     } else {
       // Pour les amis, on a besoin d'être connecté
       if (authProvider.isAuthenticated && authProvider.currentUser?.idPerson != null) {
-        context.read<CommentBloc>().add(LoadFriendsComments(authProvider.currentUser!.idPerson));
+        context.read<CommentBloc>().add(LoadFriendsComments(authProvider.currentUser!.idPerson, requestId: requestId));
       } else {
         // Si pas connecté, revenir au feed "Pour toi"
         setState(() {
           _currentFeed = FeedType.forYou;
         });
-        context.read<CommentBloc>().add(LoadMainComments(userId: userId));
+        context.read<CommentBloc>().add(LoadMainComments(userId: userId, requestId: requestId));
       }
     }
   }
@@ -115,6 +126,8 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
       _currentFeed = newFeed;
     });
     
+    // Set the current feed type in the bloc BEFORE loading
+    context.read<CommentBloc>().add(SetCurrentFeedType(newFeed));
     _loadCurrentFeed();
   }
 
@@ -170,21 +183,37 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
           },
           color: Colors.green[600],
           child: CustomScrollView(
+            controller: _scrollController,
             slivers: [
-              // Twitter-like header with feed toggle - removed SliverAppBar to eliminate spacing
-              SliverToBoxAdapter(
-                child: TwitterFeedToggle(
-                  currentFeed: _currentFeed,
-                  onFeedChanged: _onFeedChanged,
-                  hasUnreadFriends: false,
-                ),
-              ),
-              
-              // Tag filter chips
-              SliverToBoxAdapter(
-                child: TwitterTagFilter(
-                  selectedFilter: _selectedTagFilter,
-                  onFilterChanged: _onTagFilterChanged,
+              // Sticky Twitter-like header with feed toggle + tag filter
+              SliverAppBar(
+                backgroundColor: Colors.green[50],
+                floating: true, // Show when scrolling up
+                snap: true,     // Snap into view quickly
+                toolbarHeight: 0,
+                elevation: 0,
+                automaticallyImplyLeading: false,
+                stretch: true,
+                expandedHeight: 0,
+                collapsedHeight: 0,
+                primary: true,
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(116),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TwitterFeedToggle(
+                        currentFeed: _currentFeed,
+                        onFeedChanged: _onFeedChanged,
+                        hasUnreadFriends: false,
+                      ),
+                      TwitterTagFilter(
+                        selectedFilter: _selectedTagFilter,
+                        onFilterChanged: _onTagFilterChanged,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               
@@ -251,15 +280,18 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
 
                   // Afficher les commentaires pour les états CommentMainLoaded, CommentDetailLoaded et CommentLikeUpdated
                   List<Comment> commentsToShow = [];
+                  final bloc = context.read<CommentBloc>();
+                  
                   if (state is CommentMainLoaded) {
                     commentsToShow = state.comments;
                   } else if (state is CommentThreadLoaded) {
                     // Si on est en état détail, on affiche quand même la liste principale depuis le cache
-                    final bloc = context.read<CommentBloc>();
                     commentsToShow = _currentFeed == FeedType.friends ? bloc.friendsComments : bloc.mainComments;
                   } else if (state is CommentLikeUpdated) {
                     // Si c'est une mise à jour de like, afficher la liste appropriée depuis le cache
-                    final bloc = context.read<CommentBloc>();
+                    commentsToShow = _currentFeed == FeedType.friends ? bloc.friendsComments : bloc.mainComments;
+                  } else if (state is CommentLoading) {
+                    // Pendant le chargement, afficher le cache approprié si disponible
                     commentsToShow = _currentFeed == FeedType.friends ? bloc.friendsComments : bloc.mainComments;
                   }
 
@@ -267,6 +299,17 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                   commentsToShow = _filterCommentsByTag(commentsToShow);
 
                   if (commentsToShow.isEmpty) {
+                    // Si on est en état de chargement et qu'on n'a pas de cache, afficher le loading
+                    if (state is CommentLoading) {
+                      return SliverFillRemaining(
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+                          ),
+                        ),
+                      );
+                    }
+                    
                     return SliverFillRemaining(
                       child: Center(
                         child: Column(
@@ -348,21 +391,29 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final comment = commentsToShow[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Colors.grey[100]!,
-                                width: 1,
+                        // Add a subtle loading indicator at the top when refreshing with cached data
+                        if (index == 0 && state is CommentLoading && commentsToShow.isNotEmpty) {
+                          return Column(
+                            children: [
+                              SizedBox(
+                                height: 3,
+                                child: LinearProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+                                  backgroundColor: Colors.green[100],
+                                ),
                               ),
-                            ),
-                          ),
-                          child: CommentCard(
-                            comment: comment,
-                            showReplies: false,
-                          ),
+                              CommentCard(
+                                comment: commentsToShow[index],
+                                showReplies: false,
+                              ),
+                            ],
+                          );
+                        }
+                        
+                        final comment = commentsToShow[index];
+                        return CommentCard(
+                          comment: comment,
+                          showReplies: false,
                         );
                       },
                       childCount: commentsToShow.length,
