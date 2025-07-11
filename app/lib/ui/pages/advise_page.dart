@@ -297,6 +297,12 @@ class _AdvisePageState extends State<AdvisePage>
                   } else if (state is CommentThreadLoaded) {
                     // Si on est en état détail, on affiche quand même la liste principale depuis le cache
                     commentsToShow = _currentFeed == FeedType.friends ? bloc.friendsComments : bloc.mainComments;
+                    // Si le cache est vide, forcer un rechargement immédiat
+                    if (commentsToShow.isEmpty) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _loadCurrentFeed();
+                      });
+                    }
                   } else if (state is CommentLikeUpdated) {
                     // Si c'est une mise à jour de like, afficher la liste appropriée depuis le cache
                     commentsToShow = _currentFeed == FeedType.friends ? bloc.friendsComments : bloc.mainComments;
@@ -319,6 +325,8 @@ class _AdvisePageState extends State<AdvisePage>
                         ),
                       );
                     }
+                    
+
                     
                     return SliverFillRemaining(
                       child: Center(
