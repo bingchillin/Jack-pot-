@@ -65,7 +65,7 @@ class ThreadView extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border(
                 left: BorderSide(
-                  color: Colors.green[100]!,
+                  color: Colors.grey[300]!,
                   width: 2,
                 ),
               ),
@@ -83,12 +83,12 @@ class ThreadView extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.green[50],
         border: Border(
           bottom: BorderSide(
-            color: Colors.grey[100]!,
+            color: Colors.grey[300]!,
             width: 1,
           ),
         ),
@@ -205,7 +205,7 @@ class ThreadView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -219,7 +219,7 @@ class ThreadView extends StatelessWidget {
                 ],
                 
                 // Actions
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     // Like button
@@ -244,11 +244,11 @@ class ThreadView extends StatelessWidget {
                         if (onLike != null) onLike!(comment);
                       },
                     ),
-                    const SizedBox(width: 24),
+                    const SizedBox(width: 16),
                     
                     // Reply button
                     _buildActionButton(
-                      icon: Icons.reply,
+                      icon: Icons.mode_comment_outlined,
                       label: localizations.reply,
                       color: Colors.green[600]!,
                       onTap: () {
@@ -286,7 +286,7 @@ class ThreadView extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          padding: const EdgeInsets.only(top: 6, bottom: 2),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

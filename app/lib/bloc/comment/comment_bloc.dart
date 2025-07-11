@@ -34,9 +34,10 @@ class LoadFriendsComments extends CommentEvent {
 class LoadCommentDetail extends CommentEvent {
   final int commentId;
   final String? userId;
-  const LoadCommentDetail(this.commentId, {this.userId});
+  final String requestId;
+  const LoadCommentDetail(this.commentId, {this.userId, required this.requestId});
   @override
-  List<Object?> get props => [commentId, userId];
+  List<Object?> get props => [commentId, userId, requestId];
 }
 
 class LikeComment extends CommentEvent {
@@ -153,6 +154,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   List<Comment> _mainComments = [];
   List<Comment> _friendsComments = [];
   List<Comment> _currentThreadHierarchy = [];
+  String? _currentDetailRequestId;
   
   // Request tracking pour éviter les race conditions
   String? _currentMainRequestId;
@@ -292,6 +294,8 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   }
   
   Future<void> _onLoadCommentDetail(LoadCommentDetail event, Emitter<CommentState> emit) async {
+    final reqId = event.requestId;
+    _currentDetailRequestId = reqId;
     emit(CommentLoading());
     try {
       // Récupérer tous les commentaires (parent + réponses)
@@ -308,9 +312,15 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       _currentThreadHierarchy = threadHierarchy;
       
       // Émettre l'état avec la hiérarchie
-      emit(CommentThreadLoaded(threadHierarchy));
+      if (_currentDetailRequestId == reqId) {
+        emit(CommentThreadLoaded(threadHierarchy));
+      } else {
+        print('Debug: Ignoring outdated thread response');
+      }
     } catch (e) {
-      emit(CommentError(e.toString()));
+      if (_currentDetailRequestId == reqId) {
+        emit(CommentError(e.toString()));
+      }
     }
   }
   
@@ -439,7 +449,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   Future<void> _onRefreshComments(RefreshComments event, Emitter<CommentState> emit) async {
     // Forcer le rechargement avec le filtrage des utilisateurs bloqués
     if (_currentThreadHierarchy.isNotEmpty) {
-      add(LoadCommentDetail(_currentThreadHierarchy.first.idComment, userId: event.userId));
+      add(LoadCommentDetail(_currentThreadHierarchy.first.idComment, userId: event.userId, requestId: DateTime.now().millisecondsSinceEpoch.toString()));
     } else {
       add(LoadMainComments(userId: event.userId));
     }

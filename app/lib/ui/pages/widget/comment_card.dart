@@ -133,160 +133,155 @@ class _CommentCardState extends State<CommentCard> with TickerProviderStateMixin
               _navigateToDetail(context);
             },
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
+                color: Colors.green[50],
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey[300]!,
+                    width: 1,
                   ),
-                ],
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header with user info and actions
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        // Avatar with gradient background
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => UserProfilePage(userId: comment.person.idPerson),
+                  Row(
+                    children: [
+                      // Avatar with gradient background
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserProfilePage(userId: comment.person.idPerson),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.green[400]!, Colors.green[600]!],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.green[300]!.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
-                            );
-                          },
-                          child: Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Colors.green[400]!, Colors.green[600]!],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              comment.person.firstname.isNotEmpty 
+                                  ? comment.person.firstname[0].toUpperCase()
+                                  : 'U',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
                               ),
-                              borderRadius: BorderRadius.circular(24),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.green[300]!.withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      // User information
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  comment.person.displayName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.grey[800],
+                                  ),
+                                ),
+                                if (comment.tag != null) ...[
+                                  const SizedBox(width: 8),
+                                  TagDisplayWidget(
+                                    tag: comment.tag!,
+                                    isSmall: true,
+                                  ),
+                                ],
+                                const SizedBox(width: 6),
+                                Text(
+                                  '· ${_formatTimeAgo(comment.createdAt)}',
+                                  style: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ],
                             ),
-                            child: Center(
-                              child: Text(
-                                comment.person.firstname.isNotEmpty 
-                                    ? comment.person.firstname[0].toUpperCase()
-                                    : 'U',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                          ),
+                          ],
                         ),
-                        const SizedBox(width: 16),
-                        // User information
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                      ),
+                      // Options menu
+                      if (isAuthenticated)
+                        PopupMenuButton<String>(
+                          onSelected: (value) {
+                            _handleMenuAction(context, value);
+                          },
+                          icon: Icon(
+                            Icons.more_vert,
+                            color: Colors.grey[600],
+                            size: 20,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 'report',
+                              child: Row(
                                 children: [
-                                  Text(
-                                    comment.person.displayName,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Colors.grey[800],
-                                    ),
-                                  ),
-                                  if (comment.tag != null) ...[
-                                    const SizedBox(width: 8),
-                                    TagDisplayWidget(
-                                      tag: comment.tag!,
-                                      isSmall: true,
-                                    ),
-                                  ],
+                                  Icon(Icons.flag, size: 18, color: Colors.red[600]),
+                                  const SizedBox(width: 12),
+                                  Text(localizations.report),
                                 ],
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _formatTimeAgo(comment.createdAt),
-                                style: TextStyle(
-                                  color: Colors.grey[500],
-                                  fontSize: 14,
+                            ),
+                            PopupMenuItem(
+                              value: 'block',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.block, size: 18, color: Colors.red[600]),
+                                  const SizedBox(width: 12),
+                                  Text(_isUserBlocked ? localizations.unblock : localizations.block),
+                                ],
+                              ),
+                            ),
+                            if (comment.person.idPerson == Provider.of<AuthProvider>(context, listen: false).currentUser?.idPerson)
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.delete, size: 18, color: Colors.red[600]),
+                                    const SizedBox(width: 12),
+                                    Text(localizations.delete),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                          ],
                         ),
-                        // Options menu
-                        if (isAuthenticated)
-                          PopupMenuButton<String>(
-                            onSelected: (value) {
-                              _handleMenuAction(context, value);
-                            },
-                            icon: Icon(
-                              Icons.more_vert,
-                              color: Colors.grey[600],
-                              size: 20,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                value: 'report',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.flag, size: 18, color: Colors.red[600]),
-                                    const SizedBox(width: 12),
-                                    Text(localizations.report),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
-                                value: 'block',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.block, size: 18, color: Colors.red[600]),
-                                    const SizedBox(width: 12),
-                                    Text(_isUserBlocked ? localizations.unblock : localizations.block),
-                                  ],
-                                ),
-                              ),
-                              if (comment.person.idPerson == Provider.of<AuthProvider>(context, listen: false).currentUser?.idPerson)
-                                PopupMenuItem(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.delete, size: 18, color: Colors.red[600]),
-                                      const SizedBox(width: 12),
-                                      Text(localizations.delete),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                      ],
-                    ),
+                    ],
                   ),
                   
                   // Content
                   if (comment.content.isNotEmpty) ...[
                                          Padding(
-                       padding: const EdgeInsets.symmetric(horizontal: 20),
+                       padding: const EdgeInsets.only(left: 64, right: 16),
                        child: MentionRichText(
                          text: comment.content,
                          mentions: comment.mentions,
@@ -305,23 +300,21 @@ class _CommentCardState extends State<CommentCard> with TickerProviderStateMixin
                          },
                        ),
                      ),
-                    const SizedBox(height: 16),
                   ],
                   
                   // Image if present
                   if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty) ...[
                                          Padding(
-                       padding: const EdgeInsets.symmetric(horizontal: 20),
+                       padding: const EdgeInsets.only(left: 64, right: 16),
                        child: CommentImageWidget(
                          imageUrl: comment.imageUrl!,
                        ),
                      ),
-                    const SizedBox(height: 16),
                   ],
                   
                   // Action buttons
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.only(left: 64, right: 16),
                     child: Row(
                       children: [
                                                  // Like button
@@ -333,20 +326,17 @@ class _CommentCardState extends State<CommentCard> with TickerProviderStateMixin
                            color: comment.isLikedByCurrentUser ? Colors.red[500]! : Colors.grey[600]!,
                            onTap: () => _handleLike(context),
                          ),
-                         const SizedBox(width: 24),
+                         const SizedBox(width: 16),
                          // Reply button
                          _buildActionButton(
-                           icon: Icons.reply,
+                           icon: Icons.mode_comment_outlined,
                            label: comment.replyCount > 0 ? comment.replyCount.toString() : '',
                            color: Colors.grey[600]!,
                            onTap: () => _handleReply(context),
                          ),
-
                       ],
                     ),
                   ),
-                  
-                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -362,30 +352,30 @@ class _CommentCardState extends State<CommentCard> with TickerProviderStateMixin
     required Color color,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 18, color: color),
-            if (label.isNotEmpty) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: color,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 6, bottom: 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18, color: color),
+              if (label.isNotEmpty) ...[
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: color,
+                  ),
                 ),
-              ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -451,8 +441,6 @@ class _CommentCardState extends State<CommentCard> with TickerProviderStateMixin
   
 
   void _handleMenuAction(BuildContext context, String action) {
-    final localizations = AppLocalizations.of(context)!;
-    
     switch (action) {
       case 'report':
         _handleReport(context);

@@ -25,7 +25,8 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
 
   void _loadThread() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    context.read<CommentBloc>().add(LoadCommentDetail(widget.commentId, userId: authProvider.userId));
+    final reqId = DateTime.now().millisecondsSinceEpoch.toString();
+    context.read<CommentBloc>().add(LoadCommentDetail(widget.commentId, userId: authProvider.userId, requestId: reqId));
   }
 
   void _handleLike(Comment comment) {
@@ -80,7 +81,7 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
           }
 
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.green[50],
             appBar: AppBar(
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,8 +105,9 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                     ),
                 ],
               ),
-              backgroundColor: Colors.white,
-              elevation: 0.5,
+              backgroundColor: Colors.green[50],
+              surfaceTintColor: Colors.green[50],
+              elevation: 0,
               iconTheme: const IconThemeData(color: Colors.black87),
               centerTitle: false,
             ),
@@ -117,6 +119,24 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
               child: Builder(
                 builder: (context) {
                   if (state is CommentLoading) {
+                    final cached = context.read<CommentBloc>().currentThreadHierarchy;
+                    if (cached.isNotEmpty) {
+                      return Stack(
+                        children: [
+                          ThreadView(
+                            threadHierarchy: cached,
+                            onLike: _handleLike,
+                            onReply: _handleReply,
+                          ),
+                          const Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: LinearProgressIndicator(minHeight: 2),
+                          ),
+                        ],
+                      );
+                    }
                     return Center(
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),

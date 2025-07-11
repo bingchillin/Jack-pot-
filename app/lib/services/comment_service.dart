@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import '../models/comment_model.dart';
 import '../app_config.dart';
@@ -230,7 +231,12 @@ class CommentService {
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
     }
-    final response = await http.get(url, headers: headers);
+    late http.Response response;
+    try {
+      response = await http.get(url, headers: headers).timeout(const Duration(seconds: 15));
+    } on TimeoutException {
+      throw Exception('Délai dépassé lors du chargement du post');
+    }
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
       return data.map((json) => Comment.fromJson(json)).toList();
