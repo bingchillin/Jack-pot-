@@ -342,16 +342,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noRecipeAvailable => 'Sin receta disponible';
 
   @override
-  String get minutesAgo => 'minutos';
+  String get minutesAgo => 'm';
 
   @override
-  String get hoursAgo => 'horas';
+  String get hoursAgo => 'h';
 
   @override
-  String get daysAgo => 'días';
+  String get daysAgo => 'd';
 
   @override
-  String get justNow => 'ahora mismo';
+  String get justNow => 'Ahora mismo';
 
   @override
   String get tomorrow => 'mañana';
@@ -360,7 +360,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get today => 'hoy';
 
   @override
-  String get loadingError => 'Error de Carga';
+  String get loadingError => 'Error de carga';
 
   @override
   String get stateExcellent => 'Excelente';
@@ -860,4 +860,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get addImageTooltip => 'Agregar imagen';
+
+  @override
+  String get threadTitle => 'Hilo de discusión';
+
+  @override
+  String get noComments => 'Sin comentarios';
+
+  @override
+  String get post => 'Publicación';
 }

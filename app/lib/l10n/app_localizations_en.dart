@@ -339,16 +339,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRecipeAvailable => 'No recipe available';
 
   @override
-  String get minutesAgo => 'minutes ago';
+  String get minutesAgo => 'm ago';
 
   @override
-  String get hoursAgo => 'hours ago';
+  String get hoursAgo => 'h ago';
 
   @override
-  String get daysAgo => 'days ago';
+  String get daysAgo => 'd ago';
 
   @override
-  String get justNow => 'just now';
+  String get justNow => 'Just now';
 
   @override
   String get tomorrow => 'tomorrow';
@@ -469,7 +469,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newPost => 'New Post';
 
   @override
-  String get retry => 'Retry';
+  String get retry => 'Try Again';
 
   @override
   String get loginToSeeFriends => 'Sign in to see your friends\' posts';
@@ -638,10 +638,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noData => 'No data';
 
   @override
-  String get loginToLike => 'Sign in to like';
+  String get loginToLike => 'Please login to like';
 
   @override
-  String get loginToReply => 'Sign in to reply';
+  String get loginToReply => 'Please login to reply';
 
   @override
   String get loginToReport => 'Sign in to report';
@@ -852,4 +852,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addImageTooltip => 'Add image';
+
+  @override
+  String get threadTitle => 'Discussion Thread';
+
+  @override
+  String get noComments => 'No comments yet';
+
+  @override
+  String get post => 'Post';
 }

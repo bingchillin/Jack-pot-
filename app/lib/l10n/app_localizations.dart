@@ -748,28 +748,28 @@ abstract class AppLocalizations {
   /// **'No recipe available'**
   String get noRecipeAvailable;
 
-  /// Minutes ago text
+  /// Minutes ago suffix for relative time
   ///
   /// In en, this message translates to:
-  /// **'minutes ago'**
+  /// **'m ago'**
   String get minutesAgo;
 
-  /// Hours ago text
+  /// Hours ago suffix for relative time
   ///
   /// In en, this message translates to:
-  /// **'hours ago'**
+  /// **'h ago'**
   String get hoursAgo;
 
-  /// Days ago text
+  /// Days ago suffix for relative time
   ///
   /// In en, this message translates to:
-  /// **'days ago'**
+  /// **'d ago'**
   String get daysAgo;
 
-  /// Just now text
+  /// Text shown for very recent times
   ///
   /// In en, this message translates to:
-  /// **'just now'**
+  /// **'Just now'**
   String get justNow;
 
   /// Tomorrow text
@@ -784,7 +784,7 @@ abstract class AppLocalizations {
   /// **'today'**
   String get today;
 
-  /// Loading error title
+  /// Error message when loading fails
   ///
   /// In en, this message translates to:
   /// **'Loading Error'**
@@ -1003,7 +1003,7 @@ abstract class AppLocalizations {
   /// Retry button text
   ///
   /// In en, this message translates to:
-  /// **'Retry'**
+  /// **'Try Again'**
   String get retry;
 
   /// Message when user needs to login to see friends' posts
@@ -1012,7 +1012,7 @@ abstract class AppLocalizations {
   /// **'Sign in to see your friends\' posts'**
   String get loginToSeeFriends;
 
-  /// Success message when comment is deleted
+  /// Message shown when a comment is deleted
   ///
   /// In en, this message translates to:
   /// **'Comment deleted'**
@@ -1300,16 +1300,16 @@ abstract class AppLocalizations {
   /// **'No data'**
   String get noData;
 
-  /// Message when user needs to login to like
+  /// Message shown when trying to like without being logged in
   ///
   /// In en, this message translates to:
-  /// **'Sign in to like'**
+  /// **'Please login to like'**
   String get loginToLike;
 
-  /// Message when user needs to login to reply
+  /// Message shown when trying to reply without being logged in
   ///
   /// In en, this message translates to:
-  /// **'Sign in to reply'**
+  /// **'Please login to reply'**
   String get loginToReply;
 
   /// Message when user needs to login to report
@@ -1701,6 +1701,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add image'**
   String get addImageTooltip;
+
+  /// Title of the thread page
+  ///
+  /// In en, this message translates to:
+  /// **'Discussion Thread'**
+  String get threadTitle;
+
+  /// Message shown when there are no comments
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet'**
+  String get noComments;
+
+  /// Label for a post in the thread view
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get post;
 }
 
 class _AppLocalizationsDelegate

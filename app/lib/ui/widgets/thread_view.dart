@@ -5,8 +5,8 @@ import 'tag_selector_widget.dart';
 import 'comment_options_menu.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/comment/comment_bloc.dart';
+import '../../l10n/app_localizations.dart';
 
 class ThreadView extends StatelessWidget {
   final List<Comment> threadHierarchy;
@@ -23,76 +23,250 @@ class ThreadView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (threadHierarchy.isEmpty) {
-      return const Center(
-        child: Text('Aucun commentaire à afficher'),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.chat_bubble_outline,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              AppLocalizations.of(context)!.noComments,
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       );
     }
 
-    return Column(
-      children: threadHierarchy.map((comment) => _buildCommentThread(comment)).toList(),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: threadHierarchy.length,
+      itemBuilder: (context, index) => _buildCommentThread(context, threadHierarchy[index]),
     );
   }
 
-  Widget _buildCommentThread(Comment comment) {
+  Widget _buildCommentThread(BuildContext context, Comment comment) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildComment(comment),
+        _buildComment(context, comment),
         if (comment.hasChildren)
-          ...comment.children.map((child) => _buildCommentThread(child)),
+          Container(
+            margin: const EdgeInsets.only(left: 32),
+            decoration: BoxDecoration(
+              border: Border(
+                left: BorderSide(
+                  color: Colors.green[100]!,
+                  width: 2,
+                ),
+              ),
+            ),
+            child: Column(
+              children: comment.children.map((child) => _buildCommentThread(context, child)).toList(),
+            ),
+          ),
       ],
     );
   }
 
-  Widget _buildComment(Comment comment) {
+  Widget _buildComment(BuildContext context, Comment comment) {
+    final isAuthenticated = Provider.of<AuthProvider>(context, listen: false).isAuthenticated;
+    final localizations = AppLocalizations.of(context)!;
+    
     return Container(
-      margin: EdgeInsets.only(
-        left: comment.level * 20.0, // Indentation par niveau
-        bottom: 12,
-        top: comment.level > 0 ? 8 : 16,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey[100]!,
+            width: 1,
+          ),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Ligne de connexion pour les réponses
-          if (comment.level > 0) _buildConnectionLine(comment.level),
-          
-          // Carte du commentaire
-          Expanded(
-            child: Card(
-              elevation: comment.level == 0 ? 2 : 1,
-              color: _getCommentColor(comment.level),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header du commentaire
-                    _buildCommentHeader(comment),
-                    const SizedBox(height: 12),
-                    
-                    // Contenu
-                    if (comment.content.isNotEmpty)
-                      Text(
-                        comment.content,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          height: 1.4,
-                        ),
-                      ),
-                    
-                    // Affichage de l'image si présente
-                    if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      CommentImageWidget(imageUrl: comment.imageUrl!),
-                    ],
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Actions
-                    _buildCommentActions(comment),
-                  ],
+          // Avatar
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green[200]!.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: 20,
+              backgroundColor: Colors.green[600],
+              child: Text(
+                comment.person.displayName.isNotEmpty 
+                  ? comment.person.displayName[0].toUpperCase()
+                  : 'U',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Author info
+                Row(
+                  children: [
+                    Text(
+                      comment.person.displayName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: Colors.grey[800],
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '· ${_formatTimeAgo(context, comment.createdAt)}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: Icon(
+                        Icons.more_horiz,
+                        color: Colors.grey[400],
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => CommentOptionsMenu(
+                            comment: comment,
+                            onDelete: () {
+                              Navigator.pop(context);
+                              context.read<CommentBloc>().add(DeleteComment(comment.idComment));
+                            },
+                          ),
+                        );
+                      },
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      splashRadius: 20,
+                    ),
+                  ],
+                ),
+                
+                // Tag if present
+                if (comment.tag != null && comment.level == 0) ...[
+                  const SizedBox(height: 4),
+                  TagDisplayWidget(
+                    tag: comment.tag!,
+                    isSmall: true,
+                  ),
+                ],
+                
+                // Content
+                const SizedBox(height: 8),
+                Text(
+                  comment.content,
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.4,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                
+                // Image if present
+                if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: CommentImageWidget(imageUrl: comment.imageUrl!),
+                    ),
+                  ),
+                ],
+                
+                // Actions
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    // Like button
+                    _buildActionButton(
+                      icon: comment.isLikedByCurrentUser 
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                      label: comment.likeCount.toString(),
+                      color: comment.isLikedByCurrentUser 
+                        ? Colors.red[400]!
+                        : Colors.grey[500]!,
+                      onTap: () {
+                        if (!isAuthenticated) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(localizations.loginToLike),
+                              backgroundColor: Colors.orange[600],
+                            ),
+                          );
+                          return;
+                        }
+                        if (onLike != null) onLike!(comment);
+                      },
+                    ),
+                    const SizedBox(width: 24),
+                    
+                    // Reply button
+                    _buildActionButton(
+                      icon: Icons.reply,
+                      label: localizations.reply,
+                      color: Colors.green[600]!,
+                      onTap: () {
+                        if (!isAuthenticated) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(localizations.loginToReply),
+                              backgroundColor: Colors.orange[600],
+                            ),
+                          );
+                          return;
+                        }
+                        if (onReply != null) onReply!(comment);
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -100,251 +274,56 @@ class ThreadView extends StatelessWidget {
     );
   }
 
-  Widget _buildConnectionLine(int level) {
-    return Container(
-      width: 3,
-      height: 60,
-      margin: const EdgeInsets.only(right: 12, top: 16),
-      decoration: BoxDecoration(
-        color: _getConnectionColor(level),
-        borderRadius: BorderRadius.circular(2),
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18, color: color),
+              if (label.isNotEmpty) ...[
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: color,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildCommentHeader(Comment comment) {
-    return Row(
-      children: [
-        // Avatar
-        CircleAvatar(
-          radius: 18,
-          backgroundColor: _getAvatarColor(comment.level),
-          child: Text(
-            comment.person.displayName.isNotEmpty 
-              ? comment.person.displayName[0].toUpperCase()
-              : 'U',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        
-        // Nom et informations
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    comment.person.displayName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  // Affichage du tag si présent (seulement pour les posts principaux)
-                  if (comment.tag != null && comment.level == 0) ...[
-                    const SizedBox(width: 8),
-                    TagDisplayWidget(
-                      tag: comment.tag!,
-                      isSmall: true,
-                    ),
-                  ],
-                  // Badge de niveau pour les réponses
-                  if (comment.level > 0) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _getLevelBadgeColor(comment.level),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        'Niveau ${comment.level}',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                _formatTimeAgo(comment.createdAt),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-        ),
-        
-        // Menu d'options
-        Builder(
-          builder: (context) {
-            final authProvider = Provider.of<AuthProvider>(context, listen: false);
-            final currentUserId = authProvider.currentUser?.idPerson;
-            
-            return CommentOptionsMenu(
-              comment: comment,
-              currentUserId: currentUserId,
-              onDelete: () {
-                context.read<CommentBloc>().add(DeleteComment(comment.idComment));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Commentaire supprimé'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCommentActions(Comment comment) {
-    return Row(
-      children: [
-        // Bouton Like
-        InkWell(
-          onTap: () => onLike?.call(comment),
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  comment.isLikedByCurrentUser ? Icons.favorite : Icons.favorite_border,
-                  size: 20,
-                  color: comment.isLikedByCurrentUser ? Colors.red : Colors.grey[600],
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  comment.likeCount.toString(),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        
-        // Bouton Reply (seulement si possible)
-        if (comment.canReply)
-          InkWell(
-            onTap: () => onReply?.call(comment),
-            borderRadius: BorderRadius.circular(20),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.reply,
-                    size: 20,
-                    color: Colors.blue[600],
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Répondre',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.blue[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        
-        // Indicateur de niveau max
-        if (!comment.canReply)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.orange[100],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              'Niveau maximum',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.orange[800],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  // Couleurs par niveau
-  Color _getCommentColor(int level) {
-    switch (level) {
-      case 0: return Colors.white;
-      case 1: return Colors.blue[50]!;
-      case 2: return Colors.green[50]!;
-      case 3: return Colors.orange[50]!;
-      default: return Colors.grey[50]!;
-    }
-  }
-
-  Color _getConnectionColor(int level) {
-    switch (level) {
-      case 1: return Colors.blue[400]!;
-      case 2: return Colors.green[400]!;
-      case 3: return Colors.orange[400]!;
-      default: return Colors.grey[400]!;
-    }
-  }
-
-  Color _getAvatarColor(int level) {
-    switch (level) {
-      case 0: return Colors.blue[600]!;
-      case 1: return Colors.blue[500]!;
-      case 2: return Colors.green[500]!;
-      case 3: return Colors.orange[500]!;
-      default: return Colors.grey[500]!;
-    }
-  }
-
-  Color _getLevelBadgeColor(int level) {
-    switch (level) {
-      case 1: return Colors.blue[600]!;
-      case 2: return Colors.green[600]!;
-      case 3: return Colors.orange[600]!;
-      default: return Colors.grey[600]!;
-    }
-  }
-
-  String _formatTimeAgo(DateTime dateTime) {
+  String _formatTimeAgo(BuildContext context, DateTime dateTime) {
+    final localizations = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final difference = now.difference(dateTime);
 
-    if (difference.inDays > 0) {
-      return 'Il y a ${difference.inDays}j';
+    if (difference.inDays > 7) {
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays}${localizations.daysAgo}';
     } else if (difference.inHours > 0) {
-      return 'Il y a ${difference.inHours}h';
+      return '${difference.inHours}${localizations.hoursAgo}';
     } else if (difference.inMinutes > 0) {
-      return 'Il y a ${difference.inMinutes}min';
+      return '${difference.inMinutes}${localizations.minutesAgo}';
     } else {
-      return 'À l\'instant';
+      return localizations.justNow;
     }
   }
 } 

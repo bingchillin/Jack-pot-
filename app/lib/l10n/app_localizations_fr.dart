@@ -341,16 +341,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noRecipeAvailable => 'Aucune recette disponible';
 
   @override
-  String get minutesAgo => 'minutes';
+  String get minutesAgo => 'min';
 
   @override
-  String get hoursAgo => 'heures';
+  String get hoursAgo => 'h';
 
   @override
-  String get daysAgo => 'jours';
+  String get daysAgo => 'j';
 
   @override
-  String get justNow => 'à l\'instant';
+  String get justNow => 'À l\'instant';
 
   @override
   String get tomorrow => 'demain';
@@ -359,7 +359,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get today => 'aujourd\'hui';
 
   @override
-  String get loadingError => 'Erreur de Chargement';
+  String get loadingError => 'Erreur de chargement';
 
   @override
   String get stateExcellent => 'Excellent';
@@ -862,4 +862,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get addImageTooltip => 'Ajouter une image';
+
+  @override
+  String get threadTitle => 'Fil de discussion';
+
+  @override
+  String get noComments => 'Aucun commentaire';
+
+  @override
+  String get post => 'Publication';
 }

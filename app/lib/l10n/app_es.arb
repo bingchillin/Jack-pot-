@@ -1454,5 +1454,70 @@
   "addImageTooltip": "Agregar imagen",
   "@addImageTooltip": {
     "description": "Add image tooltip"
+  },
+
+  "threadTitle": "Hilo de discusión",
+  "@threadTitle": {
+    "description": "Title of the thread page"
+  },
+
+  "noComments": "Sin comentarios",
+  "@noComments": {
+    "description": "Message shown when there are no comments"
+  },
+
+  "loadingError": "Error de carga",
+  "@loadingError": {
+    "description": "Error message when loading fails"
+  },
+
+  "retry": "Reintentar",
+  "@retry": {
+    "description": "Retry button text"
+  },
+
+  "commentDeleted": "Comentario eliminado",
+  "@commentDeleted": {
+    "description": "Message shown when a comment is deleted"
+  },
+
+  "reply": "Responder",
+  "@reply": {
+    "description": "Reply button text"
+  },
+
+  "loginToLike": "Inicia sesión para dar me gusta",
+  "@loginToLike": {
+    "description": "Message shown when trying to like without being logged in"
+  },
+
+  "loginToReply": "Inicia sesión para responder",
+  "@loginToReply": {
+    "description": "Message shown when trying to reply without being logged in"
+  },
+
+  "daysAgo": "d",
+  "@daysAgo": {
+    "description": "Days ago suffix for relative time"
+  },
+
+  "hoursAgo": "h",
+  "@hoursAgo": {
+    "description": "Hours ago suffix for relative time"
+  },
+
+  "minutesAgo": "m",
+  "@minutesAgo": {
+    "description": "Minutes ago suffix for relative time"
+  },
+
+  "justNow": "Ahora mismo",
+  "@justNow": {
+    "description": "Text shown for very recent times"
+  },
+
+  "post": "Publicación",
+  "@post": {
+    "description": "Label for a post in the thread view"
   }
 } 
