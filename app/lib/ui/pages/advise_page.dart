@@ -9,6 +9,7 @@ import '../../providers/auth_provider.dart';
 import '../widgets/feed_toggle_header.dart';
 import '../widgets/tag_filter_widget.dart';
 import '../../main.dart';
+import '../../l10n/app_localizations.dart';
 
 class AdvisePage extends StatefulWidget {
   const AdvisePage({super.key});
@@ -90,14 +91,15 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
     if (newFeed == _currentFeed) return;
     
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
     
     // Vérifier l'authentification pour le feed des amis
     if (newFeed == FeedType.friends && !authProvider.isAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Connectez-vous pour voir les posts de vos amis'),
+          content: Text(localizations.loginToSeeFriends),
           action: SnackBarAction(
-            label: 'Se connecter',
+            label: localizations.signIn,
             onPressed: () => Navigator.pushNamed(context, '/login'),
           ),
         ),
@@ -132,6 +134,8 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return BlocListener<CommentBloc, CommentState>(
       listener: (context, state) {
         if (state is CommentError) {
@@ -143,8 +147,8 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
           );
         } else if (state is CommentDeleted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Commentaire supprimé'),
+            SnackBar(
+              content: Text(localizations.commentDeleted),
               backgroundColor: Colors.green,
             ),
           );
@@ -158,18 +162,64 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
           },
           child: CustomScrollView(
             slivers: [
-              // App Bar avec titre
-              SliverAppBar(
-                floating: true,
-                pinned: true,
-                backgroundColor: Colors.white,
-                elevation: 0,
-                title: const Text(
-                  '💬 Forum Communautaire',
-                  style: TextStyle(
-                    fontFamily: '04B_30__',
-                    fontSize: 20,
-                    color: Colors.black87,
+              // Header avec titre et description
+              SliverToBoxAdapter(
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.green[50],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.forum,
+                              color: Colors.green[600],
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  localizations.commentsTitle,
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[800],
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  localizations.commentsSubtitle,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -212,7 +262,7 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'Erreur de chargement',
+                              localizations.loadingError,
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey.shade600,
@@ -231,7 +281,7 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                               onPressed: () {
                                 _loadCurrentFeed();
                               },
-                              child: const Text('Réessayer'),
+                              child: Text(localizations.retry),
                             ),
                           ],
                         ),
@@ -272,10 +322,10 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                             const SizedBox(height: 16),
                             Text(
                               _selectedTagFilter != TagFilter.all
-                                  ? 'Aucun post "${_selectedTagFilter.displayName}"'
+                                  ? localizations.noPostsFilter(_selectedTagFilter.getDisplayName(context))
                                   : (_currentFeed == FeedType.friends 
-                                      ? 'Aucun post de vos amis'
-                                      : 'Aucun post pour le moment'),
+                                      ? localizations.noPostsFriends
+                                      : localizations.noPostsYet),
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey.shade600,
@@ -284,10 +334,10 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                             const SizedBox(height: 8),
                             Text(
                               _selectedTagFilter != TagFilter.all
-                                  ? 'Essayez de changer le filtre ou créez un nouveau post'
+                                  ? localizations.tryDifferentFilter
                                   : (_currentFeed == FeedType.friends 
-                                      ? 'Vos amis n\'ont pas encore posté'
-                                      : 'Soyez le premier à partager !'),
+                                      ? localizations.friendsNotPosted
+                                      : localizations.beFirstToShare),
                               style: TextStyle(
                                 color: Colors.grey.shade500,
                               ),
@@ -301,7 +351,7 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                                     _selectedTagFilter = TagFilter.all;
                                   });
                                 },
-                                child: const Text('Afficher tous les posts'),
+                                child: Text(localizations.showAllPosts),
                               ),
                             ] else if (_currentFeed == FeedType.friends) ...[
                               const SizedBox(height: 16),
@@ -309,7 +359,7 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                                 onPressed: () {
                                   Navigator.pushNamed(context, '/friends-management');
                                 },
-                                child: const Text('Gérer mes amis'),
+                                child: Text(localizations.manageFriends),
                               ),
                             ],
                           ],
@@ -350,9 +400,9 @@ class _AdvisePageState extends State<AdvisePage> with RouteAware {
                   builder: (context) => const CreatePostModal(),
                 );
               },
-              backgroundColor: Colors.blue,
+              backgroundColor: Colors.green[600],
               child: const Icon(Icons.add_comment_rounded, color: Colors.white),
-              tooltip: 'Nouveau post',
+              tooltip: localizations.newPost,
             );
           },
         ),

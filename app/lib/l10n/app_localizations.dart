@@ -124,10 +124,10 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get password;
 
-  /// Sign in button text
+  /// Button to sign in
   ///
   /// In en, this message translates to:
-  /// **'Sign In'**
+  /// **'Sign in'**
   String get signIn;
 
   /// Forgot password link text
@@ -784,10 +784,10 @@ abstract class AppLocalizations {
   /// **'today'**
   String get today;
 
-  /// Loading error message
+  /// Loading error title
   ///
   /// In en, this message translates to:
-  /// **'Loading error'**
+  /// **'Loading Error'**
   String get loadingError;
 
   /// Excellent plant state
@@ -886,17 +886,137 @@ abstract class AppLocalizations {
   /// **'Remote plant control'**
   String get autoCareDesc;
 
-  /// Feature card title
+  /// Community section title
   ///
   /// In en, this message translates to:
   /// **'Community'**
   String get community;
 
-  /// Feature card description
+  /// Community section description
   ///
   /// In en, this message translates to:
   /// **'Share & learn together'**
   String get communityDesc;
+
+  /// Title for the comments/community page
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get commentsTitle;
+
+  /// Subtitle for the comments/community page
+  ///
+  /// In en, this message translates to:
+  /// **'Share & learn together'**
+  String get commentsSubtitle;
+
+  /// Feed toggle option for personalized content
+  ///
+  /// In en, this message translates to:
+  /// **'For You'**
+  String get feedForYou;
+
+  /// Feed toggle option for friends' content
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get feedFriends;
+
+  /// Label for category filter section
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by category'**
+  String get filterByCategory;
+
+  /// Filter option to show all posts
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// Filter option for conversation posts
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation'**
+  String get filterConversation;
+
+  /// Filter option for advice posts
+  ///
+  /// In en, this message translates to:
+  /// **'Advice'**
+  String get filterAdvice;
+
+  /// No posts message
+  ///
+  /// In en, this message translates to:
+  /// **'No posts yet'**
+  String get noPostsYet;
+
+  /// No posts from friends message
+  ///
+  /// In en, this message translates to:
+  /// **'Your friends haven\'t posted yet'**
+  String get noPostsFriends;
+
+  /// No posts in category message
+  ///
+  /// In en, this message translates to:
+  /// **'No posts in \"{category}\"'**
+  String noPostsFilter(String category);
+
+  /// Be first to share message
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to share!'**
+  String get beFirstToShare;
+
+  /// Friends not posted message
+  ///
+  /// In en, this message translates to:
+  /// **'Your friends haven\'t shared anything yet'**
+  String get friendsNotPosted;
+
+  /// Try different filter message
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different filter or be the first to share!'**
+  String get tryDifferentFilter;
+
+  /// Show all posts button text
+  ///
+  /// In en, this message translates to:
+  /// **'Show All Posts'**
+  String get showAllPosts;
+
+  /// Manage friends button text
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Friends'**
+  String get manageFriends;
+
+  /// New post button text
+  ///
+  /// In en, this message translates to:
+  /// **'New Post'**
+  String get newPost;
+
+  /// Retry button text
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// Message when user needs to login to see friends' posts
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to see your friends\' posts'**
+  String get loginToSeeFriends;
+
+  /// Success message when comment is deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Comment deleted'**
+  String get commentDeleted;
 
   /// Feature card title
   ///
@@ -1119,6 +1239,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please check your plant\'s overall health and environment.'**
   String get notificationAdviceGeneral;
+
+  /// Like button text
+  ///
+  /// In en, this message translates to:
+  /// **'Like'**
+  String get like;
+
+  /// Unlike button text
+  ///
+  /// In en, this message translates to:
+  /// **'Unlike'**
+  String get unlike;
+
+  /// Reply button text
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get reply;
+
+  /// Share button text
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// Edit button text
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// Delete button text
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// Report button text
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get report;
+
+  /// Block button text
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get block;
+
+  /// Unblock button text
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get unblock;
+
+  /// Thread discussion page title
+  ///
+  /// In en, this message translates to:
+  /// **'Thread Discussion'**
+  String get threadDiscussion;
+
+  /// No data message
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get noData;
+
+  /// Message when user needs to login to like
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to like'**
+  String get loginToLike;
+
+  /// Message when user needs to login to reply
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to reply'**
+  String get loginToReply;
+
+  /// Message when user needs to login to report
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to report'**
+  String get loginToReport;
+
+  /// Message when user needs to login to delete
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to delete'**
+  String get loginToDelete;
+
+  /// Delete confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this post?'**
+  String get deleteConfirmation;
+
+  /// Delete post button text
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Post'**
+  String get deletePost;
+
+  /// Success message when post is deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Post deleted'**
+  String get postDeleted;
+
+  /// Edit post button text
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Post'**
+  String get editPost;
+
+  /// Success message when post is updated
+  ///
+  /// In en, this message translates to:
+  /// **'Post updated'**
+  String get postUpdated;
+
+  /// Error message when post update fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating post'**
+  String get postUpdateError;
+
+  /// Create post button text
+  ///
+  /// In en, this message translates to:
+  /// **'Create Post'**
+  String get createPost;
+
+  /// Post content placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s on your mind?'**
+  String get postContent;
+
+  /// Add image button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add Image'**
+  String get addImage;
+
+  /// Remove image button text
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Image'**
+  String get removeImage;
+
+  /// Success message when post is created
+  ///
+  /// In en, this message translates to:
+  /// **'Post created successfully!'**
+  String get postCreated;
+
+  /// Error message when post creation fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating post'**
+  String get postCreationError;
+
+  /// Select category label
+  ///
+  /// In en, this message translates to:
+  /// **'Select Category'**
+  String get selectCategory;
+
+  /// Conversation category
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation'**
+  String get conversation;
+
+  /// Advice category
+  ///
+  /// In en, this message translates to:
+  /// **'Advice'**
+  String get advice;
+
+  /// Replies count text
+  ///
+  /// In en, this message translates to:
+  /// **'Replies'**
+  String get replies;
+
+  /// View replies button text
+  ///
+  /// In en, this message translates to:
+  /// **'View replies'**
+  String get viewReplies;
+
+  /// Hide replies button text
+  ///
+  /// In en, this message translates to:
+  /// **'Hide replies'**
+  String get hideReplies;
+
+  /// No replies message
+  ///
+  /// In en, this message translates to:
+  /// **'No replies yet'**
+  String get noReplies;
+
+  /// Encouragement to be first to reply
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to reply!'**
+  String get beFirstToReply;
+
+  /// User blocked message
+  ///
+  /// In en, this message translates to:
+  /// **'User blocked'**
+  String get userBlocked;
+
+  /// Block user button text
+  ///
+  /// In en, this message translates to:
+  /// **'Block User'**
+  String get blockUser;
+
+  /// Unblock user button text
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock User'**
+  String get unblockUser;
+
+  /// Report post button text
+  ///
+  /// In en, this message translates to:
+  /// **'Report Post'**
+  String get reportPost;
+
+  /// Report reason label
+  ///
+  /// In en, this message translates to:
+  /// **'Report Reason'**
+  String get reportReason;
+
+  /// Inappropriate content report reason
+  ///
+  /// In en, this message translates to:
+  /// **'Inappropriate content'**
+  String get inappropriateContent;
+
+  /// Spam report reason
+  ///
+  /// In en, this message translates to:
+  /// **'Spam'**
+  String get spam;
+
+  /// Harassment report reason
+  ///
+  /// In en, this message translates to:
+  /// **'Harassment'**
+  String get harassment;
+
+  /// Other report reason
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get other;
+
+  /// Report submitted success message
+  ///
+  /// In en, this message translates to:
+  /// **'Report submitted'**
+  String get reportSubmitted;
+
+  /// Report submission error message
+  ///
+  /// In en, this message translates to:
+  /// **'Error submitting report'**
+  String get reportError;
+
+  /// Delete post confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this post?'**
+  String get deletePostConfirmation;
+
+  /// Report post confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to report this post?'**
+  String get reportPostConfirmation;
+
+  /// Post reported success message
+  ///
+  /// In en, this message translates to:
+  /// **'Post reported successfully'**
+  String get postReported;
+
+  /// Block user confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to block this user?'**
+  String get blockUserConfirmation;
+
+  /// Unblock user confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to unblock this user?'**
+  String get unblockUserConfirmation;
+
+  /// User already blocked message
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is already blocked'**
+  String userAlreadyBlocked(String name);
+
+  /// User blocked success message
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has been blocked'**
+  String userBlockedSuccess(String name);
+
+  /// User unblocked success message
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has been unblocked'**
+  String userUnblockedSuccess(String name);
+
+  /// User not blocked message
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is not blocked'**
+  String userNotBlocked(String name);
+
+  /// Block user error message
+  ///
+  /// In en, this message translates to:
+  /// **'Error blocking user'**
+  String get blockError;
+
+  /// Unblock user error message
+  ///
+  /// In en, this message translates to:
+  /// **'Error unblocking user'**
+  String get unblockError;
+
+  /// Empty content validation message
+  ///
+  /// In en, this message translates to:
+  /// **'Please write something'**
+  String get writeSomething;
+
+  /// Loading replies message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading replies...'**
+  String get loadingReplies;
+
+  /// Error loading replies message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading replies'**
+  String get errorLoadingReplies;
+
+  /// Delete reply confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this reply?'**
+  String get deleteReplyConfirmation;
+
+  /// Delete reply button text
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Reply'**
+  String get deleteReply;
+
+  /// Reply deleted success message
+  ///
+  /// In en, this message translates to:
+  /// **'Reply deleted successfully'**
+  String get replyDeleted;
+
+  /// Reply delete error message
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting reply'**
+  String get replyDeleteError;
+
+  /// Reply to reply coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Reply to reply functionality coming soon!'**
+  String get replyToReply;
+
+  /// Edit reply coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Edit reply functionality coming soon!'**
+  String get editReply;
+
+  /// Login required dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Login Required'**
+  String get loginRequired;
+
+  /// Login required message
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in to {action} this reply and participate in the community.'**
+  String loginRequiredMessage(String action);
+
+  /// Later button text
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get later;
+
+  /// Redirecting to login message
+  ///
+  /// In en, this message translates to:
+  /// **'Redirecting to login page...'**
+  String get redirectingToLogin;
+
+  /// Connect button text
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get connect;
+
+  /// Authentication token missing message
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication token missing'**
+  String get authTokenMissing;
+
+  /// Like error message
+  ///
+  /// In en, this message translates to:
+  /// **'Error liking reply'**
+  String get likeError;
+
+  /// Delete error message
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting reply'**
+  String get deleteError;
+
+  /// Image selected message
+  ///
+  /// In en, this message translates to:
+  /// **'Image selected'**
+  String get imageSelected;
+
+  /// Remove image tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Remove image'**
+  String get removeImageTooltip;
+
+  /// Add image tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Add image'**
+  String get addImageTooltip;
 }
 
 class _AppLocalizationsDelegate

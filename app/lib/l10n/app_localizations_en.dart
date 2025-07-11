@@ -21,7 +21,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get password => 'Password';
 
   @override
-  String get signIn => 'Sign In';
+  String get signIn => 'Sign in';
 
   @override
   String get forgotPassword => 'Forgot password?';
@@ -357,7 +357,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get today => 'today';
 
   @override
-  String get loadingError => 'Loading error';
+  String get loadingError => 'Loading Error';
 
   @override
   String get stateExcellent => 'Excellent';
@@ -413,6 +413,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get communityDesc => 'Share & learn together';
+
+  @override
+  String get commentsTitle => 'Community';
+
+  @override
+  String get commentsSubtitle => 'Share & learn together';
+
+  @override
+  String get feedForYou => 'For You';
+
+  @override
+  String get feedFriends => 'Friends';
+
+  @override
+  String get filterByCategory => 'Filter by category';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterConversation => 'Conversation';
+
+  @override
+  String get filterAdvice => 'Advice';
+
+  @override
+  String get noPostsYet => 'No posts yet';
+
+  @override
+  String get noPostsFriends => 'Your friends haven\'t posted yet';
+
+  @override
+  String noPostsFilter(String category) {
+    return 'No posts in \"$category\"';
+  }
+
+  @override
+  String get beFirstToShare => 'Be the first to share!';
+
+  @override
+  String get friendsNotPosted => 'Your friends haven\'t shared anything yet';
+
+  @override
+  String get tryDifferentFilter =>
+      'Try a different filter or be the first to share!';
+
+  @override
+  String get showAllPosts => 'Show All Posts';
+
+  @override
+  String get manageFriends => 'Manage Friends';
+
+  @override
+  String get newPost => 'New Post';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get loginToSeeFriends => 'Sign in to see your friends\' posts';
+
+  @override
+  String get commentDeleted => 'Comment deleted';
 
   @override
   String get healthAnalytics => 'Health Analytics';
@@ -543,4 +606,250 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationAdviceGeneral =>
       'Please check your plant\'s overall health and environment.';
+
+  @override
+  String get like => 'Like';
+
+  @override
+  String get unlike => 'Unlike';
+
+  @override
+  String get reply => 'Reply';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get report => 'Report';
+
+  @override
+  String get block => 'Block';
+
+  @override
+  String get unblock => 'Unblock';
+
+  @override
+  String get threadDiscussion => 'Thread Discussion';
+
+  @override
+  String get noData => 'No data';
+
+  @override
+  String get loginToLike => 'Sign in to like';
+
+  @override
+  String get loginToReply => 'Sign in to reply';
+
+  @override
+  String get loginToReport => 'Sign in to report';
+
+  @override
+  String get loginToDelete => 'Sign in to delete';
+
+  @override
+  String get deleteConfirmation => 'Are you sure you want to delete this post?';
+
+  @override
+  String get deletePost => 'Delete Post';
+
+  @override
+  String get postDeleted => 'Post deleted';
+
+  @override
+  String get editPost => 'Edit Post';
+
+  @override
+  String get postUpdated => 'Post updated';
+
+  @override
+  String get postUpdateError => 'Error updating post';
+
+  @override
+  String get createPost => 'Create Post';
+
+  @override
+  String get postContent => 'What\'s on your mind?';
+
+  @override
+  String get addImage => 'Add Image';
+
+  @override
+  String get removeImage => 'Remove Image';
+
+  @override
+  String get postCreated => 'Post created successfully!';
+
+  @override
+  String get postCreationError => 'Error creating post';
+
+  @override
+  String get selectCategory => 'Select Category';
+
+  @override
+  String get conversation => 'Conversation';
+
+  @override
+  String get advice => 'Advice';
+
+  @override
+  String get replies => 'Replies';
+
+  @override
+  String get viewReplies => 'View replies';
+
+  @override
+  String get hideReplies => 'Hide replies';
+
+  @override
+  String get noReplies => 'No replies yet';
+
+  @override
+  String get beFirstToReply => 'Be the first to reply!';
+
+  @override
+  String get userBlocked => 'User blocked';
+
+  @override
+  String get blockUser => 'Block User';
+
+  @override
+  String get unblockUser => 'Unblock User';
+
+  @override
+  String get reportPost => 'Report Post';
+
+  @override
+  String get reportReason => 'Report Reason';
+
+  @override
+  String get inappropriateContent => 'Inappropriate content';
+
+  @override
+  String get spam => 'Spam';
+
+  @override
+  String get harassment => 'Harassment';
+
+  @override
+  String get other => 'Other';
+
+  @override
+  String get reportSubmitted => 'Report submitted';
+
+  @override
+  String get reportError => 'Error submitting report';
+
+  @override
+  String get deletePostConfirmation =>
+      'Are you sure you want to delete this post?';
+
+  @override
+  String get reportPostConfirmation =>
+      'Are you sure you want to report this post?';
+
+  @override
+  String get postReported => 'Post reported successfully';
+
+  @override
+  String get blockUserConfirmation =>
+      'Are you sure you want to block this user?';
+
+  @override
+  String get unblockUserConfirmation =>
+      'Are you sure you want to unblock this user?';
+
+  @override
+  String userAlreadyBlocked(String name) {
+    return '$name is already blocked';
+  }
+
+  @override
+  String userBlockedSuccess(String name) {
+    return '$name has been blocked';
+  }
+
+  @override
+  String userUnblockedSuccess(String name) {
+    return '$name has been unblocked';
+  }
+
+  @override
+  String userNotBlocked(String name) {
+    return '$name is not blocked';
+  }
+
+  @override
+  String get blockError => 'Error blocking user';
+
+  @override
+  String get unblockError => 'Error unblocking user';
+
+  @override
+  String get writeSomething => 'Please write something';
+
+  @override
+  String get loadingReplies => 'Loading replies...';
+
+  @override
+  String get errorLoadingReplies => 'Error loading replies';
+
+  @override
+  String get deleteReplyConfirmation =>
+      'Are you sure you want to delete this reply?';
+
+  @override
+  String get deleteReply => 'Delete Reply';
+
+  @override
+  String get replyDeleted => 'Reply deleted successfully';
+
+  @override
+  String get replyDeleteError => 'Error deleting reply';
+
+  @override
+  String get replyToReply => 'Reply to reply functionality coming soon!';
+
+  @override
+  String get editReply => 'Edit reply functionality coming soon!';
+
+  @override
+  String get loginRequired => 'Login Required';
+
+  @override
+  String loginRequiredMessage(String action) {
+    return 'Please sign in to $action this reply and participate in the community.';
+  }
+
+  @override
+  String get later => 'Later';
+
+  @override
+  String get redirectingToLogin => 'Redirecting to login page...';
+
+  @override
+  String get connect => 'Connect';
+
+  @override
+  String get authTokenMissing => 'Authentication token missing';
+
+  @override
+  String get likeError => 'Error liking reply';
+
+  @override
+  String get deleteError => 'Error deleting reply';
+
+  @override
+  String get imageSelected => 'Image selected';
+
+  @override
+  String get removeImageTooltip => 'Remove image';
+
+  @override
+  String get addImageTooltip => 'Add image';
 }

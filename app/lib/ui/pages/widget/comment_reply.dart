@@ -1,177 +1,412 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-import '../../../bloc/comment/comment_list_bloc.dart';
-import '../../../bloc/comment/comment_replies_bloc.dart';
-import '../../../bloc/comment/comment_replies_event.dart';
-import '../../../bloc/comment/comment_replies_state.dart';
+import 'package:flutter/services.dart';
 import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
-import '../../../services/comment_service.dart';
-import 'edit_comment_modal.dart';
+import 'package:provider/provider.dart';
+import 'create_reply_modal.dart';
+import 'comment_options_menu.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../bloc/comment/comment_bloc.dart';
+import '../../../l10n/app_localizations.dart';
 
-class CommentReply extends StatelessWidget {
-  final Comment comment;
-
+class CommentReply extends StatefulWidget {
+  final Comment reply;
+  final Comment parentComment;
+  final VoidCallback? onDelete;
+  final VoidCallback? onReport;
+  final VoidCallback? onBlockUser;
+  final bool isUserBlocked;
+  
   const CommentReply({
-    Key? key,
-    required this.comment,
-  }) : super(key: key);
+    super.key,
+    required this.reply,
+    required this.parentComment,
+    this.onDelete,
+    this.onReport,
+    this.onBlockUser,
+    this.isUserBlocked = false,
+  });
+
+  @override
+  State<CommentReply> createState() => _CommentReplyState();
+}
+
+class _CommentReplyState extends State<CommentReply> with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _fadeAnimation;
+  bool _isLiked = false;
+  int _likeCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Initialize with comment data
+    _isLiked = widget.reply.isLikedByCurrentUser;
+    _likeCount = widget.reply.likeCount;
+    
+    // Initialize animations
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _slideAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    ));
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    ));
+    
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // En-tête de la réponse
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.green.shade100,
-                child: Text(
-                  comment.person.firstname[0].toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.green.shade700,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+    final localizations = AppLocalizations.of(context)!;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final isCurrentUserReply = authProvider.currentUser?.idPerson == widget.reply.person.idPerson;
+    
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(20 * (1 - _slideAnimation.value), 0),
+          child: Opacity(
+            opacity: _fadeAnimation.value,
+            child: Container(
+              margin: const EdgeInsets.only(left: 40, top: 8, bottom: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey[200]!),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      comment.person.displayName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        // User avatar
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.green[400]!, Colors.green[600]!],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Center(
+                            child: Text(
+                              widget.reply.person.firstname.isNotEmpty
+                                  ? widget.reply.person.firstname[0].toUpperCase()
+                                  : 'U',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(width: 12),
+                        
+                        // User info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.reply.person.displayName,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                              Text(
+                                _formatTimeAgo(widget.reply.createdAt),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        // Options menu
+                        if (authProvider.isAuthenticated)
+                          GestureDetector(
+                            onTap: () => _showOptionsMenu(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Icon(
+                                Icons.more_horiz,
+                                size: 20,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                    Text(
-                      _formatTimeAgo(comment.createdAt),
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Menu options pour les réponses
-              if (comment.idPerson == _getCurrentUserId(context))
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_horiz, color: Colors.grey.shade600, size: 16),
-                  onSelected: (value) {
-                    if (value == 'delete') {
-                      _showDeleteDialog(context);
-                    } else if (value == 'edit') {
-                      _showEditModal(context);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit, color: Colors.blue, size: 16),
-                          SizedBox(width: 8),
-                          Text('Modifier', style: TextStyle(color: Colors.blue, fontSize: 12)),
+                  ),
+                  
+                  // Content
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Reply text
+                        Text(
+                          widget.reply.content,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey[800],
+                            height: 1.4,
+                          ),
+                        ),
+                        
+                        // Image (if any)
+                        if (widget.reply.imageUrl != null) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            width: double.infinity,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                widget.reply.imageUrl!,
+                                width: double.infinity,
+                                height: 150,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                         ],
-                      ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Actions
+                        Row(
+                          children: [
+                            // Like button
+                            _buildActionButton(
+                              icon: _isLiked ? Icons.favorite : Icons.favorite_border,
+                              label: _likeCount > 0 ? _likeCount.toString() : '',
+                              color: _isLiked ? Colors.red[500]! : Colors.grey[600]!,
+                              onTap: () => _handleLike(context),
+                            ),
+                            
+                            const SizedBox(width: 20),
+                            
+                            // Reply button
+                            _buildActionButton(
+                              icon: Icons.reply,
+                              label: '',
+                              color: Colors.grey[600]!,
+                              onTap: () => _handleReply(context),
+                            ),
+                            
+                            const SizedBox(width: 20),
+                            
+                            // Share button
+                            _buildActionButton(
+                              icon: Icons.share,
+                              label: '',
+                              color: Colors.grey[600]!,
+                              onTap: () => _handleShare(context),
+                            ),
+                            
+                            const Spacer(),
+                            
+                            // Edit indicator
+                            if (widget.reply.updatedAt != null && 
+                                widget.reply.updatedAt!.isAfter(widget.reply.createdAt))
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'edited',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[500],
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
                     ),
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete, color: Colors.red, size: 16),
-                          SizedBox(width: 8),
-                          Text('Supprimer', style: TextStyle(color: Colors.red, fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-            ],
+                  ),
+                  
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: 8),
-          // Contenu de la réponse
-          Text(
-            comment.content,
-            style: const TextStyle(fontSize: 14, height: 1.3),
-          ),
-          const SizedBox(height: 8),
-          // Actions de la réponse
-          Row(
-            children: [
-              // Bouton Like
-              GestureDetector(
-                onTap: () {
-                  if (!_isUserAuthenticated(context)) {
-                    _showAuthRequiredDialog(context, 'liker');
-                    return;
-                  }
-                  _handleLike(context);
-                },
-                child: Row(
-                  children: [
-                    Icon(
-                      comment.isLikedByCurrentUser ? Icons.favorite : Icons.favorite_border,
-                      color: comment.isLikedByCurrentUser ? Colors.red : Colors.grey.shade600,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      comment.likeCount.toString(),
-                      style: TextStyle(
-                        color: comment.isLikedByCurrentUser ? Colors.red : Colors.grey.shade600,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+        );
+      },
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: color,
+            ),
+            if (label.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: color,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(width: 16),
-              // Bouton Reply (pour répondre à une réponse)
-              GestureDetector(
-                onTap: () {
-                  if (!_isUserAuthenticated(context)) {
-                    _showAuthRequiredDialog(context, 'répondre');
-                    return;
-                  }
-                  _showReplyToReplyModal(context);
-                },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.chat_bubble_outline,
-                      color: Colors.grey.shade600,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      comment.replyCount.toString(),
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleLike(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    if (!authProvider.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please log in to like comments'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    setState(() {
+      _isLiked = !_isLiked;
+      _likeCount += _isLiked ? 1 : -1;
+    });
+    
+    // Haptic feedback
+    HapticFeedback.lightImpact();
+    
+    // Send like event
+    context.read<CommentBloc>().add(
+      LikeComment(
+        widget.reply.idComment,
+        authProvider.currentUser!.idPerson.toString(),
+      ),
+    );
+  }
+
+  void _handleReply(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    if (!authProvider.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please log in to reply'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CreateReplyModal(parentComment: widget.reply),
+    );
+  }
+
+  void _handleShare(BuildContext context) {
+    final shareText = '${widget.reply.person.displayName}: ${widget.reply.content}';
+    
+    // For now, just copy to clipboard
+    Clipboard.setData(ClipboardData(text: shareText));
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Reply copied to clipboard'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showOptionsMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CommentOptionsMenu(
+        comment: widget.reply,
+        onDelete: widget.onDelete,
+        onReport: widget.onReport,
+        onBlockUser: widget.onBlockUser,
+        isUserBlocked: widget.isUserBlocked,
       ),
     );
   }
@@ -179,164 +414,15 @@ class CommentReply extends StatelessWidget {
   String _formatTimeAgo(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-
+    
     if (difference.inDays > 0) {
-      return 'Il y a ${difference.inDays}j';
+      return '${difference.inDays}d';
     } else if (difference.inHours > 0) {
-      return 'Il y a ${difference.inHours}h';
+      return '${difference.inHours}h';
     } else if (difference.inMinutes > 0) {
-      return 'Il y a ${difference.inMinutes}min';
+      return '${difference.inMinutes}m';
     } else {
-      return 'À l\'instant';
-    }
-  }
-
-  int _getCurrentUserId(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final userIdStr = authProvider.userId;
-    if (userIdStr != null) {
-      return int.tryParse(userIdStr) ?? 0;
-    }
-    return 0;
-  }
-
-  bool _isUserAuthenticated(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    return authProvider.isAuthenticated;
-  }
-
-  void _showDeleteDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Supprimer la réponse'),
-        content: const Text('Êtes-vous sûr de vouloir supprimer cette réponse ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          TextButton(
-            onPressed: () {
-              _handleDelete(context);
-              Navigator.pop(context);
-            },
-            child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showReplyToReplyModal(BuildContext context) {
-    // TODO: Implémenter la modal pour répondre à une réponse
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Fonctionnalité de réponse à une réponse à venir !')),
-    );
-  }
-
-  void _showEditModal(BuildContext context) {
-    // TODO: Implémenter la modal pour éditer une réponse
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Fonctionnalité d\'édition d\'une réponse à venir !')),
-    );
-  }
-
-  void _showAuthRequiredDialog(BuildContext context, String action) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Connexion requise'),
-        content: Text('Connectez-vous pour $action cette réponse et participer à la communauté.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Plus tard'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Navigation vers la page de connexion
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Redirection vers la page de connexion...'),
-                  backgroundColor: Colors.blue,
-                ),
-              );
-            },
-            child: const Text('Se connecter', style: TextStyle(color: Colors.blue)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _handleLike(BuildContext context) async {
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final token = authProvider.accessToken;
-      if (token == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Token d\'authentification manquant'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      final commentService = CommentService();
-      final userId = authProvider.userId;
-      await commentService.toggleLike(comment.idComment, token, userId!);
-      // Rafraîchir les réponses du parent
-      final parentCommentId = comment.parentCommentId;
-      if (parentCommentId != null) {
-        context.read<CommentRepliesBloc>().add(RefreshReplies(parentCommentId));
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur lors du like: \\${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  Future<void> _handleDelete(BuildContext context) async {
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final token = authProvider.accessToken;
-      if (token == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Token d\'authentification manquant'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      final commentService = CommentService();
-      await commentService.deleteComment(comment.idComment, token);
-      // Rafraîchir les réponses du parent
-      final parentCommentId = comment.parentCommentId;
-      if (parentCommentId != null) {
-        context.read<CommentRepliesBloc>().add(RefreshReplies(parentCommentId));
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Réponse supprimée avec succès'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur lors de la suppression: \\${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      return 'now';
     }
   }
 } 

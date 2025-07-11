@@ -1,272 +1,486 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import '../../../bloc/comment/comment_bloc.dart';
 import '../../../providers/auth_provider.dart';
-import '../../../services/upload_service.dart';
-import '../../widgets/simple_image_picker_widget.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/tag_selector_widget.dart';
-import '../../widgets/mention_text_field.dart';
+import '../../widgets/robust_image_picker_widget.dart';
+import '../../../l10n/app_localizations.dart';
 
 class CreatePostModal extends StatefulWidget {
-  const CreatePostModal({Key? key}) : super(key: key);
+  const CreatePostModal({super.key});
 
   @override
   State<CreatePostModal> createState() => _CreatePostModalState();
 }
 
-class _CreatePostModalState extends State<CreatePostModal> {
-  final TextEditingController _controller = TextEditingController();
-  bool _isSubmitting = false;
-  File? _selectedImage;
-  bool _isUploadingImage = false;
+class _CreatePostModalState extends State<CreatePostModal> with TickerProviderStateMixin {
+  final TextEditingController _contentController = TextEditingController();
+  String? _selectedImagePath;
   String? _selectedTag;
+  bool _isSubmitting = false;
+  late AnimationController _animationController;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    // Vérifier l'authentification au démarrage
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_isUserAuthenticated(context)) {
-        Navigator.pop(context);
-        _showAuthRequiredSnackBar(context);
-      }
-    });
+    
+    // Initialize animations
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    
+    _slideAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    ));
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    ));
+    
+    _animationController.forward();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _contentController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<CommentBloc, CommentState>(
-      listener: (context, state) {
-        if (state is CommentCreated) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Post publié !')),
-          );
-        } else if (state is CommentError) {
-          setState(() {
-            _isSubmitting = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur: ${state.message}')),
-          );
-        }
-      },
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            // En-tête de la modal
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+    final localizations = AppLocalizations.of(context)!;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, 100 * _slideAnimation.value),
+          child: Opacity(
+            opacity: _fadeAnimation.value,
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.8,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      'Nouveau post',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  // Header
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ),
-                  TextButton(
-                    onPressed: (_isSubmitting || _isUploadingImage) ? null : _submitPost,
-                    child: (_isSubmitting || _isUploadingImage)
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text(
-                          'Publier',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: Icon(
+                            Icons.close,
+                            color: Colors.grey[600],
+                            size: 24,
                           ),
                         ),
+                        const SizedBox(width: 16),
+                        Text(
+                          localizations.createPost,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        const Spacer(),
+                        if (_isSubmitting)
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+                            ),
+                          )
+                        else
+                          TextButton(
+                            onPressed: _canSubmit() ? _submitPost : null,
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.green[600],
+                              disabledForegroundColor: Colors.grey[400],
+                            ),
+                                                         child: Text(
+                               'Post',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Content
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // User info
+                          Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [Colors.green[400]!, Colors.green[600]!],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Center(
+                                                                     child: Text(
+                                     authProvider.firstName?.isNotEmpty == true
+                                         ? authProvider.firstName![0].toUpperCase()
+                                         : 'U',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                                                     Text(
+                                     authProvider.firstName ?? 'User',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey[800],
+                                    ),
+                                  ),
+                                  Text(
+                                    'Now',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          
+                          const SizedBox(height: 24),
+                          
+                          // Content text field
+                          TextField(
+                            controller: _contentController,
+                            maxLines: 8,
+                            maxLength: 1000,
+                            decoration: InputDecoration(
+                              hintText: localizations.postContent,
+                              hintStyle: TextStyle(
+                                color: Colors.grey[400],
+                                fontSize: 16,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(color: Colors.grey[300]!),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(color: Colors.grey[300]!),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(color: Colors.green[600]!, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                              contentPadding: const EdgeInsets.all(16),
+                            ),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[800],
+                              height: 1.5,
+                            ),
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                          ),
+                          
+                          const SizedBox(height: 20),
+                          
+                          // Image picker
+                          if (_selectedImagePath != null) ...[
+                            Container(
+                              width: double.infinity,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Image.asset(
+                                      _selectedImagePath!,
+                                      width: double.infinity,
+                                      height: 200,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedImagePath = null;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withValues(alpha: 0.7),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                          
+                          // Action buttons
+                          Row(
+                            children: [
+                              // Image picker button
+                              GestureDetector(
+                                onTap: _pickImage,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.blue[200]!),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.image,
+                                        color: Colors.blue[600],
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        localizations.addImage,
+                                        style: TextStyle(
+                                          color: Colors.blue[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              
+                              const SizedBox(width: 12),
+                              
+                              // Tag selector
+                              Expanded(
+                                child: TagSelectorWidget(
+                                  selectedTag: _selectedTag,
+                                  onTagSelected: (tag) {
+                                    setState(() {
+                                      _selectedTag = tag;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          
+                          const SizedBox(height: 20),
+                          
+                          // Character count
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${_contentController.text.length}/1000',
+                                style: TextStyle(
+                                  color: _contentController.text.length > 900 
+                                      ? Colors.orange[600] 
+                                      : Colors.grey[500],
+                                  fontSize: 14,
+                                ),
+                              ),
+                              if (_selectedTag != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: _getTagColor(_selectedTag!).withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: _getTagColor(_selectedTag!).withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    _getTagDisplayName(_selectedTag!),
+                                    style: TextStyle(
+                                      color: _getTagColor(_selectedTag!),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            // Zone de saisie
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    const Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.blue,
-                          child: Icon(Icons.person, color: Colors.white),
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          'Partagez votre expérience...',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Sélecteur de tag
-                    TagSelectorWidget(
-                      selectedTag: _selectedTag,
-                      onTagSelected: (tag) {
-                        setState(() {
-                          _selectedTag = tag;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      child: Consumer<AuthProvider>(
-                        builder: (context, authProvider, child) {
-                          return MentionTextField(
-                            controller: _controller,
-                            token: authProvider.accessToken ?? '',
-                            hintText: 'Que souhaitez-vous partager avec la communauté ?\n\nConseils, questions, expériences...\n\nUtilisez @ pour mentionner des utilisateurs',
-                            maxLines: null,
-                            currentUserId: authProvider.currentUser?.idPerson,
-                          );
-                        },
-                      ),
-                    ),
-                    // Widget de sélection d'image (avec fallback)
-                    SimpleImagePickerWidget(
-                      onImageSelected: (File? image) {
-                        setState(() {
-                          _selectedImage = image;
-                        });
-                      },
-                      initialImage: _selectedImage,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  bool _isUserAuthenticated(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    return authProvider.isAuthenticated;
+  bool _canSubmit() {
+    return _contentController.text.trim().isNotEmpty && !_isSubmitting;
   }
 
-  void _showAuthRequiredSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Connectez-vous pour créer un post'),
-        backgroundColor: Colors.orange,
-        action: SnackBarAction(
-          label: 'Se connecter',
-          textColor: Colors.white,
-          onPressed: (){
-            Navigator.pushNamed(context, '/login');
-          },
-        ),
-      ),
-    );
+  void _pickImage() async {
+         final result = await showModalBottomSheet<String>(
+       context: context,
+       builder: (context) => RobustImagePickerWidget(
+         onImageSelected: (file) {
+           // Handle the selected image file
+           if (file != null) {
+             setState(() {
+               _selectedImagePath = file.path;
+             });
+           }
+         },
+       ),
+     );
+    
+    if (result != null) {
+      setState(() {
+        _selectedImagePath = result;
+      });
+    }
   }
 
   void _submitPost() async {
-    if (!_isUserAuthenticated(context)) {
-      _showAuthRequiredSnackBar(context);
-      return;
-    }
-
-    final content = _controller.text.trim();
-    if (content.isEmpty && _selectedImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez écrire quelque chose ou ajouter une image')),
-      );
-      return;
-    }
-
+    if (!_canSubmit()) return;
+    
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
+    
     setState(() {
       _isSubmitting = true;
     });
-
+    
     try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      String? imageUrl;
-      
-      // Upload de l'image si sélectionnée
-      if (_selectedImage != null) {
-        setState(() {
-          _isUploadingImage = true;
-        });
-        
-        final uploadService = UploadService();
-        imageUrl = await uploadService.uploadImage(
-          _selectedImage!,
-          token: authProvider.accessToken,
-        );
-        
-        setState(() {
-          _isUploadingImage = false;
-        });
-      }
-
-      // Créer le commentaire avec ou sans image et avec le tag sélectionné
       context.read<CommentBloc>().add(
         CreateComment(
-          content,
-          imageUrl: imageUrl,
+          _contentController.text.trim(),
+          imageUrl: _selectedImagePath,
           tag: _selectedTag,
           userId: authProvider.currentUser!.idPerson.toString(),
         ),
       );
       
-      // Fermer la modal après la création
-      Navigator.pop(context);
-      
-      // Réinitialiser l'état
-      setState(() {
-        _isSubmitting = false;
-        _isUploadingImage = false;
-        _selectedImage = null;
-        _selectedTag = null;
-        _controller.clear();
-      });
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(localizations.postCreated),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
-      setState(() {
-        _isSubmitting = false;
-        _isUploadingImage = false;
-      });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur lors de l\'upload: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(localizations.postCreationError),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  Color _getTagColor(String tag) {
+    switch (tag.toLowerCase()) {
+      case 'conversation':
+        return Colors.blue[600]!;
+      case 'advice':
+        return Colors.green[600]!;
+      default:
+        return Colors.grey[600]!;
+    }
+  }
+
+  String _getTagDisplayName(String tag) {
+    final localizations = AppLocalizations.of(context)!;
+    switch (tag.toLowerCase()) {
+      case 'conversation':
+        return localizations.conversation;
+      case 'advice':
+        return localizations.advice;
+      default:
+        return tag;
     }
   }
 } 

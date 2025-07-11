@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 enum TagFilter { all, conversation, conseil }
 
@@ -14,6 +15,8 @@ class TagFilterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -37,7 +40,7 @@ class TagFilterWidget extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Filtrer par catégorie',
+                localizations.filterByCategory,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -52,21 +55,21 @@ class TagFilterWidget extends StatelessWidget {
             child: Row(
               children: [
                 _buildFilterChip(
-                  label: 'Tous',
+                  label: localizations.filterAll,
                   filter: TagFilter.all,
                   icon: Icons.all_inclusive,
                   color: Colors.grey.shade600,
                 ),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                  label: 'Conversation',
+                  label: localizations.filterConversation,
                   filter: TagFilter.conversation,
                   icon: Icons.chat_bubble_outline,
                   color: Colors.blue,
                 ),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                  label: 'Conseil',
+                  label: localizations.filterAdvice,
                   filter: TagFilter.conseil,
                   icon: Icons.lightbulb_outline,
                   color: Colors.green,
@@ -145,14 +148,15 @@ extension TagFilterExtension on TagFilter {
     }
   }
   
-  String get displayName {
+  String getDisplayName(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     switch (this) {
       case TagFilter.all:
-        return 'Tous';
+        return localizations.filterAll;
       case TagFilter.conversation:
-        return 'Conversation';
+        return localizations.filterConversation;
       case TagFilter.conseil:
-        return 'Conseil';
+        return localizations.filterAdvice;
     }
   }
 } 

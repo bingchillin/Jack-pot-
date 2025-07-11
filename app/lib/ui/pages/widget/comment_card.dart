@@ -13,6 +13,7 @@ import '../../widgets/comment_image_widget.dart';
 import '../../widgets/tag_selector_widget.dart';
 import '../../widgets/flag_reason_dialog.dart';
 import '../../widgets/user_mention_suggestions.dart';
+import '../../../l10n/app_localizations.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
@@ -30,15 +31,48 @@ class CommentCard extends StatefulWidget {
   State<CommentCard> createState() => _CommentCardState();
 }
 
-class _CommentCardState extends State<CommentCard> {
+class _CommentCardState extends State<CommentCard> with TickerProviderStateMixin {
   late Comment _currentComment;
   bool _isUserBlocked = false;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     _currentComment = widget.comment;
     _checkIfUserIsBlocked();
+    
+    // Initialize animations
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _scaleAnimation = Tween<double>(
+      begin: 0.95,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutBack,
+    ));
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    ));
+    
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -57,10 +91,10 @@ class _CommentCardState extends State<CommentCard> {
     if (token != null && currentUserId != null) {
       try {
         final contactService = ContactService();
-              final existingContact = await contactService.getContactStatus(
-        userId: _currentComment.person.idPerson,
-        token: token,
-      );
+        final existingContact = await contactService.getContactStatus(
+          userId: _currentComment.person.idPerson,
+          token: token,
+        );
         
         if (mounted) {
           setState(() {
@@ -77,7 +111,7 @@ class _CommentCardState extends State<CommentCard> {
   Widget build(BuildContext context) {
     final comment = _currentComment;
     final isAuthenticated = Provider.of<AuthProvider>(context, listen: false).isAuthenticated;
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
     
     return BlocListener<CommentBloc, CommentState>(
       listener: (context, state) {
@@ -90,253 +124,275 @@ class _CommentCardState extends State<CommentCard> {
           });
         }
       },
-      child: GestureDetector(
-        onTap: () {
-          _navigateToDetail(context);
-        },
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 3,
-                offset: const Offset(0, 1),
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: GestureDetector(
+            onTap: () {
+              _navigateToDetail(context);
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // En-tête du commentaire
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    // Avatar
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserProfilePage(userId: comment.person.idPerson),
-                          ),
-                        );
-                      },
-                      child: CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.blue.shade100,
-                        child: Text(
-                          comment.person.firstname.isNotEmpty 
-                              ? comment.person.firstname[0].toUpperCase()
-                              : 'U',
-                          style: TextStyle(
-                            color: Colors.blue.shade700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Informations utilisateur
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                comment.person.displayName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              if (comment.tag != null) ...[
-                                const SizedBox(width: 8),
-                                TagDisplayWidget(
-                                  tag: comment.tag!,
-                                  isSmall: true,
-                                ),
-                              ],
-                            ],
-                          ),
-                          Text(
-                            _formatTimeAgo(comment.createdAt),
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Menu d'options
-                    if (isAuthenticated)
-                      PopupMenuButton<String>(
-                        onSelected: (value) {
-                          _handleMenuAction(context, value);
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'report',
-                            child: Row(
-                              children: [
-                                Icon(Icons.flag, size: 18, color: Colors.red.shade600),
-                                const SizedBox(width: 8),
-                                const Text('Signaler'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'block',
-                            child: Row(
-                              children: [
-                                Icon(Icons.block, size: 18, color: Colors.red.shade600),
-                                const SizedBox(width: 8),
-                                Text(_isUserBlocked ? 'Débloquer' : 'Bloquer'),
-                              ],
-                            ),
-                          ),
-                          if (authProvider.currentUser?.idPerson == comment.person.idPerson)
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete, size: 18, color: Colors.red.shade600),
-                                  const SizedBox(width: 8),
-                                  const Text('Supprimer'),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-              // Contenu du commentaire
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (comment.content.isNotEmpty)
-                      MentionRichText(
-                        text: comment.content,
-                        mentions: comment.mentions,
-                        textStyle: const TextStyle(fontSize: 16, height: 1.4),
-                        onMentionTap: (userId) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => UserProfilePage(userId: userId),
-                            ),
-                          );
-                        },
-                      ),
-                    // Affichage de l'image si présente
-                    if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty)
-                      CommentImageWidget(imageUrl: comment.imageUrl!),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Ligne d'actions
-              Padding(
-                padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Bouton répondre
-                    Stack(
-                      alignment: Alignment.center,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header with user info and actions
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.chat_bubble_outline, color: Colors.blue),
-                          tooltip: 'Répondre',
-                          color: isAuthenticated ? Colors.blue : Colors.grey.shade400,
-                          onPressed: isAuthenticated
-                              ? () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                    ),
-                                    builder: (context) => CreateReplyModal(parentComment: _currentComment),
-                                  );
-                                }
-                              : () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Connectez-vous pour répondre')),
-                                  );
-                                },
-                        ),
-                        if (comment.replyCount > 0)
-                          Positioned(
-                            right: 4,
-                            top: 8,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: BorderRadius.circular(10),
+                        // Avatar with gradient background
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserProfilePage(userId: comment.person.idPerson),
                               ),
+                            );
+                          },
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.green[400]!, Colors.green[600]!],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.green[300]!.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Center(
                               child: Text(
-                                '${comment.replyCount}',
+                                comment.person.firstname.isNotEmpty 
+                                    ? comment.person.firstname[0].toUpperCase()
+                                    : 'U',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 18,
                                 ),
                               ),
                             ),
                           ),
+                        ),
+                        const SizedBox(width: 16),
+                        // User information
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    comment.person.displayName,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      color: Colors.grey[800],
+                                    ),
+                                  ),
+                                  if (comment.tag != null) ...[
+                                    const SizedBox(width: 8),
+                                    TagDisplayWidget(
+                                      tag: comment.tag!,
+                                      isSmall: true,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _formatTimeAgo(comment.createdAt),
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Options menu
+                        if (isAuthenticated)
+                          PopupMenuButton<String>(
+                            onSelected: (value) {
+                              _handleMenuAction(context, value);
+                            },
+                            icon: Icon(
+                              Icons.more_vert,
+                              color: Colors.grey[600],
+                              size: 20,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                value: 'report',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.flag, size: 18, color: Colors.red[600]),
+                                    const SizedBox(width: 12),
+                                    Text(localizations.report),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: 'block',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.block, size: 18, color: Colors.red[600]),
+                                    const SizedBox(width: 12),
+                                    Text(_isUserBlocked ? localizations.unblock : localizations.block),
+                                  ],
+                                ),
+                              ),
+                              if (comment.person.idPerson == Provider.of<AuthProvider>(context, listen: false).currentUser?.idPerson)
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.delete, size: 18, color: Colors.red[600]),
+                                      const SizedBox(width: 12),
+                                      Text(localizations.delete),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
                       ],
                     ),
-                    const SizedBox(width: 8),
-                    // Bouton like
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            comment.isLikedByCurrentUser ? Icons.favorite : Icons.favorite_border,
-                            color: comment.isLikedByCurrentUser ? Colors.red : Colors.grey.shade600,
-                            size: 22,
-                          ),
-                          tooltip: comment.isLikedByCurrentUser ? 'Retirer le like' : 'Liker',
-                          onPressed: isAuthenticated
-                              ? () {
-                                  context.read<CommentBloc>().add(
-                                    LikeComment(comment.idComment, authProvider.currentUser!.idPerson.toString()),
-                                  );
-                                  widget.onLikeChanged?.call();
-                                }
-                              : () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Connectez-vous pour liker')),
-                                  );
-                                },
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          '${comment.likeCount}',
-                          style: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
+                  ),
+                  
+                  // Content
+                  if (comment.content.isNotEmpty) ...[
+                                         Padding(
+                       padding: const EdgeInsets.symmetric(horizontal: 20),
+                       child: MentionRichText(
+                         text: comment.content,
+                         mentions: comment.mentions,
+                         textStyle: TextStyle(
+                           fontSize: 16,
+                           color: Colors.grey[800],
+                           height: 1.5,
+                         ),
+                         onMentionTap: (userId) {
+                           Navigator.push(
+                             context,
+                             MaterialPageRoute(
+                               builder: (context) => UserProfilePage(userId: userId),
+                             ),
+                           );
+                         },
+                       ),
+                     ),
+                    const SizedBox(height: 16),
                   ],
+                  
+                  // Image if present
+                  if (comment.imageUrl != null && comment.imageUrl!.isNotEmpty) ...[
+                                         Padding(
+                       padding: const EdgeInsets.symmetric(horizontal: 20),
+                       child: CommentImageWidget(
+                         imageUrl: comment.imageUrl!,
+                       ),
+                     ),
+                    const SizedBox(height: 16),
+                  ],
+                  
+                  // Action buttons
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                                                 // Like button
+                         _buildActionButton(
+                           icon: comment.isLikedByCurrentUser 
+                               ? Icons.favorite 
+                               : Icons.favorite_border,
+                           label: comment.likeCount > 0 ? comment.likeCount.toString() : '',
+                           color: comment.isLikedByCurrentUser ? Colors.red[500]! : Colors.grey[600]!,
+                           onTap: () => _handleLike(context),
+                         ),
+                         const SizedBox(width: 24),
+                         // Reply button
+                         _buildActionButton(
+                           icon: Icons.reply,
+                           label: comment.replyCount > 0 ? comment.replyCount.toString() : '',
+                           color: Colors.grey[600]!,
+                           onTap: () => _handleReply(context),
+                         ),
+                         const SizedBox(width: 24),
+                         // Share button
+                         _buildActionButton(
+                           icon: Icons.share,
+                           label: '',
+                           color: Colors.grey[600]!,
+                           onTap: () => _handleShare(context),
+                         ),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: color),
+            if (label.isNotEmpty) ...[
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: color,
                 ),
               ),
             ],
-          ),
+          ],
         ),
       ),
     );
@@ -351,400 +407,375 @@ class _CommentCardState extends State<CommentCard> {
     );
   }
 
-  void _handleMenuAction(BuildContext context, String action) {
-    switch (action) {
-      case 'block':
-        _showBlockUserDialog(context);
-        break;
-      case 'unblock':
-        _showUnblockUserDialog(context);
-        break;
-      case 'report':
-        _showReportDialog(context);
-        break;
-      case 'delete':
-        _showDeleteDialog(context);
-        break;
-    }
-  }
-
-  void _showBlockUserDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Bloquer cet utilisateur'),
-        content: Text(
-          'Êtes-vous sûr de vouloir bloquer ${_currentComment.person.displayName} ?\n\n'
-          'Vous ne verrez plus ses commentaires et il ne pourra plus vous contacter.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _blockUser(context);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Bloquer'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showUnblockUserDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Débloquer cet utilisateur'),
-        content: Text(
-          'Êtes-vous sûr de vouloir débloquer ${_currentComment.person.displayName} ?\n\n'
-          'Vous pourrez à nouveau voir ses commentaires et il pourra vous contacter.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _unblockUser(context);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.green),
-            child: const Text('Débloquer'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showReportDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => FlagReasonDialog(
-        onFlag: (reason, details) {
-          _flagComment(context, reason, details);
-        },
-      ),
-    );
-  }
-
-  Future<void> _flagComment(BuildContext context, String reason, String? details) async {
+  void _handleLike(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final token = authProvider.accessToken;
-    final userId = authProvider.currentUser?.idPerson;
-    
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
-    if (token == null || userId == null) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text('Vous devez être connecté pour signaler un commentaire')),
-      );
-      return;
-    }
-
-    try {
-      final commentFlagService = CommentFlagService();
-      final result = await commentFlagService.flagComment(
-        commentId: _currentComment.idComment,
-        idPerson: userId,
-        reason: reason,
-        details: details,
-        token: token,
-      );
-      
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('Commentaire signalé (${result['flagCount']} signalement${result['flagCount'] > 1 ? 's' : ''})'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('Erreur: ${e.toString().replaceAll('Exception: ', '')}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  void _showDeleteDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Supprimer le commentaire'),
-        content: const Text(
-          'Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action est irréversible.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _deleteComment(context);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Supprimer'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _deleteComment(BuildContext context) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final commentBloc = context.read<CommentBloc>();
+    final localizations = AppLocalizations.of(context)!;
     
     if (!authProvider.isAuthenticated) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text('Vous devez être connecté pour supprimer un commentaire')),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(localizations.loginToLike),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
 
-    try {
-      commentBloc.add(DeleteComment(_currentComment.idComment));
+         context.read<CommentBloc>().add(
+       LikeComment(
+         _currentComment.idComment,
+         authProvider.currentUser!.idPerson.toString(),
+       ),
+     );
+  }
+
+  void _handleReply(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
+    
+    if (!authProvider.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(localizations.loginToReply),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => CreateReplyModal(
+        parentComment: _currentComment,
+      ),
+    );
+  }
+
+  void _handleShare(BuildContext context) {
+    // Implement share functionality
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Share functionality coming soon!'),
+        backgroundColor: Colors.blue,
+      ),
+    );
+  }
+
+  void _handleMenuAction(BuildContext context, String action) {
+    final localizations = AppLocalizations.of(context)!;
+    
+    switch (action) {
+      case 'report':
+        _handleReport(context);
+        break;
+      case 'block':
+        _handleBlock(context);
+        break;
+      case 'delete':
+        _handleDelete(context);
+        break;
+    }
+  }
+
+  void _handleReport(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
+    
+    if (!authProvider.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(localizations.loginToReport),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+         showDialog(
+       context: context,
+       builder: (context) => FlagReasonDialog(
+         onFlag: (reason, details) {
+           _flagComment(context, reason, details);
+         },
+       ),
+     );
+  }
+
+  void _handleBlock(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
+    
+    if (authProvider.accessToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(localizations.authTokenMissing),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(_isUserBlocked ? localizations.unblockUser : localizations.blockUser),
+        content: Text(
+          _isUserBlocked 
+              ? localizations.unblockUserConfirmation
+              : localizations.blockUserConfirmation,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(localizations.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _performBlockAction(context);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: Text(_isUserBlocked ? localizations.unblock : localizations.block),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleDelete(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
+    
+    if (!authProvider.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(localizations.loginToDelete),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(localizations.deletePost),
+        content: Text(localizations.deletePostConfirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(localizations.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _performDelete(context);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: Text(localizations.delete),
+          ),
+        ],
+      ),
+    );
+  }
+
+     Future<void> _flagComment(BuildContext context, String reason, String? details) async {
+     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+     final localizations = AppLocalizations.of(context)!;
+     
+     try {
+       final commentFlagService = CommentFlagService();
+       final result = await commentFlagService.flagComment(
+         commentId: _currentComment.idComment,
+         idPerson: authProvider.currentUser!.idPerson,
+         reason: reason,
+         details: details,
+         token: authProvider.accessToken!,
+       );
+       
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+           content: Text(localizations.reportSubmitted),
+           backgroundColor: Colors.green,
+         ),
+       );
+     } catch (e) {
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+           content: Text(localizations.reportError),
+           backgroundColor: Colors.red,
+         ),
+       );
+     }
+   }
+
+   Future<void> _performBlockAction(BuildContext context) async {
+     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+     final localizations = AppLocalizations.of(context)!;
+     
+     try {
+       final contactService = ContactService();
+       
+       // First get the contact status to get the contact ID
+       final existingContact = await contactService.getContactStatus(
+         userId: _currentComment.person.idPerson,
+         token: authProvider.accessToken!,
+       );
+       
+       if (_isUserBlocked) {
+         if (existingContact != null) {
+           await contactService.unblockUser(
+             contactId: existingContact.id,
+             token: authProvider.accessToken!,
+           );
+         }
+         
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(
+             content: Text(localizations.userUnblockedSuccess(_currentComment.person.displayName)),
+             backgroundColor: Colors.green,
+           ),
+         );
+       } else {
+         if (existingContact != null) {
+           await contactService.blockUser(
+             contactId: existingContact.id,
+             token: authProvider.accessToken!,
+           );
+         } else {
+           // Create contact and block
+           final newContact = await contactService.sendFriendRequest(
+             receiverId: _currentComment.person.idPerson,
+             token: authProvider.accessToken!,
+           );
+           await contactService.blockUser(
+             contactId: newContact.id,
+             token: authProvider.accessToken!,
+           );
+         }
+         
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(
+             content: Text(localizations.userBlockedSuccess(_currentComment.person.displayName)),
+             backgroundColor: Colors.green,
+           ),
+         );
+       }
+       
+       setState(() {
+         _isUserBlocked = !_isUserBlocked;
+       });
+     } catch (e) {
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+           content: Text(_isUserBlocked ? localizations.unblockError : localizations.blockError),
+           backgroundColor: Colors.red,
+         ),
+       );
+     }
+   }
+
+  Future<void> _performDelete(BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
+    
+         try {
+       context.read<CommentBloc>().add(
+         DeleteComment(_currentComment.idComment),
+       );
       
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Commentaire supprimé'),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(localizations.postDeleted),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
-      scaffoldMessenger.showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erreur lors de la suppression: ${e.toString()}'),
+          content: Text('Error: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
-    }
-  }
-
-  Future<void> _blockUser(BuildContext context) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final token = authProvider.accessToken;
-    final userId = authProvider.currentUser?.idPerson.toString();
-    
-    // Stocker les références avant les opérations async
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final commentBloc = context.read<CommentBloc>();
-    
-    if (token == null) {
-      if (mounted) {
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text('Erreur: Token non disponible')),
-        );
-      }
-      return;
-    }
-
-    try {
-      // Créer ou mettre à jour la relation de contact pour bloquer
-      final contactService = ContactService();
-      
-      // D'abord, vérifier s'il y a déjà une relation
-      final existingContact = await contactService.getContactStatus(
-        userId: _currentComment.person.idPerson,
-        token: token,
-      );
-
-      bool isAlreadyBlocked = false;
-
-      if (existingContact != null) {
-        if (existingContact.isBlocked) {
-          // L'utilisateur est déjà bloqué
-          isAlreadyBlocked = true;
-        } else {
-          // Bloquer la relation existante
-          await contactService.blockUser(
-            contactId: existingContact.id,
-            token: token,
-          );
-        }
-      } else {
-        // Envoyer d'abord une demande puis la bloquer immédiatement
-        try {
-          final newContact = await contactService.sendFriendRequest(
-            receiverId: _currentComment.person.idPerson,
-            token: token,
-          );
-          
-          await contactService.blockUser(
-            contactId: newContact.id,
-            token: token,
-          );
-        } catch (requestError) {
-          // Si on ne peut pas envoyer la demande car l'utilisateur est déjà bloqué
-          if (requestError.toString().contains('user is blocked')) {
-            isAlreadyBlocked = true;
-          } else {
-            rethrow; // Re-lancer l'erreur si c'est autre chose
-          }
-        }
-      }
-
-      if (mounted) {
-        if (isAlreadyBlocked) {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text('${_currentComment.person.displayName} est déjà bloqué'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        } else {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text('${_currentComment.person.displayName} a été bloqué'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-
-        // Attendre un peu pour que le blocage soit effectif côté serveur
-        await Future.delayed(const Duration(milliseconds: 500));
-
-        // Recharger les commentaires pour faire disparaître ceux de l'utilisateur bloqué
-        commentBloc.add(LoadMainComments(userId: userId));
-      }
-
-    } catch (e) {
-      print('Error blocking user: $e');
-      if (mounted) {
-                  // Vérifier si l'utilisateur est déjà bloqué
-          if (e.toString().contains('user is blocked') || e.toString().contains('403')) {
-            scaffoldMessenger.showSnackBar(
-              SnackBar(
-                content: Text('${_currentComment.person.displayName} est déjà bloqué'),
-                backgroundColor: Colors.orange,
-              ),
-            );
-            // Recharger quand même pour actualiser la liste
-            await Future.delayed(const Duration(milliseconds: 500));
-            commentBloc.add(LoadMainComments(userId: userId));
-        } else {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text('Erreur lors du blocage: ${e.toString()}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  Future<void> _unblockUser(BuildContext context) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final token = authProvider.accessToken;
-    final userId = authProvider.currentUser?.idPerson.toString();
-    
-    // Stocker les références avant les opérations async
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final commentBloc = context.read<CommentBloc>();
-    
-    if (token == null) {
-      if (mounted) {
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text('Erreur: Token non disponible')),
-        );
-      }
-      return;
-    }
-
-    try {
-      final contactService = ContactService();
-      
-      // Récupérer le contact existant
-      final existingContact = await contactService.getContactStatus(
-        userId: _currentComment.person.idPerson,
-        token: token,
-      );
-
-      if (existingContact != null && existingContact.isBlocked) {
-        // Débloquer l'utilisateur
-        await contactService.unblockUser(
-          contactId: existingContact.id,
-          token: token,
-        );
-
-        // Le backend change automatiquement le status en ACCEPTED après déblocage
-        // Pour éviter que l'utilisateur devienne ami automatiquement, on supprime la relation
-        try {
-          await contactService.removeContact(
-            contactId: existingContact.id,
-            token: token,
-          );
-          print('🧹 Contact relation removed after unblock to avoid auto-friendship');
-        } catch (removeError) {
-          print('Warning: Could not remove contact after unblock: $removeError');
-          // Continue même si la suppression échoue
-        }
-
-        if (mounted) {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text('${_currentComment.person.displayName} a été débloqué'),
-              backgroundColor: Colors.green,
-            ),
-          );
-
-          // Mettre à jour l'état local
-          setState(() {
-            _isUserBlocked = false;
-          });
-
-          // Attendre un peu pour que le déblocage soit effectif côté serveur
-          await Future.delayed(const Duration(milliseconds: 500));
-          
-          // Recharger les commentaires (toujours avec des données fraîches)
-          commentBloc.add(LoadMainComments(userId: userId));
-        }
-      } else {
-        if (mounted) {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text('${_currentComment.person.displayName} n\'est pas bloqué'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-      }
-
-    } catch (e) {
-      print('Error unblocking user: $e');
-      if (mounted) {
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text('Erreur lors du déblocage: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
     }
   }
 
   String _formatTimeAgo(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-
+    
     if (difference.inDays > 0) {
-      return 'Il y a ${difference.inDays}j';
+      return '${difference.inDays}d';
     } else if (difference.inHours > 0) {
-      return 'Il y a ${difference.inHours}h';
+      return '${difference.inHours}h';
     } else if (difference.inMinutes > 0) {
-      return 'Il y a ${difference.inMinutes}min';
+      return '${difference.inMinutes}m';
     } else {
-      return 'À l\'instant';
+      return 'now';
     }
+  }
+}
+
+class TagDisplayWidget extends StatelessWidget {
+  final String tag;
+  final bool isSmall;
+
+  const TagDisplayWidget({
+    super.key,
+    required this.tag,
+    this.isSmall = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
+    Color tagColor;
+    String displayText;
+    
+    switch (tag.toLowerCase()) {
+      case 'conversation':
+        tagColor = Colors.blue[600]!;
+        displayText = localizations.conversation;
+        break;
+      case 'advice':
+        tagColor = Colors.green[600]!;
+        displayText = localizations.advice;
+        break;
+      default:
+        tagColor = Colors.grey[600]!;
+        displayText = tag;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmall ? 8 : 12,
+        vertical: isSmall ? 4 : 6,
+      ),
+      decoration: BoxDecoration(
+        color: tagColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(isSmall ? 12 : 16),
+        border: Border.all(
+          color: tagColor.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        displayText,
+        style: TextStyle(
+          fontSize: isSmall ? 11 : 12,
+          fontWeight: FontWeight.w600,
+          color: tagColor,
+        ),
+      ),
+    );
   }
 } 

@@ -668,12 +668,106 @@
 
   "community": "Community",
   "@community": {
-    "description": "Feature card title"
+    "description": "Community section title"
   },
-
   "communityDesc": "Share & learn together",
   "@communityDesc": {
-    "description": "Feature card description"
+    "description": "Community section description"
+  },
+
+  "commentsTitle": "Community",
+  "@commentsTitle": {
+    "description": "Title for the comments/community page"
+  },
+  "commentsSubtitle": "Share & learn together",
+  "@commentsSubtitle": {
+    "description": "Subtitle for the comments/community page"
+  },
+  "feedForYou": "For You",
+  "@feedForYou": {
+    "description": "Feed toggle option for personalized content"
+  },
+  "feedFriends": "Friends",
+  "@feedFriends": {
+    "description": "Feed toggle option for friends' content"
+  },
+  "filterByCategory": "Filter by category",
+  "@filterByCategory": {
+    "description": "Label for category filter section"
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Filter option to show all posts"
+  },
+  "filterConversation": "Conversation",
+  "@filterConversation": {
+    "description": "Filter option for conversation posts"
+  },
+  "filterAdvice": "Advice",
+  "@filterAdvice": {
+    "description": "Filter option for advice posts"
+  },
+  "noPostsYet": "No posts yet",
+  "@noPostsYet": {
+    "description": "Message when there are no posts to show"
+  },
+  "noPostsFriends": "No posts from your friends",
+  "@noPostsFriends": {
+    "description": "Message when there are no posts from friends"
+  },
+  "noPostsFilter": "No posts in \"{category}\"",
+  "@noPostsFilter": {
+    "description": "Message when there are no posts for a specific filter",
+    "placeholders": {
+      "category": {
+        "type": "String",
+        "example": "Conversation"
+      }
+    }
+  },
+  "beFirstToShare": "Be the first to share!",
+  "@beFirstToShare": {
+    "description": "Encouragement message to create first post"
+  },
+  "friendsNotPosted": "Your friends haven't posted yet",
+  "@friendsNotPosted": {
+    "description": "Message when friends haven't posted"
+  },
+  "tryDifferentFilter": "Try changing the filter or create a new post",
+  "@tryDifferentFilter": {
+    "description": "Suggestion when no posts match filter"
+  },
+  "showAllPosts": "Show all posts",
+  "@showAllPosts": {
+    "description": "Button to show all posts"
+  },
+  "manageFriends": "Manage my friends",
+  "@manageFriends": {
+    "description": "Button to manage friends"
+  },
+  "newPost": "New post",
+  "@newPost": {
+    "description": "Button to create a new post"
+  },
+  "loadingError": "Loading error",
+  "@loadingError": {
+    "description": "Error message when loading fails"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Button to retry loading"
+  },
+  "loginToSeeFriends": "Sign in to see your friends' posts",
+  "@loginToSeeFriends": {
+    "description": "Message when user needs to login to see friends' posts"
+  },
+  "signIn": "Sign in",
+  "@signIn": {
+    "description": "Button to sign in"
+  },
+  "commentDeleted": "Comment deleted",
+  "@commentDeleted": {
+    "description": "Success message when comment is deleted"
   },
 
   "healthAnalytics": "Health Analytics",
@@ -887,5 +981,481 @@
   "notificationAdviceGeneral": "Please check your plant's overall health and environment.",
   "@notificationAdviceGeneral": {
     "description": "General plant care advice"
+  },
+
+  "like": "Like",
+  "@like": {
+    "description": "Like button text"
+  },
+
+  "unlike": "Unlike",
+  "@unlike": {
+    "description": "Unlike button text"
+  },
+
+  "reply": "Reply",
+  "@reply": {
+    "description": "Reply button text"
+  },
+
+  "share": "Share",
+  "@share": {
+    "description": "Share button text"
+  },
+
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button text"
+  },
+
+  "report": "Report",
+  "@report": {
+    "description": "Report button text"
+  },
+
+  "block": "Block",
+  "@block": {
+    "description": "Block button text"
+  },
+
+  "unblock": "Unblock",
+  "@unblock": {
+    "description": "Unblock button text"
+  },
+
+  "threadDiscussion": "Thread Discussion",
+  "@threadDiscussion": {
+    "description": "Thread discussion page title"
+  },
+
+  "loadingError": "Loading Error",
+  "@loadingError": {
+    "description": "Loading error title"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+
+  "noData": "No data",
+  "@noData": {
+    "description": "No data message"
+  },
+
+  "manageFriends": "Manage Friends",
+  "@manageFriends": {
+    "description": "Manage friends button text"
+  },
+
+  "loginToLike": "Sign in to like",
+  "@loginToLike": {
+    "description": "Message when user needs to login to like"
+  },
+
+  "loginToReply": "Sign in to reply",
+  "@loginToReply": {
+    "description": "Message when user needs to login to reply"
+  },
+
+  "loginToReport": "Sign in to report",
+  "@loginToReport": {
+    "description": "Message when user needs to login to report"
+  },
+
+  "loginToDelete": "Sign in to delete",
+  "@loginToDelete": {
+    "description": "Message when user needs to login to delete"
+  },
+
+  "deleteConfirmation": "Are you sure you want to delete this post?",
+  "@deleteConfirmation": {
+    "description": "Delete confirmation message"
+  },
+
+  "deletePost": "Delete Post",
+  "@deletePost": {
+    "description": "Delete post button text"
+  },
+
+  "postDeleted": "Post deleted",
+  "@postDeleted": {
+    "description": "Success message when post is deleted"
+  },
+
+  "editPost": "Edit Post",
+  "@editPost": {
+    "description": "Edit post button text"
+  },
+
+  "postUpdated": "Post updated",
+  "@postUpdated": {
+    "description": "Success message when post is updated"
+  },
+
+  "postUpdateError": "Error updating post",
+  "@postUpdateError": {
+    "description": "Error message when post update fails"
+  },
+
+  "createPost": "Create Post",
+  "@createPost": {
+    "description": "Create post button text"
+  },
+
+  "postContent": "What's on your mind?",
+  "@postContent": {
+    "description": "Post content placeholder"
+  },
+
+  "addImage": "Add Image",
+  "@addImage": {
+    "description": "Add image button text"
+  },
+
+  "removeImage": "Remove Image",
+  "@removeImage": {
+    "description": "Remove image button text"
+  },
+
+  "postCreated": "Post created successfully!",
+  "@postCreated": {
+    "description": "Success message when post is created"
+  },
+
+  "postCreationError": "Error creating post",
+  "@postCreationError": {
+    "description": "Error message when post creation fails"
+  },
+
+  "selectCategory": "Select Category",
+  "@selectCategory": {
+    "description": "Select category label"
+  },
+
+  "conversation": "Conversation",
+  "@conversation": {
+    "description": "Conversation category"
+  },
+
+  "advice": "Advice",
+  "@advice": {
+    "description": "Advice category"
+  },
+
+  "replies": "Replies",
+  "@replies": {
+    "description": "Replies count text"
+  },
+
+  "viewReplies": "View replies",
+  "@viewReplies": {
+    "description": "View replies button text"
+  },
+
+  "hideReplies": "Hide replies",
+  "@hideReplies": {
+    "description": "Hide replies button text"
+  },
+
+  "noReplies": "No replies yet",
+  "@noReplies": {
+    "description": "No replies message"
+  },
+
+  "beFirstToReply": "Be the first to reply!",
+  "@beFirstToReply": {
+    "description": "Encouragement to be first to reply"
+  },
+
+  "userBlocked": "User blocked",
+  "@userBlocked": {
+    "description": "User blocked message"
+  },
+
+  "blockUser": "Block User",
+  "@blockUser": {
+    "description": "Block user button text"
+  },
+
+  "unblockUser": "Unblock User",
+  "@unblockUser": {
+    "description": "Unblock user button text"
+  },
+
+  "reportPost": "Report Post",
+  "@reportPost": {
+    "description": "Report post button text"
+  },
+
+  "reportReason": "Report Reason",
+  "@reportReason": {
+    "description": "Report reason label"
+  },
+
+  "inappropriateContent": "Inappropriate content",
+  "@inappropriateContent": {
+    "description": "Inappropriate content report reason"
+  },
+
+  "spam": "Spam",
+  "@spam": {
+    "description": "Spam report reason"
+  },
+
+  "harassment": "Harassment",
+  "@harassment": {
+    "description": "Harassment report reason"
+  },
+
+  "other": "Other",
+  "@other": {
+    "description": "Other report reason"
+  },
+
+  "reportSubmitted": "Report submitted",
+  "@reportSubmitted": {
+    "description": "Report submitted success message"
+  },
+
+  "reportError": "Error submitting report",
+  "@reportError": {
+    "description": "Report submission error message"
+  },
+
+  "newPost": "New Post",
+  "@newPost": {
+    "description": "New post button text"
+  },
+
+  "noPostsYet": "No posts yet",
+  "@noPostsYet": {
+    "description": "No posts message"
+  },
+
+  "noPostsFriends": "Your friends haven't posted yet",
+  "@noPostsFriends": {
+    "description": "No posts from friends message"
+  },
+
+  "noPostsFilter": "No posts in \"{category}\"",
+  "@noPostsFilter": {
+    "description": "No posts in category message",
+    "placeholders": {
+      "category": {
+        "type": "String",
+        "example": "Conversation"
+      }
+    }
+  },
+
+  "tryDifferentFilter": "Try a different filter or be the first to share!",
+  "@tryDifferentFilter": {
+    "description": "Try different filter message"
+  },
+
+  "friendsNotPosted": "Your friends haven't shared anything yet",
+  "@friendsNotPosted": {
+    "description": "Friends not posted message"
+  },
+
+  "beFirstToShare": "Be the first to share!",
+  "@beFirstToShare": {
+    "description": "Be first to share message"
+  },
+
+  "showAllPosts": "Show All Posts",
+  "@showAllPosts": {
+    "description": "Show all posts button text"
+  },
+
+  "deletePostConfirmation": "Are you sure you want to delete this post?",
+  "@deletePostConfirmation": {
+    "description": "Delete post confirmation message"
+  },
+
+  "reportPostConfirmation": "Are you sure you want to report this post?",
+  "@reportPostConfirmation": {
+    "description": "Report post confirmation message"
+  },
+
+  "postReported": "Post reported successfully",
+  "@postReported": {
+    "description": "Post reported success message"
+  },
+
+  "blockUserConfirmation": "Are you sure you want to block this user?",
+  "@blockUserConfirmation": {
+    "description": "Block user confirmation message"
+  },
+
+  "unblockUserConfirmation": "Are you sure you want to unblock this user?",
+  "@unblockUserConfirmation": {
+    "description": "Unblock user confirmation message"
+  },
+
+  "userAlreadyBlocked": "{name} is already blocked",
+  "@userAlreadyBlocked": {
+    "description": "User already blocked message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "John Doe"
+      }
+    }
+  },
+
+  "userBlockedSuccess": "{name} has been blocked",
+  "@userBlockedSuccess": {
+    "description": "User blocked success message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "John Doe"
+      }
+    }
+  },
+
+  "userUnblockedSuccess": "{name} has been unblocked",
+  "@userUnblockedSuccess": {
+    "description": "User unblocked success message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "John Doe"
+      }
+    }
+  },
+
+  "userNotBlocked": "{name} is not blocked",
+  "@userNotBlocked": {
+    "description": "User not blocked message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "John Doe"
+      }
+    }
+  },
+
+  "blockError": "Error blocking user",
+  "@blockError": {
+    "description": "Block user error message"
+  },
+
+  "unblockError": "Error unblocking user",
+  "@unblockError": {
+    "description": "Unblock user error message"
+  },
+
+  "writeSomething": "Please write something",
+  "@writeSomething": {
+    "description": "Empty content validation message"
+  },
+
+  "loadingReplies": "Loading replies...",
+  "@loadingReplies": {
+    "description": "Loading replies message"
+  },
+
+  "errorLoadingReplies": "Error loading replies",
+  "@errorLoadingReplies": {
+    "description": "Error loading replies message"
+  },
+
+  "deleteReplyConfirmation": "Are you sure you want to delete this reply?",
+  "@deleteReplyConfirmation": {
+    "description": "Delete reply confirmation message"
+  },
+
+  "deleteReply": "Delete Reply",
+  "@deleteReply": {
+    "description": "Delete reply button text"
+  },
+
+  "replyDeleted": "Reply deleted successfully",
+  "@replyDeleted": {
+    "description": "Reply deleted success message"
+  },
+
+  "replyDeleteError": "Error deleting reply",
+  "@replyDeleteError": {
+    "description": "Reply delete error message"
+  },
+
+  "replyToReply": "Reply to reply functionality coming soon!",
+  "@replyToReply": {
+    "description": "Reply to reply coming soon message"
+  },
+
+  "editReply": "Edit reply functionality coming soon!",
+  "@editReply": {
+    "description": "Edit reply coming soon message"
+  },
+
+  "loginRequired": "Login Required",
+  "@loginRequired": {
+    "description": "Login required dialog title"
+  },
+
+  "loginRequiredMessage": "Please sign in to {action} this reply and participate in the community.",
+  "@loginRequiredMessage": {
+    "description": "Login required message",
+    "placeholders": {
+      "action": {
+        "type": "String",
+        "example": "like"
+      }
+    }
+  },
+
+  "later": "Later",
+  "@later": {
+    "description": "Later button text"
+  },
+
+  "redirectingToLogin": "Redirecting to login page...",
+  "@redirectingToLogin": {
+    "description": "Redirecting to login message"
+  },
+
+  "connect": "Connect",
+  "@connect": {
+    "description": "Connect button text"
+  },
+
+  "authTokenMissing": "Authentication token missing",
+  "@authTokenMissing": {
+    "description": "Authentication token missing message"
+  },
+
+  "likeError": "Error liking reply",
+  "@likeError": {
+    "description": "Like error message"
+  },
+
+  "deleteError": "Error deleting reply",
+  "@deleteError": {
+    "description": "Delete error message"
+  },
+
+  "imageSelected": "Image selected",
+  "@imageSelected": {
+    "description": "Image selected message"
+  },
+
+  "removeImageTooltip": "Remove image",
+  "@removeImageTooltip": {
+    "description": "Remove image tooltip"
+  },
+
+  "addImageTooltip": "Add image",
+  "@addImageTooltip": {
+    "description": "Add image tooltip"
   }
 } 

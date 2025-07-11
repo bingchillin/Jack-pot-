@@ -359,7 +359,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get today => 'aujourd\'hui';
 
   @override
-  String get loadingError => 'Erreur de chargement';
+  String get loadingError => 'Erreur de Chargement';
 
   @override
   String get stateExcellent => 'Excellent';
@@ -415,6 +415,70 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get communityDesc => 'Partager et apprendre ensemble';
+
+  @override
+  String get commentsTitle => 'Communauté';
+
+  @override
+  String get commentsSubtitle => 'Partager et apprendre ensemble';
+
+  @override
+  String get feedForYou => 'Pour toi';
+
+  @override
+  String get feedFriends => 'Amis';
+
+  @override
+  String get filterByCategory => 'Filtrer par catégorie';
+
+  @override
+  String get filterAll => 'Tous';
+
+  @override
+  String get filterConversation => 'Conversation';
+
+  @override
+  String get filterAdvice => 'Conseil';
+
+  @override
+  String get noPostsYet => 'Aucune publication pour le moment';
+
+  @override
+  String get noPostsFriends => 'Vos amis n\'ont pas encore publié';
+
+  @override
+  String noPostsFilter(String category) {
+    return 'Aucune publication dans \"$category\"';
+  }
+
+  @override
+  String get beFirstToShare => 'Soyez le premier à partager !';
+
+  @override
+  String get friendsNotPosted => 'Vos amis n\'ont rien partagé pour le moment';
+
+  @override
+  String get tryDifferentFilter =>
+      'Essayez un autre filtre ou soyez le premier à partager !';
+
+  @override
+  String get showAllPosts => 'Afficher Toutes les Publications';
+
+  @override
+  String get manageFriends => 'Gérer les Amis';
+
+  @override
+  String get newPost => 'Nouvelle Publication';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get loginToSeeFriends =>
+      'Connectez-vous pour voir les posts de vos amis';
+
+  @override
+  String get commentDeleted => 'Commentaire supprimé';
 
   @override
   String get healthAnalytics => 'Analyse de Santé';
@@ -548,4 +612,254 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get notificationAdviceGeneral =>
       'Veuillez vérifier la santé générale de votre plante et son environnement.';
+
+  @override
+  String get like => 'J\'aime';
+
+  @override
+  String get unlike => 'Je n\'aime plus';
+
+  @override
+  String get reply => 'Répondre';
+
+  @override
+  String get share => 'Partager';
+
+  @override
+  String get edit => 'Modifier';
+
+  @override
+  String get delete => 'Supprimer';
+
+  @override
+  String get report => 'Signaler';
+
+  @override
+  String get block => 'Bloquer';
+
+  @override
+  String get unblock => 'Débloquer';
+
+  @override
+  String get threadDiscussion => 'Discussion du Fil';
+
+  @override
+  String get noData => 'Aucune donnée';
+
+  @override
+  String get loginToLike => 'Connectez-vous pour aimer';
+
+  @override
+  String get loginToReply => 'Connectez-vous pour répondre';
+
+  @override
+  String get loginToReport => 'Connectez-vous pour signaler';
+
+  @override
+  String get loginToDelete => 'Connectez-vous pour supprimer';
+
+  @override
+  String get deleteConfirmation =>
+      'Êtes-vous sûr de vouloir supprimer cette publication ?';
+
+  @override
+  String get deletePost => 'Supprimer la Publication';
+
+  @override
+  String get postDeleted => 'Publication supprimée';
+
+  @override
+  String get editPost => 'Modifier la Publication';
+
+  @override
+  String get postUpdated => 'Publication mise à jour';
+
+  @override
+  String get postUpdateError =>
+      'Erreur lors de la mise à jour de la publication';
+
+  @override
+  String get createPost => 'Créer une Publication';
+
+  @override
+  String get postContent => 'Qu\'avez-vous en tête ?';
+
+  @override
+  String get addImage => 'Ajouter une Image';
+
+  @override
+  String get removeImage => 'Supprimer l\'Image';
+
+  @override
+  String get postCreated => 'Publication créée avec succès !';
+
+  @override
+  String get postCreationError =>
+      'Erreur lors de la création de la publication';
+
+  @override
+  String get selectCategory => 'Sélectionner une Catégorie';
+
+  @override
+  String get conversation => 'Conversation';
+
+  @override
+  String get advice => 'Conseil';
+
+  @override
+  String get replies => 'Réponses';
+
+  @override
+  String get viewReplies => 'Voir les réponses';
+
+  @override
+  String get hideReplies => 'Masquer les réponses';
+
+  @override
+  String get noReplies => 'Aucune réponse pour le moment';
+
+  @override
+  String get beFirstToReply => 'Soyez le premier à répondre !';
+
+  @override
+  String get userBlocked => 'Utilisateur bloqué';
+
+  @override
+  String get blockUser => 'Bloquer l\'Utilisateur';
+
+  @override
+  String get unblockUser => 'Débloquer l\'Utilisateur';
+
+  @override
+  String get reportPost => 'Signaler la Publication';
+
+  @override
+  String get reportReason => 'Raison du Signalement';
+
+  @override
+  String get inappropriateContent => 'Contenu inapproprié';
+
+  @override
+  String get spam => 'Spam';
+
+  @override
+  String get harassment => 'Harcèlement';
+
+  @override
+  String get other => 'Autre';
+
+  @override
+  String get reportSubmitted => 'Signalement soumis';
+
+  @override
+  String get reportError => 'Erreur lors de la soumission du signalement';
+
+  @override
+  String get deletePostConfirmation =>
+      'Êtes-vous sûr de vouloir supprimer cette publication ?';
+
+  @override
+  String get reportPostConfirmation =>
+      'Êtes-vous sûr de vouloir signaler cette publication ?';
+
+  @override
+  String get postReported => 'Publication signalée avec succès';
+
+  @override
+  String get blockUserConfirmation =>
+      'Êtes-vous sûr de vouloir bloquer cet utilisateur ?';
+
+  @override
+  String get unblockUserConfirmation =>
+      'Êtes-vous sûr de vouloir débloquer cet utilisateur ?';
+
+  @override
+  String userAlreadyBlocked(String name) {
+    return '$name est déjà bloqué';
+  }
+
+  @override
+  String userBlockedSuccess(String name) {
+    return '$name a été bloqué';
+  }
+
+  @override
+  String userUnblockedSuccess(String name) {
+    return '$name a été débloqué';
+  }
+
+  @override
+  String userNotBlocked(String name) {
+    return '$name n\'est pas bloqué';
+  }
+
+  @override
+  String get blockError => 'Erreur lors du blocage de l\'utilisateur';
+
+  @override
+  String get unblockError => 'Erreur lors du déblocage de l\'utilisateur';
+
+  @override
+  String get writeSomething => 'Veuillez écrire quelque chose';
+
+  @override
+  String get loadingReplies => 'Chargement des réponses...';
+
+  @override
+  String get errorLoadingReplies => 'Erreur lors du chargement des réponses';
+
+  @override
+  String get deleteReplyConfirmation =>
+      'Êtes-vous sûr de vouloir supprimer cette réponse ?';
+
+  @override
+  String get deleteReply => 'Supprimer la Réponse';
+
+  @override
+  String get replyDeleted => 'Réponse supprimée avec succès';
+
+  @override
+  String get replyDeleteError => 'Erreur lors de la suppression de la réponse';
+
+  @override
+  String get replyToReply =>
+      'Fonctionnalité de réponse à une réponse à venir !';
+
+  @override
+  String get editReply => 'Fonctionnalité d\'édition d\'une réponse à venir !';
+
+  @override
+  String get loginRequired => 'Connexion Requise';
+
+  @override
+  String loginRequiredMessage(String action) {
+    return 'Veuillez vous connecter pour $action cette réponse et participer à la communauté.';
+  }
+
+  @override
+  String get later => 'Plus tard';
+
+  @override
+  String get redirectingToLogin => 'Redirection vers la page de connexion...';
+
+  @override
+  String get connect => 'Se connecter';
+
+  @override
+  String get authTokenMissing => 'Token d\'authentification manquant';
+
+  @override
+  String get likeError => 'Erreur lors de l\'aimer';
+
+  @override
+  String get deleteError => 'Erreur lors de la suppression';
+
+  @override
+  String get imageSelected => 'Image sélectionnée';
+
+  @override
+  String get removeImageTooltip => 'Supprimer l\'image';
+
+  @override
+  String get addImageTooltip => 'Ajouter une image';
 }

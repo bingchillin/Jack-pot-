@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 enum FeedType { forYou, friends }
 
@@ -16,6 +17,8 @@ class FeedToggleHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return Container(
       height: 60,
       decoration: BoxDecoration(
@@ -40,12 +43,12 @@ class FeedToggleHeader extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildToggleButton(
-                  text: 'Pour toi',
+                  text: localizations.feedForYou,
                   feedType: FeedType.forYou,
                   isSelected: currentFeed == FeedType.forYou,
                 ),
                 _buildToggleButton(
-                  text: 'Amis',
+                  text: localizations.feedFriends,
                   feedType: FeedType.friends,
                   isSelected: currentFeed == FeedType.friends,
                   hasNotification: hasUnreadFriends,
