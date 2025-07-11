@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/comment/comment_bloc.dart';
 import '../widgets/thread_view.dart';
+import '../widgets/thread_shimmer.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/comment_model.dart';
 import 'widget/create_reply_modal.dart';
@@ -17,6 +18,8 @@ class CommentDetailPage extends StatefulWidget {
 }
 
 class _CommentDetailPageState extends State<CommentDetailPage> {
+  bool _isInitialLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +80,14 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
         builder: (context, state) {
           String title = localizations.threadTitle;
           if (state is CommentThreadLoaded && state.threadHierarchy.isNotEmpty) {
+            // Update _isInitialLoading when data is loaded
+            if (_isInitialLoading) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                setState(() {
+                  _isInitialLoading = false;
+                });
+              });
+            }
             title = state.threadHierarchy[0].person.displayName;
           }
 
@@ -118,11 +129,10 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
               },
               child: Builder(
                 builder: (context) {
-                  if (state is CommentLoading) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
-                      ),
+                  if (state is CommentLoading && _isInitialLoading) {
+                    return const SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: ThreadShimmer(),
                     );
                   }
 
@@ -155,16 +165,17 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 24),
-                          TextButton.icon(
+                          ElevatedButton(
                             onPressed: _loadThread,
-                            icon: Icon(Icons.refresh, color: Colors.green[600]),
-                            label: Text(
-                              localizations.retry,
-                              style: TextStyle(
-                                color: Colors.green[600],
-                                fontWeight: FontWeight.w500,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green[600],
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
                             ),
+                            child: Text(localizations.retry),
                           ),
                         ],
                       ),
@@ -187,8 +198,8 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                               localizations.noComments,
                               style: TextStyle(
                                 fontSize: 18,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
                               ),
                             ),
                           ],
@@ -196,10 +207,13 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
                       );
                     }
 
-                    return ThreadView(
-                      threadHierarchy: state.threadHierarchy,
-                      onLike: _handleLike,
-                      onReply: _handleReply,
+                    return SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: ThreadView(
+                        threadHierarchy: state.threadHierarchy,
+                        onLike: _handleLike,
+                        onReply: _handleReply,
+                      ),
                     );
                   }
 
