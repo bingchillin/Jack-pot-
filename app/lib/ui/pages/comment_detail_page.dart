@@ -119,24 +119,6 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
               child: Builder(
                 builder: (context) {
                   if (state is CommentLoading) {
-                    final cached = context.read<CommentBloc>().currentThreadHierarchy;
-                    if (cached.isNotEmpty) {
-                      return Stack(
-                        children: [
-                          ThreadView(
-                            threadHierarchy: cached,
-                            onLike: _handleLike,
-                            onReply: _handleReply,
-                          ),
-                          const Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: LinearProgressIndicator(minHeight: 2),
-                          ),
-                        ],
-                      );
-                    }
                     return Center(
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),

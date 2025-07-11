@@ -71,10 +71,20 @@ class _AdvisePageState extends State<AdvisePage>
   @override
   void didPopNext() {
     super.didPopNext();
-    // Rafraîchir les commentaires quand on revient sur cette page
-    // (utile après des changements comme déblocage d'utilisateurs)
-    print('🔄 Advise page: Returning from another page, refreshing feed');
-    _loadCurrentFeed();
+    // Vérifier si on a du cache, sinon recharger
+    final bloc = context.read<CommentBloc>();
+    final hasCache = _currentFeed == FeedType.friends 
+        ? bloc.friendsComments.isNotEmpty 
+        : bloc.mainComments.isNotEmpty;
+    
+    if (!hasCache) {
+      print('🔄 Advise page: No cache available, loading fresh data');
+      _loadCurrentFeed();
+    } else {
+      print('🔄 Advise page: Using cached data, no reload needed');
+      // Émettre l'état principal pour afficher le cache
+      context.read<CommentBloc>().add(const EmitMainCommentsState());
+    }
   }
 
   void _loadCurrentFeed() {
