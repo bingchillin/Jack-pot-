@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../bloc/comment/comment_bloc.dart';
 import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
@@ -66,9 +67,41 @@ class _CreateReplyModalState extends State<CreateReplyModal> with TickerProvider
     final localizations = AppLocalizations.of(context)!;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
+    return BlocListener<CommentBloc, CommentState>(
+      listener: (context, state) {
+        if (state is CommentCreated) {
+          // Success - close modal and show success message
+          if (mounted) {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Reply posted successfully!'),
+                backgroundColor: Colors.green[600],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            );
+          }
+        } else if (state is CommentError) {
+          // Error - show error message and reset submitting state
+          if (mounted) {
+            setState(() {
+              _isSubmitting = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error posting reply'),
+                backgroundColor: Colors.red[600],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            );
+          }
+        }
+      },
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
         return Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -442,7 +475,8 @@ class _CreateReplyModalState extends State<CreateReplyModal> with TickerProvider
             ),
           ),
         );
-      },
+        },
+      ),
     );
   }
 
@@ -485,45 +519,19 @@ class _CreateReplyModalState extends State<CreateReplyModal> with TickerProvider
     
     HapticFeedback.lightImpact();
     
-    try {
-      context.read<CommentBloc>().add(
-        CreateComment(
-          _contentController.text.trim(),
-          imageUrl: _selectedImagePath,
-          parentCommentId: widget.parentComment.idComment,
-          userId: authProvider.currentUser!.idPerson.toString(),
-        ),
-      );
-      
-      if (mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Reply posted successfully!'),
-            backgroundColor: Colors.green[600],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error posting reply'),
-            backgroundColor: Colors.red[600],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
-    }
+    // Find the root comment ID - if parentComment has a parent, use that parent's ID
+    // Otherwise use the parentComment's ID (it's already the root)
+    final rootCommentId = widget.parentComment.parentCommentId ?? widget.parentComment.idComment;
+    
+    // Dispatch the event - the BlocListener will handle success/error
+    context.read<CommentBloc>().add(
+      CreateComment(
+        _contentController.text.trim(),
+        imageUrl: _selectedImagePath,
+        parentCommentId: rootCommentId,
+        userId: authProvider.currentUser!.idPerson.toString(),
+      ),
+    );
   }
 
   String _formatTimeAgo(DateTime dateTime) {

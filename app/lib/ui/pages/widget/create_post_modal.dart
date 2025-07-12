@@ -63,9 +63,41 @@ class _CreatePostModalState extends State<CreatePostModal> with TickerProviderSt
     final localizations = AppLocalizations.of(context)!;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
+    return BlocListener<CommentBloc, CommentState>(
+      listener: (context, state) {
+        if (state is CommentCreated) {
+          // Success - close modal and show success message
+          if (mounted) {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(localizations.postCreated),
+                backgroundColor: Colors.green[600],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            );
+          }
+        } else if (state is CommentError) {
+          // Error - show error message and reset submitting state
+          if (mounted) {
+            setState(() {
+              _isSubmitting = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(localizations.postCreationError),
+                backgroundColor: Colors.red[600],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            );
+          }
+        }
+      },
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
         return Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -378,7 +410,8 @@ class _CreatePostModalState extends State<CreatePostModal> with TickerProviderSt
             ),
           ),
         );
-      },
+        },
+      ),
     );
   }
 
@@ -414,7 +447,6 @@ class _CreatePostModalState extends State<CreatePostModal> with TickerProviderSt
     if (!_canSubmit()) return;
     
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final localizations = AppLocalizations.of(context)!;
     
     setState(() {
       _isSubmitting = true;
@@ -422,45 +454,15 @@ class _CreatePostModalState extends State<CreatePostModal> with TickerProviderSt
     
     HapticFeedback.lightImpact();
     
-    try {
-      context.read<CommentBloc>().add(
-        CreateComment(
-          _contentController.text.trim(),
-          imageUrl: _selectedImagePath,
-          tag: _selectedTag,
-          userId: authProvider.currentUser!.idPerson.toString(),
-        ),
-      );
-      
-      if (mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(localizations.postCreated),
-            backgroundColor: Colors.green[600],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(localizations.postCreationError),
-            backgroundColor: Colors.red[600],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
-    }
+    // Dispatch the event - the BlocListener will handle success/error
+    context.read<CommentBloc>().add(
+      CreateComment(
+        _contentController.text.trim(),
+        imageUrl: _selectedImagePath,
+        tag: _selectedTag,
+        userId: authProvider.currentUser!.idPerson.toString(),
+      ),
+    );
   }
 
   Color _getTagColor(String tag) {

@@ -174,6 +174,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     on<LoadFriendsComments>(_onLoadFriendsComments);
     on<LoadCommentDetail>(_onLoadCommentDetail);
     on<LikeComment>(_onLikeComment);
+    on<CreateComment>(_onCreateComment);
     on<EmitMainCommentsState>(_onEmitMainCommentsState);
   }
   
@@ -307,6 +308,44 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     }
   }
   
+  Future<void> _onCreateComment(CreateComment event, Emitter<CommentState> emit) async {
+    try {
+      if (token == null || token!.isEmpty) {
+        throw Exception('Authentication token required to create comment');
+      }
+      
+      final newComment = await commentService.createComment(
+        content: event.content,
+        imageUrl: event.imageUrl,
+        tag: event.tag,
+        parentCommentId: event.parentCommentId,
+        token: token!,
+        userId: event.userId,
+      );
+      
+      // Emit success state
+      emit(CommentCreated(newComment));
+      
+      // Only update main feed cache for main posts (no parent)
+      // Don't emit CommentMainLoaded for replies to avoid navigation issues
+      if (event.parentCommentId == null) {
+        // Add to the beginning of the appropriate cache
+        if (_currentFeedType == FeedType.forYou) {
+          _mainComments.insert(0, newComment);
+          emit(CommentMainLoaded(_mainComments));
+        } else if (_currentFeedType == FeedType.friends) {
+          _friendsComments.insert(0, newComment);
+          emit(CommentMainLoaded(_friendsComments));
+        }
+      }
+      // For replies, just emit CommentCreated and let the UI handle it
+      
+    } catch (e) {
+      print('Debug: Error creating comment: $e');
+      emit(CommentError('Failed to create comment: ${e.toString()}'));
+    }
+  }
+
   void _onEmitMainCommentsState(EmitMainCommentsState event, Emitter<CommentState> emit) {
     // Émettre l'état principal basé sur le cache actuel
     if (_currentFeedType == FeedType.friends && _friendsComments.isNotEmpty) {

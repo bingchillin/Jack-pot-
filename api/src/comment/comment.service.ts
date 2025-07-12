@@ -94,7 +94,8 @@ export class CommentService {
           where: { idComment: parentCommentId },
         });
         
-        if (parentComment) {
+        // Only send notification if the reply author is different from the parent comment author
+        if (parentComment && parentComment.idPerson !== savedComment.idPerson) {
           await this.notificationService.createReplyNotification(
             parentCommentId,
             parentComment.idPerson,
@@ -410,14 +411,16 @@ export class CommentService {
       });
       await this.commentLikeRepository.save(newLike);
       
-      // Send like notification
+      // Send like notification (only if user is not liking their own comment)
       try {
-        await this.notificationService.createLikeNotification(
-          commentId,
-          comment.idPerson,
-          personId,
-          comment.content,
-        );
+        if (comment.idPerson !== personId) {
+          await this.notificationService.createLikeNotification(
+            commentId,
+            comment.idPerson,
+            personId,
+            comment.content,
+          );
+        }
       } catch (notifError) {
         console.error('Backend - Error sending like notification:', notifError);
       }

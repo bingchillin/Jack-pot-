@@ -188,6 +188,11 @@ class _AdvisePageState extends State<AdvisePage>
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           );
+        } else if (state is CommentCreated) {
+          // If a new post was created (not a reply), refresh the main feed
+          if (state.comment.parentCommentId == null) {
+            _loadCurrentFeed();
+          }
         }
       },
       child: Scaffold(

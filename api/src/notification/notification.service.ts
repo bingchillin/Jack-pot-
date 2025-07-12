@@ -18,6 +18,13 @@ export class NotificationService {
   ) {}
 
   async create(createNotificationDto: CreateNotificationDto): Promise<Notification> {
+    // Safety check: Don't create notifications where the recipient and triggering person are the same
+    if (createNotificationDto.idTriggeringPerson && 
+        createNotificationDto.idPerson === createNotificationDto.idTriggeringPerson) {
+      console.log('Skipping self-notification:', createNotificationDto);
+      return null;
+    }
+
     const notification = this.notificationRepository.create(createNotificationDto);
     const savedNotification = await this.notificationRepository.save(notification);
     

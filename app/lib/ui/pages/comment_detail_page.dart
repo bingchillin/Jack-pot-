@@ -74,6 +74,9 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
             ),
           );
           Navigator.pop(context);
+        } else if (state is CommentCreated) {
+          // If a reply was created, refresh the thread to show the new reply
+          _loadThread();
         }
       },
       child: BlocBuilder<CommentBloc, CommentState>(
@@ -129,7 +132,7 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
               },
               child: Builder(
                 builder: (context) {
-                  if (state is CommentLoading && _isInitialLoading) {
+                  if (state is CommentLoading) {
                     return const SingleChildScrollView(
                       physics: AlwaysScrollableScrollPhysics(),
                       child: ThreadShimmer(),
