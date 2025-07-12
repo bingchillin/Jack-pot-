@@ -528,7 +528,7 @@ class _CreateReplyModalState extends State<CreateReplyModal> with TickerProvider
       CreateComment(
         _contentController.text.trim(),
         imageUrl: _selectedImagePath,
-        parentCommentId: rootCommentId,
+        parentCommentId: widget.parentComment.idComment, // Use actual parent ID for proper threading
         userId: authProvider.currentUser!.idPerson.toString(),
       ),
     );

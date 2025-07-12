@@ -75,8 +75,8 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
           );
           Navigator.pop(context);
         } else if (state is CommentCreated) {
-          // If a reply was created, refresh the thread to show the new reply
-          _loadThread();
+          // No need to refresh - BLoC should handle hierarchy updates automatically
+          // The CommentThreadLoaded state will be emitted by the BLoC after CreateComment
         }
       },
       child: BlocBuilder<CommentBloc, CommentState>(

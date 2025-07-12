@@ -4,25 +4,30 @@ class ThreadBuilderService {
   static const int maxThreadDepth = 4; // Niveaux 0, 1, 2, 3
 
   /// Construit une hiérarchie de commentaires à partir d'une liste plate
-  /// Maintenant affiche tous les replies comme des enfants directs du root (flat threading)
   static List<Comment> buildThreadHierarchy(List<Comment> flatComments) {
     if (flatComments.isEmpty) return [];
 
-    // Identifier le commentaire racine (premier dans la liste)
-    final rootComment = flatComments.first;
-    
-    // Tous les autres commentaires sont des replies (affichés de manière plate)
-    final replies = flatComments.skip(1).toList();
-    
-    // Créer la hiérarchie plate - root comment suivi de tous les replies
+    // Créer une map pour accès rapide aux commentaires par ID
+    Map<int, Comment> commentMap = {};
+    for (Comment comment in flatComments) {
+      commentMap[comment.idComment] = comment;
+    }
+
+    // Identifier les commentaires racines
+    List<Comment> rootComments = flatComments
+        .where((comment) => comment.parentCommentId == null)
+        .toList();
+
+    // Construire la hiérarchie pour chaque commentaire racine
     List<Comment> hierarchy = [];
-    
-    // Ajouter le root comment avec level 0
-    hierarchy.add(rootComment.copyWith(level: 0, children: []));
-    
-    // Ajouter tous les replies avec level 1 (affichage plat)
-    for (Comment reply in replies) {
-      hierarchy.add(reply.copyWith(level: 1, children: []));
+    for (Comment rootComment in rootComments) {
+      Comment hierarchicalComment = _buildCommentWithChildren(
+        rootComment,
+        flatComments,
+        commentMap,
+        0,
+      );
+      hierarchy.add(hierarchicalComment);
     }
 
     return hierarchy;

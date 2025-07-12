@@ -189,10 +189,8 @@ class _AdvisePageState extends State<AdvisePage>
             ),
           );
         } else if (state is CommentCreated) {
-          // If a new post was created (not a reply), refresh the main feed
-          if (state.comment.parentCommentId == null) {
-            _loadCurrentFeed();
-          }
+          // No need to refresh - BLoC should handle cache updates automatically
+          // The CommentMainLoaded state will be emitted by the BLoC after CreateComment
         }
       },
       child: Scaffold(

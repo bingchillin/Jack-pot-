@@ -161,6 +161,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   // Cache pour les feeds principaux (pas pour les threads)
   List<Comment> _mainComments = [];
   List<Comment> _friendsComments = [];
+  List<Comment> _currentThreadHierarchy = [];
   
   // Getters pour accéder au cache
   List<Comment> get mainComments => _mainComments;
@@ -175,6 +176,8 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     on<LoadCommentDetail>(_onLoadCommentDetail);
     on<LikeComment>(_onLikeComment);
     on<CreateComment>(_onCreateComment);
+    on<DeleteComment>(_onDeleteComment);
+    on<RefreshComments>(_onRefreshComments);
     on<EmitMainCommentsState>(_onEmitMainCommentsState);
   }
   
@@ -283,6 +286,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       
       // Émettre l'état avec la hiérarchie
       if (_currentDetailRequestId == reqId) {
+        _currentThreadHierarchy = threadHierarchy;
         emit(CommentThreadLoaded(threadHierarchy));
       } else {
         print('Debug: Ignoring outdated thread response');
@@ -298,10 +302,43 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     try {
       final result = await commentService.toggleLike(event.commentId, token!, event.userId);
       
+      // Mettre à jour le cache local
+      _updateCommentInCache(event.commentId, result['liked'], result['likeCount']);
+      
       // Émettre toujours CommentLikeUpdated pour une mise à jour immédiate de l'UI
       emit(CommentLikeUpdated(event.commentId, result['liked'], result['likeCount']));
       
-      // Just emit the like update, let UI handle refresh if needed
+      // Re-émettre l'état approprié avec les données mises à jour
+      if (_currentThreadHierarchy.isNotEmpty) {
+        // Mode thread - mettre à jour la hiérarchie
+        final existingComment = ThreadBuilderService.findCommentInHierarchy(
+          _currentThreadHierarchy, 
+          event.commentId
+        );
+        
+        if (existingComment != null) {
+          // Mettre à jour seulement les propriétés de like
+          final updatedComment = existingComment.copyWith(
+            isLikedByCurrentUser: result['liked'],
+            likeCount: result['likeCount'],
+          );
+          
+          // Mettre à jour la hiérarchie
+          _currentThreadHierarchy = ThreadBuilderService.updateCommentInHierarchy(
+            _currentThreadHierarchy, 
+            updatedComment
+          );
+          
+          emit(CommentThreadLoaded(_currentThreadHierarchy));
+        } else {
+          // Comment not found in hierarchy, fallback to main list
+          emit(CommentMainLoaded(_mainComments));
+        }
+      } else {
+        // Mode timeline - émettre la liste mise à jour
+        print('Debug: Updating main comments list with ${_mainComments.length} comments');
+        emit(CommentMainLoaded(_mainComments));
+      }
     } catch (e) {
       print('Debug: Error in like comment: $e');
       emit(CommentError(e.toString()));
@@ -314,32 +351,64 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
         throw Exception('Authentication token required to create comment');
       }
       
+      // Don't send tag if this is a reply (tags are only for main posts)
+      final tagToSend = event.parentCommentId != null ? null : event.tag;
+      
       final newComment = await commentService.createComment(
         content: event.content,
         imageUrl: event.imageUrl,
-        tag: event.tag,
+        tag: tagToSend,
         parentCommentId: event.parentCommentId,
         token: token!,
         userId: event.userId,
       );
       
-      // Emit success state
-      emit(CommentCreated(newComment));
-      
-      // Only update main feed cache for main posts (no parent)
-      // Don't emit CommentMainLoaded for replies to avoid navigation issues
+      // Twitter-style instant updates: Add to cache immediately
       if (event.parentCommentId == null) {
-        // Add to the beginning of the appropriate cache
-        if (_currentFeedType == FeedType.forYou) {
-          _mainComments.insert(0, newComment);
-          emit(CommentMainLoaded(_mainComments));
-        } else if (_currentFeedType == FeedType.friends) {
+        // New post - add to main feed cache
+        _mainComments.insert(0, newComment);
+        // Also add to friends cache if it's the current user
+        if (_currentFeedType == FeedType.friends) {
           _friendsComments.insert(0, newComment);
-          emit(CommentMainLoaded(_friendsComments));
+        }
+      } else {
+        // Reply - update parent comment's reply count in main feed cache
+        _updateParentReplyCount(event.parentCommentId!, 1);
+        
+        // Also add to thread hierarchy if we're in thread view
+        if (_currentThreadHierarchy.isNotEmpty) {
+          _currentThreadHierarchy = ThreadBuilderService.addCommentToHierarchy(
+            _currentThreadHierarchy,
+            newComment,
+          );
         }
       }
-      // For replies, just emit CommentCreated and let the UI handle it
       
+      // Emit success first
+      emit(CommentCreated(newComment));
+      
+      // Then immediately emit updated state (Twitter-style instant update)
+      if (event.parentCommentId == null) {
+        // For new posts, emit the appropriate feed
+        if (_currentFeedType == FeedType.friends) {
+          emit(CommentMainLoaded(_friendsComments));
+        } else {
+          emit(CommentMainLoaded(_mainComments));
+        }
+      } else {
+        // For replies, we need to be more careful about which state to emit
+        if (_currentThreadHierarchy.isNotEmpty) {
+          // If we're in thread view, emit updated thread
+          emit(CommentThreadLoaded(_currentThreadHierarchy));
+        } else {
+          // If we're in main feed view, emit the current feed with updated reply counts
+          if (_currentFeedType == FeedType.friends) {
+            emit(CommentMainLoaded(_friendsComments));
+          } else {
+            emit(CommentMainLoaded(_mainComments));
+          }
+        }
+      }
     } catch (e) {
       print('Debug: Error creating comment: $e');
       emit(CommentError('Failed to create comment: ${e.toString()}'));
@@ -355,7 +424,117 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       emit(CommentMainLoaded(_mainComments));
       print('Debug: Emitted cached main comments - ${_mainComments.length} comments');
     } else {
-      print('Debug: No cache available for current feed type $_currentFeedType');
+      // Fallback to main comments if no specific feed type or empty cache
+      if (_mainComments.isNotEmpty) {
+        emit(CommentMainLoaded(_mainComments));
+        print('Debug: Fallback - emitted main comments');
+      } else {
+        print('Debug: No cache available for current feed type $_currentFeedType');
+      }
+    }
+  }
+
+  Future<void> _onDeleteComment(DeleteComment event, Emitter<CommentState> emit) async {
+    try {
+      await commentService.deleteComment(event.commentId, token!);
+      
+      // Find the comment to get its parent ID before deletion
+      Comment? deletedComment;
+      for (var comment in _mainComments) {
+        if (comment.idComment == event.commentId) {
+          deletedComment = comment;
+          break;
+        }
+      }
+      
+      // Supprimer du cache local
+      _mainComments.removeWhere((comment) => comment.idComment == event.commentId);
+      _friendsComments.removeWhere((comment) => comment.idComment == event.commentId);
+      
+      // If it was a reply, decrease parent's reply count
+      if (deletedComment?.parentCommentId != null) {
+        _updateParentReplyCount(deletedComment!.parentCommentId!, -1);
+      }
+      
+      // Supprimer de la hiérarchie de threading si elle existe
+      if (_currentThreadHierarchy.isNotEmpty) {
+        _currentThreadHierarchy = ThreadBuilderService.removeCommentFromHierarchy(
+          _currentThreadHierarchy,
+          event.commentId,
+        );
+      }
+      
+      emit(CommentDeleted(event.commentId));
+      
+      // Re-émettre l'état approprié
+      if (_currentThreadHierarchy.isNotEmpty) {
+        emit(CommentThreadLoaded(_currentThreadHierarchy));
+      } else {
+        emit(CommentMainLoaded(_mainComments));
+      }
+    } catch (e) {
+      emit(CommentError(e.toString()));
+    }
+  }
+  
+  Future<void> _onRefreshComments(RefreshComments event, Emitter<CommentState> emit) async {
+    // Forcer le rechargement avec le filtrage des utilisateurs bloqués
+    if (_currentThreadHierarchy.isNotEmpty) {
+      add(LoadCommentDetail(_currentThreadHierarchy.first.idComment, userId: event.userId, requestId: DateTime.now().millisecondsSinceEpoch.toString()));
+    } else {
+      add(LoadMainComments(userId: event.userId));
+    }
+  }
+  
+  void _updateCommentInCache(int commentId, bool isLiked, int likeCount) {
+    // Mettre à jour dans la liste principale
+    bool found = false;
+    for (int i = 0; i < _mainComments.length; i++) {
+      if (_mainComments[i].idComment == commentId) {
+        _mainComments[i] = _mainComments[i].copyWith(
+          isLikedByCurrentUser: isLiked,
+          likeCount: likeCount,
+        );
+        found = true;
+        print('Debug: Updated comment $commentId in main cache - liked: $isLiked, count: $likeCount');
+        break;
+      }
+    }
+    
+    if (!found) {
+      print('Debug: Comment $commentId not found in main cache (${_mainComments.length} comments)');
+    }
+  }
+  
+  void _updateParentReplyCount(int parentCommentId, int increment) {
+    // Update reply count in main comments cache
+    bool foundInMain = false;
+    for (int i = 0; i < _mainComments.length; i++) {
+      if (_mainComments[i].idComment == parentCommentId) {
+        _mainComments[i] = _mainComments[i].copyWith(
+          replyCount: _mainComments[i].replyCount + increment,
+        );
+        foundInMain = true;
+        print('Debug: Updated reply count for comment $parentCommentId in main cache: ${_mainComments[i].replyCount}');
+        break;
+      }
+    }
+    
+    // Update reply count in friends comments cache
+    bool foundInFriends = false;
+    for (int i = 0; i < _friendsComments.length; i++) {
+      if (_friendsComments[i].idComment == parentCommentId) {
+        _friendsComments[i] = _friendsComments[i].copyWith(
+          replyCount: _friendsComments[i].replyCount + increment,
+        );
+        foundInFriends = true;
+        print('Debug: Updated reply count for comment $parentCommentId in friends cache: ${_friendsComments[i].replyCount}');
+        break;
+      }
+    }
+    
+    if (!foundInMain && !foundInFriends) {
+      print('Debug: Parent comment $parentCommentId not found in any cache for reply count update');
     }
   }
 } 
