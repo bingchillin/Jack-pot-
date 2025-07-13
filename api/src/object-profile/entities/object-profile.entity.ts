@@ -3,6 +3,7 @@ import { ObjectEntity } from '../../object/entities/object.entity';
 import { PlantType } from '../../plant-type/entities/plant-type.entity';
 import { Plant } from 'src/plant/entities/plant.entity';
 import { Person } from 'src/person/entities/person.entity';
+import { Avatar } from 'src/avatar/entities/avatar.entity';
 
 @Entity('object_profile')
 export class ObjectProfile {
@@ -95,4 +96,5 @@ export class ObjectProfile {
 
   @OneToMany(() => Plant, plant => plant.objectProfile)
   plants: Plant[];
+
 }

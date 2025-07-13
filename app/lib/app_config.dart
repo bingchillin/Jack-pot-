@@ -3,6 +3,8 @@ import 'core/env_config.dart';
 class AppConfig {
   // Current API URL (changes based on environment)
   static String get baseUrl => EnvConfig.apiUrl;
+
+  static String get baseUrlSrc => "http://51.222.110.241/";
   
   // API Endpoints
   static String get loginEndpoint => "$baseUrl/auth/user/login";

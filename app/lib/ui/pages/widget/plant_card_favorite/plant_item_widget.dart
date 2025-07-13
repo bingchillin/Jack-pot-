@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jackpote/ui/pages/widget/plant_card_favorite/plant_control_switches_widget.dart';
+import 'package:shimmer/shimmer.dart';
+import '../../../../models/avatar.dart';
 import '../../../../models/object_profile.dart';
 import 'package:jackpote/app_config.dart';
 import '../../plant_detail_page.dart';
@@ -71,8 +73,27 @@ class PlantItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final pathPicture = plant.plantType?.pathPicture;
     final stateColor = _getStateColor(plant.state);
+
+    final avatars = plant.plantType?.avatars;
+
+    Avatar? avatar;
+
+    if (avatars == null || avatars.isEmpty) {
+      avatar = null;
+    } else {
+      try {
+        avatar = avatars.firstWhere((a) => a.stateP == plant.state);
+      } catch (e) {
+        try {
+          avatar = avatars.firstWhere((a) => a.stateP == 0);
+        } catch (e) {
+          avatar = null;
+        }
+      }
+    }
+
+    final pathPicture = avatar?.pathPicture.toString();
 
     return Container(
       height: 360,
@@ -130,8 +151,20 @@ class PlantItemWidget extends StatelessWidget {
                           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                           child: pathPicture != null
                               ? Image.network(
-                                  Uri.parse(AppConfig.baseUrl).resolve(pathPicture).toString(),
+                                  Uri.parse(AppConfig.baseUrlSrc).resolve(pathPicture).toString(),
                                   fit: BoxFit.cover,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Shimmer.fromColors(
+                                      baseColor: Colors.grey.shade300,
+                                      highlightColor: Colors.grey.shade100,
+                                      child: Container(
+                                        width: 80,
+                                        height: 80,
+                                        color: Colors.white,
+                                      ),
+                                    );
+                                  },
                                   errorBuilder: (context, error, stackTrace) => Container(
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(

@@ -73,7 +73,7 @@ export class ObjectProfileService {
     async findOne(id: number) {
         const objectProfile = await this.objectProfileRepository.findOne({
             where: { idObjectProfile: id },
-            relations: ['object', 'plantType', 'person', 'plants'],
+            relations: ['object', 'plantType', 'person', 'plants', 'plantType.avatars'],
             select: {
                 idObjectProfile: true,
                 idPerson: true, // Add this field

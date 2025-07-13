@@ -194,7 +194,7 @@ export class PersonService {
     async findObjectsProfileByPersonId(id: number): Promise<ObjectProfile[]> {
         const person = await this.personRepository.findOne({
             where: { idPerson: id },
-            relations: ['objectProfiles', 'objectProfiles.object', 'objectProfiles.plantType']
+            relations: ['objectProfiles', 'objectProfiles.object', 'objectProfiles.plantType', 'objectProfiles.plantType.avatars',]
         });
 
         if (!person) {
@@ -208,7 +208,7 @@ export class PersonService {
     async findObjectsProfileByPersonIdFavoris(id: number): Promise<ObjectProfile[]> {
         const person = await this.personRepository.findOne({
             where: { idPerson: id },
-            relations: ['objectProfiles', 'objectProfiles.object', 'objectProfiles.plantType']
+            relations: ['objectProfiles', 'objectProfiles.object', 'objectProfiles.plantType', 'objectProfiles.plantType.avatars']
         });
 
         if (!person) {

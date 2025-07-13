@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
+import '../../../../models/avatar.dart';
 import '../../../../models/object_profile.dart';
 import 'package:jackpote/app_config.dart';
 import '../../plant_detail_page.dart';
@@ -11,6 +13,7 @@ class PlantItemMyListWidget extends StatelessWidget {
     Key? key,
     required this.plant,
   }) : super(key: ValueKey(plant.idObjectProfile));
+
 
   String _getStateText(int? state) {
     switch (state) {
@@ -66,8 +69,29 @@ class PlantItemMyListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final pathPicture = plant.plantType?.pathPicture;
     final stateColor = _getStateColor(plant.state);
+
+
+    final avatars = plant.plantType?.avatars;
+
+    Avatar? avatar;
+
+    if (avatars == null || avatars.isEmpty) {
+      avatar = null;
+    } else {
+      try {
+        avatar = avatars.firstWhere((a) => a.stateP == plant.state);
+      } catch (e) {
+        try {
+          avatar = avatars.firstWhere((a) => a.stateP == 0);
+        } catch (e) {
+          avatar = null;
+        }
+      }
+    }
+
+    final pathPicture = avatar?.pathPicture.toString();
+
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -129,34 +153,46 @@ class PlantItemMyListWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       child: pathPicture != null
                           ? Image.network(
-                              Uri.parse(AppConfig.baseUrl).resolve(pathPicture).toString(),
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.green[100],
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Icon(
-                                  Icons.eco,
-                                  color: Colors.green[600],
-                                  size: 32,
-                                ),
-                              ),
-                            )
-                          : Container(
-                              decoration: BoxDecoration(
-                                color: Colors.green[100],
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Icon(
-                                Icons.eco,
-                                color: Colors.green[600],
-                                size: 32,
-                              ),
+                        Uri.parse(AppConfig.baseUrlSrc).resolve(pathPicture).toString(),
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Shimmer.fromColors(
+                            baseColor: Colors.grey.shade300,
+                            highlightColor: Colors.grey.shade100,
+                            child: Container(
+                              width: 80,
+                              height: 80,
+                              color: Colors.white,
                             ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          decoration: BoxDecoration(
+                            color: Colors.green[100],
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            Icons.eco,
+                            color: Colors.green[600],
+                            size: 32,
+                          ),
+                        ),
+                      )
+                          : Container(
+                        decoration: BoxDecoration(
+                          color: Colors.green[100],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.eco,
+                          color: Colors.green[600],
+                          size: 32,
+                        ),
+                      ),
                     ),
                   ),
-                  
+
                   const SizedBox(width: 16),
                   
                   // Plant Info
