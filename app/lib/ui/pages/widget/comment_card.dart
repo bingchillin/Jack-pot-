@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/comment_model.dart';
 import '../comment_detail_page.dart';
-import 'create_reply_modal.dart';
+import 'create_reply_modal_redesigned.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../bloc/comment/comment_bloc.dart';
@@ -94,7 +94,7 @@ class _CommentCardState extends State<CommentCard> with TickerProviderStateMixin
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CreateReplyModal(parentComment: _currentComment),
+      builder: (context) => CreateReplyModalRedesigned(parentComment: _currentComment),
     );
   }
 

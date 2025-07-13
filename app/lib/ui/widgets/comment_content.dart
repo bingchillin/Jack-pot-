@@ -3,6 +3,7 @@ import '../../models/comment_model.dart';
 import 'comment_image_widget.dart';
 import 'tag_selector_widget.dart';
 import 'comment_options_menu.dart';
+import '../pages/widget/create_reply_modal_redesigned.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../bloc/comment/comment_bloc.dart';
@@ -213,17 +214,16 @@ class CommentContent extends StatelessWidget {
                           size: 20,
                         ),
                         onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => CommentOptionsMenu(
-                              comment: comment,
-                              onDelete: () {
-                                Navigator.pop(context);
-                                context.read<CommentBloc>().add(DeleteComment(comment.idComment));
-                              },
-                            ),
-                          );
+                          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                          final currentUserId = authProvider.currentUser?.idPerson;
+                          
+                          if (currentUserId == null || currentUserId != comment.idPerson) {
+                            // Show report/flag options for other users' comments
+                            _showReportMenu(context);
+                          } else {
+                            // Show edit/delete options for own comments
+                            _showOwnerMenu(context);
+                          }
                         },
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -309,7 +309,17 @@ class CommentContent extends StatelessWidget {
                           );
                           return;
                         }
-                        if (onReply != null) onReply!();
+                        if (onReply != null) {
+                          onReply!();
+                        } else {
+                          // Default reply action using redesigned modal
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => CreateReplyModalRedesigned(parentComment: comment),
+                          );
+                        }
                       },
                     ),
                   ],
@@ -343,5 +353,167 @@ class CommentContent extends StatelessWidget {
       default:
         return tag;
     }
+  }
+
+  void _showOwnerMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              
+              // Edit option
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.edit,
+                    color: Colors.blue[600],
+                    size: 20,
+                  ),
+                ),
+                title: const Text('Edit Comment'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Implement edit functionality
+                },
+              ),
+              
+              // Delete option
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.delete,
+                    color: Colors.red[600],
+                    size: 20,
+                  ),
+                ),
+                title: const Text('Delete Comment'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteConfirmation(context);
+                },
+              ),
+              
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showReportMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              
+              // Report option
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.flag,
+                    color: Colors.orange[600],
+                    size: 20,
+                  ),
+                ),
+                title: const Text('Report Comment'),
+                subtitle: const Text('Report inappropriate content'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Implement report functionality
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Report functionality coming soon'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                },
+              ),
+              
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Comment'),
+        content: const Text(
+          'Are you sure you want to delete this comment? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              context.read<CommentBloc>().add(DeleteComment(comment.idComment));
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 } 
