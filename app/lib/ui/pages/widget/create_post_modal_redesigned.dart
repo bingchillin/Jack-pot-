@@ -4,7 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../bloc/comment/comment_bloc.dart';
 import '../../../providers/auth_provider.dart';
 import 'package:provider/provider.dart';
-import '../../widgets/robust_image_picker_widget.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../../l10n/app_localizations.dart';
 
 class CreatePostModalRedesigned extends StatefulWidget {
@@ -295,11 +296,39 @@ class _CreatePostModalRedesignedState extends State<CreatePostModalRedesigned> w
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.asset(
-                                      _selectedImagePath!,
+                                    child: Image.file(
+                                      File(_selectedImagePath!),
                                       width: double.infinity,
                                       height: 200,
                                       fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          width: double.infinity,
+                                          height: 200,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.error,
+                                                size: 48,
+                                                color: Colors.grey[400],
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                'Error loading image',
+                                                style: TextStyle(
+                                                  color: Colors.grey[600],
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
                                   Positioned(
@@ -501,19 +530,147 @@ class _CreatePostModalRedesignedState extends State<CreatePostModalRedesigned> w
   }
 
   void _pickImage() async {
-    final result = await showModalBottomSheet<String>(
+    showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => RobustImagePickerWidget(
-        onImageSelected: (file) {
-          if (file != null) {
-            setState(() {
-              _selectedImagePath = file.path;
-            });
-          }
-        },
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'Add Photo',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              
+              // Options
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: Colors.blue[600],
+                  ),
+                ),
+                title: const Text('Take Photo'),
+                subtitle: const Text('Use camera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImageFromCamera();
+                },
+              ),
+              
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.photo_library,
+                    color: Colors.green[600],
+                  ),
+                ),
+                title: const Text('Choose from Gallery'),
+                subtitle: const Text('Select existing photo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImageFromGallery();
+                },
+              ),
+              
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  Future<void> _pickImageFromCamera() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImagePath = image.path;
+        });
+      }
+    } catch (e) {
+      print('Error picking image from camera: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error taking photo: $e'),
+            backgroundColor: Colors.red[600],
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImagePath = image.path;
+        });
+      }
+    } catch (e) {
+      print('Error picking image from gallery: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error selecting photo: $e'),
+            backgroundColor: Colors.red[600],
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   void _selectTag(String? tag) {
