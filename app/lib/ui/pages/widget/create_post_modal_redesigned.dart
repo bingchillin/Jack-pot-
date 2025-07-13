@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../l10n/app_localizations.dart';
+import '../../../services/upload_service.dart';
 
 class CreatePostModalRedesigned extends StatefulWidget {
   const CreatePostModalRedesigned({super.key});
@@ -695,15 +696,47 @@ class _CreatePostModalRedesignedState extends State<CreatePostModalRedesigned> w
     
     HapticFeedback.lightImpact();
     
-    // Dispatch the event - the BlocListener will handle success/error
-    context.read<CommentBloc>().add(
-      CreateComment(
-        _contentController.text.trim(),
-        imageUrl: _selectedImagePath,
-        tag: _selectedTag,
-        userId: authProvider.currentUser!.idPerson.toString(),
-      ),
-    );
+    try {
+      String? uploadedImageUrl;
+      
+      // Upload image first if one is selected
+      if (_selectedImagePath != null) {
+        final uploadService = UploadService();
+        final imageFile = File(_selectedImagePath!);
+        
+        print('Uploading image: ${_selectedImagePath}');
+        uploadedImageUrl = await uploadService.uploadImage(
+          imageFile, 
+          token: authProvider.accessToken,
+        );
+        print('Image uploaded successfully: $uploadedImageUrl');
+      }
+      
+      // Dispatch the event with the uploaded image URL
+      context.read<CommentBloc>().add(
+        CreateComment(
+          _contentController.text.trim(),
+          imageUrl: uploadedImageUrl,
+          tag: _selectedTag,
+          userId: authProvider.currentUser!.idPerson.toString(),
+        ),
+      );
+    } catch (e) {
+      print('Error uploading image: $e');
+      setState(() {
+        _isSubmitting = false;
+      });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error uploading image: $e'),
+            backgroundColor: Colors.red[600],
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   Color _getTagColor(String tag) {

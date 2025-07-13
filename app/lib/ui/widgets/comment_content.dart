@@ -55,19 +55,19 @@ class CommentContent extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         child: Padding(
-          padding: const EdgeInsets.only(top: 6, bottom: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 18, color: color),
+              Icon(icon, size: 20, color: color),
               if (label.isNotEmpty) ...[
                 const SizedBox(width: 6),
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: color,
                   ),
@@ -86,7 +86,7 @@ class CommentContent extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       decoration: BoxDecoration(
         color: Colors.green[50],
         border: Border(
@@ -161,15 +161,16 @@ class CommentContent extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Row(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
                             comment.person.displayName,
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              fontSize: 15,
+                              fontSize: 16,
                               color: Colors.grey[800],
-                              letterSpacing: 0.2,
+                              letterSpacing: 0.1,
                             ),
                           ),
                           if (comment.tag != null && !isThread) ...[
@@ -193,7 +194,7 @@ class CommentContent extends StatelessWidget {
                               ),
                             ),
                           ],
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 6),
                           Text(
                             '· ${_formatTimeAgo(context, comment.createdAt)}',
                             style: TextStyle(
@@ -233,11 +234,11 @@ class CommentContent extends StatelessWidget {
                 ),
                 
                 // Content
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
                   comment.content,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     height: 1.4,
                     color: Colors.grey[800],
                   ),
@@ -263,6 +264,9 @@ class CommentContent extends StatelessWidget {
                     ),
                   ),
                 ],
+                
+                // Action buttons
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     // Like button
@@ -287,7 +291,8 @@ class CommentContent extends StatelessWidget {
                         if (onLike != null) onLike!();
                       },
                     ),
-                    const SizedBox(width: 16),
+                    
+                    const SizedBox(width: 20),
                     
                     // Reply button
                     _buildActionButton(
