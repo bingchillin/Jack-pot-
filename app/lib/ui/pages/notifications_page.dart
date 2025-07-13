@@ -16,23 +16,37 @@ class NotificationsPage extends StatefulWidget {
 class _NotificationsPageState extends State<NotificationsPage> with TickerProviderStateMixin {
   final EnhancedNotificationService _notificationService = EnhancedNotificationService();
   late TabController _tabController;
+  late AnimationController _readAnimationController;
   
   List<NotificationModel> _allNotifications = [];
   List<NotificationModel> _socialNotifications = [];
   List<NotificationModel> _plantNotifications = [];
   bool _isLoading = true;
   String? _error;
+  Set<int> _animatingNotifications = {};
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _readAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
     _loadNotifications();
+    
+    // Auto-mark notifications as read after a short delay (like modern apps)
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted && _hasUnreadNotifications()) {
+        _markAllAsReadWithAnimation();
+      }
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _readAnimationController.dispose();
     super.dispose();
   }
 
@@ -97,9 +111,105 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(icon: const Icon(Icons.all_inbox), text: localizations.all),
-            Tab(icon: const Icon(Icons.chat_bubble_outline), text: localizations.social),
-            Tab(icon: const Icon(Icons.eco), text: localizations.plants),
+            Tab(
+              icon: Stack(
+                children: [
+                  const Icon(Icons.all_inbox),
+                  if (_getUnreadCount(_allNotifications) > 0)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${_getUnreadCount(_allNotifications)}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              text: localizations.all,
+            ),
+            Tab(
+              icon: Stack(
+                children: [
+                  const Icon(Icons.chat_bubble_outline),
+                  if (_getUnreadCount(_socialNotifications) > 0)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${_getUnreadCount(_socialNotifications)}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              text: localizations.social,
+            ),
+            Tab(
+              icon: Stack(
+                children: [
+                  const Icon(Icons.eco),
+                  if (_getUnreadCount(_plantNotifications) > 0)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${_getUnreadCount(_plantNotifications)}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              text: localizations.plants,
+            ),
           ],
         ),
       ),
@@ -188,9 +298,16 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
   }
 
   Widget _buildNotificationItem(NotificationModel notification, AppLocalizations localizations) {
-    return Container(
+    final isAnimating = _animatingNotifications.contains(notification.idNotification);
+    
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
       color: notification.isRead ? Colors.white : Colors.blue.withOpacity(0.02),
-      child: InkWell(
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 400),
+        opacity: isAnimating ? 0.7 : 1.0,
+        child: InkWell(
         onTap: () {
           // Handle tap - navigate to comment if social notification
           if (notification.isSocialNotification && notification.idComment != null) {
@@ -250,12 +367,16 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
                         ),
                         if (!notification.isRead) ...[
                           const SizedBox(width: 8),
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
+                          AnimatedScale(
+                            duration: const Duration(milliseconds: 400),
+                            scale: isAnimating ? 0.0 : 1.0,
+                            child: Container(
+                              width: 8,
+                              height: 8,
+                              decoration: const BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ),
                         ],
@@ -292,7 +413,7 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
           ),
         ),
       ),
-    );
+    ));
   }
 
   IconData _getNotificationIcon(NotificationModel notification) {
@@ -329,6 +450,95 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
       return '${difference.inMinutes}m';
     } else {
       return 'now';
+    }
+  }
+
+  bool _hasUnreadNotifications() {
+    return _allNotifications.any((notification) => !notification.isRead);
+  }
+
+  int _getUnreadCount(List<NotificationModel> notifications) {
+    return notifications.where((notification) => !notification.isRead).length;
+  }
+
+  Future<void> _markAllAsReadWithAnimation() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    final personId = authProvider.currentUser?.idPerson;
+
+    if (token == null || personId == null) return;
+
+    try {
+      // Get all unread notification IDs
+      final unreadNotifications = _allNotifications.where((n) => !n.isRead).toList();
+      if (unreadNotifications.isEmpty) return;
+
+      // Start animation for all unread notifications
+      setState(() {
+        for (var notification in unreadNotifications) {
+          _animatingNotifications.add(notification.idNotification);
+        }
+      });
+
+      // Wait a bit for animation to start
+      await Future.delayed(const Duration(milliseconds: 200));
+
+      // Mark all as read on server
+      final success = await _notificationService.markAllAsRead(token, personId);
+      
+      if (success) {
+        // Animate each notification with a staggered delay
+        for (int i = 0; i < unreadNotifications.length; i++) {
+          await Future.delayed(Duration(milliseconds: i * 50)); // Stagger by 50ms
+          
+          if (mounted) {
+            setState(() {
+              unreadNotifications[i].isRead = true;
+            });
+          }
+        }
+
+        // Update all filtered lists
+        if (mounted) {
+          setState(() {
+            for (var notification in _socialNotifications) {
+              if (unreadNotifications.any((n) => n.idNotification == notification.idNotification)) {
+                notification.isRead = true;
+              }
+            }
+            for (var notification in _plantNotifications) {
+              if (unreadNotifications.any((n) => n.idNotification == notification.idNotification)) {
+                notification.isRead = true;
+              }
+            }
+          });
+        }
+
+        // Clear animation state after animations complete
+        await Future.delayed(const Duration(milliseconds: 600));
+        if (mounted) {
+          setState(() {
+            _animatingNotifications.clear();
+          });
+        }
+        
+        print('DEBUG: Auto-marked ${unreadNotifications.length} notifications as read with animation');
+      } else {
+        // If API call failed, clear animation state
+        if (mounted) {
+          setState(() {
+            _animatingNotifications.clear();
+          });
+        }
+      }
+    } catch (e) {
+      print('Error auto-marking notifications as read: $e');
+      // Clear animation state on error
+      if (mounted) {
+        setState(() {
+          _animatingNotifications.clear();
+        });
+      }
     }
   }
 }

@@ -1028,6 +1028,26 @@
     "description": "Success message when all notifications are marked as read"
   },
 
+  "friends": "Friends",
+  "@friends": {
+    "description": "Friends page title"
+  },
+
+  "pending": "Pending",
+  "@pending": {
+    "description": "Pending friend requests tab"
+  },
+
+  "sent": "Sent",
+  "@sent": {
+    "description": "Sent friend requests tab"
+  },
+
+  "blocked": "Blocked",
+  "@blocked": {
+    "description": "Blocked users tab"
+  },
+
   "like": "Like",
   "@like": {
     "description": "Like button text"

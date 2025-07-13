@@ -641,6 +641,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get allNotificationsRead => 'All notifications marked as read';
 
   @override
+  String get friends => 'Friends';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get sent => 'Sent';
+
+  @override
+  String get blocked => 'Blocked';
+
+  @override
   String get like => 'J\'aime';
 
   @override

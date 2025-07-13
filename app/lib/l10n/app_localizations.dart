@@ -1294,6 +1294,30 @@ abstract class AppLocalizations {
   /// **'All notifications marked as read'**
   String get allNotificationsRead;
 
+  /// Friends page title
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get friends;
+
+  /// Pending friend requests tab
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// Sent friend requests tab
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get sent;
+
+  /// Blocked users tab
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get blocked;
+
   /// Like button text
   ///
   /// In en, this message translates to:

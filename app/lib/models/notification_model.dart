@@ -5,7 +5,7 @@ class NotificationModel {
   final String? advise;
   final int? idPerson;
   final int? idObject;
-  final bool isRead;
+  bool isRead;
   final String notificationType;
   final int? idComment;
   final int? idTriggeringPerson;

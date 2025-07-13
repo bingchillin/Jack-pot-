@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../providers/auth_provider.dart';
 import '../../l10n/app_localizations.dart';
-import 'friends_management_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
