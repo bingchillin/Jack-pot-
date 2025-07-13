@@ -983,6 +983,51 @@
     "description": "General plant care advice"
   },
 
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications page title"
+  },
+
+  "all": "All",
+  "@all": {
+    "description": "All notifications tab"
+  },
+
+  "social": "Social",
+  "@social": {
+    "description": "Social notifications tab"
+  },
+
+  "plants": "Plants",
+  "@plants": {
+    "description": "Plant notifications tab"
+  },
+
+  "noNotifications": "No notifications",
+  "@noNotifications": {
+    "description": "Message when there are no notifications"
+  },
+
+  "notAuthenticated": "Not authenticated",
+  "@notAuthenticated": {
+    "description": "Error message when user is not authenticated"
+  },
+
+  "errorLoadingNotifications": "Error loading notifications",
+  "@errorLoadingNotifications": {
+    "description": "Error message when notifications fail to load"
+  },
+
+  "markAllRead": "Mark all read",
+  "@markAllRead": {
+    "description": "Button to mark all notifications as read"
+  },
+
+  "allNotificationsRead": "All notifications marked as read",
+  "@allNotificationsRead": {
+    "description": "Success message when all notifications are marked as read"
+  },
+
   "like": "Like",
   "@like": {
     "description": "Like button text"

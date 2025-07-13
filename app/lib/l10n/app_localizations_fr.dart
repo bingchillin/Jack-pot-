@@ -614,6 +614,33 @@ class AppLocalizationsFr extends AppLocalizations {
       'Veuillez vérifier la santé générale de votre plante et son environnement.';
 
   @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get social => 'Social';
+
+  @override
+  String get plants => 'Plants';
+
+  @override
+  String get noNotifications => 'No notifications';
+
+  @override
+  String get notAuthenticated => 'Not authenticated';
+
+  @override
+  String get errorLoadingNotifications => 'Error loading notifications';
+
+  @override
+  String get markAllRead => 'Mark all read';
+
+  @override
+  String get allNotificationsRead => 'All notifications marked as read';
+
+  @override
   String get like => 'J\'aime';
 
   @override

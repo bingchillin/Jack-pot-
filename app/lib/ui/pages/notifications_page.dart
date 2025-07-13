@@ -42,7 +42,7 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
 
     if (token == null) {
       setState(() {
-        _error = 'Non authentifié';
+        _error = AppLocalizations.of(context)!.notAuthenticated;
         _isLoading = false;
       });
       return;
@@ -89,74 +89,246 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text(localizations.notifications),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.all_inbox), text: 'Toutes'),
-            Tab(icon: Icon(Icons.chat_bubble_outline), text: 'Social'),
-            Tab(icon: Icon(Icons.eco), text: 'Plantes'),
+          tabs: [
+            Tab(icon: const Icon(Icons.all_inbox), text: localizations.all),
+            Tab(icon: const Icon(Icons.chat_bubble_outline), text: localizations.social),
+            Tab(icon: const Icon(Icons.eco), text: localizations.plants),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadNotifications,
-            tooltip: 'Actualiser',
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(child: Text('Erreur: $_error'))
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        localizations.errorLoadingNotifications,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _error!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildNotificationList(_allNotifications),
-                    _buildNotificationList(_socialNotifications),
-                    _buildNotificationList(_plantNotifications),
+                    _buildNotificationList(_allNotifications, localizations),
+                    _buildNotificationList(_socialNotifications, localizations),
+                    _buildNotificationList(_plantNotifications, localizations),
                   ],
                 ),
     );
   }
 
-  Widget _buildNotificationList(List<NotificationModel> notifications) {
+  Widget _buildNotificationList(List<NotificationModel> notifications, AppLocalizations localizations) {
     if (notifications.isEmpty) {
-      return const Center(
-        child: Text('Aucune notification'),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.notifications_none,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              localizations.noNotifications,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[800],
+              ),
+            ),
+          ],
+        ),
       );
     }
 
-    return ListView.builder(
+    return ListView.separated(
       itemCount: notifications.length,
+      separatorBuilder: (context, index) => Divider(
+        height: 1,
+        color: Colors.grey[200],
+        indent: 16,
+        endIndent: 16,
+      ),
       itemBuilder: (context, index) {
         final notification = notifications[index];
-        return Card(
-          margin: const EdgeInsets.all(8),
-          child: ListTile(
-            leading: CircleAvatar(
-              child: Text(notification.notificationIcon),
-            ),
-            title: Text(notification.title ?? 'Notification'),
-            subtitle: Text(notification.description ?? ''),
-            trailing: notification.isRead ? null : const Icon(Icons.circle, color: Colors.blue, size: 12),
-            onTap: () {
-              // Handle tap - navigate to comment if social notification
-              if (notification.isSocialNotification && notification.idComment != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CommentDetailPage(commentId: notification.idComment!),
-                  ),
-                );
-              }
-            },
-          ),
-        );
+        return _buildNotificationItem(notification, localizations);
       },
     );
   }
-} 
+
+  Widget _buildNotificationItem(NotificationModel notification, AppLocalizations localizations) {
+    return Container(
+      color: notification.isRead ? Colors.white : Colors.blue.withOpacity(0.02),
+      child: InkWell(
+        onTap: () {
+          // Handle tap - navigate to comment if social notification
+          if (notification.isSocialNotification && notification.idComment != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CommentDetailPage(commentId: notification.idComment!),
+              ),
+            );
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Notification icon
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: _getNotificationColor(notification).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: _getNotificationColor(notification).withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Center(
+                  child: Icon(
+                    _getNotificationIcon(notification),
+                    color: _getNotificationColor(notification),
+                    size: 24,
+                  ),
+                ),
+              ),
+              
+              const SizedBox(width: 12),
+              
+              // Notification content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title and unread indicator
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            notification.title ?? 'Notification',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                        ),
+                        if (!notification.isRead) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 4),
+                    
+                    // Description
+                    if (notification.description != null && notification.description!.isNotEmpty) ...[
+                      Text(
+                        notification.description!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    
+                    // Timestamp
+                    Text(
+                      _formatNotificationTime(notification.createdAt),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getNotificationIcon(NotificationModel notification) {
+    if (notification.isSocialNotification) {
+      return Icons.chat_bubble_outline;
+    } else if (notification.isPlantNotification) {
+      return Icons.eco;
+    }
+    return Icons.notifications;
+  }
+
+  Color _getNotificationColor(NotificationModel notification) {
+    if (notification.isSocialNotification) {
+      return Colors.blue[600]!;
+    } else if (notification.isPlantNotification) {
+      return Colors.green[600]!;
+    }
+    return Colors.grey[600]!;
+  }
+
+  String _formatNotificationTime(DateTime? dateTime) {
+    if (dateTime == null) return '';
+    
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 7) {
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays}d';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m';
+    } else {
+      return 'now';
+    }
+  }
+}

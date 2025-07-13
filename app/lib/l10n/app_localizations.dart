@@ -1240,6 +1240,60 @@ abstract class AppLocalizations {
   /// **'Please check your plant\'s overall health and environment.'**
   String get notificationAdviceGeneral;
 
+  /// Notifications page title
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// All notifications tab
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// Social notifications tab
+  ///
+  /// In en, this message translates to:
+  /// **'Social'**
+  String get social;
+
+  /// Plant notifications tab
+  ///
+  /// In en, this message translates to:
+  /// **'Plants'**
+  String get plants;
+
+  /// Message when there are no notifications
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications'**
+  String get noNotifications;
+
+  /// Error message when user is not authenticated
+  ///
+  /// In en, this message translates to:
+  /// **'Not authenticated'**
+  String get notAuthenticated;
+
+  /// Error message when notifications fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading notifications'**
+  String get errorLoadingNotifications;
+
+  /// Button to mark all notifications as read
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get markAllRead;
+
+  /// Success message when all notifications are marked as read
+  ///
+  /// In en, this message translates to:
+  /// **'All notifications marked as read'**
+  String get allNotificationsRead;
+
   /// Like button text
   ///
   /// In en, this message translates to:

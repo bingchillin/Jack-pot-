@@ -179,6 +179,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     on<DeleteComment>(_onDeleteComment);
     on<RefreshComments>(_onRefreshComments);
     on<EmitMainCommentsState>(_onEmitMainCommentsState);
+    on<SetCurrentFeedType>(_onSetCurrentFeedType);
   }
   
   Future<void> _onLoadMainComments(LoadMainComments event, Emitter<CommentState> emit) async {
@@ -536,5 +537,10 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     if (!foundInMain && !foundInFriends) {
       print('Debug: Parent comment $parentCommentId not found in any cache for reply count update');
     }
+  }
+
+  void _onSetCurrentFeedType(SetCurrentFeedType event, Emitter<CommentState> emit) {
+    _currentFeedType = event.feedType;
+    print('DEBUG: CommentBloc - Current feed type set to: ${event.feedType}');
   }
 } 

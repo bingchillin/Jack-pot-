@@ -4,6 +4,8 @@ import 'comment_image_widget.dart';
 import 'tag_selector_widget.dart';
 import 'comment_options_menu.dart';
 import '../pages/widget/create_reply_modal_redesigned.dart';
+import '../../services/comment_flag_service.dart';
+import 'flag_reason_dialog.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../bloc/comment/comment_bloc.dart';
@@ -379,26 +381,6 @@ class CommentContent extends StatelessWidget {
                 ),
               ),
               
-              // Edit option
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.edit,
-                    color: Colors.blue[600],
-                    size: 20,
-                  ),
-                ),
-                title: const Text('Edit Comment'),
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Implement edit functionality
-                },
-              ),
               
               // Delete option
               ListTile(
@@ -471,13 +453,7 @@ class CommentContent extends StatelessWidget {
                 subtitle: const Text('Report inappropriate content'),
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Implement report functionality
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Report functionality coming soon'),
-                      backgroundColor: Colors.orange,
-                    ),
-                  );
+                  _showReportDialog(context);
                 },
               ),
               
@@ -513,6 +489,55 @@ class CommentContent extends StatelessWidget {
             child: const Text('Delete'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showReportDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => FlagReasonDialog(
+        onFlag: (reason, details) async {
+          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          if (authProvider.currentUser?.idPerson == null || authProvider.accessToken == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('You must be logged in to report comments'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+
+          try {
+            final flagService = CommentFlagService();
+            await flagService.flagComment(
+              commentId: comment.idComment,
+              idPerson: authProvider.currentUser!.idPerson,
+              reason: reason,
+              details: details,
+              token: authProvider.accessToken!,
+            );
+
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Comment reported successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error reporting comment: $e'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        },
       ),
     );
   }

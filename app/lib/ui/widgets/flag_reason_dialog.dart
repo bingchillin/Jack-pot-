@@ -17,11 +17,11 @@ class _FlagReasonDialogState extends State<FlagReasonDialog> {
   final TextEditingController _detailsController = TextEditingController();
 
   final Map<String, String> _reasons = {
-    'inappropriate': 'Contenu inapproprié',
-    'spam': 'Spam ou publicité',
-    'harassment': 'Harcèlement',
-    'hate_speech': 'Discours de haine',
-    'other': 'Autre',
+    'inappropriate': 'Inappropriate content',
+    'spam': 'Spam or advertising',
+    'harassment': 'Harassment',
+    'hate_speech': 'Hate speech',
+    'other': 'Other',
   };
 
   final Map<String, IconData> _reasonIcons = {
@@ -45,7 +45,7 @@ class _FlagReasonDialogState extends State<FlagReasonDialog> {
         children: [
           Icon(Icons.flag, color: Colors.red.shade600),
           const SizedBox(width: 8),
-          const Text('Signaler le commentaire'),
+          const Expanded(child: Text('Report Comment')),
         ],
       ),
       content: SingleChildScrollView(
@@ -54,7 +54,7 @@ class _FlagReasonDialogState extends State<FlagReasonDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Pourquoi signalez-vous ce commentaire ?',
+              'Why are you reporting this comment?',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 16),
@@ -77,7 +77,12 @@ class _FlagReasonDialogState extends State<FlagReasonDialog> {
                       color: Colors.grey.shade600,
                     ),
                     const SizedBox(width: 8),
-                    Expanded(child: Text(entry.value)),
+                    Expanded(
+                      child: Text(
+                        entry.value,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
                 contentPadding: EdgeInsets.zero,
@@ -91,8 +96,8 @@ class _FlagReasonDialogState extends State<FlagReasonDialog> {
             TextField(
               controller: _detailsController,
               decoration: const InputDecoration(
-                labelText: 'Détails supplémentaires (optionnel)',
-                hintText: 'Expliquez pourquoi ce commentaire pose problème...',
+                labelText: 'Additional details (optional)',
+                hintText: 'Explain why this comment is problematic...',
                 border: OutlineInputBorder(),
                 alignLabelWithHint: true,
               ),
@@ -105,7 +110,7 @@ class _FlagReasonDialogState extends State<FlagReasonDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -120,7 +125,7 @@ class _FlagReasonDialogState extends State<FlagReasonDialog> {
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
           ),
-          child: const Text('Signaler'),
+          child: const Text('Report'),
         ),
       ],
     );
