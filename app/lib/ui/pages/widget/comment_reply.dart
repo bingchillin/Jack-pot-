@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import '../../../models/comment_model.dart';
 import '../../../providers/auth_provider.dart';
 import 'package:provider/provider.dart';
-import 'create_reply_modal.dart';
+import 'create_reply_modal_redesigned.dart';
 import 'comment_options_menu.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../bloc/comment/comment_bloc.dart';
@@ -370,7 +370,7 @@ class _CommentReplyState extends State<CommentReply> with TickerProviderStateMix
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CreateReplyModal(parentComment: widget.reply),
+      builder: (context) => CreateReplyModalRedesigned(parentComment: widget.reply),
     );
   }
 

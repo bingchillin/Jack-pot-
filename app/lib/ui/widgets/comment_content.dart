@@ -3,6 +3,9 @@ import '../../models/comment_model.dart';
 import 'comment_image_widget.dart';
 import 'tag_selector_widget.dart';
 import 'comment_options_menu.dart';
+import '../pages/widget/create_reply_modal_redesigned.dart';
+import '../../services/comment_flag_service.dart';
+import 'flag_reason_dialog.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../bloc/comment/comment_bloc.dart';
@@ -55,19 +58,19 @@ class CommentContent extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         child: Padding(
-          padding: const EdgeInsets.only(top: 6, bottom: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 18, color: color),
+              Icon(icon, size: 20, color: color),
               if (label.isNotEmpty) ...[
                 const SizedBox(width: 6),
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: color,
                   ),
@@ -86,7 +89,7 @@ class CommentContent extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       decoration: BoxDecoration(
         color: Colors.green[50],
         border: Border(
@@ -157,28 +160,55 @@ class CommentContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Author info row
+                // Author info row with inline tag
                 Row(
                   children: [
-                    Text(
-                      comment.person.displayName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: Colors.grey[800],
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '· ${_formatTimeAgo(context, comment.createdAt)}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[500],
+                    Expanded(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            comment.person.displayName,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.grey[800],
+                              letterSpacing: 0.1,
+                            ),
+                          ),
+                          if (comment.tag != null && !isThread) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: _getTagColor(comment.tag!).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _getTagColor(comment.tag!).withOpacity(0.3),
+                                ),
+                              ),
+                              child: Text(
+                                _getTagDisplayName(comment.tag!, context),
+                                style: TextStyle(
+                                  color: _getTagColor(comment.tag!),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(width: 6),
+                          Text(
+                            '· ${_formatTimeAgo(context, comment.createdAt)}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     if (showOptions) ...[
-                      const Spacer(),
                       IconButton(
                         icon: Icon(
                           Icons.more_horiz,
@@ -186,17 +216,16 @@ class CommentContent extends StatelessWidget {
                           size: 20,
                         ),
                         onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => CommentOptionsMenu(
-                              comment: comment,
-                              onDelete: () {
-                                Navigator.pop(context);
-                                context.read<CommentBloc>().add(DeleteComment(comment.idComment));
-                              },
-                            ),
-                          );
+                          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                          final currentUserId = authProvider.currentUser?.idPerson;
+                          
+                          if (currentUserId == null || currentUserId != comment.idPerson) {
+                            // Show report/flag options for other users' comments
+                            _showReportMenu(context);
+                          } else {
+                            // Show edit/delete options for own comments
+                            _showOwnerMenu(context);
+                          }
                         },
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -206,21 +235,12 @@ class CommentContent extends StatelessWidget {
                   ],
                 ),
                 
-                // Tag if present
-                if (comment.tag != null && !isThread) ...[
-                  const SizedBox(height: 4),
-                  TagDisplayWidget(
-                    tag: comment.tag!,
-                    isSmall: true,
-                  ),
-                ],
-                
                 // Content
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
                   comment.content,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     height: 1.4,
                     color: Colors.grey[800],
                   ),
@@ -246,6 +266,9 @@ class CommentContent extends StatelessWidget {
                     ),
                   ),
                 ],
+                
+                // Action buttons
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     // Like button
@@ -270,7 +293,8 @@ class CommentContent extends StatelessWidget {
                         if (onLike != null) onLike!();
                       },
                     ),
-                    const SizedBox(width: 16),
+                    
+                    const SizedBox(width: 20),
                     
                     // Reply button
                     _buildActionButton(
@@ -287,7 +311,17 @@ class CommentContent extends StatelessWidget {
                           );
                           return;
                         }
-                        if (onReply != null) onReply!();
+                        if (onReply != null) {
+                          onReply!();
+                        } else {
+                          // Default reply action using redesigned modal
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => CreateReplyModalRedesigned(parentComment: comment),
+                          );
+                        }
                       },
                     ),
                   ],
@@ -296,6 +330,214 @@ class CommentContent extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Color _getTagColor(String tag) {
+    switch (tag.toLowerCase()) {
+      case 'conversation':
+        return Colors.blue[600]!;
+      case 'conseil':
+        return Colors.green[600]!;
+      default:
+        return Colors.grey[600]!;
+    }
+  }
+
+  String _getTagDisplayName(String tag, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    switch (tag.toLowerCase()) {
+      case 'conversation':
+        return localizations.conversation;
+      case 'conseil':
+        return localizations.advice;
+      default:
+        return tag;
+    }
+  }
+
+  void _showOwnerMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              
+              
+              // Delete option
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.delete,
+                    color: Colors.red[600],
+                    size: 20,
+                  ),
+                ),
+                title: const Text('Delete Comment'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteConfirmation(context);
+                },
+              ),
+              
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showReportMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              
+              // Report option
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.flag,
+                    color: Colors.orange[600],
+                    size: 20,
+                  ),
+                ),
+                title: const Text('Report Comment'),
+                subtitle: const Text('Report inappropriate content'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showReportDialog(context);
+                },
+              ),
+              
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Comment'),
+        content: const Text(
+          'Are you sure you want to delete this comment? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              context.read<CommentBloc>().add(DeleteComment(comment.idComment));
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showReportDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => FlagReasonDialog(
+        onFlag: (reason, details) async {
+          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          if (authProvider.currentUser?.idPerson == null || authProvider.accessToken == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('You must be logged in to report comments'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+
+          try {
+            final flagService = CommentFlagService();
+            await flagService.flagComment(
+              commentId: comment.idComment,
+              idPerson: authProvider.currentUser!.idPerson,
+              reason: reason,
+              details: details,
+              token: authProvider.accessToken!,
+            );
+
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Comment reported successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error reporting comment: $e'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        },
       ),
     );
   }

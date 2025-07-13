@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/comment/comment_bloc.dart';
 import '../../models/comment_model.dart';
 import 'widget/comment_card.dart';
-import 'widget/create_post_modal.dart';
+import 'widget/create_post_modal_redesigned.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../widgets/twitter_feed_toggle.dart';
@@ -19,30 +19,30 @@ class AdvisePage extends StatefulWidget {
   State<AdvisePage> createState() => _AdvisePageState();
 }
 
-class _AdvisePageState extends State<AdvisePage> 
+class _AdvisePageState extends State<AdvisePage>
     with RouteAware, TickerProviderStateMixin {
   FeedType _currentFeed = FeedType.forYou;
   TagFilter _selectedTagFilter = TagFilter.all;
-  
+
   // Scroll controller for the feed list
   final ScrollController _scrollController = ScrollController();
-  
+
   // Track if this is initial loading (show shimmer) vs tab switching (show cached data)
   bool _isInitialLoading = true;
 
   @override
   void initState() {
     super.initState();
-    
+
     // No custom scroll listener needed
-    
+
     // Charger les commentaires au démarrage si pas déjà chargés
     final currentState = context.read<CommentBloc>().state;
     if (currentState is CommentInitial) {
       _loadCurrentFeed();
     }
   }
-  
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -51,7 +51,7 @@ class _AdvisePageState extends State<AdvisePage>
     if (route is PageRoute) {
       routeObserver.subscribe(this, route);
     }
-    
+
     // Détecter quand on revient à cette page
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final currentState = context.read<CommentBloc>().state;
@@ -68,7 +68,7 @@ class _AdvisePageState extends State<AdvisePage>
     routeObserver.unsubscribe(this);
     super.dispose();
   }
-  
+
   // No custom _onScroll needed as SliverAppBar handles show/hide
 
   // Méthode appelée quand la page devient visible (retour depuis une autre page)
@@ -77,10 +77,10 @@ class _AdvisePageState extends State<AdvisePage>
     super.didPopNext();
     // Vérifier si on a du cache, sinon recharger
     final bloc = context.read<CommentBloc>();
-    final hasCache = _currentFeed == FeedType.friends 
-        ? bloc.friendsComments.isNotEmpty 
+    final hasCache = _currentFeed == FeedType.friends
+        ? bloc.friendsComments.isNotEmpty
         : bloc.mainComments.isNotEmpty;
-    
+
     if (!hasCache) {
       print('🔄 Advise page: No cache available, loading fresh data');
       _loadCurrentFeed();
@@ -95,7 +95,7 @@ class _AdvisePageState extends State<AdvisePage>
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final userId = authProvider.userId;
     final requestId = DateTime.now().millisecondsSinceEpoch.toString();
-    
+
     if (_currentFeed == FeedType.forYou) {
       context.read<CommentBloc>().add(LoadMainComments(userId: userId, requestId: requestId));
     } else {
@@ -114,10 +114,10 @@ class _AdvisePageState extends State<AdvisePage>
 
   void _onFeedChanged(FeedType newFeed) {
     if (newFeed == _currentFeed) return;
-    
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
-    
+
     // Vérifier l'authentification pour le feed des amis
     if (newFeed == FeedType.friends && !authProvider.isAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -135,12 +135,12 @@ class _AdvisePageState extends State<AdvisePage>
       );
       return;
     }
-    
+
     setState(() {
       _currentFeed = newFeed;
       _isInitialLoading = false; // No longer initial loading when switching tabs
     });
-    
+
     // Set the current feed type in the bloc BEFORE loading
     context.read<CommentBloc>().add(SetCurrentFeedType(newFeed));
     _loadCurrentFeed();
@@ -156,7 +156,7 @@ class _AdvisePageState extends State<AdvisePage>
     if (_selectedTagFilter == TagFilter.all) {
       return comments;
     }
-    
+
     return comments.where((comment) {
       // Filtrer par tag
       final tagValue = _selectedTagFilter.tagValue;
@@ -167,7 +167,7 @@ class _AdvisePageState extends State<AdvisePage>
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    
+
     return BlocListener<CommentBloc, CommentState>(
       listener: (context, state) {
         if (state is CommentError) {
@@ -234,14 +234,14 @@ class _AdvisePageState extends State<AdvisePage>
                   ),
                 ),
               ),
-              
+
               // Comments list
               BlocBuilder<CommentBloc, CommentState>(
                 builder: (context, state) {
                   if (state is CommentLoading && _isInitialLoading) {
                     return SliverList(
                       delegate: SliverChildBuilderDelegate(
-                        (context, index) => const CommentCardShimmer(),
+                            (context, index) => const CommentCardShimmer(),
                         childCount: 6, // Show 6 shimmer cards
                       ),
                     );
@@ -298,7 +298,7 @@ class _AdvisePageState extends State<AdvisePage>
                   // Afficher les commentaires pour les états CommentMainLoaded, CommentDetailLoaded et CommentLikeUpdated
                   List<Comment> commentsToShow = [];
                   final bloc = context.read<CommentBloc>();
-                  
+
                   if (state is CommentMainLoaded) {
                     commentsToShow = state.comments;
                   } else if (state is CommentThreadLoaded) {
@@ -326,12 +326,12 @@ class _AdvisePageState extends State<AdvisePage>
                     if (state is CommentLoading) {
                       return SliverList(
                         delegate: SliverChildBuilderDelegate(
-                          (context, index) => const CommentCardShimmer(),
+                              (context, index) => const CommentCardShimmer(),
                           childCount: 6, // Show 6 shimmer cards
                         ),
                       );
                     }
-                    
+
                     return SliverFillRemaining(
                       child: Center(
                         child: Column(
@@ -344,7 +344,7 @@ class _AdvisePageState extends State<AdvisePage>
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                _selectedTagFilter != TagFilter.all 
+                                _selectedTagFilter != TagFilter.all
                                     ? Icons.filter_list_off
                                     : (_currentFeed == FeedType.friends ? Icons.people_outline : Icons.chat_bubble_outline),
                                 size: 48,
@@ -355,9 +355,9 @@ class _AdvisePageState extends State<AdvisePage>
                             Text(
                               _selectedTagFilter != TagFilter.all
                                   ? localizations.noPostsFilter(_selectedTagFilter.getDisplayName(context))
-                                  : (_currentFeed == FeedType.friends 
-                                      ? localizations.noPostsFriends
-                                      : localizations.noPostsYet),
+                                  : (_currentFeed == FeedType.friends
+                                  ? localizations.noPostsFriends
+                                  : localizations.noPostsYet),
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
@@ -369,9 +369,9 @@ class _AdvisePageState extends State<AdvisePage>
                             Text(
                               _selectedTagFilter != TagFilter.all
                                   ? localizations.tryDifferentFilter
-                                  : (_currentFeed == FeedType.friends 
-                                      ? localizations.friendsNotPosted
-                                      : localizations.beFirstToPost),
+                                  : (_currentFeed == FeedType.friends
+                                  ? localizations.friendsNotPosted
+                                  : localizations.beFirstToPost),
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 14,
@@ -412,7 +412,7 @@ class _AdvisePageState extends State<AdvisePage>
 
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
-                      (context, index) {
+                          (context, index) {
                         // Add a subtle loading indicator at the top when refreshing with cached data
                         if (index == 0 && state is CommentLoading && commentsToShow.isNotEmpty) {
                           return Column(
@@ -431,7 +431,7 @@ class _AdvisePageState extends State<AdvisePage>
                             ],
                           );
                         }
-                        
+
                         final comment = commentsToShow[index];
                         return CommentCard(
                           comment: comment,
@@ -450,14 +450,14 @@ class _AdvisePageState extends State<AdvisePage>
           builder: (context) {
             final isAuthenticated = Provider.of<AuthProvider>(context, listen: false).isAuthenticated;
             if (!isAuthenticated) return const SizedBox.shrink();
-            
+
             return FloatingActionButton(
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => const CreatePostModal(),
+                  builder: (context) => const CreatePostModalRedesigned(),
                 );
               },
               backgroundColor: Colors.green[600],

@@ -90,11 +90,11 @@ class EnhancedNotificationService {
     }
   }
 
-  /// Mark all notifications as read
-  Future<bool> markAllAsRead(String token) async {
+  /// Mark all notifications as read for current user
+  Future<bool> markAllAsRead(String token, int personId) async {
     try {
       final response = await http.patch(
-        Uri.parse('$baseUrl/notifications/read-all'),
+        Uri.parse('$baseUrl/notifications/person/$personId/read-all'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

@@ -3,24 +3,25 @@ import 'package:provider/provider.dart';
 import '../../models/contact_model.dart';
 import '../../services/contact_service.dart';
 import '../../providers/auth_provider.dart';
+import '../../l10n/app_localizations.dart';
 import 'user_profile_page.dart';
-import 'blocked_users_page.dart';
 
 class FriendsManagementPage extends StatefulWidget {
-  const FriendsManagementPage({Key? key}) : super(key: key);
+  const FriendsManagementPage({super.key});
 
   @override
   State<FriendsManagementPage> createState() => _FriendsManagementPageState();
 }
 
 class _FriendsManagementPageState extends State<FriendsManagementPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController _tabController;
   final ContactService _contactService = ContactService();
   
   List<Contact> _friends = [];
   List<Contact> _pendingRequests = [];
   List<Contact> _sentRequests = [];
+  List<Contact> _blockedUsers = [];
   
   bool _isLoading = true;
   String? _error;
@@ -28,7 +29,7 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _loadAllContacts();
   }
 
@@ -44,7 +45,7 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
     
     if (token == null) {
       setState(() {
-        _error = 'Token non disponible';
+        _error = 'Not authenticated';
         _isLoading = false;
       });
       return;
@@ -60,193 +61,167 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
         _contactService.getMyContacts(token: token),
         _contactService.getPendingRequests(token: token),
         _contactService.getSentRequests(token: token),
+        _contactService.getBlockedContacts(token: token),
       ]);
 
       setState(() {
         _friends = results[0];
         _pendingRequests = results[1];
         _sentRequests = results[2];
+        _blockedUsers = results[3];
         _isLoading = false;
       });
     } catch (e) {
       setState(() {
-        _error = 'Erreur de chargement: ${e.toString()}';
+        _error = e.toString();
         _isLoading = false;
       });
     }
   }
 
-  Future<void> _acceptRequest(Contact contact) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final token = authProvider.accessToken;
-    
-    if (token == null) return;
-
-    try {
-      await _contactService.acceptFriendRequest(
-        contactId: contact.id,
-        token: token,
-      );
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Demande acceptée !')),
-      );
-      
-      _loadAllContacts(); // Recharger les données
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: ${e.toString()}')),
-      );
-    }
-  }
-
-  Future<void> _rejectRequest(Contact contact) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final token = authProvider.accessToken;
-    
-    if (token == null) return;
-
-    try {
-      await _contactService.rejectFriendRequest(
-        contactId: contact.id,
-        token: token,
-      );
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Demande rejetée')),
-      );
-      
-      _loadAllContacts(); // Recharger les données
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: ${e.toString()}')),
-      );
-    }
-  }
-
-  Future<void> _removeContact(Contact contact) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final token = authProvider.accessToken;
-    
-    if (token == null) return;
-
-    // Demander confirmation
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Supprimer le contact'),
-        content: Text('Êtes-vous sûr de vouloir supprimer ${contact.getOtherUser(authProvider.currentUser!.idPerson)?.displayName ?? 'ce contact'} ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Annuler'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Supprimer'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-
-    try {
-      await _contactService.removeContact(
-        contactId: contact.id,
-        token: token,
-      );
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Contact supprimé')),
-      );
-      
-      _loadAllContacts(); // Recharger les données
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: ${e.toString()}')),
-      );
-    }
-  }
-
-  void _navigateToUserProfile(int userId) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UserProfilePage(userId: userId),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-    final currentUserId = authProvider.currentUser?.idPerson;
-
+    final localizations = AppLocalizations.of(context)!;
+    
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text(
-          'Mes Amis',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black87),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.block),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const BlockedUsersPage(),
-                ),
-              );
-            },
-            tooltip: 'Utilisateurs bloqués',
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadAllContacts,
-            tooltip: 'Actualiser',
-          ),
-        ],
+        title: Text(localizations.friends),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
             Tab(
-              icon: Badge(
-                isLabelVisible: _friends.isNotEmpty,
-                label: Text('${_friends.length}'),
-                child: const Icon(Icons.people),
+              icon: Stack(
+                children: [
+                  const Icon(Icons.people),
+                  if (_friends.isNotEmpty)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${_friends.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              text: 'Amis',
+              text: localizations.friends,
             ),
             Tab(
-              icon: Badge(
-                isLabelVisible: _pendingRequests.isNotEmpty,
-                label: Text('${_pendingRequests.length}'),
-                child: const Icon(Icons.person_add),
+              icon: Stack(
+                children: [
+                  const Icon(Icons.person_add),
+                  if (_pendingRequests.isNotEmpty)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${_pendingRequests.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              text: 'Reçues',
+              text: localizations.pending,
             ),
             Tab(
-              icon: Badge(
-                isLabelVisible: _sentRequests.isNotEmpty,
-                label: Text('${_sentRequests.length}'),
-                child: const Icon(Icons.schedule),
+              icon: Stack(
+                children: [
+                  const Icon(Icons.send),
+                  if (_sentRequests.isNotEmpty)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${_sentRequests.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              text: 'Envoyées',
+              text: localizations.sent,
+            ),
+            Tab(
+              icon: Stack(
+                children: [
+                  const Icon(Icons.block),
+                  if (_blockedUsers.isNotEmpty)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${_blockedUsers.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              text: localizations.blocked,
             ),
           ],
-          labelColor: Colors.blue,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
         ),
       ),
       body: _isLoading
@@ -259,21 +234,25 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
                       Icon(
                         Icons.error_outline,
                         size: 64,
-                        color: Colors.grey.shade400,
+                        color: Colors.grey[400],
                       ),
                       const SizedBox(height: 16),
                       Text(
+                        'Error loading friends',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
                         _error!,
                         style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
+                          fontSize: 14,
+                          color: Colors.grey[600],
                         ),
                         textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadAllContacts,
-                        child: const Text('Réessayer'),
                       ),
                     ],
                   ),
@@ -281,44 +260,33 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    // Onglet Amis
-                    _buildFriendsList(),
-                    // Onglet Demandes reçues
-                    _buildPendingRequestsList(),
-                    // Onglet Demandes envoyées
-                    _buildSentRequestsList(),
+                    _buildContactList(_friends, ContactType.friend, localizations),
+                    _buildContactList(_pendingRequests, ContactType.pending, localizations),
+                    _buildContactList(_sentRequests, ContactType.sent, localizations),
+                    _buildContactList(_blockedUsers, ContactType.blocked, localizations),
                   ],
                 ),
     );
   }
 
-  Widget _buildFriendsList() {
-    final authProvider = Provider.of<AuthProvider>(context);
-    final currentUserId = authProvider.currentUser?.idPerson;
-
-    if (_friends.isEmpty) {
+  Widget _buildContactList(List<Contact> contacts, ContactType type, AppLocalizations localizations) {
+    if (contacts.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.people_outline,
+              _getEmptyStateIcon(type),
               size: 64,
-              color: Colors.grey.shade400,
+              color: Colors.grey[400],
             ),
             const SizedBox(height: 16),
             Text(
-              'Aucun ami pour le moment',
+              _getEmptyStateMessage(type, localizations),
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.grey.shade600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Commencez à ajouter des amis !',
-              style: TextStyle(
-                color: Colors.grey.shade500,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[800],
               ),
             ),
           ],
@@ -326,290 +294,443 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: _loadAllContacts,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _friends.length,
-        itemBuilder: (context, index) {
-          final contact = _friends[index];
-          final otherUser = contact.getOtherUser(currentUserId!);
-          
-          if (otherUser == null) return const SizedBox.shrink();
-
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.green.shade100,
-                child: Text(
-                  otherUser.firstname.isNotEmpty 
-                      ? otherUser.firstname[0].toUpperCase()
-                      : 'U',
-                  style: TextStyle(
-                    color: Colors.green.shade700,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              title: Text(
-                otherUser.displayName,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Text(otherUser.email),
-              trailing: PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'profile') {
-                    _navigateToUserProfile(otherUser.id);
-                  } else if (value == 'remove') {
-                    _removeContact(contact);
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'profile',
-                    child: Row(
-                      children: [
-                        Icon(Icons.person, color: Colors.blue),
-                        SizedBox(width: 8),
-                        Text('Voir le profil'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'remove',
-                    child: Row(
-                      children: [
-                        Icon(Icons.person_remove, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Supprimer'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              onTap: () => _navigateToUserProfile(otherUser.id),
-            ),
-          );
-        },
+    return ListView.separated(
+      itemCount: contacts.length,
+      separatorBuilder: (context, index) => Divider(
+        height: 1,
+        color: Colors.grey[200],
+        indent: 16,
+        endIndent: 16,
       ),
+      itemBuilder: (context, index) {
+        final contact = contacts[index];
+        return _buildContactItem(contact, type, localizations);
+      },
     );
   }
 
-  Widget _buildPendingRequestsList() {
-    final authProvider = Provider.of<AuthProvider>(context);
-    final currentUserId = authProvider.currentUser?.idPerson;
-
-    if (_pendingRequests.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildContactItem(Contact contact, ContactType type, AppLocalizations localizations) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final currentUserId = authProvider.currentUser?.idPerson ?? 0;
+    final otherUser = contact.getOtherUser(currentUserId);
+    
+    if (otherUser == null) return const SizedBox.shrink();
+    
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserProfilePage(userId: otherUser.id),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
           children: [
-            Icon(
-              Icons.inbox_outlined,
-              size: 64,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Aucune demande reçue',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey.shade600,
+            // Avatar
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.green[400]!, Colors.green[600]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Center(
+                child: Text(
+                  otherUser.displayName.isNotEmpty
+                      ? otherUser.displayName[0].toUpperCase()
+                      : 'U',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Les nouvelles demandes apparaîtront ici',
-              style: TextStyle(
-                color: Colors.grey.shade500,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: _loadAllContacts,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _pendingRequests.length,
-        itemBuilder: (context, index) {
-          final contact = _pendingRequests[index];
-          final requester = contact.requester;
-          
-          if (requester == null) return const SizedBox.shrink();
-
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+            
+            const SizedBox(width: 12),
+            
+            // Contact info
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.blue.shade100,
-                        child: Text(
-                          requester.firstname.isNotEmpty 
-                              ? requester.firstname[0].toUpperCase()
-                              : 'U',
-                          style: TextStyle(
-                            color: Colors.blue.shade700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              requester.displayName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Text(
-                              requester.email,
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => _acceptRequest(contact),
-                          icon: const Icon(Icons.check, size: 18),
-                          label: const Text('Accepter'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _rejectRequest(contact),
-                          icon: const Icon(Icons.close, size: 18),
-                          label: const Text('Rejeter'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildSentRequestsList() {
-    final authProvider = Provider.of<AuthProvider>(context);
-    final currentUserId = authProvider.currentUser?.idPerson;
-
-    if (_sentRequests.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.send_outlined,
-              size: 64,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Aucune demande envoyée',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey.shade600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Vos demandes en attente apparaîtront ici',
-              style: TextStyle(
-                color: Colors.grey.shade500,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: _loadAllContacts,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _sentRequests.length,
-        itemBuilder: (context, index) {
-          final contact = _sentRequests[index];
-          final receiver = contact.receiver;
-          
-          if (receiver == null) return const SizedBox.shrink();
-
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.orange.shade100,
-                child: Text(
-                  receiver.firstname.isNotEmpty 
-                      ? receiver.firstname[0].toUpperCase()
-                      : 'U',
-                  style: TextStyle(
-                    color: Colors.orange.shade700,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              title: Text(
-                receiver.displayName,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Text(receiver.email),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.schedule,
-                    color: Colors.orange,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 4),
                   Text(
-                    'En attente',
+                    otherUser.displayName,
                     style: TextStyle(
-                      color: Colors.orange,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _getContactSubtitle(contact, type),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
                     ),
                   ),
                 ],
               ),
-              onTap: () => _navigateToUserProfile(receiver.id),
             ),
-          );
-        },
+            
+            // Action buttons
+            _buildActionButtons(contact, type, localizations),
+          ],
+        ),
       ),
     );
   }
-} 
+
+  Widget _buildActionButtons(Contact contact, ContactType type, AppLocalizations localizations) {
+    switch (type) {
+      case ContactType.friend:
+        return PopupMenuButton<String>(
+          icon: Icon(Icons.more_vert, color: Colors.grey[600]),
+          onSelected: (value) {
+            if (value == 'block') {
+              _blockUser(contact);
+            } else if (value == 'remove') {
+              _removeFriend(contact);
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'block',
+              child: Row(
+                children: [
+                  Icon(Icons.block, color: Colors.red[600]),
+                  const SizedBox(width: 8),
+                  const Text('Block'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'remove',
+              child: Row(
+                children: [
+                  Icon(Icons.person_remove, color: Colors.orange[600]),
+                  const SizedBox(width: 8),
+                  const Text('Remove'),
+                ],
+              ),
+            ),
+          ],
+        );
+        
+      case ContactType.pending:
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: () => _acceptRequest(contact),
+              icon: Icon(Icons.check, color: Colors.green[600]),
+              tooltip: 'Accept',
+            ),
+            IconButton(
+              onPressed: () => _rejectRequest(contact),
+              icon: Icon(Icons.close, color: Colors.red[600]),
+              tooltip: 'Reject',
+            ),
+          ],
+        );
+        
+      case ContactType.sent:
+        return IconButton(
+          onPressed: () => _cancelRequest(contact),
+          icon: Icon(Icons.cancel, color: Colors.orange[600]),
+          tooltip: 'Cancel',
+        );
+        
+      case ContactType.blocked:
+        return TextButton(
+          onPressed: () => _unblockUser(contact),
+          child: Text(
+            'Unblock',
+            style: TextStyle(color: Colors.blue[600]),
+          ),
+        );
+    }
+  }
+
+  IconData _getEmptyStateIcon(ContactType type) {
+    switch (type) {
+      case ContactType.friend:
+        return Icons.people_outline;
+      case ContactType.pending:
+        return Icons.person_add_outlined;
+      case ContactType.sent:
+        return Icons.send_outlined;
+      case ContactType.blocked:
+        return Icons.block_outlined;
+    }
+  }
+
+  String _getEmptyStateMessage(ContactType type, AppLocalizations localizations) {
+    switch (type) {
+      case ContactType.friend:
+        return 'No friends yet';
+      case ContactType.pending:
+        return 'No pending requests';
+      case ContactType.sent:
+        return 'No sent requests';
+      case ContactType.blocked:
+        return 'No blocked users';
+    }
+  }
+
+  String _getContactSubtitle(Contact contact, ContactType type) {
+    switch (type) {
+      case ContactType.friend:
+        return 'Friend';
+      case ContactType.pending:
+        return 'Wants to be friends';
+      case ContactType.sent:
+        return 'Request sent';
+      case ContactType.blocked:
+        return 'Blocked';
+    }
+  }
+
+  // Action methods
+  Future<void> _acceptRequest(Contact contact) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    
+    if (token == null) return;
+    
+    try {
+      await _contactService.acceptFriendRequest(
+        contactId: contact.id,
+        token: token,
+      );
+      _loadAllContacts(); // Refresh the lists
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Friend request accepted'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error accepting request: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _rejectRequest(Contact contact) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    
+    if (token == null) return;
+    
+    try {
+      await _contactService.rejectFriendRequest(
+        contactId: contact.id,
+        token: token,
+      );
+      _loadAllContacts(); // Refresh the lists
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Friend request rejected'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error rejecting request: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _cancelRequest(Contact contact) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    
+    if (token == null) return;
+    
+    try {
+      await _contactService.removeContact(
+        contactId: contact.id,
+        token: token,
+      );
+      _loadAllContacts(); // Refresh the lists
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Friend request cancelled'),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error cancelling request: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _blockUser(Contact contact) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    final currentUserId = authProvider.currentUser?.idPerson;
+    final otherUser = contact.getOtherUser(currentUserId ?? 0);
+    
+    if (token == null || otherUser == null) return;
+    
+    try {
+      await _contactService.blockUser(
+        contactId: otherUser.id,
+        token: token,
+      );
+      _loadAllContacts(); // Refresh the lists
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${otherUser.displayName} has been blocked'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error blocking user: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _unblockUser(Contact contact) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    final currentUserId = authProvider.currentUser?.idPerson;
+    final otherUser = contact.getOtherUser(currentUserId ?? 0);
+    
+    if (token == null || otherUser == null) return;
+    
+    try {
+      await _contactService.unblockUser(
+        contactId: otherUser.id,
+        token: token,
+      );
+      _loadAllContacts(); // Refresh the lists
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${otherUser.displayName} has been unblocked'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error unblocking user: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _removeFriend(Contact contact) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    final currentUserId = authProvider.currentUser?.idPerson;
+    final otherUser = contact.getOtherUser(currentUserId ?? 0);
+    
+    if (token == null || otherUser == null) return;
+    
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Friend'),
+        content: Text('Are you sure you want to remove ${otherUser.displayName} from your friends?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirmed != true) return;
+    
+    try {
+      await _contactService.removeContact(
+        contactId: contact.id,
+        token: token,
+      );
+      _loadAllContacts(); // Refresh the lists
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${otherUser.displayName} removed from friends'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error removing friend: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+}
+
+enum ContactType {
+  friend,
+  pending,
+  sent,
+  blocked,
+}

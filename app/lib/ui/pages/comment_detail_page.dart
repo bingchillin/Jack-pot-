@@ -5,7 +5,7 @@ import '../widgets/thread_view.dart';
 import '../widgets/thread_shimmer.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/comment_model.dart';
-import 'widget/create_reply_modal.dart';
+import 'widget/create_reply_modal_redesigned.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -49,7 +49,7 @@ class _CommentDetailPageState extends State<CommentDetailPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CreateReplyModal(parentComment: comment),
+      builder: (context) => CreateReplyModalRedesigned(parentComment: comment),
     );
   }
 
