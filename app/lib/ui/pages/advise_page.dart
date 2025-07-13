@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/comment/comment_bloc.dart';
 import '../../models/comment_model.dart';
 import 'widget/comment_card.dart';
-import 'widget/create_post_modal.dart';
+import 'widget/create_post_modal_redesigned.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../widgets/twitter_feed_toggle.dart';
@@ -457,7 +457,7 @@ class _AdvisePageState extends State<AdvisePage>
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => const CreatePostModal(),
+                  builder: (context) => const CreatePostModalRedesigned(),
                 );
               },
               backgroundColor: Colors.green[600],

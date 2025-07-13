@@ -157,28 +157,54 @@ class CommentContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Author info row
+                // Author info row with inline tag
                 Row(
                   children: [
-                    Text(
-                      comment.person.displayName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: Colors.grey[800],
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '· ${_formatTimeAgo(context, comment.createdAt)}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[500],
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Text(
+                            comment.person.displayName,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              color: Colors.grey[800],
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          if (comment.tag != null && !isThread) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: _getTagColor(comment.tag!).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _getTagColor(comment.tag!).withOpacity(0.3),
+                                ),
+                              ),
+                              child: Text(
+                                _getTagDisplayName(comment.tag!, context),
+                                style: TextStyle(
+                                  color: _getTagColor(comment.tag!),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(width: 4),
+                          Text(
+                            '· ${_formatTimeAgo(context, comment.createdAt)}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     if (showOptions) ...[
-                      const Spacer(),
                       IconButton(
                         icon: Icon(
                           Icons.more_horiz,
@@ -205,15 +231,6 @@ class CommentContent extends StatelessWidget {
                     ],
                   ],
                 ),
-                
-                // Tag if present
-                if (comment.tag != null && !isThread) ...[
-                  const SizedBox(height: 4),
-                  TagDisplayWidget(
-                    tag: comment.tag!,
-                    isSmall: true,
-                  ),
-                ],
                 
                 // Content
                 const SizedBox(height: 8),
@@ -298,5 +315,28 @@ class CommentContent extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Color _getTagColor(String tag) {
+    switch (tag.toLowerCase()) {
+      case 'conversation':
+        return Colors.blue[600]!;
+      case 'conseil':
+        return Colors.green[600]!;
+      default:
+        return Colors.grey[600]!;
+    }
+  }
+
+  String _getTagDisplayName(String tag, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    switch (tag.toLowerCase()) {
+      case 'conversation':
+        return localizations.conversation;
+      case 'conseil':
+        return localizations.advice;
+      default:
+        return tag;
+    }
   }
 } 

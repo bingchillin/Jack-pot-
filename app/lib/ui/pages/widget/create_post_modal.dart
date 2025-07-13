@@ -23,6 +23,7 @@ class _CreatePostModalState extends State<CreatePostModal> with TickerProviderSt
   bool _isSubmitting = false;
   late AnimationController _animationController;
   late Animation<double> _slideAnimation;
+  double _keyboardHeight = 0;
 
   @override
   void initState() {
