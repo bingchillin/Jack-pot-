@@ -1534,10 +1534,10 @@ abstract class AppLocalizations {
   /// **'Be the first to reply!'**
   String get beFirstToReply;
 
-  /// User blocked message
+  /// Message shown when viewing blocked user's profile
   ///
   /// In en, this message translates to:
-  /// **'User blocked'**
+  /// **'This user is blocked'**
   String get userBlocked;
 
   /// Block user button text
@@ -1869,6 +1869,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to unfollow this user?'**
   String get unfollowConfirmMessage;
+
+  /// Cancel friend request button
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Request'**
+  String get cancelRequest;
+
+  /// Cancel friend request confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to cancel this friend request?'**
+  String get cancelRequestMessage;
+
+  /// Success message when friend request is sent
+  ///
+  /// In en, this message translates to:
+  /// **'Friend request sent'**
+  String get friendRequestSent;
+
+  /// Message to unblock user to see their content
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock to see posts'**
+  String get unblockToSee;
 }
 
 class _AppLocalizationsDelegate

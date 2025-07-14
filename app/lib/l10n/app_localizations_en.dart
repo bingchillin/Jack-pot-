@@ -755,7 +755,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get beFirstToReply => 'Be the first to reply!';
 
   @override
-  String get userBlocked => 'User blocked';
+  String get userBlocked => 'This user is blocked';
 
   @override
   String get blockUser => 'Block User';
@@ -938,4 +938,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get unfollowConfirmMessage =>
       'Are you sure you want to unfollow this user?';
+
+  @override
+  String get cancelRequest => 'Cancel Request';
+
+  @override
+  String get cancelRequestMessage =>
+      'Are you sure you want to cancel this friend request?';
+
+  @override
+  String get friendRequestSent => 'Friend request sent';
+
+  @override
+  String get unblockToSee => 'Unblock to see posts';
 }

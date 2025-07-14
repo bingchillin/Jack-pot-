@@ -762,7 +762,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get beFirstToReply => '¡Sé el primero en responder!';
 
   @override
-  String get userBlocked => 'Usuario bloqueado';
+  String get userBlocked => 'Este usuario está bloqueado';
 
   @override
   String get blockUser => 'Bloquear Usuario';
@@ -946,4 +946,17 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get unfollowConfirmMessage =>
       '¿Estás seguro de que quieres dejar de seguir a este usuario?';
+
+  @override
+  String get cancelRequest => 'Cancelar solicitud';
+
+  @override
+  String get cancelRequestMessage =>
+      '¿Estás seguro de que quieres cancelar esta solicitud de amistad?';
+
+  @override
+  String get friendRequestSent => 'Solicitud de amistad enviada';
+
+  @override
+  String get unblockToSee => 'Desbloquear para ver publicaciones';
 }

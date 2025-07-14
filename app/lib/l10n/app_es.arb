@@ -1606,6 +1606,31 @@
     "description": "Sent requests tab"
   },
 
+  "cancelRequest": "Cancelar solicitud",
+  "@cancelRequest": {
+    "description": "Cancel friend request button"
+  },
+
+  "cancelRequestMessage": "¿Estás seguro de que quieres cancelar esta solicitud de amistad?",
+  "@cancelRequestMessage": {
+    "description": "Cancel friend request confirmation message"
+  },
+
+  "friendRequestSent": "Solicitud de amistad enviada",
+  "@friendRequestSent": {
+    "description": "Success message when friend request is sent"
+  },
+
+  "userBlocked": "Este usuario está bloqueado",
+  "@userBlocked": {
+    "description": "Message shown when viewing blocked user's profile"
+  },
+
+  "unblockToSee": "Desbloquear para ver publicaciones",
+  "@unblockToSee": {
+    "description": "Message to unblock user to see their content"
+  },
+
   "notifications": "Notificaciones",
   "@notifications": {
     "description": "Notifications page title"

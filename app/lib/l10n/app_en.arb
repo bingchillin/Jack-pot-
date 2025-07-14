@@ -1679,5 +1679,30 @@
   "sent": "Sent",
   "@sent": {
     "description": "Sent requests tab"
+  },
+
+  "cancelRequest": "Cancel Request",
+  "@cancelRequest": {
+    "description": "Cancel friend request button"
+  },
+
+  "cancelRequestMessage": "Are you sure you want to cancel this friend request?",
+  "@cancelRequestMessage": {
+    "description": "Cancel friend request confirmation message"
+  },
+
+  "friendRequestSent": "Friend request sent",
+  "@friendRequestSent": {
+    "description": "Success message when friend request is sent"
+  },
+
+  "userBlocked": "This user is blocked",
+  "@userBlocked": {
+    "description": "Message shown when viewing blocked user's profile"
+  },
+
+  "unblockToSee": "Unblock to see posts",
+  "@unblockToSee": {
+    "description": "Message to unblock user to see their content"
   }
 } 

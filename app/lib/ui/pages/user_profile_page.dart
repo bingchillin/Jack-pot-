@@ -21,7 +21,6 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
   late Future<UserProfile> _profileFuture;
-  late CommentBloc _commentBloc;
   late Future<int> _friendsCountFuture;
 
   @override
@@ -34,14 +33,12 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
     _profileFuture = CommentService().fetchUserProfile(widget.userId, token);
     _friendsCountFuture = _getFriendsCount(token);
     
-    // Créer un bloc dédié pour ce profil utilisateur
-    _commentBloc = CommentBloc(
-      commentService: CommentService(),
-      token: token,
-    );
-    
-    // Charger les commentaires de l'utilisateur
-    _commentBloc.add(LoadMainComments(userId: currentUserId));
+    // Use the shared CommentBloc and load main comments if not already loaded
+    final commentBloc = context.read<CommentBloc>();
+    final currentState = commentBloc.state;
+    if (currentState is CommentInitial) {
+      commentBloc.add(LoadMainComments(userId: currentUserId));
+    }
   }
 
   Future<int> _getFriendsCount(String? token) async {
@@ -64,7 +61,7 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
 
   @override
   void dispose() {
-    _commentBloc.close();
+    // Don't close the shared CommentBloc
     super.dispose();
   }
 
@@ -109,11 +106,31 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
             );
           }
           final profile = snapshot.data!;
-          return SingleChildScrollView(
-            child: Container(
-              color: Colors.green[50], // Same as comment cards background
-              child: Column(
-                children: [
+          return RefreshIndicator(
+            onRefresh: () async {
+              // Refresh profile data
+              setState(() {
+                _profileFuture = CommentService().fetchUserProfile(widget.userId, 
+                  Provider.of<AuthProvider>(context, listen: false).accessToken);
+                _friendsCountFuture = _getFriendsCount(
+                  Provider.of<AuthProvider>(context, listen: false).accessToken);
+              });
+              
+              // Refresh comments
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              context.read<CommentBloc>().add(LoadMainComments(userId: authProvider.userId));
+              
+              // Wait for the futures to complete
+              await _profileFuture;
+              await _friendsCountFuture;
+            },
+            color: Colors.green[600],
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(), // Enable pull-to-refresh even when content doesn't fill screen
+              child: Container(
+                color: Colors.green[50], // Same as comment cards background
+                child: Column(
+                  children: [
                   const SizedBox(height: 8),
                   // Profile picture and info
                   Container(
@@ -263,14 +280,12 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
                   const SizedBox(height: 8),
                   
                   // Posts list
-                  BlocProvider.value(
-                    value: _commentBloc,
-                    child: BlocBuilder<CommentBloc, CommentState>(
+                  BlocBuilder<CommentBloc, CommentState>(
                     builder: (context, state) {
                       if (state is CommentLoading) {
-                        return Container(
+                        return const SizedBox(
                           height: 200,
-                          child: const Center(
+                          child: Center(
                             child: CircularProgressIndicator(color: Color(0xFF22c55e)),
                           ),
                         );
@@ -332,8 +347,8 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
                       return const SizedBox.shrink();
                     },
                   ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
