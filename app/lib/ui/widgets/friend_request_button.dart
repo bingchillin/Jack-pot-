@@ -52,7 +52,6 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
         _isInitialLoading = false;
       });
     } catch (e) {
-      print('Error loading contact status: $e');
       setState(() {
         _isInitialLoading = false;
       });
@@ -150,6 +149,61 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
       });
       
       _showMessage('Demande d\'ami rejetée');
+      widget.onStatusChanged?.call();
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showMessage('Erreur: ${e.toString()}');
+    }
+  }
+
+  Future<void> _cancelFriendRequest() async {
+    if (_currentContact == null) return;
+    
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+    
+    if (token == null) return;
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.cancelRequest),
+        content: Text(AppLocalizations.of(context)!.cancelRequestMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(AppLocalizations.of(context)!.cancelRequest),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirmed != true) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _contactService.removeContact(
+        contactId: _currentContact!.id,
+        token: token,
+      );
+      
+      setState(() {
+        _currentContact = null;
+        _isLoading = false;
+      });
+      
+      _showMessage('Demande d\'ami annulée');
       widget.onStatusChanged?.call();
     } catch (e) {
       setState(() {
@@ -292,9 +346,9 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
     switch (contact.status) {
       case ContactStatus.pending:
         if (isCurrentUserRequester) {
-          // Current user sent the request - show "Pending"
+          // Current user sent the request - show "Cancel Request" button
           return OutlinedButton(
-            onPressed: null,
+            onPressed: _isLoading ? null : _cancelFriendRequest,
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.grey[700],
               side: BorderSide(color: Colors.grey[300]!),
@@ -304,10 +358,16 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
               ),
               minimumSize: const Size(100, 36),
             ),
-            child: Text(
-              localizations.pending,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
+            child: _isLoading 
+              ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey[700]),
+                )
+              : Text(
+                  localizations.cancelRequest,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
           );
         } else {
           // Current user received the request - show Accept/Reject buttons

@@ -58,7 +58,6 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
       ).toList();
       return userContacts.length;
     } catch (e) {
-      print('Error getting friends count: $e');
       return 0;
     }
   }
@@ -73,7 +72,6 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
         token: token,
       );
     } catch (e) {
-      print('Error checking blocking status: $e');
       return BlockingStatus.notBlocked;
     }
   }
@@ -278,7 +276,6 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
                                 FriendRequestButton(
                                   targetUserId: widget.userId,
                                   onStatusChanged: () {
-                                    print('Statut d\'ami changé pour l\'utilisateur ${widget.userId}');
                                     // Refresh friends count when status changes
                                     setState(() {
                                       _friendsCountFuture = _getFriendsCount(

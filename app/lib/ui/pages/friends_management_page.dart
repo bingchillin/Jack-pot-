@@ -5,6 +5,7 @@ import '../../services/contact_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../l10n/app_localizations.dart';
 import 'user_profile_page.dart';
+import '../../main.dart';
 
 class FriendsManagementPage extends StatefulWidget {
   const FriendsManagementPage({super.key});
@@ -14,7 +15,7 @@ class FriendsManagementPage extends StatefulWidget {
 }
 
 class _FriendsManagementPageState extends State<FriendsManagementPage>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, RouteAware {
   late TabController _tabController;
   final ContactService _contactService = ContactService();
   
@@ -34,9 +35,27 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Subscribe to route observer
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
   void dispose() {
     _tabController.dispose();
+    routeObserver.unsubscribe(this);
     super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    super.didPopNext();
+    // Refresh data when returning to this page
+    _loadAllContacts();
   }
 
   Future<void> _loadAllContacts() async {
