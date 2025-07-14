@@ -21,6 +21,7 @@ import 'l10n/app_localizations.dart';
 import 'bloc/comment/comment_bloc.dart';
 import 'services/comment_service.dart';
 import 'services/notification_service.dart';
+import 'services/plant_care_score_service.dart';
 import 'ui/pages/user_profile_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -136,6 +137,10 @@ class _RootAppState extends State<RootApp> {
             commentService: CommentService(),
             token: token,
           ),
+        ),
+        // Provider for PlantCareScoreService
+        Provider<PlantCareScoreService>(
+          create: (_) => PlantCareScoreService(),
         ),
       ],
       child: MaterialApp(

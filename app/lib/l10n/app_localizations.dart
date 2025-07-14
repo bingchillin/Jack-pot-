@@ -664,7 +664,7 @@ abstract class AppLocalizations {
   /// **'Temperature'**
   String get temperature;
 
-  /// Light level sensor label
+  /// Light level label
   ///
   /// In en, this message translates to:
   /// **'Light Level'**
@@ -2169,6 +2169,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Monstera Deliciosa'**
   String get monsteraDeliciosa;
+
+  /// Plant care scores section title
+  ///
+  /// In en, this message translates to:
+  /// **'Plant Care Scores'**
+  String get plantCareScores;
+
+  /// Daily score label
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Score'**
+  String get dailyScore;
+
+  /// Weekly score label
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Score'**
+  String get weeklyScore;
+
+  /// Current streak label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Streak'**
+  String get currentStreak;
+
+  /// Best streak label
+  ///
+  /// In en, this message translates to:
+  /// **'Best Streak'**
+  String get bestStreak;
+
+  /// Average score label
+  ///
+  /// In en, this message translates to:
+  /// **'Average Score'**
+  String get averageScore;
+
+  /// Total scores label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Scores'**
+  String get totalScores;
+
+  /// Score history section title
+  ///
+  /// In en, this message translates to:
+  /// **'Score History'**
+  String get scoreHistory;
+
+  /// Message when no scores are available
+  ///
+  /// In en, this message translates to:
+  /// **'No scores yet'**
+  String get noScoresYet;
+
+  /// Message to encourage starting score tracking
+  ///
+  /// In en, this message translates to:
+  /// **'Start tracking your plant care!'**
+  String get startTracking;
+
+  /// Message for excellent plant care scores
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent! Your plant care is outstanding!'**
+  String get excellentCare;
+
+  /// Message for great plant care scores
+  ///
+  /// In en, this message translates to:
+  /// **'Great job! Your plant is thriving!'**
+  String get greatJob;
+
+  /// Message for good plant care scores
+  ///
+  /// In en, this message translates to:
+  /// **'Good work! Keep up the consistent care!'**
+  String get goodWork;
+
+  /// Message for average plant care scores
+  ///
+  /// In en, this message translates to:
+  /// **'Not bad! A few adjustments could help.'**
+  String get notBad;
+
+  /// Message for below average plant care scores
+  ///
+  /// In en, this message translates to:
+  /// **'Your plant needs more attention.'**
+  String get needsAttention;
+
+  /// Message for poor plant care scores
+  ///
+  /// In en, this message translates to:
+  /// **'Your plant needs immediate care and attention.'**
+  String get immediateCare;
+
+  /// Message for significant improvement in care
+  ///
+  /// In en, this message translates to:
+  /// **'Great improvement! Your care is getting better!'**
+  String get greatImprovement;
+
+  /// Message for slight improvement in care
+  ///
+  /// In en, this message translates to:
+  /// **'Slight improvement - keep it up!'**
+  String get slightImprovement;
+
+  /// Message for significant decline in care
+  ///
+  /// In en, this message translates to:
+  /// **'Care quality has declined - check your routine.'**
+  String get careDeclined;
+
+  /// Message for slight decline in care
+  ///
+  /// In en, this message translates to:
+  /// **'Slight decline - review your care practices.'**
+  String get slightDecline;
+
+  /// Message for consistent care quality
+  ///
+  /// In en, this message translates to:
+  /// **'Consistent care - maintain this steady approach!'**
+  String get consistentCare;
+
+  /// Message to encourage continued tracking
+  ///
+  /// In en, this message translates to:
+  /// **'Keep tracking to see trends!'**
+  String get keepTracking;
+
+  /// Message when no data is available for selected period
+  ///
+  /// In en, this message translates to:
+  /// **'No data in selected period'**
+  String get noDataInPeriod;
+
+  /// Message when trend data is not available
+  ///
+  /// In en, this message translates to:
+  /// **'No trends available'**
+  String get noTrendsAvailable;
+
+  /// Button to calculate plant care score
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate Score'**
+  String get calculateScore;
+
+  /// Title for score calculation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Score Calculation'**
+  String get scoreCalculation;
+
+  /// Moisture level label
+  ///
+  /// In en, this message translates to:
+  /// **'Moisture Level'**
+  String get moistureLevel;
+
+  /// Temperature level label
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature Level'**
+  String get temperatureLevel;
+
+  /// pH level label
+  ///
+  /// In en, this message translates to:
+  /// **'pH Level'**
+  String get phLevel;
+
+  /// Label for optional notes field
+  ///
+  /// In en, this message translates to:
+  /// **'Add Notes (Optional)'**
+  String get addNotes;
+
+  /// Calculate button text
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate'**
+  String get calculate;
+
+  /// Success message when score is calculated
+  ///
+  /// In en, this message translates to:
+  /// **'Score calculated successfully!'**
+  String get scoreCalculated;
+
+  /// Error message when score calculation fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error calculating score'**
+  String get errorCalculatingScore;
 }
 
 class _AppLocalizationsDelegate

@@ -299,7 +299,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get temperature => 'Température';
 
   @override
-  String get lightLevel => 'Niveau de lumière';
+  String get lightLevel => 'Niveau de Lumière';
 
   @override
   String get soilPH => 'pH du sol';
@@ -1111,4 +1111,108 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get monsteraDeliciosa => 'Monstera Deliciosa';
+
+  @override
+  String get plantCareScores => 'Scores de Soins des Plantes';
+
+  @override
+  String get dailyScore => 'Score Quotidien';
+
+  @override
+  String get weeklyScore => 'Score Hebdomadaire';
+
+  @override
+  String get currentStreak => 'Série Actuelle';
+
+  @override
+  String get bestStreak => 'Meilleure Série';
+
+  @override
+  String get averageScore => 'Score Moyen';
+
+  @override
+  String get totalScores => 'Total des Scores';
+
+  @override
+  String get scoreHistory => 'Historique des Scores';
+
+  @override
+  String get noScoresYet => 'Aucun score encore';
+
+  @override
+  String get startTracking => 'Commencez à suivre vos soins de plantes !';
+
+  @override
+  String get excellentCare =>
+      'Excellent ! Vos soins de plantes sont remarquables !';
+
+  @override
+  String get greatJob => 'Bon travail ! Votre plante s\'épanouit !';
+
+  @override
+  String get goodWork => 'Bon travail ! Continuez les soins réguliers !';
+
+  @override
+  String get notBad => 'Pas mal ! Quelques ajustements pourraient aider.';
+
+  @override
+  String get needsAttention => 'Votre plante a besoin de plus d\'attention.';
+
+  @override
+  String get immediateCare =>
+      'Votre plante a besoin de soins immédiats et d\'attention.';
+
+  @override
+  String get greatImprovement =>
+      'Grande amélioration ! Vos soins s\'améliorent !';
+
+  @override
+  String get slightImprovement => 'Légère amélioration - continuez !';
+
+  @override
+  String get careDeclined =>
+      'La qualité des soins a diminué - vérifiez votre routine.';
+
+  @override
+  String get slightDecline => 'Légère baisse - revoyez vos pratiques de soins.';
+
+  @override
+  String get consistentCare =>
+      'Soins réguliers - maintenez cette approche constante !';
+
+  @override
+  String get keepTracking => 'Continuez à suivre pour voir les tendances !';
+
+  @override
+  String get noDataInPeriod => 'Aucune donnée pour la période sélectionnée';
+
+  @override
+  String get noTrendsAvailable => 'Aucune tendance disponible';
+
+  @override
+  String get calculateScore => 'Calculer le Score';
+
+  @override
+  String get scoreCalculation => 'Calcul du Score';
+
+  @override
+  String get moistureLevel => 'Niveau d\'Humidité';
+
+  @override
+  String get temperatureLevel => 'Niveau de Température';
+
+  @override
+  String get phLevel => 'Niveau de pH';
+
+  @override
+  String get addNotes => 'Ajouter des Notes (Optionnel)';
+
+  @override
+  String get calculate => 'Calculer';
+
+  @override
+  String get scoreCalculated => 'Score calculé avec succès !';
+
+  @override
+  String get errorCalculatingScore => 'Erreur lors du calcul du score';
 }

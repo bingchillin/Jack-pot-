@@ -1940,11 +1940,6 @@
     "description": "Tooltip for add device button"
   },
 
-  "retry": "Retry",
-  "@retry": {
-    "description": "Retry button text"
-  },
-
   "orchid": "Orchid",
   "@orchid": {
     "description": "Orchid plant name"
@@ -1963,5 +1958,170 @@
   "monsteraDeliciosa": "Monstera Deliciosa",
   "@monsteraDeliciosa": {
     "description": "Monstera Deliciosa plant name"
+  },
+
+  "plantCareScores": "Plant Care Scores",
+  "@plantCareScores": {
+    "description": "Plant care scores section title"
+  },
+
+  "dailyScore": "Daily Score",
+  "@dailyScore": {
+    "description": "Daily score label"
+  },
+
+  "weeklyScore": "Weekly Score",
+  "@weeklyScore": {
+    "description": "Weekly score label"
+  },
+
+  "currentStreak": "Current Streak",
+  "@currentStreak": {
+    "description": "Current streak label"
+  },
+
+  "bestStreak": "Best Streak",
+  "@bestStreak": {
+    "description": "Best streak label"
+  },
+
+  "averageScore": "Average Score",
+  "@averageScore": {
+    "description": "Average score label"
+  },
+
+  "totalScores": "Total Scores",
+  "@totalScores": {
+    "description": "Total scores label"
+  },
+
+  "scoreHistory": "Score History",
+  "@scoreHistory": {
+    "description": "Score history section title"
+  },
+
+  "noScoresYet": "No scores yet",
+  "@noScoresYet": {
+    "description": "Message when no scores are available"
+  },
+
+  "startTracking": "Start tracking your plant care!",
+  "@startTracking": {
+    "description": "Message to encourage starting score tracking"
+  },
+
+  "excellentCare": "Excellent! Your plant care is outstanding!",
+  "@excellentCare": {
+    "description": "Message for excellent plant care scores"
+  },
+
+  "greatJob": "Great job! Your plant is thriving!",
+  "@greatJob": {
+    "description": "Message for great plant care scores"
+  },
+
+  "goodWork": "Good work! Keep up the consistent care!",
+  "@goodWork": {
+    "description": "Message for good plant care scores"
+  },
+
+  "notBad": "Not bad! A few adjustments could help.",
+  "@notBad": {
+    "description": "Message for average plant care scores"
+  },
+
+  "needsAttention": "Your plant needs more attention.",
+  "@needsAttention": {
+    "description": "Message for below average plant care scores"
+  },
+
+  "immediateCare": "Your plant needs immediate care and attention.",
+  "@immediateCare": {
+    "description": "Message for poor plant care scores"
+  },
+
+  "greatImprovement": "Great improvement! Your care is getting better!",
+  "@greatImprovement": {
+    "description": "Message for significant improvement in care"
+  },
+
+  "slightImprovement": "Slight improvement - keep it up!",
+  "@slightImprovement": {
+    "description": "Message for slight improvement in care"
+  },
+
+  "careDeclined": "Care quality has declined - check your routine.",
+  "@careDeclined": {
+    "description": "Message for significant decline in care"
+  },
+
+  "slightDecline": "Slight decline - review your care practices.",
+  "@slightDecline": {
+    "description": "Message for slight decline in care"
+  },
+
+  "consistentCare": "Consistent care - maintain this steady approach!",
+  "@consistentCare": {
+    "description": "Message for consistent care quality"
+  },
+
+  "keepTracking": "Keep tracking to see trends!",
+  "@keepTracking": {
+    "description": "Message to encourage continued tracking"
+  },
+
+  "noDataInPeriod": "No data in selected period",
+  "@noDataInPeriod": {
+    "description": "Message when no data is available for selected period"
+  },
+
+  "noTrendsAvailable": "No trends available",
+  "@noTrendsAvailable": {
+    "description": "Message when trend data is not available"
+  },
+
+  "calculateScore": "Calculate Score",
+  "@calculateScore": {
+    "description": "Button to calculate plant care score"
+  },
+
+  "scoreCalculation": "Score Calculation",
+  "@scoreCalculation": {
+    "description": "Title for score calculation dialog"
+  },
+
+  "moistureLevel": "Moisture Level",
+  "@moistureLevel": {
+    "description": "Moisture level label"
+  },
+
+  "temperatureLevel": "Temperature Level",
+  "@temperatureLevel": {
+    "description": "Temperature level label"
+  },
+
+  "phLevel": "pH Level",
+  "@phLevel": {
+    "description": "pH level label"
+  },
+
+  "addNotes": "Add Notes (Optional)",
+  "@addNotes": {
+    "description": "Label for optional notes field"
+  },
+
+  "calculate": "Calculate",
+  "@calculate": {
+    "description": "Calculate button text"
+  },
+
+  "scoreCalculated": "Score calculated successfully!",
+  "@scoreCalculated": {
+    "description": "Success message when score is calculated"
+  },
+
+  "errorCalculatingScore": "Error calculating score",
+  "@errorCalculatingScore": {
+    "description": "Error message when score calculation fails"
   }
 } 

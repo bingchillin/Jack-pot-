@@ -1101,4 +1101,105 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monsteraDeliciosa => 'Monstera Deliciosa';
+
+  @override
+  String get plantCareScores => 'Plant Care Scores';
+
+  @override
+  String get dailyScore => 'Daily Score';
+
+  @override
+  String get weeklyScore => 'Weekly Score';
+
+  @override
+  String get currentStreak => 'Current Streak';
+
+  @override
+  String get bestStreak => 'Best Streak';
+
+  @override
+  String get averageScore => 'Average Score';
+
+  @override
+  String get totalScores => 'Total Scores';
+
+  @override
+  String get scoreHistory => 'Score History';
+
+  @override
+  String get noScoresYet => 'No scores yet';
+
+  @override
+  String get startTracking => 'Start tracking your plant care!';
+
+  @override
+  String get excellentCare => 'Excellent! Your plant care is outstanding!';
+
+  @override
+  String get greatJob => 'Great job! Your plant is thriving!';
+
+  @override
+  String get goodWork => 'Good work! Keep up the consistent care!';
+
+  @override
+  String get notBad => 'Not bad! A few adjustments could help.';
+
+  @override
+  String get needsAttention => 'Your plant needs more attention.';
+
+  @override
+  String get immediateCare => 'Your plant needs immediate care and attention.';
+
+  @override
+  String get greatImprovement =>
+      'Great improvement! Your care is getting better!';
+
+  @override
+  String get slightImprovement => 'Slight improvement - keep it up!';
+
+  @override
+  String get careDeclined => 'Care quality has declined - check your routine.';
+
+  @override
+  String get slightDecline => 'Slight decline - review your care practices.';
+
+  @override
+  String get consistentCare =>
+      'Consistent care - maintain this steady approach!';
+
+  @override
+  String get keepTracking => 'Keep tracking to see trends!';
+
+  @override
+  String get noDataInPeriod => 'No data in selected period';
+
+  @override
+  String get noTrendsAvailable => 'No trends available';
+
+  @override
+  String get calculateScore => 'Calculate Score';
+
+  @override
+  String get scoreCalculation => 'Score Calculation';
+
+  @override
+  String get moistureLevel => 'Moisture Level';
+
+  @override
+  String get temperatureLevel => 'Temperature Level';
+
+  @override
+  String get phLevel => 'pH Level';
+
+  @override
+  String get addNotes => 'Add Notes (Optional)';
+
+  @override
+  String get calculate => 'Calculate';
+
+  @override
+  String get scoreCalculated => 'Score calculated successfully!';
+
+  @override
+  String get errorCalculatingScore => 'Error calculating score';
 }

@@ -1729,5 +1729,175 @@
   "systemUpdates": "Actualizaciones del Sistema",
   "@systemUpdates": {
     "description": "System updates notification setting"
+  },
+
+  "plantCareScores": "Puntuaciones de Cuidado de Plantas",
+  "@plantCareScores": {
+    "description": "Plant care scores section title"
+  },
+
+  "dailyScore": "Puntuación Diaria",
+  "@dailyScore": {
+    "description": "Daily score label"
+  },
+
+  "weeklyScore": "Puntuación Semanal",
+  "@weeklyScore": {
+    "description": "Weekly score label"
+  },
+
+  "currentStreak": "Racha Actual",
+  "@currentStreak": {
+    "description": "Current streak label"
+  },
+
+  "bestStreak": "Mejor Racha",
+  "@bestStreak": {
+    "description": "Best streak label"
+  },
+
+  "averageScore": "Puntuación Promedio",
+  "@averageScore": {
+    "description": "Average score label"
+  },
+
+  "totalScores": "Total de Puntuaciones",
+  "@totalScores": {
+    "description": "Total scores label"
+  },
+
+  "scoreHistory": "Historial de Puntuaciones",
+  "@scoreHistory": {
+    "description": "Score history section title"
+  },
+
+  "noScoresYet": "Aún no hay puntuaciones",
+  "@noScoresYet": {
+    "description": "Message when no scores are available"
+  },
+
+  "startTracking": "¡Comienza a rastrear el cuidado de tus plantas!",
+  "@startTracking": {
+    "description": "Message to encourage starting score tracking"
+  },
+
+  "excellentCare": "¡Excelente! ¡Tu cuidado de plantas es excepcional!",
+  "@excellentCare": {
+    "description": "Message for excellent plant care scores"
+  },
+
+  "greatJob": "¡Buen trabajo! ¡Tu planta está prosperando!",
+  "@greatJob": {
+    "description": "Message for great plant care scores"
+  },
+
+  "goodWork": "¡Buen trabajo! ¡Mantén el cuidado constante!",
+  "@goodWork": {
+    "description": "Message for good plant care scores"
+  },
+
+  "notBad": "¡No está mal! Algunos ajustes podrían ayudar.",
+  "@notBad": {
+    "description": "Message for average plant care scores"
+  },
+
+  "needsAttention": "Tu planta necesita más atención.",
+  "@needsAttention": {
+    "description": "Message for below average plant care scores"
+  },
+
+  "immediateCare": "Tu planta necesita cuidado inmediato y atención.",
+  "@immediateCare": {
+    "description": "Message for poor plant care scores"
+  },
+
+  "greatImprovement": "¡Gran mejora! ¡Tu cuidado está mejorando!",
+  "@greatImprovement": {
+    "description": "Message for significant improvement in care"
+  },
+
+  "slightImprovement": "Ligera mejora - ¡sigue así!",
+  "@slightImprovement": {
+    "description": "Message for slight improvement in care"
+  },
+
+  "careDeclined": "La calidad del cuidado ha disminuido - revisa tu rutina.",
+  "@careDeclined": {
+    "description": "Message for significant decline in care"
+  },
+
+  "slightDecline": "Ligera disminución - revisa tus prácticas de cuidado.",
+  "@slightDecline": {
+    "description": "Message for slight decline in care"
+  },
+
+  "consistentCare": "Cuidado constante - ¡mantén este enfoque estable!",
+  "@consistentCare": {
+    "description": "Message for consistent care quality"
+  },
+
+  "keepTracking": "¡Sigue rastreando para ver las tendencias!",
+  "@keepTracking": {
+    "description": "Message to encourage continued tracking"
+  },
+
+  "noDataInPeriod": "No hay datos en el período seleccionado",
+  "@noDataInPeriod": {
+    "description": "Message when no data is available for selected period"
+  },
+
+  "noTrendsAvailable": "No hay tendencias disponibles",
+  "@noTrendsAvailable": {
+    "description": "Message when trend data is not available"
+  },
+
+  "calculateScore": "Calcular Puntuación",
+  "@calculateScore": {
+    "description": "Button to calculate plant care score"
+  },
+
+  "scoreCalculation": "Cálculo de Puntuación",
+  "@scoreCalculation": {
+    "description": "Title for score calculation dialog"
+  },
+
+  "moistureLevel": "Nivel de Humedad",
+  "@moistureLevel": {
+    "description": "Moisture level label"
+  },
+
+  "temperatureLevel": "Nivel de Temperatura",
+  "@temperatureLevel": {
+    "description": "Temperature level label"
+  },
+
+  "lightLevel": "Nivel de Luz",
+  "@lightLevel": {
+    "description": "Light level label"
+  },
+
+  "phLevel": "Nivel de pH",
+  "@phLevel": {
+    "description": "pH level label"
+  },
+
+  "addNotes": "Agregar Notas (Opcional)",
+  "@addNotes": {
+    "description": "Label for optional notes field"
+  },
+
+  "calculate": "Calcular",
+  "@calculate": {
+    "description": "Calculate button text"
+  },
+
+  "scoreCalculated": "¡Puntuación calculada exitosamente!",
+  "@scoreCalculated": {
+    "description": "Success message when score is calculated"
+  },
+
+  "errorCalculatingScore": "Error al calcular la puntuación",
+  "@errorCalculatingScore": {
+    "description": "Error message when score calculation fails"
   }
 } 
