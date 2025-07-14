@@ -16,8 +16,7 @@ import 'plant_detail/plant_overview_tab.dart';
 import 'plant_detail/plant_sensors_tab.dart';
 import 'plant_detail/plant_care_tab.dart';
 import 'widget/favorite_toggle_button.dart';
-import '../widgets/plant_care_score_card.dart';
-import '../widgets/score_calculation_dialog.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PlantDetailPage extends StatefulWidget {
@@ -360,8 +359,6 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 _buildTabButton(1, localizations.sensorData, Icons.sensors),
                 const SizedBox(width: 8),
                 _buildTabButton(2, localizations.plantCareAdvice, Icons.lightbulb_outline),
-                const SizedBox(width: 8),
-                _buildTabButton(3, localizations.plantCareScores, Icons.assessment),
               ],
             ),
           ),
@@ -434,8 +431,6 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 _buildTabButton(1, localizations.sensorData, Icons.sensors),
                 const SizedBox(width: 8),
                 _buildTabButton(2, localizations.plantCareAdvice, Icons.lightbulb_outline),
-                const SizedBox(width: 8),
-                _buildTabButton(3, localizations.plantCareScores, Icons.assessment),
               ],
             ),
           ),
@@ -572,80 +567,12 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
         return PlantSensorsTab(plant: plant);
       case 2:
         return PlantCareTab(plant: plant);
-      case 3:
-        return _buildPlantCareScoresTab(context, localizations, plant);
       default:
         return PlantOverviewTab(plant: plant);
     }
   }
 
-  Widget _buildPlantCareScoresTab(BuildContext context, AppLocalizations localizations, ObjectProfile plant) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final token = authProvider.accessToken;
-    
-    if (token == null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.lock_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              localizations.plantControlsMessage,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
-    }
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Plant Care Score Card
-          PlantCareScoreCard(
-            plantId: plant.idObjectProfile,
-            token: token,
-          ),
-          
-          // Calculate Score Button
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => ScoreCalculationDialog(
-                    plantId: plant.idObjectProfile,
-                    token: token,
-                  ),
-                );
-              },
-              icon: const Icon(Icons.calculate),
-              label: Text(localizations.calculateScore),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[600],
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildLoadingState(AppLocalizations localizations, BuildContext context) {
     return Scaffold(

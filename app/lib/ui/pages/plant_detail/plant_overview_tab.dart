@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
-import '../../../models/avatar.dart';
+import 'package:provider/provider.dart';
 import '../../../models/object_profile.dart';
 import '../../../app_config.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../services/automatic_score_service.dart';
+import '../../../services/plant_care_score_service.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../models/plant_care_score.dart';
 import '../widget/plant_card_favorite/plant_control_switches_widget.dart';
+import '../../widgets/animated_score_popup.dart';
 
-class PlantOverviewTab extends StatelessWidget {
+class PlantOverviewTab extends StatefulWidget {
   final ObjectProfile plant;
 
   const PlantOverviewTab({Key? key, required this.plant}) : super(key: key);
+
+  @override
+  State<PlantOverviewTab> createState() => _PlantOverviewTabState();
+}
+
+class _PlantOverviewTabState extends State<PlantOverviewTab> {
+  bool _showScorePopup = false;
+  PlantCareScore? _calculatedScore;
 
   String _getStateText(AppLocalizations localizations, int? state) {
     switch (state) {
@@ -62,7 +75,7 @@ class PlantOverviewTab extends StatelessWidget {
   }
 
   int _getHealthScore() {
-    switch (plant.state) {
+    switch (widget.plant.state) {
       case 1:
         return 95;
       case 2:
@@ -87,65 +100,212 @@ class PlantOverviewTab extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-    final stateColor = _getStateColor(plant.state);
-    final healthScore = _getHealthScore();
-    final healthColor = _getHealthColor();
+  void initState() {
+    super.initState();
+    _checkAndCalculateScore();
+  }
 
-    final avatars = plant.plantType?.avatars;
+  Future<void> _checkAndCalculateScore() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      
+      if (token == null) return;
 
-    Avatar? avatar;
+      final autoScoreService = AutomaticScoreService(
+        Provider.of<PlantCareScoreService>(context, listen: false),
+      );
 
-    if (avatars == null || avatars.isEmpty) {
-      avatar = null;
-    } else {
-      try {
-        avatar = avatars.firstWhere((a) => a.stateP == plant.state);
-      } catch (e) {
-        try {
-          avatar = avatars.firstWhere((a) => a.stateP == 0);
-        } catch (e) {
-          avatar = null;
+      // Check if we should calculate a score for today
+      final shouldCalculate = await autoScoreService.shouldCalculateScore();
+      
+      if (shouldCalculate) {
+        // Calculate the score
+        final score = await autoScoreService.calculateAutomaticScore(
+          widget.plant.idObjectProfile,
+          token,
+        );
+
+        if (score != null) {
+          setState(() {
+            _calculatedScore = score;
+            _showScorePopup = true;
+          });
         }
       }
+    } catch (e) {
+      // Silent fail for automatic scoring
     }
+  }
 
-    final pathPicture = avatar?.pathPicture.toString();
-    final imageUrl = pathPicture != null
-        ? Uri.parse(AppConfig.baseUrlSrc).resolve(pathPicture).toString()
+  void _testScorePopup() {
+    // Create a mock score for testing
+    final mockScore = PlantCareScore(
+      idPlantCareScore: 0,
+      idObjectProfile: widget.plant.idObjectProfile,
+      scoreDate: DateTime.now(),
+      dailyScore: 28, // High score for testing
+      weeklyScore: 0,
+      moistureScore: 10,
+      temperatureScore: 8,
+      lightScore: 6,
+      phScore: 4,
+      consistencyBonus: 2,
+      improvementBonus: 0,
+      dailyMessage: "Excellent! Your plant care is outstanding!",
+      weeklyMessage: null,
+      sensorData: {
+        'moisture': 75.0,
+        'temperature': 22.0,
+        'light': 65.0,
+        'ph': 6.5,
+      },
+      isPerfectDay: true,
+      isPerfectWeek: false,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    setState(() {
+      _calculatedScore = mockScore;
+      _showScorePopup = true;
+    });
+  }
+
+  Widget _buildTestScoreButton(AppLocalizations localizations) {
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: ElevatedButton.icon(
+            onPressed: _testScorePopup,
+            icon: const Icon(Icons.play_arrow),
+            label: Text('Test Score Popup'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue[600],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: ElevatedButton.icon(
+            onPressed: _resetAutomaticScoring,
+            icon: const Icon(Icons.refresh),
+            label: Text('Reset Auto-Scoring'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange[600],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _resetAutomaticScoring() async {
+    final autoScoreService = AutomaticScoreService(
+      Provider.of<PlantCareScoreService>(context, listen: false),
+    );
+    await autoScoreService.resetLastScoreDate();
+    
+    // Show a snackbar to confirm
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Automatic scoring reset! Next visit will trigger a new score calculation.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final stateColor = _getStateColor(widget.plant.state);
+    final healthScore = _getHealthScore();
+    final healthColor = _getHealthColor();
+    final imageUrl = widget.plant.plantType?.pathPicture != null
+        ? Uri.parse(AppConfig.baseUrl).resolve(widget.plant.plantType!.pathPicture!).toString()
         : null;
 
+    return Stack(
+      children: [
+        // Main content
+        SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Plant Image Section with Floating Switches
+              _buildSectionHeader(
+                'Plant Image',
+                Icons.photo,
+                Colors.green[600]!,
+              ),
+              const SizedBox(height: 16),
+              _buildImageCardWithSwitches(imageUrl, localizations),
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Plant Image Section with Floating Switches
-          _buildSectionHeader(
-            'Plant Image',
-            Icons.photo,
-            Colors.green[600]!,
+              const SizedBox(height: 24),
+
+              // Plant Health Section
+              _buildSectionHeader(
+                'Plant Health',
+                Icons.favorite,
+                Colors.red[600]!,
+              ),
+              const SizedBox(height: 16),
+              _buildHealthCard(localizations, stateColor, healthScore, healthColor),
+
+              const SizedBox(height: 24),
+
+              // Test Score Popup Button (for development)
+              _buildTestScoreButton(localizations),
+
+              const SizedBox(height: 40),
+            ],
           ),
-          const SizedBox(height: 16),
-          _buildImageCardWithSwitches(imageUrl, localizations),
-
-          const SizedBox(height: 24),
-
-          // Plant Health Section
-          _buildSectionHeader(
-            'Plant Health',
-            Icons.favorite,
-            Colors.red[600]!,
+        ),
+        
+        // Full screen overlay for the popup - properly centered
+        if (_showScorePopup && _calculatedScore != null)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withValues(alpha: 0.5), // Semi-transparent background
+              child: Center(
+                child: AnimatedScorePopup(
+                  moistureScore: _calculatedScore!.moistureScore,
+                  temperatureScore: _calculatedScore!.temperatureScore,
+                  lightScore: _calculatedScore!.lightScore,
+                  phScore: _calculatedScore!.phScore,
+                  bonusScore: _calculatedScore!.consistencyBonus,
+                  totalScore: _calculatedScore!.dailyScore,
+                  onDismiss: _dismissScorePopup,
+                ),
+              ),
+            ),
           ),
-          const SizedBox(height: 16),
-          _buildHealthCard(localizations, stateColor, healthScore, healthColor),
-
-          const SizedBox(height: 40),
-        ],
-      ),
+      ],
     );
+  }
+
+  void _dismissScorePopup() {
+    setState(() {
+      _showScorePopup = false;
+      _calculatedScore = null;
+    });
   }
 
   Widget _buildSectionHeader(String title, IconData icon, Color color) {
@@ -266,7 +426,7 @@ class PlantOverviewTab extends StatelessWidget {
             bottom: 12,
             left: 12,
             right: 12,
-            child: PlantControlSwitches(plant: plant),
+            child: PlantControlSwitches(plant: widget.plant),
           ),
         ],
       ),
@@ -367,13 +527,13 @@ class PlantOverviewTab extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _getStateIcon(plant.state),
+                        _getStateIcon(widget.plant.state),
                         size: 18,
                         color: stateColor,
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        _getStateText(localizations, plant.state),
+                        _getStateText(localizations, widget.plant.state),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -456,4 +616,4 @@ class PlantOverviewTab extends StatelessWidget {
       ),
     );
   }
-} 
+}
