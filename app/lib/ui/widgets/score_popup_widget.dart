@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../../l10n/app_localizations.dart';
 
-class AnimatedScorePopup extends StatefulWidget {
+class ScorePopupWidget extends StatefulWidget {
   final int moistureScore;
   final int temperatureScore;
   final int lightScore;
@@ -11,7 +11,7 @@ class AnimatedScorePopup extends StatefulWidget {
   final int totalScore;
   final VoidCallback? onDismiss;
 
-  const AnimatedScorePopup({
+  const ScorePopupWidget({
     Key? key,
     required this.moistureScore,
     required this.temperatureScore,
@@ -23,32 +23,21 @@ class AnimatedScorePopup extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<AnimatedScorePopup> createState() => _AnimatedScorePopupState();
+  State<ScorePopupWidget> createState() => _ScorePopupWidgetState();
 }
 
-class _AnimatedScorePopupState extends State<AnimatedScorePopup>
+class _ScorePopupWidgetState extends State<ScorePopupWidget>
     with TickerProviderStateMixin {
   late AnimationController _popupController;
-  late AnimationController _titleController;
-  late AnimationController _componentController;
+  late AnimationController _contentController;
   late AnimationController _totalController;
   late AnimationController _messageController;
-  late AnimationController _dismissController;
 
-  late Animation<double> _popupSlideAnimation;
-  late Animation<double> _popupFadeAnimation;
-  late Animation<double> _titleAnimation;
-  late Animation<double> _componentAnimation;
-  late Animation<double> _totalAnimation;
-  late Animation<double> _messageAnimation;
-  late Animation<double> _dismissAnimation;
-
-  int _currentMoistureScore = 0;
-  int _currentTemperatureScore = 0;
-  int _currentLightScore = 0;
-  int _currentPhScore = 0;
-  int _currentBonusScore = 0;
-  int _currentTotalScore = 0;
+  late Animation<double> _popupScale;
+  late Animation<double> _popupOpacity;
+  late Animation<double> _contentOpacity;
+  late Animation<double> _totalScale;
+  late Animation<double> _messageOpacity;
 
   bool _showMoisture = false;
   bool _showTemperature = false;
@@ -70,17 +59,17 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
   void _initializeAnimations() {
     // Popup entrance animation
     _popupController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    _popupSlideAnimation = Tween<double>(
-      begin: -1.0,
-      end: 0.0,
+    _popupScale = Tween<double>(
+      begin: 0.3,
+      end: 1.0,
     ).animate(CurvedAnimation(
       parent: _popupController,
       curve: Curves.elasticOut,
     ));
-    _popupFadeAnimation = Tween<double>(
+    _popupOpacity = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
@@ -88,38 +77,25 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
       curve: Curves.easeInOut,
     ));
 
-    // Title animation
-    _titleController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    _titleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _titleController,
-      curve: Curves.easeInOut,
-    ));
-
-    // Component animations
-    _componentController = AnimationController(
+    // Content animation
+    _contentController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    _componentAnimation = Tween<double>(
+    _contentOpacity = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
-      parent: _componentController,
-      curve: Curves.bounceOut,
+      parent: _contentController,
+      curve: Curves.easeInOut,
     ));
 
     // Total score animation
     _totalController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _totalAnimation = Tween<double>(
+    _totalScale = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
@@ -132,24 +108,11 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _messageAnimation = Tween<double>(
+    _messageOpacity = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _messageController,
-      curve: Curves.easeInOut,
-    ));
-
-    // Dismiss animation
-    _dismissController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    _dismissAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _dismissController,
       curve: Curves.easeInOut,
     ));
   }
@@ -159,36 +122,35 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
     _popupController.forward();
     await Future.delayed(const Duration(milliseconds: 300));
 
-    // Show title
-    _titleController.forward();
-    await Future.delayed(const Duration(milliseconds: 800));
+    // Show content
+    _contentController.forward();
+    await Future.delayed(const Duration(milliseconds: 200));
 
     // Show components one by one
     await _showComponent('moisture');
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 200));
     
     await _showComponent('temperature');
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 200));
     
     await _showComponent('light');
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 200));
     
     await _showComponent('ph');
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 200));
     
     await _showComponent('bonus');
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 300));
 
     // Show total score
     _showTotal = true;
     _totalController.forward();
-    await _animateTotalScore();
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     // Show message
     _showMessage = true;
     _messageController.forward();
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 800));
 
     // Auto dismiss after 3 seconds
     _dismissTimer = Timer(const Duration(seconds: 3), () {
@@ -216,42 +178,21 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
           break;
       }
     });
-
-    _componentController.reset();
-    _componentController.forward();
-    await _componentController.forward();
-  }
-
-  Future<void> _animateTotalScore() async {
-    const duration = Duration(milliseconds: 1500);
-    const steps = 30;
-    final stepDuration = duration.inMilliseconds ~/ steps;
-    final stepIncrement = widget.totalScore / steps;
-
-    for (int i = 0; i <= steps; i++) {
-      setState(() {
-        _currentTotalScore = (stepIncrement * i).round();
-      });
-      await Future.delayed(Duration(milliseconds: stepDuration));
-    }
+    await Future.delayed(const Duration(milliseconds: 100));
   }
 
   void _dismissPopup() {
     _dismissTimer?.cancel();
-    _dismissController.forward().then((_) {
-      widget.onDismiss?.call();
-    });
+    widget.onDismiss?.call();
   }
 
   @override
   void dispose() {
+    _dismissTimer?.cancel();
     _popupController.dispose();
-    _titleController.dispose();
-    _componentController.dispose();
+    _contentController.dispose();
     _totalController.dispose();
     _messageController.dispose();
-    _dismissController.dispose();
-    _dismissTimer?.cancel();
     super.dispose();
   }
 
@@ -260,16 +201,12 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
     final localizations = AppLocalizations.of(context)!;
     
     return AnimatedBuilder(
-      animation: _dismissController,
+      animation: _popupController,
       builder: (context, child) {
-        if (_dismissController.value == 1.0) {
-          return const SizedBox.shrink();
-        }
-
-        return Transform.translate(
-          offset: Offset(0, 100 * _dismissController.value),
+        return Transform.scale(
+          scale: _popupScale.value,
           child: Opacity(
-            opacity: 1.0 - _dismissController.value,
+            opacity: _popupOpacity.value,
             child: _buildPopupContent(localizations),
           ),
         );
@@ -278,95 +215,69 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
   }
 
   Widget _buildPopupContent(AppLocalizations localizations) {
-    return AnimatedBuilder(
-      animation: _popupController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, 300 * (1 - _popupSlideAnimation.value)),
-          child: Opacity(
-            opacity: _popupFadeAnimation.value,
-            child: _buildMainContent(localizations),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildMainContent(AppLocalizations localizations) {
-    return Material(
-      color: Colors.transparent,
+    return Center(
       child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Colors.black.withValues(alpha: 0.7),
-        child: Center(
-          child: GestureDetector(
-            onTap: _dismissPopup,
-            child: Container(
-              margin: const EdgeInsets.all(32),
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.green[50]!,
-                    Colors.green[100]!,
-                    Colors.white,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Title
-                  AnimatedBuilder(
-                    animation: _titleAnimation,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: 0.5 + (_titleAnimation.value * 0.5),
-                        child: Opacity(
-                          opacity: _titleAnimation.value,
-                          child: Text(
-                            localizations.dailyScore,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // Score Components
-                  _buildScoreComponents(),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // Total Score
-                  if (_showTotal) _buildTotalScore(),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Message
-                  if (_showMessage) _buildMessage(localizations),
-                ],
-              ),
-            ),
+        margin: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.green[50]!,
+              Colors.green[100]!,
+              Colors.white,
+            ],
           ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Title
+            AnimatedBuilder(
+              animation: _contentController,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: 0.5 + (_contentController.value * 0.5),
+                  child: Opacity(
+                    opacity: _contentController.value,
+                    child: Text(
+                      localizations.dailyScore,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              },
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Score Components
+            _buildScoreComponents(),
+            
+            const SizedBox(height: 24),
+            
+            // Total Score
+            if (_showTotal) _buildTotalScore(),
+            
+            const SizedBox(height: 16),
+            
+            // Message
+            if (_showMessage) _buildMessage(localizations),
+          ],
         ),
       ),
     );
@@ -416,12 +327,12 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
     required Color color,
   }) {
     return AnimatedBuilder(
-      animation: _componentAnimation,
+      animation: _contentController,
       builder: (context, child) {
         return Transform.scale(
-          scale: 0.3 + (_componentAnimation.value * 0.7),
+          scale: 0.3 + (_contentController.value * 0.7),
           child: Opacity(
-            opacity: _componentAnimation.value,
+            opacity: _contentController.value,
             child: Container(
               margin: const EdgeInsets.symmetric(vertical: 4),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -466,12 +377,12 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
 
   Widget _buildTotalScore() {
     return AnimatedBuilder(
-      animation: _totalAnimation,
+      animation: _totalController,
       builder: (context, child) {
         return Transform.scale(
-          scale: 0.5 + (_totalAnimation.value * 0.5),
+          scale: 0.5 + (_totalController.value * 0.5),
           child: Opacity(
-            opacity: _totalAnimation.value,
+            opacity: _totalController.value,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               decoration: BoxDecoration(
@@ -502,7 +413,7 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '$_currentTotalScore',
+                    '${widget.totalScore}',
                     style: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
@@ -522,12 +433,12 @@ class _AnimatedScorePopupState extends State<AnimatedScorePopup>
     final message = _getScoreMessage(widget.totalScore, localizations);
     
     return AnimatedBuilder(
-      animation: _messageAnimation,
+      animation: _messageController,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(0, 20 * (1 - _messageAnimation.value)),
+          offset: Offset(0, 20 * (1 - _messageController.value)),
           child: Opacity(
-            opacity: _messageAnimation.value,
+            opacity: _messageController.value,
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(

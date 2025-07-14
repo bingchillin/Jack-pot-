@@ -5,10 +5,10 @@ import '../../../app_config.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../services/automatic_score_service.dart';
 import '../../../services/plant_care_score_service.dart';
+import '../../../services/score_popup_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/plant_care_score.dart';
 import '../widget/plant_card_favorite/plant_control_switches_widget.dart';
-import '../../widgets/animated_score_popup.dart';
 
 class PlantOverviewTab extends StatefulWidget {
   final ObjectProfile plant;
@@ -20,7 +20,6 @@ class PlantOverviewTab extends StatefulWidget {
 }
 
 class _PlantOverviewTabState extends State<PlantOverviewTab> {
-  bool _showScorePopup = false;
   PlantCareScore? _calculatedScore;
 
   String _getStateText(AppLocalizations localizations, int? state) {
@@ -127,9 +126,24 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
         );
 
         if (score != null) {
+          // Show popup using score service
+          ScorePopupService().showScorePopup(
+            context: context,
+            moistureScore: score.moistureScore,
+            temperatureScore: score.temperatureScore,
+            lightScore: score.lightScore,
+            phScore: score.phScore,
+            bonusScore: score.consistencyBonus,
+            totalScore: score.dailyScore,
+            onDismiss: () {
+              setState(() {
+                _calculatedScore = null;
+              });
+            },
+          );
+          
           setState(() {
             _calculatedScore = score;
-            _showScorePopup = true;
           });
         }
       }
@@ -166,9 +180,24 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
       updatedAt: DateTime.now(),
     );
 
+    // Show popup using score service
+    ScorePopupService().showScorePopup(
+      context: context,
+      moistureScore: mockScore.moistureScore,
+      temperatureScore: mockScore.temperatureScore,
+      lightScore: mockScore.lightScore,
+      phScore: mockScore.phScore,
+      bonusScore: mockScore.consistencyBonus,
+      totalScore: mockScore.dailyScore,
+      onDismiss: () {
+        setState(() {
+          _calculatedScore = null;
+        });
+      },
+    );
+    
     setState(() {
       _calculatedScore = mockScore;
-      _showScorePopup = true;
     });
   }
 
@@ -241,72 +270,43 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
         ? Uri.parse(AppConfig.baseUrl).resolve(widget.plant.plantType!.pathPicture!).toString()
         : null;
 
-    return Stack(
-      children: [
-        // Main content
-        SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Plant Image Section with Floating Switches
-              _buildSectionHeader(
-                'Plant Image',
-                Icons.photo,
-                Colors.green[600]!,
-              ),
-              const SizedBox(height: 16),
-              _buildImageCardWithSwitches(imageUrl, localizations),
-
-              const SizedBox(height: 24),
-
-              // Plant Health Section
-              _buildSectionHeader(
-                'Plant Health',
-                Icons.favorite,
-                Colors.red[600]!,
-              ),
-              const SizedBox(height: 16),
-              _buildHealthCard(localizations, stateColor, healthScore, healthColor),
-
-              const SizedBox(height: 24),
-
-              // Test Score Popup Button (for development)
-              _buildTestScoreButton(localizations),
-
-              const SizedBox(height: 40),
-            ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Plant Image Section with Floating Switches
+          _buildSectionHeader(
+            'Plant Image',
+            Icons.photo,
+            Colors.green[600]!,
           ),
-        ),
-        
-        // Full screen overlay for the popup - properly centered
-        if (_showScorePopup && _calculatedScore != null)
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withValues(alpha: 0.5), // Semi-transparent background
-              child: Center(
-                child: AnimatedScorePopup(
-                  moistureScore: _calculatedScore!.moistureScore,
-                  temperatureScore: _calculatedScore!.temperatureScore,
-                  lightScore: _calculatedScore!.lightScore,
-                  phScore: _calculatedScore!.phScore,
-                  bonusScore: _calculatedScore!.consistencyBonus,
-                  totalScore: _calculatedScore!.dailyScore,
-                  onDismiss: _dismissScorePopup,
-                ),
-              ),
-            ),
+          const SizedBox(height: 16),
+          _buildImageCardWithSwitches(imageUrl, localizations),
+
+          const SizedBox(height: 24),
+
+          // Plant Health Section
+          _buildSectionHeader(
+            'Plant Health',
+            Icons.favorite,
+            Colors.red[600]!,
           ),
-      ],
+          const SizedBox(height: 16),
+          _buildHealthCard(localizations, stateColor, healthScore, healthColor),
+
+          const SizedBox(height: 24),
+
+          // Test Score Popup Button (for development)
+          _buildTestScoreButton(localizations),
+
+          const SizedBox(height: 40),
+        ],
+      ),
     );
   }
 
-  void _dismissScorePopup() {
-    setState(() {
-      _showScorePopup = false;
-      _calculatedScore = null;
-    });
-  }
+
 
   Widget _buildSectionHeader(String title, IconData icon, Color color) {
     return Row(
