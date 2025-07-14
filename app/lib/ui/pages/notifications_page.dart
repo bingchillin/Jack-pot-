@@ -108,6 +108,15 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.notifications),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.pushNamed(context, '/notification-settings');
+            },
+            tooltip: localizations.notificationSettings,
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [

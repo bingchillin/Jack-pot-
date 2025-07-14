@@ -75,15 +75,6 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.people),
-            onPressed: () {
-              Navigator.pushNamed(context, '/friends-management');
-            },
-            tooltip: 'Gérer mes amis',
-          ),
-        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -214,6 +205,22 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             title: localizations.manageFriends,
             onTap: () {
               Navigator.pushNamed(context, '/friends-management');
+            },
+          ),
+          
+          // Divider
+          Divider(
+            height: 1,
+            color: Colors.grey[200],
+            indent: 60,
+          ),
+          
+          // Notification Settings Line
+          _buildActionLine(
+            icon: Icons.notifications,
+            title: localizations.notificationSettings,
+            onTap: () {
+              Navigator.pushNamed(context, '/notification-settings');
             },
           ),
           

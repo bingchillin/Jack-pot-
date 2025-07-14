@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/notification_service.dart';
+import '../../services/notification_preferences_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../app_config.dart';
 
@@ -14,6 +15,7 @@ class NotificationSettingsPage extends StatefulWidget {
 
 class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   final NotificationService _notificationService = NotificationService();
+  final NotificationPreferencesService _preferencesService = NotificationPreferencesService();
   bool _isLoading = false;
   
   // Notification preferences
@@ -24,6 +26,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   bool _nutrientAlerts = true;
   bool _healthCheckups = true;
   bool _systemUpdates = false;
+  
+  // Social notification preferences
+  bool _commentLikes = true;
+  bool _commentMentions = true;
+  bool _commentReplies = true;
+  
+  // Test notification
+  String _selectedTestType = 'plant_care';
 
   @override
   void initState() {
@@ -32,28 +42,81 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Future<void> _loadNotificationPreferences() async {
-    // Load user's notification preferences
-    // This would typically come from SharedPreferences or backend
-    // For now, we'll use default values
-  }
-
-  Future<void> _saveNotificationPreferences() async {
     setState(() => _isLoading = true);
     
     try {
-      // Save preferences to backend or SharedPreferences
-      // For now, we'll just show a success message
+      final preferences = await _preferencesService.loadPreferences();
       
       if (mounted) {
+        setState(() {
+          _plantCareNotifications = preferences['plant_care_notifications'] ?? true;
+          _wateringReminders = preferences['watering_reminders'] ?? true;
+          _lightAlerts = preferences['light_alerts'] ?? true;
+          _temperatureAlerts = preferences['temperature_alerts'] ?? true;
+          _nutrientAlerts = preferences['nutrient_alerts'] ?? true;
+          _healthCheckups = preferences['health_checkups'] ?? true;
+          _systemUpdates = preferences['system_updates'] ?? false;
+          _commentLikes = preferences['comment_likes'] ?? true;
+          _commentMentions = preferences['comment_mentions'] ?? true;
+          _commentReplies = preferences['comment_replies'] ?? true;
+        });
+      }
+    } catch (e) {
+      print('Error loading notification preferences: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+    Future<void> _saveNotificationPreferences() async {
+    setState(() => _isLoading = true);
+    
+    try {
+      // Create preferences map
+      final Map<String, bool> preferences = {
+        'plant_care_notifications': _plantCareNotifications,
+        'watering_reminders': _wateringReminders,
+        'light_alerts': _lightAlerts,
+        'temperature_alerts': _temperatureAlerts,
+        'nutrient_alerts': _nutrientAlerts,
+        'health_checkups': _healthCheckups,
+        'system_updates': _systemUpdates,
+        'comment_likes': _commentLikes,
+        'comment_mentions': _commentMentions,
+        'comment_replies': _commentReplies,
+      };
+      
+      // Save to local storage
+      final localSuccess = await _preferencesService.savePreferences(preferences);
+      
+      // Try to save to backend if user is logged in
+      bool backendSuccess = false;
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.isLoggedIn && authProvider.accessToken != null && authProvider.userId != null) {
+        backendSuccess = await _preferencesService.savePreferencesToBackend(
+          preferences,
+          authProvider.accessToken!,
+          int.parse(authProvider.userId!),
+        );
+      }
+      
+      if (mounted) {
+        final localizations = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Settings saved successfully'),
-            backgroundColor: Colors.green[600],
+            content: Text(localSuccess 
+              ? localizations.settingsSaved
+              : localizations.settingsSaveError
+            ),
+            backgroundColor: localSuccess ? Colors.green[600] : Colors.red[600],
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
+      print('Error saving notification preferences: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -79,19 +142,80 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     setState(() => _isLoading = true);
     
     try {
+      // Check if the selected notification type is enabled
+      String preferenceKey;
+      switch (_selectedTestType) {
+        case 'plant_care':
+          preferenceKey = 'plant_care_notifications';
+          break;
+        case 'comment_like':
+          preferenceKey = 'comment_likes';
+          break;
+        case 'comment_mention':
+          preferenceKey = 'comment_mentions';
+          break;
+        case 'comment_reply':
+          preferenceKey = 'comment_replies';
+          break;
+        default:
+          preferenceKey = 'plant_care_notifications';
+      }
+      
+      final isEnabled = await _preferencesService.isNotificationEnabled(preferenceKey);
+      
+      if (!isEnabled) {
+        if (mounted) {
+          final localizations = AppLocalizations.of(context)!;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(localizations.notificationDisabled),
+              backgroundColor: Colors.orange[600],
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        return;
+      }
+      
+      String title;
+      String message;
+      
+      switch (_selectedTestType) {
+        case 'plant_care':
+          title = '🌱 Plant Care Test';
+          message = 'This is a test plant care notification!';
+          break;
+        case 'comment_like':
+          title = '❤️ Comment Like Test';
+          message = 'Someone liked your comment!';
+          break;
+        case 'comment_mention':
+          title = '@ Mention Test';
+          message = 'Someone mentioned you in a comment!';
+          break;
+        case 'comment_reply':
+          title = '💬 Comment Reply Test';
+          message = 'Someone replied to your comment!';
+          break;
+        default:
+          title = '🌱 Jack Pot Test';
+          message = 'This is a test notification from your plant care app!';
+      }
+      
       final success = await _notificationService.sendTestNotification(
         baseUrl: AppConfig.baseUrl,
         authToken: token,
-        title: '🌱 Jack Pot Test',
-        message: 'This is a test notification from your plant care app!',
+        title: title,
+        message: message,
       );
       
       if (mounted) {
+        final localizations = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(success 
-              ? 'Test notification sent!'
-              : 'Failed to send test notification'
+              ? localizations.testNotificationSent
+              : localizations.testNotificationError
             ),
             backgroundColor: success ? Colors.green[600] : Colors.red[600],
             behavior: SnackBarBehavior.floating,
@@ -100,9 +224,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       }
     } catch (e) {
       if (mounted) {
+        final localizations = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to send test notification'),
+            content: Text(localizations.testNotificationError),
             backgroundColor: Colors.red[600],
             behavior: SnackBarBehavior.floating,
           ),
@@ -117,6 +242,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -125,7 +252,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
-          'Notification Settings',
+          localizations.notificationSettings,
           style: const TextStyle(
             color: Colors.green,
             fontSize: 20,
@@ -144,126 +271,92 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Plant Care Notifications Section
-              _buildSectionCard(
-                title: 'Plant Care Notifications',
+              _buildSectionHeader(
+                title: localizations.plantCareNotifications,
                 subtitle: 'Get alerts about your plants\' health and care needs',
                 icon: Icons.eco,
-                children: [
-                  _buildNotificationToggle(
-                    title: 'Watering Reminders',
-                    subtitle: 'When your plants need water',
-                    value: _wateringReminders,
-                    onChanged: (value) => setState(() => _wateringReminders = value),
-                    icon: Icons.water_drop,
-                  ),
-                  _buildNotificationToggle(
-                    title: 'Light Alerts',
-                    subtitle: 'When light levels are too low or high',
-                    value: _lightAlerts,
-                    onChanged: (value) => setState(() => _lightAlerts = value),
-                    icon: Icons.wb_sunny,
-                  ),
-                  _buildNotificationToggle(
-                    title: 'Temperature Alerts',
-                    subtitle: 'When temperature is outside optimal range',
-                    value: _temperatureAlerts,
-                    onChanged: (value) => setState(() => _temperatureAlerts = value),
-                    icon: Icons.thermostat,
-                  ),
-                  _buildNotificationToggle(
-                    title: 'Nutrient Alerts',
-                    subtitle: 'When soil nutrients are low',
-                    value: _nutrientAlerts,
-                    onChanged: (value) => setState(() => _nutrientAlerts = value),
-                    icon: Icons.scatter_plot,
-                  ),
-                  _buildNotificationToggle(
-                    title: 'Health Checkups',
-                    subtitle: 'Regular plant health reports',
-                    value: _healthCheckups,
-                    onChanged: (value) => setState(() => _healthCheckups = value),
-                    icon: Icons.favorite,
-                  ),
-                ],
+                color: Colors.green,
+              ),
+              const SizedBox(height: 16),
+              _buildNotificationToggle(
+                title: localizations.wateringReminders,
+                subtitle: 'When your plants need water',
+                value: _wateringReminders,
+                onChanged: (value) => setState(() => _wateringReminders = value),
+                icon: Icons.water_drop,
+              ),
+              _buildNotificationToggle(
+                title: localizations.lightAlerts,
+                subtitle: 'When light levels are too low or high',
+                value: _lightAlerts,
+                onChanged: (value) => setState(() => _lightAlerts = value),
+                icon: Icons.wb_sunny,
+              ),
+              _buildNotificationToggle(
+                title: localizations.temperatureAlerts,
+                subtitle: 'When temperature is outside optimal range',
+                value: _temperatureAlerts,
+                onChanged: (value) => setState(() => _temperatureAlerts = value),
+                icon: Icons.thermostat,
+              ),
+              _buildNotificationToggle(
+                title: localizations.nutrientAlerts,
+                subtitle: 'When soil nutrients are low',
+                value: _nutrientAlerts,
+                onChanged: (value) => setState(() => _nutrientAlerts = value),
+                icon: Icons.scatter_plot,
+              ),
+              _buildNotificationToggle(
+                title: localizations.healthCheckups,
+                subtitle: 'Regular plant health reports',
+                value: _healthCheckups,
+                onChanged: (value) => setState(() => _healthCheckups = value),
+                icon: Icons.favorite,
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-              // General Notifications Section
-              _buildSectionCard(
-                title: 'General Notifications',
-                subtitle: 'App updates and system notifications',
-                icon: Icons.notifications,
-                children: [
-                  _buildNotificationToggle(
-                    title: 'System Updates',
-                    subtitle: 'New features and app updates',
-                    value: _systemUpdates,
-                    onChanged: (value) => setState(() => _systemUpdates = value),
-                    icon: Icons.system_update,
-                  ),
-                ],
+              // Social Notifications Section
+              _buildSectionHeader(
+                title: localizations.socialNotifications,
+                subtitle: 'Notifications from other users and social interactions',
+                icon: Icons.people,
+                color: Colors.blue,
+              ),
+              const SizedBox(height: 16),
+              _buildNotificationToggle(
+                title: localizations.commentLikes,
+                subtitle: 'When someone likes your comments',
+                value: _commentLikes,
+                onChanged: (value) => setState(() => _commentLikes = value),
+                icon: Icons.favorite,
+              ),
+              _buildNotificationToggle(
+                title: localizations.commentMentions,
+                subtitle: 'When someone mentions you in a comment',
+                value: _commentMentions,
+                onChanged: (value) => setState(() => _commentMentions = value),
+                icon: Icons.alternate_email,
+              ),
+              _buildNotificationToggle(
+                title: localizations.commentReplies,
+                subtitle: 'When someone replies to your comments',
+                value: _commentReplies,
+                onChanged: (value) => setState(() => _commentReplies = value),
+                icon: Icons.reply,
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
               // Test Notification Section
-              _buildSectionCard(
-                title: 'Test Notification',
-                subtitle: 'Send a test notification to verify your settings',
+              _buildSectionHeader(
+                title: 'Test Notifications',
+                subtitle: 'Send test notifications to verify your settings',
                 icon: Icons.bug_report,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.green[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.green[200]!),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.notification_add,
-                          size: 48,
-                          color: Colors.green[600],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Tap the button below to send a test notification and verify your settings are working correctly.',
-                          style: TextStyle(
-                            color: Colors.green[700],
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: _isLoading ? null : _sendTestNotification,
-                          icon: _isLoading 
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              )
-                            : const Icon(Icons.send),
-                          label: Text('Send Test Notification'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green[600],
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                color: Colors.orange,
               ),
+              const SizedBox(height: 16),
+              _buildTestNotificationSection(),
 
               const SizedBox(height: 32),
 
@@ -301,86 +394,167 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     );
   }
 
-  Widget _buildSectionCard({
+
+
+  Widget _buildSectionHeader({
     required String title,
     required String subtitle,
     required IconData icon,
-    required List<Widget> children,
+    required Color color,
   }) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section Header
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.green[600]!, Colors.green[500]!],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 24,
+          child: Icon(icon, color: color, size: 24),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTestNotificationSection() {
+    final localizations = AppLocalizations.of(context)!;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Notification type selector
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                localizations.selectNotificationType,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _selectedTestType,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
-              ],
+                items: [
+                  DropdownMenuItem(
+                    value: 'plant_care',
+                    child: Row(
+                      children: [
+                        Icon(Icons.eco, color: Colors.green[600], size: 20),
+                        const SizedBox(width: 8),
+                        Text('Plant Care'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'comment_like',
+                    child: Row(
+                      children: [
+                        Icon(Icons.favorite, color: Colors.red[600], size: 20),
+                        const SizedBox(width: 8),
+                        Text('Comment Like'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'comment_mention',
+                    child: Row(
+                      children: [
+                        Icon(Icons.alternate_email, color: Colors.blue[600], size: 20),
+                        const SizedBox(width: 8),
+                        Text('Comment Mention'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'comment_reply',
+                    child: Row(
+                      children: [
+                        Icon(Icons.reply, color: Colors.orange[600], size: 20),
+                        const SizedBox(width: 8),
+                        Text('Comment Reply'),
+                      ],
+                    ),
+                  ),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedTestType = value;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Test button
+        SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton.icon(
+            onPressed: _isLoading ? null : _sendTestNotification,
+            icon: _isLoading 
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Icon(Icons.send),
+            label: Text('Send Test Notification'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange[600],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
-          
-          // Section Content
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: children,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

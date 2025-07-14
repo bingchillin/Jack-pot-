@@ -617,6 +617,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationSettings => 'Notification Settings';
 
   @override
+  String get plantCareNotifications => 'Plant Care Notifications';
+
+  @override
+  String get socialNotifications => 'Social Notifications';
+
+  @override
+  String get generalNotifications => 'General Notifications';
+
+  @override
+  String get commentLikes => 'Comment Likes';
+
+  @override
+  String get commentMentions => 'Comment Mentions';
+
+  @override
+  String get commentReplies => 'Comment Replies';
+
+  @override
+  String get wateringReminders => 'Watering Reminders';
+
+  @override
+  String get lightAlerts => 'Light Alerts';
+
+  @override
+  String get temperatureAlerts => 'Temperature Alerts';
+
+  @override
+  String get nutrientAlerts => 'Nutrient Alerts';
+
+  @override
+  String get healthCheckups => 'Health Checkups';
+
+  @override
+  String get systemUpdates => 'System Updates';
+
+  @override
+  String get settingsSaved => 'Settings saved successfully';
+
+  @override
+  String get settingsSaveError => 'Failed to save settings';
+
+  @override
+  String get notificationDisabled =>
+      'This notification type is disabled. Please enable it first.';
+
+  @override
+  String get testNotificationSent => 'Test notification sent!';
+
+  @override
+  String get testNotificationError => 'Failed to send test notification';
+
+  @override
+  String get selectNotificationType => 'Select notification type to test:';
+
+  @override
   String get all => 'All';
 
   @override

@@ -1,5 +1,11 @@
 {
   "es": [
+    "settingsSaved",
+    "settingsSaveError",
+    "notificationDisabled",
+    "testNotificationSent",
+    "testNotificationError",
+    "selectNotificationType",
     "noNotifications",
     "notAuthenticated",
     "errorLoadingNotifications",
@@ -10,6 +16,12 @@
   ],
 
   "fr": [
+    "settingsSaved",
+    "settingsSaveError",
+    "notificationDisabled",
+    "testNotificationSent",
+    "testNotificationError",
+    "selectNotificationType",
     "noNotifications",
     "notAuthenticated",
     "errorLoadingNotifications",

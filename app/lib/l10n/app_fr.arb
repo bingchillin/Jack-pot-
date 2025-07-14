@@ -1664,5 +1664,65 @@
   "notificationSettings": "Paramètres Notifications",
   "@notificationSettings": {
     "description": "Notification settings menu item"
+  },
+
+  "plantCareNotifications": "Notifications de Soins des Plantes",
+  "@plantCareNotifications": {
+    "description": "Plant care notifications section title"
+  },
+
+  "socialNotifications": "Notifications Sociales",
+  "@socialNotifications": {
+    "description": "Social notifications section title"
+  },
+
+  "generalNotifications": "Notifications Générales",
+  "@generalNotifications": {
+    "description": "General notifications section title"
+  },
+
+  "commentLikes": "J'aime sur les Commentaires",
+  "@commentLikes": {
+    "description": "Comment likes notification setting"
+  },
+
+  "commentMentions": "Mentions dans les Commentaires",
+  "@commentMentions": {
+    "description": "Comment mentions notification setting"
+  },
+
+  "commentReplies": "Réponses aux Commentaires",
+  "@commentReplies": {
+    "description": "Comment replies notification setting"
+  },
+
+  "wateringReminders": "Rappels d'Arrosage",
+  "@wateringReminders": {
+    "description": "Watering reminders notification setting"
+  },
+
+  "lightAlerts": "Alertes de Lumière",
+  "@lightAlerts": {
+    "description": "Light alerts notification setting"
+  },
+
+  "temperatureAlerts": "Alertes de Température",
+  "@temperatureAlerts": {
+    "description": "Temperature alerts notification setting"
+  },
+
+  "nutrientAlerts": "Alertes de Nutriments",
+  "@nutrientAlerts": {
+    "description": "Nutrient alerts notification setting"
+  },
+
+  "healthCheckups": "Contrôles de Santé",
+  "@healthCheckups": {
+    "description": "Health checkups notification setting"
+  },
+
+  "systemUpdates": "Mises à Jour Système",
+  "@systemUpdates": {
+    "description": "System updates notification setting"
   }
 } 

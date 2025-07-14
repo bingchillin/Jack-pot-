@@ -1258,6 +1258,114 @@ abstract class AppLocalizations {
   /// **'Notification Settings'**
   String get notificationSettings;
 
+  /// Plant care notifications section title
+  ///
+  /// In en, this message translates to:
+  /// **'Plant Care Notifications'**
+  String get plantCareNotifications;
+
+  /// Social notifications section title
+  ///
+  /// In en, this message translates to:
+  /// **'Social Notifications'**
+  String get socialNotifications;
+
+  /// General notifications section title
+  ///
+  /// In en, this message translates to:
+  /// **'General Notifications'**
+  String get generalNotifications;
+
+  /// Comment likes notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'Comment Likes'**
+  String get commentLikes;
+
+  /// Comment mentions notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'Comment Mentions'**
+  String get commentMentions;
+
+  /// Comment replies notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'Comment Replies'**
+  String get commentReplies;
+
+  /// Watering reminders notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'Watering Reminders'**
+  String get wateringReminders;
+
+  /// Light alerts notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'Light Alerts'**
+  String get lightAlerts;
+
+  /// Temperature alerts notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature Alerts'**
+  String get temperatureAlerts;
+
+  /// Nutrient alerts notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrient Alerts'**
+  String get nutrientAlerts;
+
+  /// Health checkups notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'Health Checkups'**
+  String get healthCheckups;
+
+  /// System updates notification setting
+  ///
+  /// In en, this message translates to:
+  /// **'System Updates'**
+  String get systemUpdates;
+
+  /// Success message when settings are saved
+  ///
+  /// In en, this message translates to:
+  /// **'Settings saved successfully'**
+  String get settingsSaved;
+
+  /// Error message when settings fail to save
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save settings'**
+  String get settingsSaveError;
+
+  /// Message when trying to test a disabled notification type
+  ///
+  /// In en, this message translates to:
+  /// **'This notification type is disabled. Please enable it first.'**
+  String get notificationDisabled;
+
+  /// Success message when test notification is sent
+  ///
+  /// In en, this message translates to:
+  /// **'Test notification sent!'**
+  String get testNotificationSent;
+
+  /// Error message when test notification fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send test notification'**
+  String get testNotificationError;
+
+  /// Label for notification type selector
+  ///
+  /// In en, this message translates to:
+  /// **'Select notification type to test:'**
+  String get selectNotificationType;
+
   /// All notifications tab
   ///
   /// In en, this message translates to:

@@ -998,6 +998,96 @@
     "description": "Notification settings menu item"
   },
 
+  "plantCareNotifications": "Plant Care Notifications",
+  "@plantCareNotifications": {
+    "description": "Plant care notifications section title"
+  },
+
+  "socialNotifications": "Social Notifications",
+  "@socialNotifications": {
+    "description": "Social notifications section title"
+  },
+
+  "generalNotifications": "General Notifications",
+  "@generalNotifications": {
+    "description": "General notifications section title"
+  },
+
+  "commentLikes": "Comment Likes",
+  "@commentLikes": {
+    "description": "Comment likes notification setting"
+  },
+
+  "commentMentions": "Comment Mentions",
+  "@commentMentions": {
+    "description": "Comment mentions notification setting"
+  },
+
+  "commentReplies": "Comment Replies",
+  "@commentReplies": {
+    "description": "Comment replies notification setting"
+  },
+
+  "wateringReminders": "Watering Reminders",
+  "@wateringReminders": {
+    "description": "Watering reminders notification setting"
+  },
+
+  "lightAlerts": "Light Alerts",
+  "@lightAlerts": {
+    "description": "Light alerts notification setting"
+  },
+
+  "temperatureAlerts": "Temperature Alerts",
+  "@temperatureAlerts": {
+    "description": "Temperature alerts notification setting"
+  },
+
+  "nutrientAlerts": "Nutrient Alerts",
+  "@nutrientAlerts": {
+    "description": "Nutrient alerts notification setting"
+  },
+
+  "healthCheckups": "Health Checkups",
+  "@healthCheckups": {
+    "description": "Health checkups notification setting"
+  },
+
+  "systemUpdates": "System Updates",
+  "@systemUpdates": {
+    "description": "System updates notification setting"
+  },
+
+  "settingsSaved": "Settings saved successfully",
+  "@settingsSaved": {
+    "description": "Success message when settings are saved"
+  },
+
+  "settingsSaveError": "Failed to save settings",
+  "@settingsSaveError": {
+    "description": "Error message when settings fail to save"
+  },
+
+  "notificationDisabled": "This notification type is disabled. Please enable it first.",
+  "@notificationDisabled": {
+    "description": "Message when trying to test a disabled notification type"
+  },
+
+  "testNotificationSent": "Test notification sent!",
+  "@testNotificationSent": {
+    "description": "Success message when test notification is sent"
+  },
+
+  "testNotificationError": "Failed to send test notification",
+  "@testNotificationError": {
+    "description": "Error message when test notification fails"
+  },
+
+  "selectNotificationType": "Select notification type to test:",
+  "@selectNotificationType": {
+    "description": "Label for notification type selector"
+  },
+
   "all": "All",
   "@all": {
     "description": "All notifications tab"

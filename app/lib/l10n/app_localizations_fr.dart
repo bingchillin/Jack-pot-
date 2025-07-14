@@ -623,6 +623,61 @@ class AppLocalizationsFr extends AppLocalizations {
   String get notificationSettings => 'Paramètres Notifications';
 
   @override
+  String get plantCareNotifications => 'Notifications de Soins des Plantes';
+
+  @override
+  String get socialNotifications => 'Notifications Sociales';
+
+  @override
+  String get generalNotifications => 'Notifications Générales';
+
+  @override
+  String get commentLikes => 'J\'aime sur les Commentaires';
+
+  @override
+  String get commentMentions => 'Mentions dans les Commentaires';
+
+  @override
+  String get commentReplies => 'Réponses aux Commentaires';
+
+  @override
+  String get wateringReminders => 'Rappels d\'Arrosage';
+
+  @override
+  String get lightAlerts => 'Alertes de Lumière';
+
+  @override
+  String get temperatureAlerts => 'Alertes de Température';
+
+  @override
+  String get nutrientAlerts => 'Alertes de Nutriments';
+
+  @override
+  String get healthCheckups => 'Contrôles de Santé';
+
+  @override
+  String get systemUpdates => 'Mises à Jour Système';
+
+  @override
+  String get settingsSaved => 'Settings saved successfully';
+
+  @override
+  String get settingsSaveError => 'Failed to save settings';
+
+  @override
+  String get notificationDisabled =>
+      'This notification type is disabled. Please enable it first.';
+
+  @override
+  String get testNotificationSent => 'Test notification sent!';
+
+  @override
+  String get testNotificationError => 'Failed to send test notification';
+
+  @override
+  String get selectNotificationType => 'Select notification type to test:';
+
+  @override
   String get all => 'Tout';
 
   @override
