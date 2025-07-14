@@ -151,6 +151,26 @@ class ObjectProfileService {
     }
   }
 
+  Future<bool> deleteObjectProfile(int objectProfileId, String token) async {
+    final url = Uri.parse(AppConfig.deleteObjectProfile(objectProfileId.toString()));
+
+    final response = await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Échec de la suppression (code: ${response.statusCode})');
+    }
+  }
+
+
+
   // Method to clear cache (useful for refresh)
   static void clearCache() {
     _plantCache.clear();

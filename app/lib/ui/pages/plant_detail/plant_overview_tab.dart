@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../models/avatar.dart';
 import '../../../models/object_profile.dart';
 import '../../../app_config.dart';
 import '../../../l10n/app_localizations.dart';
@@ -91,9 +92,30 @@ class PlantOverviewTab extends StatelessWidget {
     final stateColor = _getStateColor(plant.state);
     final healthScore = _getHealthScore();
     final healthColor = _getHealthColor();
-    final imageUrl = plant.plantType?.pathPicture != null
-        ? Uri.parse(AppConfig.baseUrl).resolve(plant.plantType!.pathPicture!).toString()
+
+    final avatars = plant.plantType?.avatars;
+
+    Avatar? avatar;
+
+    if (avatars == null || avatars.isEmpty) {
+      avatar = null;
+    } else {
+      try {
+        avatar = avatars.firstWhere((a) => a.stateP == plant.state);
+      } catch (e) {
+        try {
+          avatar = avatars.firstWhere((a) => a.stateP == 0);
+        } catch (e) {
+          avatar = null;
+        }
+      }
+    }
+
+    final pathPicture = avatar?.pathPicture.toString();
+    final imageUrl = pathPicture != null
+        ? Uri.parse(AppConfig.baseUrlSrc).resolve(pathPicture).toString()
         : null;
+
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),

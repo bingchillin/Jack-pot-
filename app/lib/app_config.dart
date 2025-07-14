@@ -19,6 +19,7 @@ class AppConfig {
   static String updateObjectProfileEndpoint(String id) => "$baseUrl/api/object-profile/$id";
   static String objectProfilesFavorisEndpoint(String personId) => "$baseUrl/person/$personId/object-profiles/favoris";
   static String plantTypeSearch(String title) => "$baseUrl/plant-type/search?title=$title";
+  static String deleteObjectProfile(String objectProfileId) => "$baseUrl/api/object-profile/$objectProfileId";
 
   // Simple way to check current setup
   static void showCurrentEnvironment() {

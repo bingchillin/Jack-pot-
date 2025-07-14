@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jackpote/ui/pages/widget/delete_confirmation.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../bloc/plant_detail/plant_detail_bloc.dart';
@@ -300,6 +301,35 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
         ),
         centerTitle: true,
         actions: [
+
+          // Wi-Fi button
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              icon: Icon(Icons.wifi, color: Colors.green[700]),
+              onPressed: () {
+                Navigator.pushNamed(context, '/add_my_object');
+              },
+            ),
+          ),
+
+          // Delete button
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DeleteConfirmation(plantId: plant.idObjectProfile),
+                  ),
+                );
+              },
+            ),
+          ),
+
+
           // Add favorite toggle button to the AppBar
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
