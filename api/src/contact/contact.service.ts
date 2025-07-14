@@ -210,8 +210,6 @@ export class ContactsService {
   }
 
   async getBlockedContacts(userId: number): Promise<ContactResponseDto[]> {
-    console.log(`[BLOCKED] API - Getting blocked contacts for user ${userId}`);
-    
     const contacts = await this.contactRepository.find({
       where: [
         { requesterId: userId, status: ContactStatus.BLOCKED },
@@ -221,38 +219,22 @@ export class ContactsService {
       order: { updatedAt: 'DESC' }
     });
 
-    console.log(`[BLOCKED] API - Found ${contacts.length} blocked contacts in database:`);
-    contacts.forEach(contact => {
-      console.log(`[BLOCKED] API - Raw contact: id=${contact.id}, requester=${contact.requesterId}, receiver=${contact.receiverId}, status=${contact.status}, blockedBy=${contact.blockedBy}`);
-    });
-
     const response = contacts.map(contact => this.transformContactToResponse(contact));
-    
-    console.log(`[BLOCKED] API - Transformed response:`);
-    response.forEach(contact => {
-      console.log(`[BLOCKED] API - Response contact: id=${contact.id}, requester=${contact.requesterId}, receiver=${contact.receiverId}, status=${contact.status}, blockedBy=${contact.blockedBy}`);
-    });
 
     return response;
   }
 
   async unblockContact(userId: number, contactId: number): Promise<ContactResponseDto> {
-    console.log(`[UNBLOCK] API - Starting unblock process: contactId=${contactId}, userId=${userId}`);
-    
     const contact = await this.contactRepository.findOne({
       where: { id: contactId },
       relations: ['requester', 'receiver']
     });
 
     if (!contact) {
-      console.log(`[UNBLOCK] ERROR - Contact ${contactId} not found in database`);
       throw new NotFoundException('Contact not found');
     }
 
-    console.log(`[UNBLOCK] Found contact: id=${contact.id}, status=${contact.status}, blockedBy=${contact.blockedBy}, requester=${contact.requesterId}, receiver=${contact.receiverId}`);
-
     if (contact.status !== ContactStatus.BLOCKED) {
-      console.log(`[UNBLOCK] ERROR - Contact ${contactId} is not blocked (current status: ${contact.status})`);
       throw new BadRequestException('Contact is not blocked');
     }
 
@@ -262,24 +244,18 @@ export class ContactsService {
     });
 
     if (!user) {
-      console.log(`[UNBLOCK] ERROR - User ${userId} not found in database`);
       throw new NotFoundException('User not found');
     }
 
-    console.log(`[UNBLOCK] User details: id=${userId}, role=${user.idRole}, contact blockedBy=${contact.blockedBy}`);
-
     // Allow admins (idRole === 1) to unblock any contact
     if (user.idRole !== 1 && contact.blockedBy !== userId) {
-      console.log(`[UNBLOCK] ERROR - Permission denied: User ${userId} (role=${user.idRole}) cannot unblock contact ${contactId} (blocked by ${contact.blockedBy})`);
       throw new ForbiddenException('You can only unblock contacts you blocked');
     }
 
-    console.log(`[UNBLOCK] Permission granted - proceeding with unblock`);
     contact.status = ContactStatus.ACCEPTED;
     contact.blockedBy = null;
 
     const savedContact = await this.contactRepository.save(contact);
-    console.log(`[UNBLOCK] SUCCESS - Contact ${contactId} unblocked successfully, new status: ${savedContact.status}`);
     
     return this.transformContactToResponse(savedContact);
   }

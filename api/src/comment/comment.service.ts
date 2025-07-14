@@ -27,9 +27,6 @@ export class CommentService {
   ) {}
 
   async create(createCommentDto: CreateCommentDto): Promise<Comment> {
-    console.log('Backend - Creating comment with data:', createCommentDto);
-    console.log('Backend - ImageUrl received:', createCommentDto.imageUrl);
-    
     const { parentCommentId, ...commentData } = createCommentDto;
 
     // If parentCommentId is provided, verify the parent comment exists
@@ -46,7 +43,6 @@ export class CommentService {
     // If this is a reply (has parentCommentId), remove the tag as tags are only for main posts
     if (parentCommentId) {
       commentData.tag = null;
-      console.log('Backend - Removing tag from reply, tags are only allowed on main posts');
     }
 
     const comment = this.commentRepository.create({
@@ -54,9 +50,7 @@ export class CommentService {
       parentComment: parentCommentId ? { idComment: parentCommentId } : null,
     });
 
-    console.log('Backend - Comment before save:', comment);
     const savedComment = await this.commentRepository.save(comment);
-    console.log('Backend - Comment after save:', savedComment);
     
     // Process mentions after comment is saved
     try {
@@ -80,7 +74,7 @@ export class CommentService {
         }
       }
       
-      console.log('Backend - Mentions processed successfully for comment:', savedComment.idComment);
+
     } catch (error) {
       console.error('Backend - Error processing mentions:', error);
       // Don't fail the comment creation if mention processing fails
@@ -178,7 +172,6 @@ export class CommentService {
       likedMap = Object.fromEntries(liked.map(l => [Number(l.idComment), true]));
     }
     const result = comments.map(comment => {
-      console.log(`Backend - Comment ${comment.idComment}: imageUrl = "${comment.imageUrl}"`);
       return {
         ...comment,
         replyCount: replyCountMap[comment.idComment] || 0,

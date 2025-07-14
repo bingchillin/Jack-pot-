@@ -24,7 +24,6 @@ export class NotificationService {
     // Safety check: Don't create notifications where the recipient and triggering person are the same
     if (createNotificationDto.idTriggeringPerson && 
         createNotificationDto.idPerson === createNotificationDto.idTriggeringPerson) {
-      console.log('Skipping self-notification:', createNotificationDto);
       return null;
     }
 
@@ -35,7 +34,6 @@ export class NotificationService {
         createNotificationDto.idPerson
       );
       if (isBlocked) {
-        console.log('Skipping notification due to blocking:', createNotificationDto);
         return null;
       }
     }

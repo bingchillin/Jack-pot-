@@ -16,8 +16,6 @@ class ContactService {
       'receiverId': receiverId,
     };
 
-    print('Flutter - Sending friend request to user $receiverId');
-
     final response = await http.post(
       url,
       headers: {
@@ -26,9 +24,6 @@ class ContactService {
       },
       body: jsonEncode(body),
     );
-
-    print('Flutter - Response status: ${response.statusCode}');
-    print('Flutter - Response body: ${response.body}');
 
     if (response.statusCode == 201) {
       return Contact.fromJson(jsonDecode(response.body));
@@ -111,10 +106,6 @@ class ContactService {
   }) async {
     final url = Uri.parse('$baseUrl/contacts/$contactId/unblock');
 
-    print('[UNBLOCK] ContactService - Unblocking contact ID: $contactId');
-    print('[UNBLOCK] ContactService - Unblock URL: ${url.toString()}');
-    print('[UNBLOCK] ContactService - Token: ${token.substring(0, 20)}...');
-
     final response = await http.patch(
       url,
       headers: {
@@ -123,16 +114,10 @@ class ContactService {
       },
     );
 
-    print('[UNBLOCK] ContactService - Unblock response status: ${response.statusCode}');
-    print('[UNBLOCK] ContactService - Unblock response body: ${response.body}');
-
     if (response.statusCode == 200) {
       final contact = Contact.fromJson(jsonDecode(response.body));
-      print('[UNBLOCK] SUCCESS - Successfully unblocked contact: ${contact.id}');
       return contact;
     } else {
-      print('[UNBLOCK] ERROR - Unblock failed with status: ${response.statusCode}');
-      print('[UNBLOCK] ERROR - Error response: ${response.body}');
       throw Exception('Erreur lors du déblocage: ${response.statusCode}');
     }
   }
@@ -163,8 +148,6 @@ class ContactService {
   }) async {
     final url = Uri.parse('$baseUrl/contacts/my-contacts');
     
-    print('🌐 ContactService - Requesting: ${url.toString()}');
-
     final response = await http.get(
       url,
       headers: {
@@ -173,17 +156,9 @@ class ContactService {
       },
     );
 
-    print('📡 ContactService - Response status: ${response.statusCode}');
-    print('📡 ContactService - Response body: ${response.body}');
-
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
       final contacts = data.map((json) => Contact.fromJson(json)).toList();
-      
-      print('📋 ContactService - Parsed ${contacts.length} contacts');
-      for (var contact in contacts) {
-        print('📋 Contact: id=${contact.id}, status=${contact.status.value}, requester=${contact.requesterId}, receiver=${contact.receiverId}');
-      }
       
       return contacts;
     } else {
@@ -241,8 +216,6 @@ class ContactService {
   }) async {
     final url = Uri.parse('$baseUrl/contacts/blocked');
     
-    print('🌐 ContactService - Requesting blocked: ${url.toString()}');
-
     final response = await http.get(
       url,
       headers: {
@@ -251,17 +224,9 @@ class ContactService {
       },
     );
 
-    print('📡 ContactService - Blocked response status: ${response.statusCode}');
-    print('📡 ContactService - Blocked response body: ${response.body}');
-
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
       final contacts = data.map((json) => Contact.fromJson(json)).toList();
-      
-      print('📋 ContactService - Parsed ${contacts.length} blocked contacts');
-      for (var contact in contacts) {
-        print('📋 Blocked Contact: id=${contact.id}, status=${contact.status.value}, requester=${contact.requesterId}, receiver=${contact.receiverId}');
-      }
       
       return contacts;
     } else {

@@ -37,7 +37,6 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
           });
         }
       } catch (e) {
-        print('Error loading blocked users: $e');
         if (mounted) {
           setState(() {
             _isLoading = false;
@@ -62,12 +61,6 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
 
     try {
       final contactService = ContactService();
-      print('[UNBLOCK] BlockedUsersPage - Contact details: id=${contact.id}, requester=${contact.requesterId}, receiver=${contact.receiverId}, status=${contact.status.value}, blockedBy=${contact.blockedBy}');
-      print('[UNBLOCK] BlockedUsersPage - Current user ID: $currentUserId');
-      print('[UNBLOCK] BlockedUsersPage - About to call unblockUser with contactId: ${contact.id}');
-      
-      print('[DEBUG] About to unblock - contact.id: ${contact.id}');
-      print('[DEBUG] Contact object: requesterId=${contact.requesterId}, receiverId=${contact.receiverId}');
       
       await contactService.unblockUser(
         contactId: contact.id,
@@ -81,9 +74,7 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
           contactId: contact.id,
           token: token,
         );
-        print('🧹 Contact relation removed after unblock to avoid auto-friendship');
       } catch (removeError) {
-        print('Warning: Could not remove contact after unblock: $removeError');
         // Continue même si la suppression échoue
       }
 
