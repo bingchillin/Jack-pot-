@@ -24,6 +24,7 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
   late Future<UserProfile> _profileFuture;
   late Future<int> _friendsCountFuture;
+  late Future<BlockingStatus> _blockingStatusFuture;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
     
     _profileFuture = CommentService().fetchUserProfile(widget.userId, token);
     _friendsCountFuture = _getFriendsCount(token);
+    _blockingStatusFuture = _checkBlockingStatus(token, currentUserId);
     
     // Use the shared CommentBloc and load main comments if not already loaded
     final commentBloc = context.read<CommentBloc>();
@@ -58,6 +60,21 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
     } catch (e) {
       print('Error getting friends count: $e');
       return 0;
+    }
+  }
+
+  Future<BlockingStatus> _checkBlockingStatus(String? token, String? currentUserId) async {
+    if (token == null || currentUserId == null) return BlockingStatus.notBlocked;
+    try {
+      final contactService = ContactService();
+      return await contactService.checkBlockingStatus(
+        currentUserId: int.parse(currentUserId),
+        targetUserId: widget.userId,
+        token: token,
+      );
+    } catch (e) {
+      print('Error checking blocking status: $e');
+      return BlockingStatus.notBlocked;
     }
   }
 
@@ -108,23 +125,113 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
             );
           }
           final profile = snapshot.data!;
-          return RefreshIndicator(
+          
+          // Always show normal profile, but check blocking for comments section
+          return _buildNormalProfileView(profile);
+        },
+      ),
+    );
+  }
+
+  Widget _buildBlockedCommentsSection(BlockingStatus blockingStatus) {
+    final localizations = AppLocalizations.of(context)!;
+    String message;
+    IconData icon;
+    Color iconColor;
+    
+    switch (blockingStatus) {
+      case BlockingStatus.youBlockedThem:
+        message = localizations.youBlockedThisUserPosts;
+        icon = Icons.block;
+        iconColor = Colors.red;
+        break;
+      case BlockingStatus.theyBlockedYou:
+        message = localizations.thisUserBlockedYouPosts;
+        icon = Icons.lock;
+        iconColor = Colors.orange;
+        break;
+      default:
+        return const SizedBox.shrink();
+    }
+    
+    return Container(
+      padding: const EdgeInsets.all(32),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: iconColor.withValues(alpha: 0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 32,
+              color: iconColor,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[700],
+              height: 1.4,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (blockingStatus == BlockingStatus.youBlockedThem) ...[
+            const SizedBox(height: 16),
+            TextButton.icon(
+              onPressed: () {
+                // Navigate to blocked users page
+                Navigator.pushNamed(context, '/blocked-users');
+              },
+              icon: const Icon(Icons.settings, size: 18),
+              label: Text(localizations.manageBlockedUsers),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.green[600],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNormalProfileView(UserProfile profile) {
+    final localizations = AppLocalizations.of(context)!;
+    
+    return RefreshIndicator(
             onRefresh: () async {
               // Refresh profile data
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
               setState(() {
-                _profileFuture = CommentService().fetchUserProfile(widget.userId, 
-                  Provider.of<AuthProvider>(context, listen: false).accessToken);
-                _friendsCountFuture = _getFriendsCount(
-                  Provider.of<AuthProvider>(context, listen: false).accessToken);
+                _profileFuture = CommentService().fetchUserProfile(widget.userId, authProvider.accessToken);
+                _friendsCountFuture = _getFriendsCount(authProvider.accessToken);
+                _blockingStatusFuture = _checkBlockingStatus(authProvider.accessToken, authProvider.userId);
               });
               
               // Refresh comments
-              final authProvider = Provider.of<AuthProvider>(context, listen: false);
               context.read<CommentBloc>().add(LoadMainComments(userId: authProvider.userId));
               
               // Wait for the futures to complete
               await _profileFuture;
               await _friendsCountFuture;
+              await _blockingStatusFuture;
             },
             color: Colors.green[600],
             child: SingleChildScrollView(
@@ -281,69 +388,82 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
                   ),
                   const SizedBox(height: 8),
                   
-                  // Posts list
-                  BlocBuilder<CommentBloc, CommentState>(
-                    builder: (context, state) {
-                      if (state is CommentLoading) {
-                        return Column(
-                          children: List.generate(3, (index) => _buildCommentShimmer()),
-                        );
+                  // Posts list with blocking check
+                  FutureBuilder<BlockingStatus>(
+                    future: _blockingStatusFuture,
+                    builder: (context, blockingSnapshot) {
+                      final blockingStatus = blockingSnapshot.data ?? BlockingStatus.notBlocked;
+                      
+                      // Show blocking message instead of comments if blocked
+                      if (blockingStatus != BlockingStatus.notBlocked) {
+                        return _buildBlockedCommentsSection(blockingStatus);
                       }
-                      if (state is CommentError) {
-                        return Container(
-                          padding: const EdgeInsets.all(32),
-                          child: Column(
-                            children: [
-                              Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Erreur: ${state.message}',
-                                style: TextStyle(color: Colors.grey[600]),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                      if (state is CommentMainLoaded) {
-                        // Filter comments for this user
-                        final userComments = state.comments
-                            .where((comment) => comment.idPerson == widget.userId)
-                            .toList();
-                        
-                        if (userComments.isEmpty) {
-                          return Container(
-                            padding: const EdgeInsets.all(32),
-                            child: Column(
-                              children: [
-                                Icon(Icons.article_outlined, size: 48, color: Colors.grey[400]),
-                                const SizedBox(height: 16),
-                                Text(
-                                  localizations.noPublications,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[600],
+                      
+                      // Show normal comments if not blocked
+                      return BlocBuilder<CommentBloc, CommentState>(
+                        builder: (context, state) {
+                          if (state is CommentLoading) {
+                            return Column(
+                              children: List.generate(3, (index) => _buildCommentShimmer()),
+                            );
+                          }
+                          if (state is CommentError) {
+                            return Container(
+                              padding: const EdgeInsets.all(32),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Erreur: ${state.message}',
+                                    style: TextStyle(color: Colors.grey[600]),
+                                    textAlign: TextAlign.center,
                                   ),
+                                ],
+                              ),
+                            );
+                          }
+                          if (state is CommentMainLoaded) {
+                            // Filter comments for this user
+                            final userComments = state.comments
+                                .where((comment) => comment.idPerson == widget.userId)
+                                .toList();
+                            
+                            if (userComments.isEmpty) {
+                              return Container(
+                                padding: const EdgeInsets.all(32),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.article_outlined, size: 48, color: Colors.grey[400]),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      localizations.noPublications,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      localizations.noPublicationsDescription,
+                                      style: TextStyle(color: Colors.grey[500]),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  localizations.noPublicationsDescription,
-                                  style: TextStyle(color: Colors.grey[500]),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        
-                        return Column(
-                          children: userComments.map((comment) {
-                            return CommentCard(comment: comment);
-                          }).toList(),
-                        );
-                      }
-                      return const SizedBox.shrink();
+                              );
+                            }
+                            
+                            return Column(
+                              children: userComments.map((comment) {
+                                return CommentCard(comment: comment);
+                              }).toList(),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      );
                     },
                   ),
                   ],
@@ -351,9 +471,6 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
               ),
             ),
           );
-        },
-      ),
-    );
   }
   
   Widget _buildStatItem(String count, String label) {

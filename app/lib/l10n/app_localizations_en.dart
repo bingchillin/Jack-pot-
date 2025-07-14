@@ -951,4 +951,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unblockToSee => 'Unblock to see posts';
+
+  @override
+  String get youBlockedThisUserPosts =>
+      'You have blocked this user. Their posts are hidden.';
+
+  @override
+  String get thisUserBlockedYouPosts =>
+      'This user has blocked you. You cannot view their posts.';
+
+  @override
+  String get manageBlockedUsers => 'Manage Blocked Users';
+
+  @override
+  String get accessRestricted => 'Access Restricted';
 }

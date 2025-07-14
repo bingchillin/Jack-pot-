@@ -285,4 +285,29 @@ class ContactService {
       return null;
     }
   }
+
+  // Check if there's a blocking relationship between current user and target user
+  Future<BlockingStatus> checkBlockingStatus({
+    required int currentUserId,
+    required int targetUserId,
+    required String token,
+  }) async {
+    try {
+      final contact = await getContactStatus(userId: targetUserId, token: token);
+      
+      if (contact == null || !contact.isBlocked) {
+        return BlockingStatus.notBlocked;
+      }
+      
+      // Check who blocked whom
+      if (contact.blockedBy == currentUserId) {
+        return BlockingStatus.youBlockedThem;
+      } else {
+        return BlockingStatus.theyBlockedYou;
+      }
+    } catch (e) {
+      print('Error checking blocking status: $e');
+      return BlockingStatus.notBlocked;
+    }
+  }
 } 

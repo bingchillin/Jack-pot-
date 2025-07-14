@@ -959,4 +959,18 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get unblockToSee => 'Desbloquear para ver publicaciones';
+
+  @override
+  String get youBlockedThisUserPosts =>
+      'Has bloqueado a este usuario. Sus publicaciones están ocultas.';
+
+  @override
+  String get thisUserBlockedYouPosts =>
+      'Este usuario te ha bloqueado. No puedes ver sus publicaciones.';
+
+  @override
+  String get manageBlockedUsers => 'Gestionar Usuarios Bloqueados';
+
+  @override
+  String get accessRestricted => 'Acceso Restringido';
 }

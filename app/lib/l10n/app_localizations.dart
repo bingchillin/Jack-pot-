@@ -1893,6 +1893,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unblock to see posts'**
   String get unblockToSee;
+
+  /// Message shown when viewing posts of a user you blocked
+  ///
+  /// In en, this message translates to:
+  /// **'You have blocked this user. Their posts are hidden.'**
+  String get youBlockedThisUserPosts;
+
+  /// Message shown when trying to view posts of a user who blocked you
+  ///
+  /// In en, this message translates to:
+  /// **'This user has blocked you. You cannot view their posts.'**
+  String get thisUserBlockedYouPosts;
+
+  /// Button text to navigate to blocked users management
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Blocked Users'**
+  String get manageBlockedUsers;
+
+  /// Title shown when access is restricted due to blocking
+  ///
+  /// In en, this message translates to:
+  /// **'Access Restricted'**
+  String get accessRestricted;
 }
 
 class _AppLocalizationsDelegate

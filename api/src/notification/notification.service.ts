@@ -6,6 +6,7 @@ import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { FirebaseService } from '../firebase/firebase.service';
 import { Person } from '../person/entities/person.entity';
+import { Contact, ContactStatus } from '../contact/entities/contact.entity';
 
 @Injectable()
 export class NotificationService {
@@ -14,6 +15,8 @@ export class NotificationService {
     private readonly notificationRepository: Repository<Notification>,
     @InjectRepository(Person)
     private readonly personRepository: Repository<Person>,
+    @InjectRepository(Contact)
+    private readonly contactRepository: Repository<Contact>,
     private readonly firebaseService: FirebaseService,
   ) {}
 
@@ -23,6 +26,18 @@ export class NotificationService {
         createNotificationDto.idPerson === createNotificationDto.idTriggeringPerson) {
       console.log('Skipping self-notification:', createNotificationDto);
       return null;
+    }
+
+    // Check if users are blocked
+    if (createNotificationDto.idTriggeringPerson) {
+      const isBlocked = await this.areUsersBlocked(
+        createNotificationDto.idTriggeringPerson,
+        createNotificationDto.idPerson
+      );
+      if (isBlocked) {
+        console.log('Skipping notification due to blocking:', createNotificationDto);
+        return null;
+      }
     }
 
     const notification = this.notificationRepository.create(createNotificationDto);
@@ -441,5 +456,24 @@ export class NotificationService {
       relations: ['triggeringPerson', 'person', 'object'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  /**
+   * Check if two users have blocked each other
+   */
+  private async areUsersBlocked(userId1: number, userId2: number): Promise<boolean> {
+    try {
+      const blockingContact = await this.contactRepository.findOne({
+        where: [
+          { requesterId: userId1, receiverId: userId2, status: ContactStatus.BLOCKED },
+          { requesterId: userId2, receiverId: userId1, status: ContactStatus.BLOCKED }
+        ]
+      });
+      
+      return !!blockingContact;
+    } catch (error) {
+      console.error('Error checking blocking status:', error);
+      return false; // If there's an error, don't block notifications
+    }
   }
 } 

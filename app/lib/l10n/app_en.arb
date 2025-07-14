@@ -1704,5 +1704,25 @@
   "unblockToSee": "Unblock to see posts",
   "@unblockToSee": {
     "description": "Message to unblock user to see their content"
+  },
+
+  "youBlockedThisUserPosts": "You have blocked this user. Their posts are hidden.",
+  "@youBlockedThisUserPosts": {
+    "description": "Message shown when viewing posts of a user you blocked"
+  },
+
+  "thisUserBlockedYouPosts": "This user has blocked you. You cannot view their posts.",
+  "@thisUserBlockedYouPosts": {
+    "description": "Message shown when trying to view posts of a user who blocked you"
+  },
+
+  "manageBlockedUsers": "Manage Blocked Users",
+  "@manageBlockedUsers": {
+    "description": "Button text to navigate to blocked users management"
+  },
+
+  "accessRestricted": "Access Restricted",
+  "@accessRestricted": {
+    "description": "Title shown when access is restricted due to blocking"
   }
 } 

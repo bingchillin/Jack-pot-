@@ -1631,6 +1631,26 @@
     "description": "Message to unblock user to see their content"
   },
 
+  "youBlockedThisUserPosts": "Vous avez bloqué cet utilisateur. Ses publications sont masquées.",
+  "@youBlockedThisUserPosts": {
+    "description": "Message shown when viewing posts of a user you blocked"
+  },
+
+  "thisUserBlockedYouPosts": "Cet utilisateur vous a bloqué. Vous ne pouvez pas voir ses publications.",
+  "@thisUserBlockedYouPosts": {
+    "description": "Message shown when trying to view posts of a user who blocked you"
+  },
+
+  "manageBlockedUsers": "Gérer les Utilisateurs Bloqués",
+  "@manageBlockedUsers": {
+    "description": "Button text to navigate to blocked users management"
+  },
+
+  "accessRestricted": "Accès Restreint",
+  "@accessRestricted": {
+    "description": "Title shown when access is restricted due to blocking"
+  },
+
   "notifications": "Notifications",
   "@notifications": {
     "description": "Notifications page title"

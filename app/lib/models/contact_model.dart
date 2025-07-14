@@ -23,6 +23,12 @@ enum ContactStatus {
   }
 }
 
+enum BlockingStatus {
+  notBlocked,
+  youBlockedThem,
+  theyBlockedYou,
+}
+
 class ContactUser {
   final int id;
   final String email;

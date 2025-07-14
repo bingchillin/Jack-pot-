@@ -1631,6 +1631,26 @@
     "description": "Message to unblock user to see their content"
   },
 
+  "youBlockedThisUserPosts": "Has bloqueado a este usuario. Sus publicaciones están ocultas.",
+  "@youBlockedThisUserPosts": {
+    "description": "Message shown when viewing posts of a user you blocked"
+  },
+
+  "thisUserBlockedYouPosts": "Este usuario te ha bloqueado. No puedes ver sus publicaciones.",
+  "@thisUserBlockedYouPosts": {
+    "description": "Message shown when trying to view posts of a user who blocked you"
+  },
+
+  "manageBlockedUsers": "Gestionar Usuarios Bloqueados",
+  "@manageBlockedUsers": {
+    "description": "Button text to navigate to blocked users management"
+  },
+
+  "accessRestricted": "Acceso Restringido",
+  "@accessRestricted": {
+    "description": "Title shown when access is restricted due to blocking"
+  },
+
   "notifications": "Notificaciones",
   "@notifications": {
     "description": "Notifications page title"
