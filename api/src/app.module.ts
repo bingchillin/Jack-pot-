@@ -30,6 +30,7 @@ import { Comment } from './comment/entities/comment.entity';
 import { CommentLike } from './comment/entities/comment-like.entity';
 import { CommentFlag } from './comment/entities/comment-flag.entity';
 import { CommentMention } from './comment/entities/comment-mention.entity';
+import { PlantCareScore } from './plant-care-score/entities/plant-care-score.entity';
 
 // Module imports
 import { RoleModule } from './role/role.module';
@@ -54,6 +55,7 @@ import { CommentModule } from './comment/comment.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { SensorsModule } from './sensors/sensors.module';
 import { UploadModule } from './upload/upload.module';
+import { PlantCareScoreModule } from './plant-care-score/plant-care-score.module';
 
 @Module({
   imports: [
@@ -96,7 +98,8 @@ import { UploadModule } from './upload/upload.module';
             Comment,
             CommentLike,
             CommentFlag,
-            CommentMention
+            CommentMention,
+            PlantCareScore
           ],
           synchronize: true,
           autoLoadEntities: true,
@@ -137,6 +140,7 @@ import { UploadModule } from './upload/upload.module';
     FirebaseModule,
     SensorsModule,
     UploadModule,
+    PlantCareScoreModule,
   ],
   controllers: [AppController],
   providers: [AppService],
