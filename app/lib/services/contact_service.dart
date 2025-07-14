@@ -111,6 +111,10 @@ class ContactService {
   }) async {
     final url = Uri.parse('$baseUrl/contacts/$contactId/unblock');
 
+    print('[UNBLOCK] ContactService - Unblocking contact ID: $contactId');
+    print('[UNBLOCK] ContactService - Unblock URL: ${url.toString()}');
+    print('[UNBLOCK] ContactService - Token: ${token.substring(0, 20)}...');
+
     final response = await http.patch(
       url,
       headers: {
@@ -119,9 +123,16 @@ class ContactService {
       },
     );
 
+    print('[UNBLOCK] ContactService - Unblock response status: ${response.statusCode}');
+    print('[UNBLOCK] ContactService - Unblock response body: ${response.body}');
+
     if (response.statusCode == 200) {
-      return Contact.fromJson(jsonDecode(response.body));
+      final contact = Contact.fromJson(jsonDecode(response.body));
+      print('[UNBLOCK] SUCCESS - Successfully unblocked contact: ${contact.id}');
+      return contact;
     } else {
+      print('[UNBLOCK] ERROR - Unblock failed with status: ${response.statusCode}');
+      print('[UNBLOCK] ERROR - Error response: ${response.body}');
       throw Exception('Erreur lors du déblocage: ${response.statusCode}');
     }
   }

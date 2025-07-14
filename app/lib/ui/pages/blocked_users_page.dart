@@ -62,6 +62,13 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
 
     try {
       final contactService = ContactService();
+      print('[UNBLOCK] BlockedUsersPage - Contact details: id=${contact.id}, requester=${contact.requesterId}, receiver=${contact.receiverId}, status=${contact.status.value}, blockedBy=${contact.blockedBy}');
+      print('[UNBLOCK] BlockedUsersPage - Current user ID: $currentUserId');
+      print('[UNBLOCK] BlockedUsersPage - About to call unblockUser with contactId: ${contact.id}');
+      
+      print('[DEBUG] About to unblock - contact.id: ${contact.id}');
+      print('[DEBUG] Contact object: requesterId=${contact.requesterId}, receiverId=${contact.receiverId}');
+      
       await contactService.unblockUser(
         contactId: contact.id,
         token: token,

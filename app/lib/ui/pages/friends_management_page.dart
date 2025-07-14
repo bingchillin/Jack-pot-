@@ -610,7 +610,7 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
     
     try {
       await _contactService.blockUser(
-        contactId: otherUser.id,
+        contactId: contact.id,  // ✅ FIXED: Use contact.id instead of otherUser.id
         token: token,
       );
       _loadAllContacts(); // Refresh the lists
@@ -645,7 +645,7 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
     
     try {
       await _contactService.unblockUser(
-        contactId: otherUser.id,
+        contactId: contact.id,  // ✅ FIXED: Use contact.id instead of otherUser.id
         token: token,
       );
       _loadAllContacts(); // Refresh the lists

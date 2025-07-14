@@ -193,20 +193,6 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
             ),
             textAlign: TextAlign.center,
           ),
-          if (blockingStatus == BlockingStatus.youBlockedThem) ...[
-            const SizedBox(height: 16),
-            TextButton.icon(
-              onPressed: () {
-                // Navigate to blocked users page
-                Navigator.pushNamed(context, '/blocked-users');
-              },
-              icon: const Icon(Icons.settings, size: 18),
-              label: Text(localizations.manageBlockedUsers),
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.green[600],
-              ),
-            ),
-          ],
         ],
       ),
     );
