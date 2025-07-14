@@ -211,7 +211,7 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
           // Friends Management Line
           _buildActionLine(
             icon: Icons.people,
-            title: 'Mes Amis',
+            title: localizations.manageFriends,
             onTap: () {
               Navigator.pushNamed(context, '/friends-management');
             },
@@ -224,53 +224,6 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             indent: 60,
           ),
           
-          // Notifications Line
-          _buildActionLine(
-            icon: Icons.notifications,
-            title: 'Mes Notifications',
-            onTap: () {
-              Navigator.pushNamed(context, '/notifications');
-            },
-          ),
-          
-          // Divider
-          Divider(
-            height: 1,
-            color: Colors.grey[200],
-            indent: 60,
-          ),
-          
-          // Notification Settings Line
-          _buildActionLine(
-            icon: Icons.settings,
-            title: 'Paramètres Notifications',
-            onTap: () {
-              Navigator.pushNamed(context, '/notification-settings');
-            },
-          ),
-          
-          // Divider
-          Divider(
-            height: 1,
-            color: Colors.grey[200],
-            indent: 60,
-          ),
-          
-          // Notification Testing Line
-          _buildActionLine(
-            icon: Icons.bug_report,
-            title: 'Notification Testing',
-            onTap: () {
-              Navigator.pushNamed(context, '/notification-test');
-            },
-          ),
-          
-          // Divider
-          Divider(
-            height: 1,
-            color: Colors.grey[200],
-            indent: 60,
-          ),
           
           // Logout Line
           _buildActionLine(

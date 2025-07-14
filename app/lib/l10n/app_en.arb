@@ -988,6 +988,16 @@
     "description": "Notifications page title"
   },
 
+  "myNotifications": "My Notifications",
+  "@myNotifications": {
+    "description": "My notifications menu item"
+  },
+
+  "notificationSettings": "Notification Settings",
+  "@notificationSettings": {
+    "description": "Notification settings menu item"
+  },
+
   "all": "All",
   "@all": {
     "description": "All notifications tab"
@@ -1584,5 +1594,90 @@
   "post": "Post",
   "@post": {
     "description": "Label for a post in the thread view"
+  },
+
+  "memberSince": "Member since",
+  "@memberSince": {
+    "description": "Member since label on profile page"
+  },
+
+  "publications": "Posts",
+  "@publications": {
+    "description": "Publications section title on profile page"
+  },
+
+  "noPublications": "No posts",
+  "@noPublications": {
+    "description": "Empty state when user has no posts"
+  },
+
+  "noPublicationsDescription": "This user hasn't posted any content yet.",
+  "@noPublicationsDescription": {
+    "description": "Description for empty posts state"
+  },
+
+  "follow": "Add friend",
+  "@follow": {
+    "description": "Follow button text"
+  },
+
+  "following": "Friends",
+  "@following": {
+    "description": "Following button text when already following"
+  },
+
+  "pending": "Pending",
+  "@pending": {
+    "description": "Pending friend request status"
+  },
+
+  "accept": "Accept",
+  "@accept": {
+    "description": "Accept friend request button"
+  },
+
+  "reject": "Reject",
+  "@reject": {
+    "description": "Reject friend request button"
+  },
+
+  "unfollow": "Remove friend ?",
+  "@unfollow": {
+    "description": "Unfollow option in menu"
+  },
+
+  "block": "Block",
+  "@block": {
+    "description": "Block user option"
+  },
+
+  "unfollowConfirmTitle": "Unfollow User",
+  "@unfollowConfirmTitle": {
+    "description": "Title for unfollow confirmation dialog"
+  },
+
+  "unfollowConfirmMessage": "Are you sure you want to unfollow this user?",
+  "@unfollowConfirmMessage": {
+    "description": "Message for unfollow confirmation dialog"
+  },
+
+  "all": "All",
+  "@all": {
+    "description": "All notifications tab"
+  },
+
+  "social": "Social",
+  "@social": {
+    "description": "Social notifications tab"
+  },
+
+  "plants": "Plants",
+  "@plants": {
+    "description": "Plant notifications tab"
+  },
+
+  "sent": "Sent",
+  "@sent": {
+    "description": "Sent requests tab"
   }
 } 

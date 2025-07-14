@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/contact_model.dart';
 import '../../services/contact_service.dart';
 import '../../providers/auth_provider.dart';
+import '../../l10n/app_localizations.dart';
 
 class FriendRequestButton extends StatefulWidget {
   final int targetUserId;
@@ -166,26 +167,7 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
     
     if (token == null) return;
 
-    // Demander confirmation
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Supprimer le contact'),
-        content: const Text('Êtes-vous sûr de vouloir supprimer ce contact ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Annuler'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Supprimer'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
+    // Confirmation is now handled by _showUnfollowConfirmation
 
     setState(() {
       _isLoading = true;
@@ -220,8 +202,38 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
     }
   }
 
+  Future<void> _showUnfollowConfirmation(AppLocalizations localizations) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(localizations.unfollowConfirmTitle),
+        content: Text(localizations.unfollowConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(localizations.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(localizations.unfollow),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _removeContact();
+      // Notify parent that status changed so friends list can refresh
+      if (widget.onStatusChanged != null) {
+        widget.onStatusChanged!();
+      }
+    }
+  }
+
   Widget _buildButton() {
     final authProvider = Provider.of<AuthProvider>(context);
+    final localizations = AppLocalizations.of(context)!;
     final currentUserId = authProvider.currentUser?.idPerson;
     
     if (currentUserId == null) {
@@ -248,22 +260,29 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
     }
 
     if (_currentContact == null) {
-      // Pas de relation - afficher bouton "Ajouter"
-      return ElevatedButton.icon(
+      // No relationship - show "Follow" button (Twitter-like)
+      return ElevatedButton(
         onPressed: _isLoading ? null : _sendFriendRequest,
-        icon: _isLoading 
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Icon(Icons.person_add, size: 16),
-        label: const Text('Ajouter'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.black87,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          minimumSize: const Size(100, 36),
         ),
+        child: _isLoading 
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+            )
+          : Text(
+              localizations.follow,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
       );
     }
 
@@ -273,45 +292,66 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
     switch (contact.status) {
       case ContactStatus.pending:
         if (isCurrentUserRequester) {
-          // Demande envoyée - afficher statut
-          return OutlinedButton.icon(
+          // Current user sent the request - show "Pending"
+          return OutlinedButton(
             onPressed: null,
-            icon: const Icon(Icons.schedule, size: 16),
-            label: const Text('En attente'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.orange,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              foregroundColor: Colors.grey[700],
+              side: BorderSide(color: Colors.grey[300]!),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              minimumSize: const Size(100, 36),
+            ),
+            child: Text(
+              localizations.pending,
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           );
         } else {
-          // Demande reçue - afficher boutons accepter/rejeter
+          // Current user received the request - show Accept/Reject buttons
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ElevatedButton.icon(
+              ElevatedButton(
                 onPressed: _isLoading ? null : _acceptFriendRequest,
-                icon: _isLoading 
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.check, size: 16),
-                label: const Text('Accepter'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: const Color(0xFF22c55e),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 0,
+                  minimumSize: const Size(80, 36),
                 ),
+                child: _isLoading 
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : Text(
+                      localizations.accept,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
               ),
               const SizedBox(width: 8),
-              OutlinedButton.icon(
+              OutlinedButton(
                 onPressed: _isLoading ? null : _rejectFriendRequest,
-                icon: const Icon(Icons.close, size: 16),
-                label: const Text('Rejeter'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  foregroundColor: Colors.grey[700],
+                  side: BorderSide(color: Colors.grey[300]!),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  minimumSize: const Size(80, 36),
+                ),
+                child: Text(
+                  localizations.reject,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -319,61 +359,66 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
         }
 
       case ContactStatus.accepted:
-        // Amis - afficher statut avec option de suppression
-        return PopupMenuButton<String>(
-          onSelected: (value) {
-            if (value == 'remove') {
-              _removeContact();
-            }
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'remove',
-              child: Row(
+        // Already friends - show "Following" button that directly unfollows
+        return ElevatedButton(
+          onPressed: _isLoading ? null : () => _showUnfollowConfirmation(localizations),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: Colors.grey[300]!),
+            ),
+            elevation: 0,
+            minimumSize: const Size(100, 36),
+          ),
+          child: _isLoading 
+            ? SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey[700]),
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.person_remove, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Supprimer le contact'),
+                  Icon(Icons.check, color: const Color(0xFF22c55e), size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    localizations.following,
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.green.shade50,
-              border: Border.all(color: Colors.green),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 16),
-                const SizedBox(width: 4),
-                const Text('Amis'),
-                const SizedBox(width: 4),
-                Icon(Icons.arrow_drop_down, color: Colors.green, size: 16),
-              ],
-            ),
-          ),
         );
 
       case ContactStatus.rejected:
-        // Demande rejetée - permettre de renvoyer
-        return OutlinedButton.icon(
+        // Request was rejected - show "Follow" again
+        return ElevatedButton(
           onPressed: _isLoading ? null : _sendFriendRequest,
-          icon: _isLoading 
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.refresh, size: 16),
-          label: const Text('Renvoyer'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.blue,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black87,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            elevation: 0,
+            minimumSize: const Size(100, 36),
           ),
+          child: _isLoading 
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              )
+            : Text(
+                localizations.follow,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
         );
 
       case ContactStatus.blocked:
@@ -390,7 +435,7 @@ class _FriendRequestButtonState extends State<FriendRequestButton> {
             children: [
               Icon(Icons.block, color: Colors.red, size: 16),
               const SizedBox(width: 4),
-              const Text('Bloqué', style: TextStyle(color: Colors.red)),
+              Text(localizations.block, style: const TextStyle(color: Colors.red)),
             ],
           ),
         );

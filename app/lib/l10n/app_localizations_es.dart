@@ -614,16 +614,22 @@ class AppLocalizationsEs extends AppLocalizations {
       'Por favor verifica la salud general de tu planta y su entorno.';
 
   @override
-  String get notifications => 'Notifications';
+  String get notifications => 'Notificaciones';
 
   @override
-  String get all => 'All';
+  String get myNotifications => 'Mis Notificaciones';
+
+  @override
+  String get notificationSettings => 'Configuración de Notificaciones';
+
+  @override
+  String get all => 'Todo';
 
   @override
   String get social => 'Social';
 
   @override
-  String get plants => 'Plants';
+  String get plants => 'Plantas';
 
   @override
   String get noNotifications => 'No notifications';
@@ -644,10 +650,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get friends => 'Friends';
 
   @override
-  String get pending => 'Pending';
+  String get pending => 'Pendiente';
 
   @override
-  String get sent => 'Sent';
+  String get sent => 'Enviadas';
 
   @override
   String get blocked => 'Blocked';
@@ -908,4 +914,36 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get post => 'Publicación';
+
+  @override
+  String get publications => 'Publicaciones';
+
+  @override
+  String get noPublications => 'Sin publicaciones';
+
+  @override
+  String get noPublicationsDescription =>
+      'Este usuario aún no ha publicado contenido.';
+
+  @override
+  String get follow => 'Seguir';
+
+  @override
+  String get following => 'Siguiendo';
+
+  @override
+  String get accept => 'Aceptar';
+
+  @override
+  String get reject => 'Rechazar';
+
+  @override
+  String get unfollow => 'Dejar de seguir';
+
+  @override
+  String get unfollowConfirmTitle => 'Dejar de seguir';
+
+  @override
+  String get unfollowConfirmMessage =>
+      '¿Estás seguro de que quieres dejar de seguir a este usuario?';
 }

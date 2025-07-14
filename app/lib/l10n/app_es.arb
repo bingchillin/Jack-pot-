@@ -1519,5 +1519,105 @@
   "post": "Publicación",
   "@post": {
     "description": "Label for a post in the thread view"
+  },
+
+  "memberSince": "Miembro desde",
+  "@memberSince": {
+    "description": "Member since label on profile page"
+  },
+
+  "publications": "Publicaciones",
+  "@publications": {
+    "description": "Publications section title on profile page"
+  },
+
+  "noPublications": "Sin publicaciones",
+  "@noPublications": {
+    "description": "Empty state when user has no posts"
+  },
+
+  "noPublicationsDescription": "Este usuario aún no ha publicado contenido.",
+  "@noPublicationsDescription": {
+    "description": "Description for empty posts state"
+  },
+
+  "follow": "Seguir",
+  "@follow": {
+    "description": "Follow button text"
+  },
+
+  "following": "Siguiendo",
+  "@following": {
+    "description": "Following button text when already following"
+  },
+
+  "pending": "Pendiente",
+  "@pending": {
+    "description": "Pending friend request status"
+  },
+
+  "accept": "Aceptar",
+  "@accept": {
+    "description": "Accept friend request button"
+  },
+
+  "reject": "Rechazar",
+  "@reject": {
+    "description": "Reject friend request button"
+  },
+
+  "unfollow": "Dejar de seguir",
+  "@unfollow": {
+    "description": "Unfollow option in menu"
+  },
+
+  "block": "Bloquear",
+  "@block": {
+    "description": "Block user option"
+  },
+
+  "unfollowConfirmTitle": "Dejar de seguir",
+  "@unfollowConfirmTitle": {
+    "description": "Title for unfollow confirmation dialog"
+  },
+
+  "unfollowConfirmMessage": "¿Estás seguro de que quieres dejar de seguir a este usuario?",
+  "@unfollowConfirmMessage": {
+    "description": "Message for unfollow confirmation dialog"
+  },
+
+  "all": "Todo",
+  "@all": {
+    "description": "All notifications tab"
+  },
+
+  "social": "Social",
+  "@social": {
+    "description": "Social notifications tab"
+  },
+
+  "plants": "Plantas",
+  "@plants": {
+    "description": "Plant notifications tab"
+  },
+
+  "sent": "Enviadas",
+  "@sent": {
+    "description": "Sent requests tab"
+  },
+
+  "notifications": "Notificaciones",
+  "@notifications": {
+    "description": "Notifications page title"
+  },
+
+  "myNotifications": "Mis Notificaciones",
+  "@myNotifications": {
+    "description": "My notifications menu item"
+  },
+
+  "notificationSettings": "Configuración de Notificaciones",
+  "@notificationSettings": {
+    "description": "Notification settings menu item"
   }
 } 

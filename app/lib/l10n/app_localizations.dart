@@ -268,7 +268,7 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
-  /// Member since label
+  /// Member since label on profile page
   ///
   /// In en, this message translates to:
   /// **'Member since'**
@@ -1246,6 +1246,18 @@ abstract class AppLocalizations {
   /// **'Notifications'**
   String get notifications;
 
+  /// My notifications menu item
+  ///
+  /// In en, this message translates to:
+  /// **'My Notifications'**
+  String get myNotifications;
+
+  /// Notification settings menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Settings'**
+  String get notificationSettings;
+
   /// All notifications tab
   ///
   /// In en, this message translates to:
@@ -1300,13 +1312,13 @@ abstract class AppLocalizations {
   /// **'Friends'**
   String get friends;
 
-  /// Pending friend requests tab
+  /// Pending friend request status
   ///
   /// In en, this message translates to:
   /// **'Pending'**
   String get pending;
 
-  /// Sent friend requests tab
+  /// Sent requests tab
   ///
   /// In en, this message translates to:
   /// **'Sent'**
@@ -1354,7 +1366,7 @@ abstract class AppLocalizations {
   /// **'Report'**
   String get report;
 
-  /// Block button text
+  /// Block user option
   ///
   /// In en, this message translates to:
   /// **'Block'**
@@ -1797,6 +1809,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Post'**
   String get post;
+
+  /// Publications section title on profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get publications;
+
+  /// Empty state when user has no posts
+  ///
+  /// In en, this message translates to:
+  /// **'No posts'**
+  String get noPublications;
+
+  /// Description for empty posts state
+  ///
+  /// In en, this message translates to:
+  /// **'This user hasn\'t posted any content yet.'**
+  String get noPublicationsDescription;
+
+  /// Follow button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add friend'**
+  String get follow;
+
+  /// Following button text when already following
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get following;
+
+  /// Accept friend request button
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get accept;
+
+  /// Reject friend request button
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get reject;
+
+  /// Unfollow option in menu
+  ///
+  /// In en, this message translates to:
+  /// **'Remove friend ?'**
+  String get unfollow;
+
+  /// Title for unfollow confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Unfollow User'**
+  String get unfollowConfirmTitle;
+
+  /// Message for unfollow confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to unfollow this user?'**
+  String get unfollowConfirmMessage;
 }
 
 class _AppLocalizationsDelegate

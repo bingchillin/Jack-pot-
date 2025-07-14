@@ -1,0 +1,21 @@
+{
+  "es": [
+    "noNotifications",
+    "notAuthenticated",
+    "errorLoadingNotifications",
+    "markAllRead",
+    "allNotificationsRead",
+    "friends",
+    "blocked"
+  ],
+
+  "fr": [
+    "noNotifications",
+    "notAuthenticated",
+    "errorLoadingNotifications",
+    "markAllRead",
+    "allNotificationsRead",
+    "friends",
+    "blocked"
+  ]
+}

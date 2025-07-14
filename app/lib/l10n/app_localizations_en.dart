@@ -611,6 +611,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
+  String get myNotifications => 'My Notifications';
+
+  @override
+  String get notificationSettings => 'Notification Settings';
+
+  @override
   String get all => 'All';
 
   @override
@@ -900,4 +906,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get post => 'Post';
+
+  @override
+  String get publications => 'Posts';
+
+  @override
+  String get noPublications => 'No posts';
+
+  @override
+  String get noPublicationsDescription =>
+      'This user hasn\'t posted any content yet.';
+
+  @override
+  String get follow => 'Add friend';
+
+  @override
+  String get following => 'Friends';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get reject => 'Reject';
+
+  @override
+  String get unfollow => 'Remove friend ?';
+
+  @override
+  String get unfollowConfirmTitle => 'Unfollow User';
+
+  @override
+  String get unfollowConfirmMessage =>
+      'Are you sure you want to unfollow this user?';
 }
