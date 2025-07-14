@@ -161,8 +161,8 @@ class PlantItemMyListWidget extends StatelessWidget {
                             baseColor: Colors.grey.shade300,
                             highlightColor: Colors.grey.shade100,
                             child: Container(
-                              width: 80,
-                              height: 80,
+                              width: double.infinity,
+                              height: double.infinity,
                               color: Colors.white,
                             ),
                           );
