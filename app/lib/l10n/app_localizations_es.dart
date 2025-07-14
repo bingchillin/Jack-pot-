@@ -76,6 +76,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get editProfile => 'Editar perfil';
 
   @override
+  String get viewMyProfile => 'Ver mi perfil';
+
+  @override
   String get accountSettings => 'Configuración de cuenta';
 
   @override

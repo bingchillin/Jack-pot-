@@ -199,6 +199,26 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             indent: 60,
           ),
           
+          // View My Profile Line
+          _buildActionLine(
+            icon: Icons.person,
+            title: localizations.viewMyProfile,
+            onTap: () {
+              Navigator.pushNamed(
+                context, 
+                '/user-profile',
+                arguments: int.parse(authProvider.userId!),
+              );
+            },
+          ),
+          
+          // Divider
+          Divider(
+            height: 1,
+            color: Colors.grey[200],
+            indent: 60,
+          ),
+          
           // Friends Management Line
           _buildActionLine(
             icon: Icons.people,

@@ -232,6 +232,12 @@ abstract class AppLocalizations {
   /// **'Edit Profile'**
   String get editProfile;
 
+  /// View my profile button text
+  ///
+  /// In en, this message translates to:
+  /// **'View My Profile'**
+  String get viewMyProfile;
+
   /// Account settings section title
   ///
   /// In en, this message translates to:

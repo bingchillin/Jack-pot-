@@ -111,6 +111,11 @@
     "description": "Edit profile button text"
   },
 
+  "viewMyProfile": "Ver mi perfil",
+  "@viewMyProfile": {
+    "description": "View my profile button text"
+  },
+
   "accountSettings": "Configuración de cuenta",
   "@accountSettings": {
     "description": "Account settings section title"

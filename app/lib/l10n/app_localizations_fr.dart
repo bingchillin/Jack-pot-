@@ -75,6 +75,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get editProfile => 'Modifier le profil';
 
   @override
+  String get viewMyProfile => 'Voir mon profil';
+
+  @override
   String get accountSettings => 'Paramètres du compte';
 
   @override

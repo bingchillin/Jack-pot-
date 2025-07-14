@@ -21,6 +21,7 @@ import 'l10n/app_localizations.dart';
 import 'bloc/comment/comment_bloc.dart';
 import 'services/comment_service.dart';
 import 'services/notification_service.dart';
+import 'ui/pages/user_profile_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
@@ -141,6 +142,15 @@ class _RootAppState extends State<RootApp> {
         title: 'Jackpot App',
         theme: appTheme,
         routes: appRoutes,
+        onGenerateRoute: (settings) {
+          if (settings.name == '/user-profile') {
+            final userId = settings.arguments as int;
+            return MaterialPageRoute(
+              builder: (context) => UserProfilePage(userId: userId),
+            );
+          }
+          return null;
+        },
         initialRoute: '/',
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
