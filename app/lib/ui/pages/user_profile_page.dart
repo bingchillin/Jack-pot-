@@ -10,6 +10,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/comment/comment_bloc.dart';
 import '../widgets/friend_request_button.dart';
 import '../../l10n/app_localizations.dart';
+import '../widgets/user_profile_shimmer.dart';
+import 'package:shimmer/shimmer.dart';
 
 class UserProfilePage extends StatefulWidget {
   final int userId;
@@ -87,7 +89,7 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
         future: _profileFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Color(0xFF22c55e)));
+            return const UserProfileShimmer();
           }
           if (snapshot.hasError) {
             return Center(
@@ -283,11 +285,8 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
                   BlocBuilder<CommentBloc, CommentState>(
                     builder: (context, state) {
                       if (state is CommentLoading) {
-                        return const SizedBox(
-                          height: 200,
-                          child: Center(
-                            child: CircularProgressIndicator(color: Color(0xFF22c55e)),
-                          ),
+                        return Column(
+                          children: List.generate(3, (index) => _buildCommentShimmer()),
                         );
                       }
                       if (state is CommentError) {
@@ -396,5 +395,181 @@ class _UserProfilePageState extends State<UserProfilePage> with RouteAware {
     final months = monthNames[languageCode] ?? monthNames['en']!;
     
     return month >= 1 && month <= 12 ? months[month] : '';
+  }
+
+  Widget _buildCommentShimmer() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      decoration: BoxDecoration(
+        color: Colors.green[50],
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey[300]!,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with user info and actions
+          Row(
+            children: [
+              // Avatar shimmer
+              Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              // User information
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        // Username
+                        Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: 120,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Tag
+                        Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: 60,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        // Time
+                        Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: 40,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // Options menu
+              Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          
+          // Content
+          Padding(
+            padding: const EdgeInsets.only(left: 64, right: 16, top: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: double.infinity,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 200,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Action buttons
+          Padding(
+            padding: const EdgeInsets.only(left: 64, right: 16, top: 8),
+            child: Row(
+              children: [
+                // Like button
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 40,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Reply button
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 40,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 } 
