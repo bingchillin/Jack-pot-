@@ -1009,7 +1009,7 @@ abstract class AppLocalizations {
   /// Retry button text
   ///
   /// In en, this message translates to:
-  /// **'Try Again'**
+  /// **'Retry'**
   String get retry;
 
   /// Message when user needs to login to see friends' posts
@@ -2031,6 +2031,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Access Restricted'**
   String get accessRestricted;
+
+  /// Plant classification page title
+  ///
+  /// In en, this message translates to:
+  /// **'Plant Classification'**
+  String get plantClassification;
+
+  /// Plant identification header title
+  ///
+  /// In en, this message translates to:
+  /// **'Identify Your Plant'**
+  String get identifyYourPlant;
+
+  /// Description of AI classification feature
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo to automatically identify your plant among:\nOrchid, Ficus Lyrata, Lavender, Monstera Deliciosa'**
+  String get aiClassificationDescription;
+
+  /// Button text to take a picture
+  ///
+  /// In en, this message translates to:
+  /// **'Take Picture'**
+  String get takePicture;
+
+  /// Button text to select from gallery
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// Message when no image is selected
+  ///
+  /// In en, this message translates to:
+  /// **'No image selected'**
+  String get noImageSelected;
+
+  /// Loading model message
+  ///
+  /// In en, this message translates to:
+  /// **'Loading model...'**
+  String get loadingModel;
+
+  /// Analysis in progress message
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis in progress...'**
+  String get analysisInProgress;
+
+  /// Plant identification in progress message
+  ///
+  /// In en, this message translates to:
+  /// **'Identifying your plant'**
+  String get identifyingPlant;
+
+  /// Title for identification results
+  ///
+  /// In en, this message translates to:
+  /// **'Identification Result'**
+  String get identificationResult;
+
+  /// Label for all predictions section
+  ///
+  /// In en, this message translates to:
+  /// **'All predictions:'**
+  String get allPredictions;
+
+  /// Button text to add identified plant
+  ///
+  /// In en, this message translates to:
+  /// **'Add This Plant'**
+  String get addThisPlant;
+
+  /// Confidence level display
+  ///
+  /// In en, this message translates to:
+  /// **'{percentage}% confidence'**
+  String confidenceLevel(int percentage);
+
+  /// Warning for low confidence predictions
+  ///
+  /// In en, this message translates to:
+  /// **'Low confidence prediction'**
+  String get lowConfidencePrediction;
+
+  /// Error message when model fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Model loading error: {error}'**
+  String modelLoadError(String error);
+
+  /// Error message when image selection fails
+  ///
+  /// In en, this message translates to:
+  /// **'Image selection error: {error}'**
+  String imageSelectionError(String error);
+
+  /// Error message when classification fails
+  ///
+  /// In en, this message translates to:
+  /// **'Classification error: {error}'**
+  String classificationError(String error);
+
+  /// Tooltip for AI classifier button
+  ///
+  /// In en, this message translates to:
+  /// **'AI Plant Classifier'**
+  String get aiClassifierTooltip;
+
+  /// Tooltip for add device button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Smart Device'**
+  String get addDeviceTooltip;
+
+  /// Orchid plant name
+  ///
+  /// In en, this message translates to:
+  /// **'Orchid'**
+  String get orchid;
+
+  /// Ficus Lyrata plant name
+  ///
+  /// In en, this message translates to:
+  /// **'Ficus Lyrata'**
+  String get ficusLyrata;
+
+  /// Lavender plant name
+  ///
+  /// In en, this message translates to:
+  /// **'Lavender'**
+  String get lavender;
+
+  /// Monstera Deliciosa plant name
+  ///
+  /// In en, this message translates to:
+  /// **'Monstera Deliciosa'**
+  String get monsteraDeliciosa;
 }
 
 class _AppLocalizationsDelegate

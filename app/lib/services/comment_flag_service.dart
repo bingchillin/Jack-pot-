@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../app_config.dart';
 
 class CommentFlagService {
-  static const String baseUrl = 'http://10.0.2.2:3000';
+  static String get baseUrl => AppConfig.baseUrl;
 
   // Signaler un commentaire
   Future<Map<String, dynamic>> flagComment({

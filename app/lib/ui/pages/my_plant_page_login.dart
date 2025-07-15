@@ -484,35 +484,80 @@ class _MyPlantPageLoginState extends State<MyPlantPageLogin> with TickerProvider
           ),
         ),
       ),
-      floatingActionButton: Container(
-        width: 72,
-        height: 72,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.green[600]!, Colors.green[700]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(36),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.green[300]!.withValues(alpha: 0.6),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
+      floatingActionButton: _buildFloatingActionButtons(context, localizations),
+    );
+  }
+
+  Widget _buildFloatingActionButtons(BuildContext context, AppLocalizations localizations) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        // AI Classification Button - Available for guest users
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.purple[600]!, Colors.purple[700]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
-        ),
-        child: FloatingActionButton(
-          onPressed: _showAddPlantDialog,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: const Icon(
-            Icons.add,
-            size: 36,
-            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.purple[300]!.withValues(alpha: 0.6),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/plant_classifier');
+            },
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            heroTag: "ai_classifier",
+            child: const Icon(
+              Icons.smart_toy,
+              size: 28,
+              color: Colors.white,
+            ),
           ),
         ),
-      ),
+        const SizedBox(height: 16),
+        // Main Add Button - Shows dialog for guest users
+        Container(
+          width: 72,
+          height: 72,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green[600]!, Colors.green[700]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(36),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.green[300]!.withValues(alpha: 0.6),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: FloatingActionButton(
+            onPressed: _showAddPlantDialog,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            heroTag: "add_device",
+            child: const Icon(
+              Icons.add,
+              size: 36,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

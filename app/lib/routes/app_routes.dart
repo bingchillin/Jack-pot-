@@ -18,6 +18,7 @@ import '../ui/pages/notification_settings_page.dart';
 import '../ui/pages/notification_test_page.dart';
 import '../ui/pages/friends_management_page.dart';
 import '../ui/pages/notifications_page.dart';
+import '../ui/pages/plant_classifier_page.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
   '/': (context) => const AuthWrapper(),
@@ -39,4 +40,5 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/reset_password': (_) => const ResetPasswordPage(),
   '/add_my_object': (_) => AddMyObjectPage(),
   '/choose_your_plant': (_) => ChooseYourPlantPage(),
+  '/plant_classifier': (_) => const PlantClassifierPage(),
 };

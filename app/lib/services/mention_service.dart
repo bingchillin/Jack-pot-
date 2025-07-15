@@ -3,9 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import '../models/comment_mention_model.dart';
+import '../app_config.dart';
 
 class MentionService {
-  static const String baseUrl = 'http://10.0.2.2:3000';
+  static String get baseUrl => AppConfig.baseUrl;
 
   /// Rechercher des utilisateurs pour l'autocomplétion des mentions
   Future<List<MentionUser>> searchUsersForMention({

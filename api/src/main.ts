@@ -16,7 +16,9 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
-      process.env.NEXT_PUBLIC_FRONT_URL || 'http://localhost:3001'
+      process.env.NEXT_PUBLIC_FRONT_URL || 'http://localhost:3001',
+      'http://192.168.0.231:3000', // Allow local IP for mobile app
+      'http://10.0.2.2:3000', // Allow emulator access
     ],
     credentials: true,
   });
@@ -77,6 +79,6 @@ async function bootstrap() {
     },
 
   });
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
 }
 bootstrap();

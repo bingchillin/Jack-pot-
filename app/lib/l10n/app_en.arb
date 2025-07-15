@@ -1819,5 +1819,149 @@
   "accessRestricted": "Access Restricted",
   "@accessRestricted": {
     "description": "Title shown when access is restricted due to blocking"
+  },
+
+  "plantClassification": "Plant Classification",
+  "@plantClassification": {
+    "description": "Plant classification page title"
+  },
+
+  "identifyYourPlant": "Identify Your Plant",
+  "@identifyYourPlant": {
+    "description": "Plant identification header title"
+  },
+
+  "aiClassificationDescription": "Take a photo to automatically identify your plant among:\nOrchid, Ficus Lyrata, Lavender, Monstera Deliciosa",
+  "@aiClassificationDescription": {
+    "description": "Description of AI classification feature"
+  },
+
+  "takePicture": "Take Picture",
+  "@takePicture": {
+    "description": "Button text to take a picture"
+  },
+
+  "gallery": "Gallery",
+  "@gallery": {
+    "description": "Button text to select from gallery"
+  },
+
+  "noImageSelected": "No image selected",
+  "@noImageSelected": {
+    "description": "Message when no image is selected"
+  },
+
+  "loadingModel": "Loading model...",
+  "@loadingModel": {
+    "description": "Loading model message"
+  },
+
+  "analysisInProgress": "Analysis in progress...",
+  "@analysisInProgress": {
+    "description": "Analysis in progress message"
+  },
+
+  "identifyingPlant": "Identifying your plant",
+  "@identifyingPlant": {
+    "description": "Plant identification in progress message"
+  },
+
+  "identificationResult": "Identification Result",
+  "@identificationResult": {
+    "description": "Title for identification results"
+  },
+
+  "allPredictions": "All predictions:",
+  "@allPredictions": {
+    "description": "Label for all predictions section"
+  },
+
+  "addThisPlant": "Add This Plant",
+  "@addThisPlant": {
+    "description": "Button text to add identified plant"
+  },
+
+  "confidenceLevel": "{percentage}% confidence",
+  "@confidenceLevel": {
+    "description": "Confidence level display",
+    "placeholders": {
+      "percentage": {
+        "type": "int",
+        "example": "85"
+      }
+    }
+  },
+
+  "lowConfidencePrediction": "Low confidence prediction",
+  "@lowConfidencePrediction": {
+    "description": "Warning for low confidence predictions"
+  },
+
+  "modelLoadError": "Model loading error: {error}",
+  "@modelLoadError": {
+    "description": "Error message when model fails to load",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "File not found"
+      }
+    }
+  },
+
+  "imageSelectionError": "Image selection error: {error}",
+  "@imageSelectionError": {
+    "description": "Error message when image selection fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Permission denied"
+      }
+    }
+  },
+
+  "classificationError": "Classification error: {error}",
+  "@classificationError": {
+    "description": "Error message when classification fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Model processing failed"
+      }
+    }
+  },
+
+  "aiClassifierTooltip": "AI Plant Classifier",
+  "@aiClassifierTooltip": {
+    "description": "Tooltip for AI classifier button"
+  },
+
+  "addDeviceTooltip": "Add Smart Device",
+  "@addDeviceTooltip": {
+    "description": "Tooltip for add device button"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+
+  "orchid": "Orchid",
+  "@orchid": {
+    "description": "Orchid plant name"
+  },
+
+  "ficusLyrata": "Ficus Lyrata",
+  "@ficusLyrata": {
+    "description": "Ficus Lyrata plant name"
+  },
+
+  "lavender": "Lavender",
+  "@lavender": {
+    "description": "Lavender plant name"
+  },
+
+  "monsteraDeliciosa": "Monstera Deliciosa",
+  "@monsteraDeliciosa": {
+    "description": "Monstera Deliciosa plant name"
   }
 } 

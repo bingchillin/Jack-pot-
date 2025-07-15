@@ -1,17 +1,23 @@
-enum Environment { local, production }
+enum Environment { local, localPhysical, production }
 
 class EnvConfig {
-  static const Environment _currentEnv = Environment.local;
+  static const Environment _currentEnv = Environment.local; // Changé pour émulateur Android
   
   // API Configuration
   static const Map<Environment, String> _apiUrls = {
-    Environment.local: 'http://10.0.2.2:3000', // Correct for Android emulator
+    Environment.local: 'http://10.0.2.2:3000', // Pour émulateur Android
+    Environment.localPhysical: 'http://192.168.0.231:3000', // Pour appareil physique
     Environment.production: 'https://jacquespote.duckdns.org',
   };
   
   // App Configuration
   static const Map<Environment, Map<String, dynamic>> _appConfig = {
     Environment.local: {
+      'debug': true,
+      'enableLogging': true,
+      'apiTimeout': 30000, // 30 seconds
+    },
+    Environment.localPhysical: {
       'debug': true,
       'enableLogging': true,
       'apiTimeout': 30000, // 30 seconds
@@ -41,6 +47,10 @@ class EnvConfig {
   static void printCurrentEnv() {
     print('🌐 Environment: $environmentName');
     print('🔗 API URL: $apiUrl');
-    print('📱 Note: Using 10.0.2.2 for Android emulator');
+    if (_currentEnv == Environment.local) {
+      print('📱 Note: Using 10.0.2.2 for Android emulator');
+    } else if (_currentEnv == Environment.localPhysical) {
+      print('📱 Note: Using local IP for physical device');
+    }
   }
 } 

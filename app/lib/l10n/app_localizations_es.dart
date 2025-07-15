@@ -1031,4 +1031,82 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get accessRestricted => 'Acceso Restringido';
+
+  @override
+  String get plantClassification => 'Plant Classification';
+
+  @override
+  String get identifyYourPlant => 'Identify Your Plant';
+
+  @override
+  String get aiClassificationDescription =>
+      'Take a photo to automatically identify your plant among:\nOrchid, Ficus Lyrata, Lavender, Monstera Deliciosa';
+
+  @override
+  String get takePicture => 'Take Picture';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get noImageSelected => 'No image selected';
+
+  @override
+  String get loadingModel => 'Loading model...';
+
+  @override
+  String get analysisInProgress => 'Analysis in progress...';
+
+  @override
+  String get identifyingPlant => 'Identifying your plant';
+
+  @override
+  String get identificationResult => 'Identification Result';
+
+  @override
+  String get allPredictions => 'All predictions:';
+
+  @override
+  String get addThisPlant => 'Add This Plant';
+
+  @override
+  String confidenceLevel(int percentage) {
+    return '$percentage% confidence';
+  }
+
+  @override
+  String get lowConfidencePrediction => 'Low confidence prediction';
+
+  @override
+  String modelLoadError(String error) {
+    return 'Model loading error: $error';
+  }
+
+  @override
+  String imageSelectionError(String error) {
+    return 'Image selection error: $error';
+  }
+
+  @override
+  String classificationError(String error) {
+    return 'Classification error: $error';
+  }
+
+  @override
+  String get aiClassifierTooltip => 'AI Plant Classifier';
+
+  @override
+  String get addDeviceTooltip => 'Add Smart Device';
+
+  @override
+  String get orchid => 'Orchid';
+
+  @override
+  String get ficusLyrata => 'Ficus Lyrata';
+
+  @override
+  String get lavender => 'Lavender';
+
+  @override
+  String get monsteraDeliciosa => 'Monstera Deliciosa';
 }
