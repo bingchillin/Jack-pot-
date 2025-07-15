@@ -178,10 +178,7 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
       _pulseController.repeat(reverse: true);
     }
     
-    await Future.delayed(const Duration(seconds: 5));
-    if (mounted) {
-      _dismissPopup();
-    }
+    // Popup will stay open until user manually closes it
   }
 
   void _dismissPopup() {
@@ -505,9 +502,10 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
   }
 
   Widget _buildSensorDataSection() {
+    final localizations = AppLocalizations.of(context)!;
     final sensors = [
       {
-        'label': 'Moisture',
+        'label': localizations.moisture,
         'score': widget.moistureScore,
         'icon': Icons.water_drop,
         'color': Colors.blue[600]!,
@@ -517,17 +515,17 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
         'goodRange': [40.0, 70.0],
       },
       {
-        'label': 'Temperature',
+        'label': localizations.temperature,
         'score': widget.temperatureScore,
         'icon': Icons.thermostat,
         'color': Colors.orange[600]!,
         'maxScore': 8,
         'sensorValue': widget.plant.temperatureSensorExtern ?? 22.0,
-        'unit': '°C',
+        'unit': 'Â°C',
         'goodRange': [18.0, 26.0],
       },
       {
-        'label': 'Light',
+        'label': localizations.light,
         'score': widget.lightScore,
         'icon': Icons.wb_sunny,
         'color': Colors.yellow[700]!,
@@ -537,7 +535,7 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
         'goodRange': [20000.0, 40000.0],
       },
       {
-        'label': 'pH Level',
+        'label': localizations.ph,
         'score': widget.phScore,
         'icon': Icons.science,
         'color': Colors.purple[600]!,
@@ -684,7 +682,7 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
       child: Column(
         children: [
           Text(
-            'Total Daily Score',
+            localizations.totalScore,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,

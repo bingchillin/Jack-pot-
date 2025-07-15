@@ -616,6 +616,12 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
+  /// Total daily score label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Score'**
+  String get totalScore;
+
   /// Plant overview section title
   ///
   /// In en, this message translates to:
@@ -2397,12 +2403,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'pH'**
   String get ph;
-
-  /// No description provided for @totalScore.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Score'**
-  String get totalScore;
 }
 
 class _AppLocalizationsDelegate

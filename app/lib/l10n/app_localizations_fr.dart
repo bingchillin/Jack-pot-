@@ -275,6 +275,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get close => 'Fermer';
 
   @override
+  String get totalScore => 'Score total';
+
+  @override
   String get plantOverview => 'Aperçu de la plante';
 
   @override
@@ -1231,7 +1234,4 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get ph => 'pH';
-
-  @override
-  String get totalScore => 'Score total';
 }

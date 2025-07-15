@@ -441,6 +441,11 @@
     "description": "Close button text"
   },
 
+  "totalScore": "Puntuación Diaria Total",
+  "@totalScore": {
+    "description": "Total daily score label"
+  },
+
   "plantOverview": "Resumen de la planta",
   "@plantOverview": {
     "description": "Plant overview section title"
