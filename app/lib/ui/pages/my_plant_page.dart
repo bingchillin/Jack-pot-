@@ -4,14 +4,13 @@ import 'package:jackpote/ui/pages/widget/plant_card_my_list/plant_item_my_list_w
 import 'package:jackpote/ui/pages/widget/plant_card_favorite/plant_item_widget.dart';
 import '../../bloc/object_profile/object_profile_bloc.dart';
 import '../../bloc/object_profile/object_profile_event.dart';
-import '../../bloc/object_profile/object_profile_state.dart' as favorite_state;
 import '../../bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
 import '../../bloc/object_profile_my_list/object_profile_my_list_event.dart';
 import '../../bloc/object_profile_my_list/object_profile_my_list_state.dart' as mylist_state;
 import '../../models/object_profile.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/object_profile_service.dart';
-import '../widgets/enhanced_score_popup.dart';
+import '../widgets/improved_score_popup.dart';
 import '../../services/automatic_score_service.dart';
 import '../../services/plant_care_score_service.dart';
 import '../../providers/auth_provider.dart';
@@ -118,7 +117,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
         );
       }
       
-      // targetPlant is always set above, so this check is redundant but kept for safety
+      // Show popup for the selected plant
       if (targetPlant != null) {
         if (token != null) {
           // Try to get real score
@@ -130,7 +129,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           );
 
           if (score != null && mounted) {
-            EnhancedScorePopupService().showScorePopup(
+            ImprovedScorePopupService().showScorePopup(
               context: context,
               plant: targetPlant,
               moistureScore: score.moistureScore,
@@ -146,7 +145,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
         
         // Fallback to mock data
         if (mounted) {
-          EnhancedScorePopupService().showScorePopup(
+          ImprovedScorePopupService().showScorePopup(
             context: context,
             plant: targetPlant,
             moistureScore: 8,
@@ -179,9 +178,9 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       plantType: null,
     );
 
-    // Use the enhanced popup directly with mock data
+    // Use the improved popup directly with mock data
 
-    EnhancedScorePopupService().showScorePopup(
+    ImprovedScorePopupService().showScorePopup(
       context: context,
       plant: mockPlant,
       moistureScore: 8,

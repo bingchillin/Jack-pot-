@@ -6,7 +6,7 @@ import '../../../../models/object_profile.dart';
 import 'package:jackpote/app_config.dart';
 import '../../plant_detail_page.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../widgets/enhanced_score_popup.dart';
+import '../../../widgets/improved_score_popup.dart';
 import '../../../../services/automatic_score_service.dart';
 import '../../../../services/plant_care_score_service.dart';
 import '../../../../providers/auth_provider.dart';
@@ -38,7 +38,7 @@ class PlantItemWidget extends StatelessWidget {
         );
 
         if (score != null && context.mounted) {
-          EnhancedScorePopupService().showScorePopup(
+          ImprovedScorePopupService().showScorePopup(
             context: context,
             plant: plant,
             moistureScore: score.moistureScore,
@@ -51,7 +51,7 @@ class PlantItemWidget extends StatelessWidget {
         }
       } else {
         // Show mock data for guest users
-        EnhancedScorePopupService().showScorePopup(
+        ImprovedScorePopupService().showScorePopup(
           context: context,
           plant: plant,
           moistureScore: 8,
@@ -65,7 +65,7 @@ class PlantItemWidget extends StatelessWidget {
     } catch (e) {
       // Show mock data on error
       if (context.mounted) {
-        EnhancedScorePopupService().showScorePopup(
+        ImprovedScorePopupService().showScorePopup(
           context: context,
           plant: plant,
           moistureScore: 6,
