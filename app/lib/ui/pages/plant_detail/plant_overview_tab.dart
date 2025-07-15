@@ -126,21 +126,8 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
         );
 
         if (score != null) {
-          // Show popup using score service
-          ScorePopupService().showScorePopup(
-            context: context,
-            moistureScore: score.moistureScore,
-            temperatureScore: score.temperatureScore,
-            lightScore: score.lightScore,
-            phScore: score.phScore,
-            bonusScore: score.consistencyBonus,
-            totalScore: score.dailyScore,
-            onDismiss: () {
-              setState(() {
-                _calculatedScore = null;
-              });
-            },
-          );
+          // Score calculation completed - no popup shown here anymore
+          // Popup is now shown from plant list pages
           
           setState(() {
             _calculatedScore = score;
@@ -180,21 +167,8 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
       updatedAt: DateTime.now(),
     );
 
-    // Show popup using score service
-    ScorePopupService().showScorePopup(
-      context: context,
-      moistureScore: mockScore.moistureScore,
-      temperatureScore: mockScore.temperatureScore,
-      lightScore: mockScore.lightScore,
-      phScore: mockScore.phScore,
-      bonusScore: mockScore.consistencyBonus,
-      totalScore: mockScore.dailyScore,
-      onDismiss: () {
-        setState(() {
-          _calculatedScore = null;
-        });
-      },
-    );
+    // Mock score calculation completed - no popup shown here anymore
+    // Popup is now shown from plant list pages
     
     setState(() {
       _calculatedScore = mockScore;
@@ -297,8 +271,7 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
 
           const SizedBox(height: 24),
 
-          // Test Score Popup Button (for development)
-          _buildTestScoreButton(localizations),
+          // Test score button removed - moved to plants page
 
           const SizedBox(height: 40),
         ],

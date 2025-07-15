@@ -1970,6 +1970,11 @@
     "description": "Daily score label"
   },
 
+  "dailyScoreSubtitle": "Your plant care performance for today",
+  "@dailyScoreSubtitle": {
+    "description": "Daily score subtitle explaining what the score represents"
+  },
+
   "weeklyScore": "Weekly Score",
   "@weeklyScore": {
     "description": "Weekly score label"
@@ -2123,5 +2128,11 @@
   "errorCalculatingScore": "Error calculating score",
   "@errorCalculatingScore": {
     "description": "Error message when score calculation fails"
-  }
+  },
+  "bonusScore": "Bonus",
+  "moisture": "Moisture",
+  "temperature": "Temperature",
+  "light": "Light",
+  "ph": "pH",
+  "totalScore": "Total Score"
 } 

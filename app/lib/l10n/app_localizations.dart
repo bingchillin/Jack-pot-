@@ -664,7 +664,7 @@ abstract class AppLocalizations {
   /// **'Temperature'**
   String get temperature;
 
-  /// Light level label
+  /// Light level sensor label
   ///
   /// In en, this message translates to:
   /// **'Light Level'**
@@ -1009,7 +1009,7 @@ abstract class AppLocalizations {
   /// Retry button text
   ///
   /// In en, this message translates to:
-  /// **'Retry'**
+  /// **'Try Again'**
   String get retry;
 
   /// Message when user needs to login to see friends' posts
@@ -2182,6 +2182,12 @@ abstract class AppLocalizations {
   /// **'Daily Score'**
   String get dailyScore;
 
+  /// Daily score subtitle explaining what the score represents
+  ///
+  /// In en, this message translates to:
+  /// **'Your plant care performance for today'**
+  String get dailyScoreSubtitle;
+
   /// Weekly score label
   ///
   /// In en, this message translates to:
@@ -2367,6 +2373,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error calculating score'**
   String get errorCalculatingScore;
+
+  /// No description provided for @bonusScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Bonus'**
+  String get bonusScore;
+
+  /// No description provided for @moisture.
+  ///
+  /// In en, this message translates to:
+  /// **'Moisture'**
+  String get moisture;
+
+  /// No description provided for @light.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get light;
+
+  /// No description provided for @ph.
+  ///
+  /// In en, this message translates to:
+  /// **'pH'**
+  String get ph;
+
+  /// No description provided for @totalScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Score'**
+  String get totalScore;
 }
 
 class _AppLocalizationsDelegate

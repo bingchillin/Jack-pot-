@@ -6,6 +6,11 @@ import '../../../../models/object_profile.dart';
 import 'package:jackpote/app_config.dart';
 import '../../plant_detail_page.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../widgets/enhanced_score_popup.dart';
+import '../../../../services/automatic_score_service.dart';
+import '../../../../services/plant_care_score_service.dart';
+import '../../../../providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class PlantItemWidget extends StatelessWidget {
   final ObjectProfile plant;
@@ -18,6 +23,61 @@ class PlantItemWidget extends StatelessWidget {
     this.onToggleAutomatic,
     this.onToggleWillWatering,
   }) : super(key: ValueKey(plant.idObjectProfile));
+
+  Future<void> _showScorePopup(BuildContext context) async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      
+      if (token != null) {
+        final scoreService = PlantCareScoreService();
+        final autoScoreService = AutomaticScoreService(scoreService);
+        final score = await autoScoreService.calculateAutomaticScore(
+          plant.idObjectProfile,
+          token,
+        );
+
+        if (score != null && context.mounted) {
+          EnhancedScorePopupService().showScorePopup(
+            context: context,
+            plant: plant,
+            moistureScore: score.moistureScore,
+            temperatureScore: score.temperatureScore,
+            lightScore: score.lightScore,
+            phScore: score.phScore,
+            bonusScore: score.consistencyBonus,
+            totalScore: score.dailyScore,
+          );
+        }
+      } else {
+        // Show mock data for guest users
+        EnhancedScorePopupService().showScorePopup(
+          context: context,
+          plant: plant,
+          moistureScore: 8,
+          temperatureScore: 7,
+          lightScore: 5,
+          phScore: 3,
+          bonusScore: 2,
+          totalScore: 25,
+        );
+      }
+    } catch (e) {
+      // Show mock data on error
+      if (context.mounted) {
+        EnhancedScorePopupService().showScorePopup(
+          context: context,
+          plant: plant,
+          moistureScore: 6,
+          temperatureScore: 5,
+          lightScore: 4,
+          phScore: 2,
+          bonusScore: 0,
+          totalScore: 17,
+        );
+      }
+    }
+  }
 
   String _getStateText(int? state) {
     switch (state) {

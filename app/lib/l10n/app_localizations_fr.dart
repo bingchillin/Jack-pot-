@@ -1119,6 +1119,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dailyScore => 'Score Quotidien';
 
   @override
+  String get dailyScoreSubtitle =>
+      'Votre performance de soin des plantes pour aujourd\'hui';
+
+  @override
   String get weeklyScore => 'Score Hebdomadaire';
 
   @override
@@ -1215,4 +1219,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get errorCalculatingScore => 'Erreur lors du calcul du score';
+
+  @override
+  String get bonusScore => 'Bonus';
+
+  @override
+  String get moisture => 'Humidité';
+
+  @override
+  String get light => 'Lumière';
+
+  @override
+  String get ph => 'pH';
+
+  @override
+  String get totalScore => 'Score total';
 }

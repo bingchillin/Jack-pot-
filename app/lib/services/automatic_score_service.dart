@@ -2,14 +2,16 @@ import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/plant_care_score.dart';
 import 'plant_care_score_service.dart';
+import 'sensor_data_service.dart';
 
 class AutomaticScoreService {
   static const String _lastScoreDateKey = 'last_score_date';
   static const String _autoScoreEnabledKey = 'auto_score_enabled';
   
   final PlantCareScoreService _scoreService;
+  final SensorDataService _sensorDataService;
   
-  AutomaticScoreService(this._scoreService);
+  AutomaticScoreService(this._scoreService) : _sensorDataService = SensorDataService();
 
   /// Check if automatic scoring should be triggered for today
   Future<bool> shouldCalculateScore() async {
@@ -27,41 +29,48 @@ class AutomaticScoreService {
   /// Calculate and save automatic daily score
   Future<PlantCareScore?> calculateAutomaticScore(int plantId, String token) async {
     try {
-      // Get latest sensor data for the plant
-      final sensorData = await _getLatestSensorData(plantId);
+      // Get latest sensor data for the plant (today's data)
+      final todaySensorData = await _getLatestSensorData(plantId);
       
-      if (sensorData == null) {
+      if (todaySensorData == null) {
         // No sensor data available, skip calculation
         return null;
       }
 
-      // Calculate score components
-      final moistureScore = _calculateMoistureScore(sensorData['moisture'] ?? 0);
-      final temperatureScore = _calculateTemperatureScore(sensorData['temperature'] ?? 0);
-      final lightScore = _calculateLightScore(sensorData['light'] ?? 0);
-      final phScore = _calculatePhScore(sensorData['ph'] ?? 0);
-      final consistencyBonus = _calculateBonusScore(sensorData);
+      // Store today's sensor data for future reference
+      await _sensorDataService.storeSensorData(plantId, todaySensorData);
+
+      // Calculate score components using today's data
+      final moistureScore = _calculateMoistureScore(todaySensorData['moisture'] ?? 0);
+      final temperatureScore = _calculateTemperatureScore(todaySensorData['temperature'] ?? 0);
+      final lightScore = _calculateLightScore(todaySensorData['light'] ?? 0);
+      final phScore = _calculatePhScore(todaySensorData['ph'] ?? 0);
+      final consistencyBonus = _calculateBonusScore(todaySensorData);
+      final improvementBonus = await _sensorDataService.calculateImprovementBonus(plantId, todaySensorData);
       
-      final totalScore = moistureScore + temperatureScore + lightScore + phScore + consistencyBonus;
+      final dailyScore = moistureScore + temperatureScore + lightScore + phScore + consistencyBonus + improvementBonus;
+
+      // Calculate weekly score
+      final weeklyScore = await _calculateWeeklyScore(plantId, dailyScore);
 
       // Create score object
       final score = PlantCareScore(
         idPlantCareScore: 0, // Will be set by backend
         idObjectProfile: plantId,
         scoreDate: DateTime.now(),
-        dailyScore: totalScore,
-        weeklyScore: 0, // Will be calculated later
+        dailyScore: dailyScore,
+        weeklyScore: weeklyScore,
         moistureScore: moistureScore,
         temperatureScore: temperatureScore,
         lightScore: lightScore,
         phScore: phScore,
         consistencyBonus: consistencyBonus,
-        improvementBonus: 0, // Will be calculated later
-        dailyMessage: _getScoreMessage(totalScore),
-        weeklyMessage: null, // Will be set later
-        sensorData: sensorData,
-        isPerfectDay: totalScore >= 25,
-        isPerfectWeek: false, // Will be calculated later
+        improvementBonus: improvementBonus,
+        dailyMessage: _getScoreMessage(dailyScore),
+        weeklyMessage: _getWeeklyMessage(weeklyScore),
+        sensorData: todaySensorData,
+        isPerfectDay: dailyScore >= 25,
+        isPerfectWeek: weeklyScore >= 150, // 25 * 6 days = 150
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -184,6 +193,41 @@ class AutomaticScoreService {
   Future<void> resetLastScoreDate() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_lastScoreDateKey);
+  }
+
+  /// Calculate weekly score based on last 7 days
+  Future<int> _calculateWeeklyScore(int plantId, int todayScore) async {
+    try {
+      // Get last 7 days of scores from backend
+      final weekStart = DateTime.now().subtract(const Duration(days: 7));
+      final weeklyScores = await _scoreService.getWeeklyScores(plantId, weekStart, 'token');
+      
+      // Add today's score
+      final allScores = [...weeklyScores.map((score) => score.dailyScore), todayScore];
+      
+      // Calculate total of last 7 days
+      if (allScores.length > 7) {
+        allScores.removeRange(0, allScores.length - 7);
+      }
+      
+      final total = allScores.fold<int>(0, (sum, score) => sum + score);
+      return total;
+    } catch (e) {
+      // If we can't get historical data, just return today's score
+      return todayScore;
+    }
+  }
+
+  /// Get weekly message based on weekly score
+  String _getWeeklyMessage(int weeklyScore) {
+    final average = weeklyScore / 7;
+    
+    if (average >= 25) return "Outstanding week! You're a plant care master!";
+    if (average >= 20) return "Great week! Your consistency is impressive!";
+    if (average >= 15) return "Good week! Keep up the steady care!";
+    if (average >= 10) return "Decent week! Room for improvement.";
+    if (average >= 5) return "Challenging week! Let's do better next week.";
+    return "Difficult week! Your plants need more attention.";
   }
 
   /// Get score message based on total score

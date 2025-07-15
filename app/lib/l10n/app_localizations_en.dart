@@ -472,7 +472,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newPost => 'New Post';
 
   @override
-  String get retry => 'Retry';
+  String get retry => 'Try Again';
 
   @override
   String get loginToSeeFriends => 'Sign in to see your friends\' posts';
@@ -1109,6 +1109,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dailyScore => 'Daily Score';
 
   @override
+  String get dailyScoreSubtitle => 'Your plant care performance for today';
+
+  @override
   String get weeklyScore => 'Weekly Score';
 
   @override
@@ -1202,4 +1205,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorCalculatingScore => 'Error calculating score';
+
+  @override
+  String get bonusScore => 'Bonus';
+
+  @override
+  String get moisture => 'Moisture';
+
+  @override
+  String get light => 'Light';
+
+  @override
+  String get ph => 'pH';
+
+  @override
+  String get totalScore => 'Total Score';
 }

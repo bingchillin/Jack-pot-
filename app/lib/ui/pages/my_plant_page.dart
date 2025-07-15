@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:jackpote/ui/pages/widget/plant_card_my_list/plant_item_my_list_widget.dart';
 import 'package:jackpote/ui/pages/widget/plant_card_favorite/plant_item_widget.dart';
 import '../../bloc/object_profile/object_profile_bloc.dart';
 import '../../bloc/object_profile/object_profile_event.dart';
+import '../../bloc/object_profile/object_profile_state.dart' as favorite_state;
 import '../../bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
 import '../../bloc/object_profile_my_list/object_profile_my_list_event.dart';
+import '../../bloc/object_profile_my_list/object_profile_my_list_state.dart' as mylist_state;
 import '../../models/object_profile.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/object_profile_service.dart';
+import '../widgets/enhanced_score_popup.dart';
+import '../../services/automatic_score_service.dart';
+import '../../services/plant_care_score_service.dart';
+import '../../providers/auth_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyPlantPage extends StatefulWidget {
   const MyPlantPage({Key? key}) : super(key: key);
@@ -47,6 +54,9 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
     myListBloc.add(LoadProfilesMyList());
     
     _animationController.forward();
+    
+    // Check for daily popup
+    _checkDailyPopup();
   }
 
   @override
@@ -56,11 +66,138 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
     super.dispose();
   }
 
+  // Check if we should show daily popup
+  Future<void> _checkDailyPopup() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastPopupDate = prefs.getString('last_daily_popup_date');
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      
+      if (lastPopupDate != today) {
+        // Wait a bit for the page to load
+        await Future.delayed(const Duration(milliseconds: 1500));
+        
+        if (mounted) {
+          await _showDailyScorePopup();
+          // Save today's date
+          await prefs.setString('last_daily_popup_date', today);
+        }
+      }
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  // Show daily score popup for the first plant or a random plant
+  Future<void> _showDailyScorePopup() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      
+      // Get a plant to show score for (first from my list or favorites)
+      ObjectProfile? targetPlant;
+      
+      // Try to get from my list first
+      final myListState = myListBloc.state;
+      if (myListState is mylist_state.ProfileLoaded && myListState.profiles.isNotEmpty) {
+        targetPlant = myListState.profiles.first;
+      } else {
+        // Fallback to favorites - simplified approach
+        // For now, create a mock plant if no real plants available
+        targetPlant = ObjectProfile(
+          idObjectProfile: 1,
+          title: "Daily Care Plant",
+          description: "Your plant care summary",
+          advise: "Keep up the good work!",
+          recipe: "Daily care routine",
+          state: 1,
+          isAutomatic: true,
+          isWillWatering: false,
+          object: null,
+          plantType: null,
+        );
+      }
+      
+      // targetPlant is always set above, so this check is redundant but kept for safety
+      if (targetPlant != null) {
+        if (token != null) {
+          // Try to get real score
+          final scoreService = PlantCareScoreService();
+          final autoScoreService = AutomaticScoreService(scoreService);
+          final score = await autoScoreService.calculateAutomaticScore(
+            targetPlant.idObjectProfile,
+            token,
+          );
+
+          if (score != null && mounted) {
+            EnhancedScorePopupService().showScorePopup(
+              context: context,
+              plant: targetPlant,
+              moistureScore: score.moistureScore,
+              temperatureScore: score.temperatureScore,
+              lightScore: score.lightScore,
+              phScore: score.phScore,
+              bonusScore: score.consistencyBonus,
+              totalScore: score.dailyScore,
+            );
+            return;
+          }
+        }
+        
+        // Fallback to mock data
+        if (mounted) {
+          EnhancedScorePopupService().showScorePopup(
+            context: context,
+            plant: targetPlant,
+            moistureScore: 8,
+            temperatureScore: 7,
+            lightScore: 5,
+            phScore: 3,
+            bonusScore: 2,
+            totalScore: 25,
+          );
+        }
+      }
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  // Test score popup method (for development)
+  void _testScorePopup() {
+    // Create a mock plant for testing
+    final mockPlant = ObjectProfile(
+      idObjectProfile: 999,
+      title: "Test Plant",
+      description: "Test plant for popup",
+      advise: "Test advice",
+      recipe: "Test recipe",
+      state: 1,
+      isAutomatic: true,
+      isWillWatering: false,
+      object: null,
+      plantType: null,
+    );
+
+    // Use the enhanced popup directly with mock data
+
+    EnhancedScorePopupService().showScorePopup(
+      context: context,
+      plant: mockPlant,
+      moistureScore: 8,
+      temperatureScore: 7,
+      lightScore: 5,
+      phScore: 3,
+      bonusScore: 2,
+      totalScore: 25,
+    );
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      print('🔄 App resumed, refreshing plant data');
+      // App resumed, refreshing plant data
       // Clear cache and refresh data when returning to app
       ObjectProfileService.clearCache();
       favoriteBloc.add(LoadProfiles());
@@ -362,82 +499,91 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           ),
         ),
       ),
-      floatingActionButton: _buildFloatingActionButtons(context, localizations),
-    );
-  }
-
-  Widget _buildFloatingActionButtons(BuildContext context, AppLocalizations localizations) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        // AI Classification Button
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.purple[600]!, Colors.purple[700]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.purple[300]!.withValues(alpha: 0.6),
-                blurRadius: 15,
-                offset: const Offset(0, 6),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // AI Classification Button
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.purple[600]!, Colors.purple[700]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ],
-          ),
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/plant_classifier');
-            },
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            heroTag: "ai_classifier",
-            child: const Icon(
-              Icons.smart_toy,
-              size: 28,
-              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.purple[300]!.withValues(alpha: 0.6),
+                  blurRadius: 15,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        // Main Add Button
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green[600]!, Colors.green[700]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(36),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.green[300]!.withValues(alpha: 0.6),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/plant_classifier');
+              },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              heroTag: "ai_classifier",
+              child: const Icon(
+                Icons.smart_toy,
+                size: 28,
+                color: Colors.white,
               ),
-            ],
-          ),
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/add_my_object');
-            },
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            heroTag: "add_device",
-            child: const Icon(
-              Icons.add,
-              size: 36,
-              color: Colors.white,
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 16),
+          // Test Score Button (for development)
+          Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            child: FloatingActionButton(
+              onPressed: _testScorePopup,
+              backgroundColor: Colors.blue[600],
+              heroTag: "test_score",
+              child: const Icon(
+                Icons.emoji_events,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          // Main Add Button
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green[600]!, Colors.green[700]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(36),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green[300]!.withValues(alpha: 0.6),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/add_my_object');
+              },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              heroTag: "add_plant",
+              child: const Icon(
+                Icons.add,
+                size: 36,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

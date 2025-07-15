@@ -1741,6 +1741,11 @@
     "description": "Daily score label"
   },
 
+  "dailyScoreSubtitle": "Tu rendimiento de cuidado de plantas para hoy",
+  "@dailyScoreSubtitle": {
+    "description": "Daily score subtitle explaining what the score represents"
+  },
+
   "weeklyScore": "Puntuación Semanal",
   "@weeklyScore": {
     "description": "Weekly score label"
@@ -1899,5 +1904,11 @@
   "errorCalculatingScore": "Error al calcular la puntuación",
   "@errorCalculatingScore": {
     "description": "Error message when score calculation fails"
-  }
+  },
+  "bonusScore": "Bono",
+  "moisture": "Humedad",
+  "temperature": "Temperatura",
+  "light": "Luz",
+  "ph": "pH",
+  "totalScore": "Puntuación total"
 } 
