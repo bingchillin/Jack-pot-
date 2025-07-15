@@ -18,6 +18,7 @@ class ImprovedScorePopupService {
     required int bonusScore,
     required int totalScore,
     VoidCallback? onDismiss,
+    Map<String, double>? yesterdaySensorData,
   }) {
     showDialog(
       context: context,
@@ -32,6 +33,7 @@ class ImprovedScorePopupService {
           phScore: phScore,
           bonusScore: bonusScore,
           totalScore: totalScore,
+          yesterdaySensorData: yesterdaySensorData,
           onDismiss: () {
             Navigator.of(context).pop();
             onDismiss?.call();
@@ -51,6 +53,7 @@ class ImprovedScorePopupWidget extends StatefulWidget {
   final int bonusScore;
   final int totalScore;
   final VoidCallback onDismiss;
+  final Map<String, double>? yesterdaySensorData;
 
   const ImprovedScorePopupWidget({
     super.key,
@@ -62,6 +65,7 @@ class ImprovedScorePopupWidget extends StatefulWidget {
     required this.bonusScore,
     required this.totalScore,
     required this.onDismiss,
+    this.yesterdaySensorData,
   });
 
   @override
@@ -510,7 +514,7 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
         'icon': Icons.water_drop,
         'color': Colors.blue[600]!,
         'maxScore': 10,
-        'sensorValue': widget.plant.humidityGroundSensor ?? 45.0,
+        'sensorValue': widget.yesterdaySensorData?['moisture'] ?? widget.plant.humidityGroundSensor ?? 45.0,
         'unit': '%',
         'goodRange': [40.0, 70.0],
       },
@@ -520,7 +524,7 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
         'icon': Icons.thermostat,
         'color': Colors.orange[600]!,
         'maxScore': 8,
-        'sensorValue': widget.plant.temperatureSensorExtern ?? 22.0,
+        'sensorValue': widget.yesterdaySensorData?['temperature'] ?? widget.plant.temperatureSensorExtern ?? 22.0,
         'unit': '°C',
         'goodRange': [18.0, 26.0],
       },
@@ -530,7 +534,7 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
         'icon': Icons.wb_sunny,
         'color': Colors.yellow[700]!,
         'maxScore': 6,
-        'sensorValue': widget.plant.lightSensor ?? 25000.0,
+        'sensorValue': widget.yesterdaySensorData?['light'] ?? widget.plant.lightSensor ?? 25000.0,
         'unit': 'lux',
         'goodRange': [20000.0, 40000.0],
       },
@@ -540,7 +544,7 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
         'icon': Icons.science,
         'color': Colors.purple[600]!,
         'maxScore': 4,
-        'sensorValue': widget.plant.phGroundSensor ?? 6.2,
+        'sensorValue': widget.yesterdaySensorData?['ph'] ?? widget.plant.phGroundSensor ?? 6.2,
         'unit': 'pH',
         'goodRange': [6.0, 7.0],
       },

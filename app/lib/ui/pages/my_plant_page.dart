@@ -129,6 +129,18 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           );
 
           if (score != null && mounted) {
+            // Extract yesterday's sensor data from the score
+            Map<String, double>? yesterdayData;
+            if (score.sensorData != null) {
+              final data = score.sensorData as Map<String, dynamic>;
+              yesterdayData = {
+                'moisture': (data['moisture'] ?? 0).toDouble(),
+                'temperature': (data['temperature'] ?? 0).toDouble(),
+                'light': (data['light'] ?? 0).toDouble(),
+                'ph': (data['ph'] ?? 0).toDouble(),
+              };
+            }
+            
             ImprovedScorePopupService().showScorePopup(
               context: context,
               plant: targetPlant,
@@ -138,6 +150,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
               phScore: score.phScore,
               bonusScore: score.consistencyBonus,
               totalScore: score.dailyScore,
+              yesterdaySensorData: yesterdayData,
             );
             return;
           }
@@ -145,6 +158,14 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
         
         // Fallback to mock data
         if (mounted) {
+          // Mock yesterday's sensor data
+          final mockYesterdayData = {
+            'moisture': 68.0,
+            'temperature': 21.5,
+            'light': 62.0,
+            'ph': 6.3,
+          };
+          
           ImprovedScorePopupService().showScorePopup(
             context: context,
             plant: targetPlant,
@@ -154,6 +175,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
             phScore: 3,
             bonusScore: 2,
             totalScore: 25,
+            yesterdaySensorData: mockYesterdayData,
           );
         }
       }
@@ -179,6 +201,12 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
     );
 
     // Use the improved popup directly with mock data
+    final mockYesterdayData = {
+      'moisture': 72.0,
+      'temperature': 23.0,
+      'light': 58.0,
+      'ph': 6.1,
+    };
 
     ImprovedScorePopupService().showScorePopup(
       context: context,
@@ -189,6 +217,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       phScore: 3,
       bonusScore: 2,
       totalScore: 25,
+      yesterdaySensorData: mockYesterdayData,
     );
   }
 
