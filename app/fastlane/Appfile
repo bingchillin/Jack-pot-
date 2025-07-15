@@ -1,0 +1,20 @@
+# Configuration Fastlane pour Jack Pot App
+
+# ID de l'application Android (package name)
+app_identifier("com.example.jackpot") # TODO: Remplacez par votre vrai package name
+
+# Chemin vers le fichier de clé de service Google Play Store
+# Ce fichier sera configuré dans Jenkins comme credential sécurisé
+json_key_file("google-play-service-account.json")
+
+# Configuration pour Android
+for_platform :android do
+  # ID de l'application sur Google Play Store
+  app_identifier("com.example.jackpot") # TODO: Remplacez par votre vrai package name
+  
+  # Chemin vers le fichier de clé de service Google Play Store
+  json_key_file("google-play-service-account.json")
+end
+
+# Configuration optionnelle pour les notifications
+# slack_url("https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK") 

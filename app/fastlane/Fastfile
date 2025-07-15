@@ -1,0 +1,167 @@
+# Configuration Fastlane pour Flutter - Jack Pot App
+# Déploiement automatique sur Google Play Store
+
+default_platform(:android)
+
+platform :android do
+  desc "Déploiement sur Google Play Store"
+  lane :deploy_playstore do
+    # Récupération des versions
+    version_name = get_version_name(
+      gradle_file_path: "app/build.gradle",
+      ext_constant_name: "versionName"
+    )
+    
+    version_code = get_version_code(
+      gradle_file_path: "app/build.gradle",
+      ext_constant_name: "versionCode"
+    )
+    
+    puts "🚀 Déploiement de la version #{version_name} (#{version_code})"
+    
+    # Build de l'APK et AAB
+    build_app_bundle
+    
+    # Upload sur Google Play Store
+    upload_to_play_store(
+      track: 'internal',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    
+    puts "✅ Déploiement terminé avec succès!"
+  end
+  
+  desc "Build de l'application (APK + AAB)"
+  lane :build_app_bundle do
+    puts "🔨 Construction de l'application..."
+    
+    # Nettoyage
+    sh("cd .. && flutter clean")
+    
+    # Installation des dépendances
+    sh("cd .. && flutter pub get")
+    
+    # Build de l'AAB pour le Play Store
+    sh("cd .. && flutter build appbundle --release")
+    
+    # Build de l'APK pour les tests
+    sh("cd .. && flutter build apk --release")
+    
+    puts "✅ Build terminé avec succès!"
+  end
+  
+  desc "Déploiement sur track de test interne"
+  lane :deploy_internal do
+    build_app_bundle
+    
+    upload_to_play_store(
+      track: 'internal',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    
+    puts "✅ Déploiement sur track interne terminé!"
+  end
+  
+  desc "Déploiement sur track de test alpha"
+  lane :deploy_alpha do
+    build_app_bundle
+    
+    upload_to_play_store(
+      track: 'alpha',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    
+    puts "✅ Déploiement sur track alpha terminé!"
+  end
+  
+  desc "Déploiement sur track de test beta"
+  lane :deploy_beta do
+    build_app_bundle
+    
+    upload_to_play_store(
+      track: 'beta',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    
+    puts "✅ Déploiement sur track beta terminé!"
+  end
+  
+  desc "Déploiement en production"
+  lane :deploy_production do
+    build_app_bundle
+    
+    upload_to_play_store(
+      track: 'production',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    
+    puts "✅ Déploiement en production terminé!"
+  end
+  
+  desc "Tests et vérifications"
+  lane :test do
+    puts "🧪 Exécution des tests..."
+    
+    # Tests Flutter
+    sh("cd .. && flutter test")
+    
+    # Analyse du code
+    sh("cd .. && flutter analyze")
+    
+    puts "✅ Tests terminés avec succès!"
+  end
+  
+  desc "Mise à jour des métadonnées du Play Store"
+  lane :update_metadata do
+    upload_to_play_store(
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: false,
+      skip_upload_changelogs: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+    
+    puts "✅ Métadonnées mises à jour!"
+  end
+end
+
+# Configuration globale
+before_all do
+  puts "🚀 Début du processus de déploiement..."
+  puts "📱 Application: Jack Pot"
+  puts "🗓️ Date: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
+end
+
+after_all do |lane|
+  puts "✅ Lane '#{lane}' terminée avec succès!"
+end
+
+error do |lane, exception|
+  puts "❌ Erreur dans la lane '#{lane}': #{exception.message}"
+end 

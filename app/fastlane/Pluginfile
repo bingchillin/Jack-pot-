@@ -1,0 +1,10 @@
+# Plugins Fastlane pour Jack Pot App
+
+# Plugin pour Flutter
+gem 'fastlane-plugin-flutter_version'
+
+# Plugin pour la gestion des versions
+gem 'fastlane-plugin-versioning_android'
+
+# Plugin pour les notifications Slack (optionnel)
+# gem 'fastlane-plugin-slack' 
