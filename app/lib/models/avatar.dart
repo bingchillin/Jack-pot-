@@ -1,26 +1,26 @@
 class Avatar {
   final int idAvatar;
-  final String title;
-  final String description;
+  final String? title;
+  final String? description;
   final int idPlantType;
-  final String advise;
+  final String? advise;
   final String pathPicture;
   final dynamic typeP;
   final dynamic stateP;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Avatar({
     required this.idAvatar,
-    required this.title,
-    required this.description,
+    this.title,
+    this.description,
     required this.idPlantType,
-    required this.advise,
+    this.advise,
     required this.pathPicture,
     this.typeP,
     this.stateP,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Avatar.fromJson(Map<String, dynamic> json) {

@@ -309,7 +309,11 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
             child: IconButton(
               icon: Icon(Icons.wifi, color: Colors.green[700]),
               onPressed: () {
-                Navigator.pushNamed(context, '/add_my_object');
+                Navigator.pushNamed(
+                  context,
+                  '/add_my_object',
+                  arguments: {'goToSearch': 0},
+                );
               },
             ),
           ),

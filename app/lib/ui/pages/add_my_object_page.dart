@@ -20,8 +20,13 @@ Une fois détecté, la configuration démarrera automatiquement.
 ''';
 
 class AddMyObjectPage extends StatefulWidget {
+  final int? goToSearch;
+
+  const AddMyObjectPage({Key? key, this.goToSearch}) : super(key: key);
+
   @override
   _AddMyObjectPageState createState() => _AddMyObjectPageState();
+
 }
 
 enum ScanState {
@@ -240,7 +245,7 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
         isSending = false;
       });
 
-      if (responseRaw == "wifi_ok") {
+      if (responseRaw == "wifi_ok" && widget.goToSearch != 0) {
         Navigator.pushNamed(
           context,
           '/choose_your_plant',
