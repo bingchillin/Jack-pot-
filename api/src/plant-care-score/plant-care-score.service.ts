@@ -12,7 +12,13 @@ export class PlantCareScoreService {
   ) {}
 
   async create(createPlantCareScoreDto: CreatePlantCareScoreDto): Promise<PlantCareScore> {
-    const plantCareScore = this.plantCareScoreRepository.create(createPlantCareScoreDto);
+    // Convert string date to Date object
+    const scoreData = {
+      ...createPlantCareScoreDto,
+      scoreDate: new Date(createPlantCareScoreDto.scoreDate),
+    };
+    
+    const plantCareScore = this.plantCareScoreRepository.create(scoreData);
     return await this.plantCareScoreRepository.save(plantCareScore);
   }
 

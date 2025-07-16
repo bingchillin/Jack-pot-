@@ -22,14 +22,24 @@ class PlantCareScoreService {
       );
 
       if (response.statusCode == 200) {
+        // Check if response body is empty
+        if (response.body.isEmpty || response.body.trim() == '') {
+          return null; // No score for this date
+        }
+        
         final data = json.decode(response.body);
         return data != null ? PlantCareScore.fromJson(data) : null;
-      } else if (response.statusCode == 404) {
+      } else if (response.statusCode == 404 || response.statusCode == 204) {
         return null; // No score for this date
       } else {
+        print('API Error: ${response.statusCode} - ${response.body}');
         throw Exception('Failed to get daily score: ${response.statusCode}');
       }
     } catch (e) {
+      // If it's a JSON parsing error due to empty response, return null
+      if (e.toString().contains('Unexpected end of input')) {
+        return null; // No score for this date
+      }
       throw Exception('Error getting daily score: $e');
     }
   }
@@ -49,12 +59,21 @@ class PlantCareScoreService {
       );
 
       if (response.statusCode == 200) {
+        // Check if response body is empty
+        if (response.body.isEmpty || response.body.trim() == '') {
+          return []; // No scores for this week
+        }
+        
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => PlantCareScore.fromJson(json)).toList();
       } else {
         throw Exception('Failed to get weekly scores: ${response.statusCode}');
       }
     } catch (e) {
+      // If it's a JSON parsing error due to empty response, return empty list
+      if (e.toString().contains('Unexpected end of input')) {
+        return []; // No scores for this week
+      }
       throw Exception('Error getting weekly scores: $e');
     }
   }
@@ -99,12 +118,21 @@ class PlantCareScoreService {
       );
 
       if (response.statusCode == 200) {
+        // Check if response body is empty
+        if (response.body.isEmpty || response.body.trim() == '') {
+          return []; // No scores for this range
+        }
+        
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => PlantCareScore.fromJson(json)).toList();
       } else {
         throw Exception('Failed to get scores by range: ${response.statusCode}');
       }
     } catch (e) {
+      // If it's a JSON parsing error due to empty response, return empty list
+      if (e.toString().contains('Unexpected end of input')) {
+        return []; // No scores for this range
+      }
       throw Exception('Error getting scores by range: $e');
     }
   }
@@ -163,6 +191,11 @@ class PlantCareScoreService {
   Future<PlantCareScore> createScore(PlantCareScore score, String token) async {
     try {
       final uri = Uri.parse('$baseUrl/plant-care-scores');
+      final requestBody = score.toJson();
+      
+      print('📤 Sending score data to API:');
+      print('   URL: $uri');
+      print('   Body: ${json.encode(requestBody)}');
       
       final response = await http.post(
         uri,
@@ -170,14 +203,18 @@ class PlantCareScoreService {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: json.encode(score.toJson()),
+        body: json.encode(requestBody),
       );
+
+      print('📥 API Response:');
+      print('   Status: ${response.statusCode}');
+      print('   Body: ${response.body}');
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
         return PlantCareScore.fromJson(data);
       } else {
-        throw Exception('Failed to create score: ${response.statusCode}');
+        throw Exception('Failed to create score: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       throw Exception('Error creating score: $e');
@@ -211,6 +248,7 @@ class PlantCareScoreService {
         phScore: dailyCalculation.phScore,
         consistencyBonus: dailyCalculation.consistencyBonus,
         improvementBonus: 0, // Will be calculated later
+        currentStreak: 0, // Will be calculated by automatic score service
         dailyMessage: dailyCalculation.dailyMessage,
         weeklyMessage: null, // Will be set later
         sensorData: sensorData,

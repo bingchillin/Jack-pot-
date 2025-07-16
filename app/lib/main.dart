@@ -22,6 +22,7 @@ import 'bloc/comment/comment_bloc.dart';
 import 'services/comment_service.dart';
 import 'services/notification_service.dart';
 import 'services/plant_care_score_service.dart';
+import 'services/daily_score_background_service.dart';
 import 'ui/pages/user_profile_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -75,6 +76,9 @@ class _RootAppState extends State<RootApp> {
     
     // Initialize notification service
     _initializeNotifications();
+    
+    // Initialize daily score background service
+    _initializeDailyScoreService();
   }
 
   @override
@@ -106,6 +110,17 @@ class _RootAppState extends State<RootApp> {
     // Subscribe to plant care topics
     await notificationService.subscribeToTopic('plant_care');
     await notificationService.subscribeToTopic('watering_reminders');
+  }
+
+  /// Initialize daily score background service
+  Future<void> _initializeDailyScoreService() async {
+    try {
+      // Initialize the background service
+      await DailyScoreBackgroundService.initialize();
+      print('✅ Daily score background service initialized');
+    } catch (e) {
+      print('❌ Error initializing daily score background service: $e');
+    }
   }
 
   @override

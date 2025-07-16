@@ -14,7 +14,15 @@ export class PlantCareScoreController {
   @ApiOperation({ summary: 'Create a new plant care score' })
   @ApiResponse({ status: 201, description: 'Score created successfully' })
   async create(@Body() createPlantCareScoreDto: CreatePlantCareScoreDto) {
-    return await this.plantCareScoreService.create(createPlantCareScoreDto);
+    console.log('📥 Received plant care score data:', JSON.stringify(createPlantCareScoreDto, null, 2));
+    try {
+      const result = await this.plantCareScoreService.create(createPlantCareScoreDto);
+      console.log('✅ Plant care score created successfully:', result.idPlantCareScore);
+      return result;
+    } catch (error) {
+      console.error('❌ Error creating plant care score:', error);
+      throw error;
+    }
   }
 
   @Get('plant/:idObjectProfile/daily/:date')

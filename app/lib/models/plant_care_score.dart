@@ -10,6 +10,7 @@ class PlantCareScore {
   final int phScore;
   final int consistencyBonus;
   final int improvementBonus;
+  final int currentStreak;
   final String? dailyMessage;
   final String? weeklyMessage;
   final Map<String, dynamic>? sensorData;
@@ -30,6 +31,7 @@ class PlantCareScore {
     required this.phScore,
     required this.consistencyBonus,
     required this.improvementBonus,
+    required this.currentStreak,
     this.dailyMessage,
     this.weeklyMessage,
     this.sensorData,
@@ -52,6 +54,7 @@ class PlantCareScore {
       phScore: json['phScore'] ?? 0,
       consistencyBonus: json['consistencyBonus'] ?? 0,
       improvementBonus: json['improvementBonus'] ?? 0,
+      currentStreak: json['currentStreak'] ?? 0,
       dailyMessage: json['dailyMessage'],
       weeklyMessage: json['weeklyMessage'],
       sensorData: json['sensorData'] != null 
@@ -68,7 +71,7 @@ class PlantCareScore {
     return {
       'idPlantCareScore': idPlantCareScore,
       'idObjectProfile': idObjectProfile,
-      'scoreDate': scoreDate.toIso8601String().split('T')[0], // YYYY-MM-DD format
+      'scoreDate': scoreDate.toIso8601String(), // Full ISO string for backend
       'dailyScore': dailyScore,
       'weeklyScore': weeklyScore,
       'moistureScore': moistureScore,
@@ -77,13 +80,13 @@ class PlantCareScore {
       'phScore': phScore,
       'consistencyBonus': consistencyBonus,
       'improvementBonus': improvementBonus,
+      'currentStreak': currentStreak,
       'dailyMessage': dailyMessage,
       'weeklyMessage': weeklyMessage,
       'sensorData': sensorData,
       'isPerfectDay': isPerfectDay,
       'isPerfectWeek': isPerfectWeek,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      // Don't send createdAt and updatedAt - let the backend set these
     };
   }
 
@@ -99,6 +102,7 @@ class PlantCareScore {
     int? phScore,
     int? consistencyBonus,
     int? improvementBonus,
+    int? currentStreak,
     String? dailyMessage,
     String? weeklyMessage,
     Map<String, dynamic>? sensorData,
@@ -119,6 +123,7 @@ class PlantCareScore {
       phScore: phScore ?? this.phScore,
       consistencyBonus: consistencyBonus ?? this.consistencyBonus,
       improvementBonus: improvementBonus ?? this.improvementBonus,
+      currentStreak: currentStreak ?? this.currentStreak,
       dailyMessage: dailyMessage ?? this.dailyMessage,
       weeklyMessage: weeklyMessage ?? this.weeklyMessage,
       sensorData: sensorData ?? this.sensorData,

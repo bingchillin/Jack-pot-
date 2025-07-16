@@ -7,8 +7,8 @@ export class CreatePlantCareScoreDto {
   idObjectProfile: number;
 
   @ApiProperty({ description: 'Score date' })
-  @IsDate()
-  scoreDate: Date;
+  @IsString()
+  scoreDate: string;
 
   @ApiProperty({ description: 'Daily score (0-30)' })
   @IsNumber()

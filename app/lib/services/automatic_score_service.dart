@@ -3,15 +3,115 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/plant_care_score.dart';
 import 'plant_care_score_service.dart';
 import 'sensor_data_service.dart';
+import 'object_profile_service.dart';
+import 'plant_type_requirements_service.dart';
+import '../models/object_profile.dart';
 
 class AutomaticScoreService {
   static const String _lastScoreDateKey = 'last_score_date';
   static const String _autoScoreEnabledKey = 'auto_score_enabled';
+  static const String _lastAutoScoreTimeKey = 'last_auto_score_time';
+  static const String _lastDataCollectionDateKey = 'last_data_collection_date';
   
   final PlantCareScoreService _scoreService;
   final SensorDataService _sensorDataService;
+  final ObjectProfileService _objectProfileService;
+  final PlantTypeRequirementsService _plantTypeService;
   
-  AutomaticScoreService(this._scoreService) : _sensorDataService = SensorDataService();
+  AutomaticScoreService(this._scoreService) 
+    : _sensorDataService = SensorDataService(),
+      _objectProfileService = ObjectProfileService(),
+      _plantTypeService = PlantTypeRequirementsService();
+
+  /// Check if we should collect end-of-day data
+  Future<bool> shouldCollectEndOfDayData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final autoScoreEnabled = prefs.getBool(_autoScoreEnabledKey) ?? true;
+    
+    if (!autoScoreEnabled) return false;
+    
+    final lastCollectionDate = prefs.getString(_lastDataCollectionDateKey);
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    
+    return lastCollectionDate != today;
+  }
+
+  /// Collect end-of-day sensor data and calculate scores
+  Future<void> collectEndOfDayDataAndCalculateScores(String token) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      
+      // Check if we already collected data today
+      final lastCollectionDate = prefs.getString(_lastDataCollectionDateKey);
+      if (lastCollectionDate == today) {
+        print('ℹ️ End-of-day data already collected today');
+        return;
+      }
+      
+      print('🌙 Collecting end-of-day sensor data...');
+      
+      // Get all plants
+      final plants = await _objectProfileService.fetchProfilesAll(token);
+      
+      for (final plant in plants) {
+        try {
+          // Collect current sensor data (end-of-day snapshot)
+          final currentSensorData = await _collectCurrentSensorData(plant);
+          
+          // Store the end-of-day data
+          await _sensorDataService.storeSensorData(plant.idObjectProfile, currentSensorData);
+          
+          // Calculate score based on this data
+          final score = await _calculateScoreFromData(plant.idObjectProfile, currentSensorData, token);
+          
+          if (score != null) {
+            print('✅ Calculated end-of-day score for plant ${plant.idObjectProfile}: ${score.dailyScore} points');
+          }
+        } catch (e) {
+          print('❌ Error processing plant ${plant.idObjectProfile}: $e');
+        }
+      }
+      
+      // Mark today as collected
+      await prefs.setString(_lastDataCollectionDateKey, today);
+      print('✅ End-of-day data collection completed');
+      
+    } catch (e) {
+      print('❌ Error in end-of-day data collection: $e');
+    }
+  }
+
+  /// Collect current sensor data for a plant
+  Future<Map<String, double>> _collectCurrentSensorData(ObjectProfile plant) async {
+    // For now, use the plant's current sensor values
+    // In a real implementation, this would read from actual sensors
+    return {
+      'moisture': plant.humidityGroundSensor?.toDouble() ?? 70.0,
+      'temperature': plant.temperatureSensorGround?.toDouble() ?? 22.0,
+      'light': plant.lightSensor?.toDouble() ?? 65.0,
+      'ph': plant.phGroundSensor?.toDouble() ?? 6.5,
+    };
+  }
+
+  /// Get yesterday's score for display (used by popup)
+  Future<PlantCareScore?> getYesterdayScore(int plantId, String token) async {
+    try {
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final score = await _scoreService.getDailyScore(plantId, yesterday, token);
+      
+      if (score != null) {
+        print('✅ Found yesterday\'s score for plant $plantId: ${score.dailyScore} points');
+        return score;
+      } else {
+        print('ℹ️ No yesterday\'s score found for plant $plantId');
+        return null;
+      }
+    } catch (e) {
+      print('❌ Error getting yesterday\'s score: $e');
+      return null;
+    }
+  }
 
   /// Check if automatic scoring should be triggered for today
   Future<bool> shouldCalculateScore() async {
@@ -39,34 +139,104 @@ class AutomaticScoreService {
           // Use mock data as fallback
           final mockData = _getMockYesterdayData();
           await _sensorDataService.storeSensorData(plantId, mockData);
-          return await _calculateScoreFromData(plantId, mockData);
+          return await _calculateScoreFromData(plantId, mockData, token);
         }
-        return await _calculateScoreFromData(plantId, apiData);
+        return await _calculateScoreFromData(plantId, apiData, token);
       }
 
-      return await _calculateScoreFromData(plantId, yesterdayData);
+      return await _calculateScoreFromData(plantId, yesterdayData, token);
     } catch (e) {
       // Fallback to mock data on error
       final mockData = _getMockYesterdayData();
-      return await _calculateScoreFromData(plantId, mockData);
+      return await _calculateScoreFromData(plantId, mockData, token);
     }
   }
 
-  /// Calculate score from sensor data
-  Future<PlantCareScore?> _calculateScoreFromData(int plantId, Map<String, double> sensorData) async {
+  /// Calculate and save automatic scores for all plants
+  Future<void> calculateAndSaveAllPlantScores(String token) async {
     try {
-      // Calculate score components using yesterday's data
-      final moistureScore = _calculateMoistureScore(sensorData['moisture'] ?? 0);
-      final temperatureScore = _calculateTemperatureScore(sensorData['temperature'] ?? 0);
-      final lightScore = _calculateLightScore(sensorData['light'] ?? 0);
-      final phScore = _calculatePhScore(sensorData['ph'] ?? 0);
-      final consistencyBonus = _calculateBonusScore(sensorData);
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      final lastAutoScoreTime = prefs.getString(_lastAutoScoreTimeKey);
+      
+      // Only run once per day
+      if (lastAutoScoreTime == today) {
+        return;
+      }
+      
+      // Get all plants for the current user
+      final plants = await _objectProfileService.fetchProfilesAll(token);
+      
+      for (final plant in plants) {
+        try {
+          // Check if score already exists for today
+          final todayScore = await _scoreService.getDailyScore(
+            plant.idObjectProfile, 
+            DateTime.now(), 
+            token
+          );
+          
+          if (todayScore == null) {
+            // Calculate and save score for this plant
+            final score = await calculateAutomaticScore(plant.idObjectProfile, token);
+            if (score != null) {
+              print('✅ Calculated and saved score for plant ${plant.idObjectProfile}: ${score.dailyScore} points');
+            } else {
+              print('⚠️ Failed to calculate score for plant ${plant.idObjectProfile}');
+            }
+          } else {
+            print('ℹ️ Score already exists for plant ${plant.idObjectProfile} today');
+          }
+        } catch (e) {
+          // Continue with other plants if one fails
+          print('❌ Error calculating score for plant ${plant.idObjectProfile}: $e');
+        }
+      }
+      
+      // Mark today as processed
+      await prefs.setString(_lastAutoScoreTimeKey, today);
+    } catch (e) {
+      print('Error in calculateAndSaveAllPlantScores: $e');
+    }
+  }
+
+  /// Calculate score from sensor data and save to database
+  Future<PlantCareScore?> _calculateScoreFromData(int plantId, Map<String, double> sensorData, String token) async {
+    try {
+      // Get plant type ID for plant-specific scoring
+      final plant = await _objectProfileService.fetchObjectProfileDetails(plantId, token);
+      final plantTypeId = plant.plantType?.idPlantType;
+      
+      // Calculate score components using plant-specific requirements
+      Map<String, int> scores;
+      if (plantTypeId != null) {
+        scores = await _plantTypeService.calculatePlantScores(plantTypeId, sensorData, token);
+      } else {
+        // Fallback to default scoring if no plant type
+        scores = {
+          'moisture': _calculateMoistureScore(sensorData['moisture'] ?? 0),
+          'temperature': _calculateTemperatureScore(sensorData['temperature'] ?? 0),
+          'light': _calculateLightScore(sensorData['light'] ?? 0),
+          'ph': _calculatePhScore(sensorData['ph'] ?? 0),
+        };
+      }
+      
+      final moistureScore = scores['moisture'] ?? 0;
+      final temperatureScore = scores['temperature'] ?? 0;
+      final lightScore = scores['light'] ?? 0;
+      final phScore = scores['ph'] ?? 0;
+      
+      // Calculate streak and consistency bonus
+      final streakInfo = await _calculateStreakAndBonus(plantId, token);
+      final consistencyBonus = streakInfo['consistencyBonus'] as int;
+      final currentStreak = streakInfo['currentStreak'] as int;
+      
       final improvementBonus = await _sensorDataService.calculateImprovementBonus(plantId, sensorData);
       
       final dailyScore = moistureScore + temperatureScore + lightScore + phScore + consistencyBonus + improvementBonus;
 
       // Calculate weekly score
-      final weeklyScore = await _calculateWeeklyScore(plantId, dailyScore);
+      final weeklyScore = await _calculateWeeklyScore(plantId, dailyScore, token);
 
       // Create score object
       final score = PlantCareScore(
@@ -81,6 +251,7 @@ class AutomaticScoreService {
         phScore: phScore,
         consistencyBonus: consistencyBonus,
         improvementBonus: improvementBonus,
+        currentStreak: currentStreak,
         dailyMessage: _getScoreMessage(dailyScore),
         weeklyMessage: _getWeeklyMessage(weeklyScore),
         sensorData: sensorData,
@@ -90,14 +261,15 @@ class AutomaticScoreService {
         updatedAt: DateTime.now(),
       );
 
-      // Save to backend (note: token not available in this context, skip backend save for now)
-      // final savedScore = await _scoreService.createScore(score, token);
+      // Save to backend
+      final savedScore = await _scoreService.createScore(score, token);
       
       // Mark today as scored and return the score
       await _markTodayAsScored();
-      return score;
+      return savedScore;
     } catch (e) {
       // Log error but don't throw - automatic scoring should be silent
+      print('Error calculating score from data: $e');
       return null;
     }
   }
@@ -170,28 +342,83 @@ class AutomaticScoreService {
     return 0; // Critical range
   }
 
-  /// Calculate bonus score (0-2 points)
-  int _calculateBonusScore(Map<String, double> sensorData) {
-    int bonus = 0;
-    
-    // Consistency bonus - if all sensors are in good or optimal ranges
-    final moisture = sensorData['moisture'] ?? 0;
-    final temperature = sensorData['temperature'] ?? 0;
-    final light = sensorData['light'] ?? 0;
-    final ph = sensorData['ph'] ?? 0;
-    
-    if (moisture >= 50 && moisture <= 90 &&
-        temperature >= 15 && temperature <= 30 &&
-        light >= 30 && light <= 90 &&
-        ph >= 5.5 && ph <= 7.5) {
-      bonus += 1;
+  /// Calculate streak and consistency bonus
+  Future<Map<String, int>> _calculateStreakAndBonus(int plantId, String token) async {
+    try {
+      // Get the last 3 days of scores to check streak
+      final threeDaysAgo = DateTime.now().subtract(const Duration(days: 3));
+      final recentScores = await _scoreService.getScoresByRange(plantId, threeDaysAgo, DateTime.now(), token);
+      
+      int currentStreak = 0;
+      int consistencyBonus = 0;
+      
+      // Check if we have consecutive days with good scores (≥75 points)
+      final goodScoreThreshold = 75;
+      
+      // Sort scores by date (most recent first)
+      recentScores.sort((a, b) => b.scoreDate.compareTo(a.scoreDate));
+      
+      // Check for consecutive days with good scores
+      DateTime? lastDate;
+      int consecutiveGoodDays = 0;
+      
+      for (final score in recentScores) {
+        // Check if this score is from a consecutive day
+        if (lastDate == null) {
+          // First score
+          lastDate = score.scoreDate;
+          if (score.dailyScore >= goodScoreThreshold) {
+            consecutiveGoodDays = 1;
+          } else {
+            consecutiveGoodDays = 0;
+          }
+        } else {
+          // Check if this score is from the day before the last score
+          final expectedDate = lastDate.subtract(const Duration(days: 1));
+          if (score.scoreDate.year == expectedDate.year &&
+              score.scoreDate.month == expectedDate.month &&
+              score.scoreDate.day == expectedDate.day) {
+            // Consecutive day
+            if (score.dailyScore >= goodScoreThreshold) {
+              consecutiveGoodDays++;
+            } else {
+              // Break in streak
+              consecutiveGoodDays = 0;
+            }
+            lastDate = score.scoreDate;
+          } else {
+            // Gap in days - reset streak
+            consecutiveGoodDays = 0;
+            lastDate = score.scoreDate;
+            if (score.dailyScore >= goodScoreThreshold) {
+              consecutiveGoodDays = 1;
+            }
+          }
+        }
+      }
+      
+      // Set current streak
+      currentStreak = consecutiveGoodDays;
+      
+      // Award consistency bonus only if streak is 3 or more
+      if (currentStreak >= 3) {
+        consistencyBonus = 10;
+      }
+      
+      print('🌱 Plant $plantId: Current streak = $currentStreak, Consistency bonus = $consistencyBonus');
+      
+      return {
+        'currentStreak': currentStreak,
+        'consistencyBonus': consistencyBonus,
+      };
+    } catch (e) {
+      print('❌ Error calculating streak: $e');
+      // Return default values on error
+      return {
+        'currentStreak': 0,
+        'consistencyBonus': 0,
+      };
     }
-    
-    // Improvement bonus - if this is better than yesterday
-    // TODO: Compare with previous day's data
-    bonus += 1; // For now, give 1 point as default
-    
-    return bonus;
   }
 
   /// Mark today as scored to prevent duplicate calculations
@@ -219,12 +446,24 @@ class AutomaticScoreService {
     await prefs.remove(_lastScoreDateKey);
   }
 
+  /// Reset the last auto score time (for testing)
+  Future<void> resetLastAutoScoreTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_lastAutoScoreTimeKey);
+  }
+
+  /// Reset the last data collection date (for testing)
+  Future<void> resetLastDataCollectionDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_lastDataCollectionDateKey);
+  }
+
   /// Calculate weekly score based on last 7 days
-  Future<int> _calculateWeeklyScore(int plantId, int todayScore) async {
+  Future<int> _calculateWeeklyScore(int plantId, int todayScore, String token) async {
     try {
       // Get last 7 days of scores from backend
       final weekStart = DateTime.now().subtract(const Duration(days: 7));
-      final weeklyScores = await _scoreService.getWeeklyScores(plantId, weekStart, 'token');
+      final weeklyScores = await _scoreService.getWeeklyScores(plantId, weekStart, token);
       
       // Add today's score
       final allScores = [...weeklyScores.map((score) => score.dailyScore), todayScore];
@@ -263,4 +502,4 @@ class AutomaticScoreService {
     if (score >= 5) return "Needs attention! Check your plant care routine.";
     return "Critical issues! Immediate care required!";
   }
-} 
+}

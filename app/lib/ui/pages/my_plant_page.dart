@@ -13,6 +13,7 @@ import '../../services/object_profile_service.dart';
 import '../widgets/improved_score_popup.dart';
 import '../../services/automatic_score_service.dart';
 import '../../services/plant_care_score_service.dart';
+import '../../services/daily_score_background_service.dart';
 import '../../providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -118,107 +119,108 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       }
       
       // Show popup for the selected plant
-      if (targetPlant != null) {
-        if (token != null) {
-          // Try to get real score
-          final scoreService = PlantCareScoreService();
-          final autoScoreService = AutomaticScoreService(scoreService);
-          final score = await autoScoreService.calculateAutomaticScore(
-            targetPlant.idObjectProfile,
-            token,
-          );
+      if (targetPlant != null && token != null) {
+        // Get yesterday's score from the database
+        final scoreService = PlantCareScoreService();
+        final autoScoreService = AutomaticScoreService(scoreService);
+        final yesterdayScore = await autoScoreService.getYesterdayScore(
+          targetPlant.idObjectProfile,
+          token,
+        );
 
-          if (score != null && mounted) {
-            // Extract yesterday's sensor data from the score
-            Map<String, double>? yesterdayData;
-            if (score.sensorData != null) {
-              final data = score.sensorData as Map<String, dynamic>;
-              yesterdayData = {
-                'moisture': (data['moisture'] ?? 0).toDouble(),
-                'temperature': (data['temperature'] ?? 0).toDouble(),
-                'light': (data['light'] ?? 0).toDouble(),
-                'ph': (data['ph'] ?? 0).toDouble(),
-              };
-            }
-            
-            ImprovedScorePopupService().showScorePopup(
-              context: context,
-              plant: targetPlant,
-              moistureScore: score.moistureScore,
-              temperatureScore: score.temperatureScore,
-              lightScore: score.lightScore,
-              phScore: score.phScore,
-              bonusScore: score.consistencyBonus,
-              totalScore: score.dailyScore,
-              yesterdaySensorData: yesterdayData,
-            );
-            return;
+        // Only show popup if yesterday's score exists
+        if (yesterdayScore != null && mounted) {
+          // Extract yesterday's sensor data from the score
+          Map<String, double>? yesterdayData;
+          if (yesterdayScore.sensorData != null) {
+            final data = yesterdayScore.sensorData as Map<String, dynamic>;
+            yesterdayData = {
+              'moisture': (data['moisture'] ?? 0).toDouble(),
+              'temperature': (data['temperature'] ?? 0).toDouble(),
+              'light': (data['light'] ?? 0).toDouble(),
+              'ph': (data['ph'] ?? 0).toDouble(),
+            };
           }
-        }
-        
-        // Fallback to mock data
-        if (mounted) {
-          // Mock yesterday's sensor data
-          final mockYesterdayData = {
-            'moisture': 68.0,
-            'temperature': 21.5,
-            'light': 62.0,
-            'ph': 6.3,
-          };
           
           ImprovedScorePopupService().showScorePopup(
             context: context,
             plant: targetPlant,
-            moistureScore: 8,
-            temperatureScore: 7,
-            lightScore: 5,
-            phScore: 3,
-            bonusScore: 2,
-            totalScore: 25,
-            yesterdaySensorData: mockYesterdayData,
+            moistureScore: yesterdayScore.moistureScore,
+            temperatureScore: yesterdayScore.temperatureScore,
+            lightScore: yesterdayScore.lightScore,
+            phScore: yesterdayScore.phScore,
+            bonusScore: yesterdayScore.consistencyBonus,
+            totalScore: yesterdayScore.dailyScore,
+            yesterdaySensorData: yesterdayData,
           );
+        } else {
+          print('ℹ️ No yesterday\'s score available - not showing popup');
         }
       }
     } catch (e) {
-      // Silent fail
+      print('❌ Error showing daily score popup: $e');
     }
   }
 
   // Test score popup method (for development)
-  void _testScorePopup() {
-    // Create a mock plant for testing
-    final mockPlant = ObjectProfile(
-      idObjectProfile: 999,
-      title: "Test Plant",
-      description: "Test plant for popup",
-      advise: "Test advice",
-      recipe: "Test recipe",
-      state: 1,
-      isAutomatic: true,
-      isWillWatering: false,
-      object: null,
-      plantType: null,
-    );
+  Future<void> _testScorePopup() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      
+      if (token == null) {
+        print('❌ No auth token available for test popup');
+        return;
+      }
+      
+      // Get the first available plant
+      ObjectProfile? targetPlant;
+      final myListState = myListBloc.state;
+      if (myListState is mylist_state.ProfileLoaded && myListState.profiles.isNotEmpty) {
+        targetPlant = myListState.profiles.first;
+      } else {
+        print('❌ No plants available for test popup');
+        return;
+      }
+      
+      // Get yesterday's score from the database
+      final scoreService = PlantCareScoreService();
+      final autoScoreService = AutomaticScoreService(scoreService);
+      final yesterdayScore = await autoScoreService.getYesterdayScore(
+        targetPlant.idObjectProfile,
+        token,
+      );
 
-    // Use the improved popup directly with mock data
-    final mockYesterdayData = {
-      'moisture': 72.0,
-      'temperature': 23.0,
-      'light': 58.0,
-      'ph': 6.1,
-    };
-
-    ImprovedScorePopupService().showScorePopup(
-      context: context,
-      plant: mockPlant,
-      moistureScore: 8,
-      temperatureScore: 7,
-      lightScore: 5,
-      phScore: 3,
-      bonusScore: 2,
-      totalScore: 25,
-      yesterdaySensorData: mockYesterdayData,
-    );
+      if (yesterdayScore != null) {
+        // Extract yesterday's sensor data from the score
+        Map<String, double>? yesterdayData;
+        if (yesterdayScore.sensorData != null) {
+          final data = yesterdayScore.sensorData as Map<String, dynamic>;
+          yesterdayData = {
+            'moisture': (data['moisture'] ?? 0).toDouble(),
+            'temperature': (data['temperature'] ?? 0).toDouble(),
+            'light': (data['light'] ?? 0).toDouble(),
+            'ph': (data['ph'] ?? 0).toDouble(),
+          };
+        }
+        
+        ImprovedScorePopupService().showScorePopup(
+          context: context,
+          plant: targetPlant,
+          moistureScore: yesterdayScore.moistureScore,
+          temperatureScore: yesterdayScore.temperatureScore,
+          lightScore: yesterdayScore.lightScore,
+          phScore: yesterdayScore.phScore,
+          bonusScore: yesterdayScore.consistencyBonus,
+          totalScore: yesterdayScore.dailyScore,
+          yesterdaySensorData: yesterdayData,
+        );
+      } else {
+        print('ℹ️ No yesterday\'s score available for test popup');
+      }
+    } catch (e) {
+      print('❌ Error in test score popup: $e');
+    }
   }
 
   @override
@@ -230,6 +232,55 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       ObjectProfileService.clearCache();
       favoriteBloc.add(LoadProfiles());
       myListBloc.add(LoadProfilesMyList());
+      
+      // Trigger daily score background service when app resumes
+      _triggerDailyScoreService();
+    }
+  }
+
+  /// Trigger daily score background service
+  Future<void> _triggerDailyScoreService() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      
+      if (token != null) {
+        final backgroundService = DailyScoreBackgroundService();
+        await backgroundService.triggerDailyScoring(token);
+      }
+    } catch (e) {
+      print('Error triggering daily score service: $e');
+    }
+  }
+
+  /// Test the automatic scoring system
+  Future<void> _testSystem() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      
+      if (token != null) {
+        final backgroundService = DailyScoreBackgroundService();
+        await backgroundService.testSystem(token);
+      }
+    } catch (e) {
+      print('Error testing system: $e');
+    }
+  }
+
+  /// Trigger end-of-day data collection (for testing)
+  Future<void> _triggerEndOfDayCollection() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.accessToken;
+      
+      if (token != null) {
+        final autoScoreService = AutomaticScoreService(PlantCareScoreService());
+        await autoScoreService.collectEndOfDayDataAndCalculateScores(token);
+        print('✅ End-of-day data collection triggered successfully');
+      }
+    } catch (e) {
+      print('❌ Error triggering end-of-day collection: $e');
     }
   }
 
@@ -564,19 +615,6 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
             ),
           ),
           const SizedBox(height: 16),
-          // Test Score Button (for development)
-          Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            child: FloatingActionButton(
-              onPressed: _testScorePopup,
-              backgroundColor: Colors.blue[600],
-              heroTag: "test_score",
-              child: const Icon(
-                Icons.emoji_events,
-                color: Colors.white,
-              ),
-            ),
-          ),
           // Main Add Button
           Container(
             width: 72,
