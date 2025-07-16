@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../models/avatar.dart';
 import '../../../models/object_profile.dart';
 import '../../../app_config.dart';
 import '../../../l10n/app_localizations.dart';
@@ -240,9 +241,30 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
     final stateColor = _getStateColor(widget.plant.state);
     final healthScore = _getHealthScore();
     final healthColor = _getHealthColor();
-    final imageUrl = widget.plant.plantType?.pathPicture != null
-        ? Uri.parse(AppConfig.baseUrl).resolve(widget.plant.plantType!.pathPicture!).toString()
+
+    final avatars = widget.plant.plantType?.avatars;
+
+    Avatar? avatar;
+
+    if (avatars == null || avatars.isEmpty) {
+      avatar = null;
+    } else {
+      try {
+        avatar = avatars.firstWhere((a) => a.stateP == widget.plant.state);
+      } catch (e) {
+        try {
+          avatar = avatars.firstWhere((a) => a.stateP == 0);
+        } catch (e) {
+          avatar = null;
+        }
+      }
+    }
+
+    final pathPicture = avatar?.pathPicture.toString();
+    final imageUrl = pathPicture != null
+        ? Uri.parse(AppConfig.baseUrlSrc).resolve(pathPicture).toString()
         : null;
+
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
