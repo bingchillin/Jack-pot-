@@ -62,7 +62,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
   /// Initialize popup check with proper timing
   Future<void> _initializePopupCheck() async {
     // Wait for the page to fully load and animations to complete
-    await Future.delayed(const Duration(milliseconds: 2000));
+    await Future.delayed(const Duration(milliseconds: 800));
     
     // Only check for popup if the widget is still mounted and we're on the current route
     if (mounted && ModalRoute.of(context)?.isCurrent == true) {
@@ -80,59 +80,50 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
   // Check if we should show daily popup
   Future<void> _checkDailyPopup() async {
     try {
+      // Check if popup is already showing
+      if (ImprovedScorePopupService().isPopupShowing) {
+        return;
+      }
+
       final prefs = await SharedPreferences.getInstance();
       final lastPopupDate = prefs.getString('last_daily_popup_date');
       final today = DateTime.now().toIso8601String().split('T')[0];
       
-      print('🔍 Daily popup check:');
-      print('   Last popup date: $lastPopupDate');
-      print('   Today: $today');
-      print('   Should show: ${lastPopupDate != today}');
-      
       if (lastPopupDate != today) {
-        // Wait longer for the page to fully load and navigation to complete
-        await Future.delayed(const Duration(milliseconds: 3000));
+        // Wait for the page to fully load and navigation to complete
+        await Future.delayed(const Duration(milliseconds: 1000));
         
-        // Additional check to ensure we're still on the plants page
-        if (mounted && ModalRoute.of(context)?.isCurrent == true) {
-          print('🚀 Showing daily score popup...');
-          await _showDailyScorePopup();
-          // Save today's date
-          await prefs.setString('last_daily_popup_date', today);
-        } else {
-          print('⏭️ Page not ready or navigation changed, skipping popup');
+        // Additional check to ensure we're still on the plants page and no popup is showing
+        if (mounted && 
+            ModalRoute.of(context)?.isCurrent == true && 
+            !ImprovedScorePopupService().isPopupShowing) {
+          
+          // Add a small delay to ensure any previous popup operations are complete
+          await Future.delayed(const Duration(milliseconds: 200));
+          
+          // Final check before showing popup
+          if (!ImprovedScorePopupService().isPopupShowing) {
+            await _showDailyScorePopup();
+            // Save today's date
+            await prefs.setString('last_daily_popup_date', today);
+          }
         }
-      } else {
-        print('⏭️ Popup already shown today, skipping');
       }
     } catch (e) {
-      print('❌ Error in daily popup check: $e');
-    }
-  }
-
-  // Temporary test method to force popup display
-  Future<void> _testPopup() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      // Clear the stored date to force popup
-      await prefs.remove('last_daily_popup_date');
-      print('🧪 Test: Cleared popup date, popup should show on next check');
-      
-      // Trigger popup check
-      await _checkDailyPopup();
-    } catch (e) {
-      print('❌ Error in test popup: $e');
+      // Silent fail
     }
   }
 
   // Show daily score popup for the first plant or a random plant
   Future<void> _showDailyScorePopup() async {
     try {
+      // Double-check if popup is already showing before proceeding
+      if (ImprovedScorePopupService().isPopupShowing) {
+        return;
+      }
+
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.accessToken;
-      
-      print('🔍 _showDailyScorePopup:');
-      print('   Token available: ${token != null}');
       
       // Get a plant to show score for (first from my list or favorites)
       ObjectProfile? targetPlant;
@@ -141,7 +132,6 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       final myListState = myListBloc.state;
       if (myListState is mylist_state.ProfileLoaded && myListState.profiles.isNotEmpty) {
         targetPlant = myListState.profiles.first;
-        print('   Found plant from my list: ${targetPlant.title}');
       } else {
         // Fallback to favorites - simplified approach
         // For now, create a mock plant if no real plants available
@@ -157,13 +147,10 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           object: null,
           plantType: null,
         );
-        print('   Using mock plant: ${targetPlant.title}');
       }
       
       // Show popup for the selected plant
       if (targetPlant != null && token != null) {
-        print('   Getting yesterday\'s score for plant ${targetPlant.idObjectProfile}...');
-        
         // Get yesterday's score from the database
         final scoreService = PlantCareScoreService();
         final autoScoreService = AutomaticScoreService(scoreService);
@@ -172,15 +159,8 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           token,
         );
 
-        print('   Yesterday\'s score found: ${yesterdayScore != null}');
-        if (yesterdayScore != null) {
-          print('   Score details: ${yesterdayScore.dailyScore} points');
-        }
-
-        // Only show popup if yesterday's score exists
-        if (yesterdayScore != null && mounted) {
-          print('   Showing popup with yesterday\'s score...');
-          
+        // Final check before showing popup
+        if (yesterdayScore != null && mounted && !ImprovedScorePopupService().isPopupShowing) {
           // Extract yesterday's sensor data from the score
           Map<String, double>? yesterdayData;
           if (yesterdayScore.sensorData != null) {
@@ -204,15 +184,10 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
             totalScore: yesterdayScore.dailyScore,
             yesterdaySensorData: yesterdayData,
           );
-          print('✅ Popup shown successfully');
-        } else {
-          print('❌ Cannot show popup: yesterdayScore=${yesterdayScore != null}, mounted=$mounted');
         }
-      } else {
-        print('❌ Cannot show popup: targetPlant=${targetPlant != null}, token=${token != null}');
       }
     } catch (e) {
-      print('❌ Error in _showDailyScorePopup: $e');
+      // Silent fail
     }
   }
 
@@ -243,6 +218,34 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       }
     } catch (e) {
       // Silent fail
+    }
+  }
+
+  /// Debug method to clear popup date (for testing)
+  Future<void> _clearPopupDate() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('last_daily_popup_date');
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Popup date cleared - popup will show on next app launch'),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error clearing popup date'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -681,36 +684,34 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Test Popup Button (Temporary)
+          // Debug Button (for testing popup)
           Container(
-            width: 56,
-            height: 56,
-            margin: const EdgeInsets.only(bottom: 16),
+            width: 40,
+            height: 40,
+            margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.red[600]!, Colors.red[700]!],
+                colors: [Colors.blue[600]!, Colors.blue[700]!],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.red[300]!.withValues(alpha: 0.6),
-                  blurRadius: 15,
-                  offset: const Offset(0, 6),
+                  color: Colors.blue[300]!.withValues(alpha: 0.6),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: FloatingActionButton(
-              onPressed: () {
-                _testPopup();
-              },
+              onPressed: _clearPopupDate,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              heroTag: "test_popup",
+              heroTag: "debug_popup",
               child: const Icon(
                 Icons.bug_report,
-                size: 28,
+                size: 20,
                 color: Colors.white,
               ),
             ),

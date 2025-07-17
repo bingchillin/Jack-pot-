@@ -26,6 +26,12 @@ class PlantItemWidget extends StatelessWidget {
 
   Future<void> _showScorePopup(BuildContext context) async {
     try {
+      // Check if popup is already showing
+      if (ImprovedScorePopupService().isPopupShowing) {
+        print('⚠️ Popup already showing, skipping plant item popup');
+        return;
+      }
+
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.accessToken;
       
@@ -37,7 +43,7 @@ class PlantItemWidget extends StatelessWidget {
           token,
         );
 
-        if (score != null && context.mounted) {
+        if (score != null && context.mounted && !ImprovedScorePopupService().isPopupShowing) {
           ImprovedScorePopupService().showScorePopup(
             context: context,
             plant: plant,
@@ -51,20 +57,22 @@ class PlantItemWidget extends StatelessWidget {
         }
       } else {
         // Show mock data for guest users
-        ImprovedScorePopupService().showScorePopup(
-          context: context,
-          plant: plant,
-          moistureScore: 8,
-          temperatureScore: 7,
-          lightScore: 5,
-          phScore: 3,
-          bonusScore: 2,
-          totalScore: 25,
-        );
+        if (!ImprovedScorePopupService().isPopupShowing) {
+          ImprovedScorePopupService().showScorePopup(
+            context: context,
+            plant: plant,
+            moistureScore: 8,
+            temperatureScore: 7,
+            lightScore: 5,
+            phScore: 3,
+            bonusScore: 2,
+            totalScore: 25,
+          );
+        }
       }
     } catch (e) {
       // Show mock data on error
-      if (context.mounted) {
+      if (context.mounted && !ImprovedScorePopupService().isPopupShowing) {
         ImprovedScorePopupService().showScorePopup(
           context: context,
           plant: plant,

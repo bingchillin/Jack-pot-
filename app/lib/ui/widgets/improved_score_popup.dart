@@ -8,6 +8,9 @@ class ImprovedScorePopupService {
   factory ImprovedScorePopupService() => _instance;
   ImprovedScorePopupService._internal();
 
+  // Track if a popup is currently showing
+  bool _isPopupShowing = false;
+
   void showScorePopup({
     required BuildContext context,
     required ObjectProfile plant,
@@ -20,26 +23,29 @@ class ImprovedScorePopupService {
     VoidCallback? onDismiss,
     Map<String, double>? yesterdaySensorData,
   }) {
+    // Prevent multiple popups from showing simultaneously
+    if (_isPopupShowing) {
+      return;
+    }
+
     // Safety checks to prevent popup during navigation transitions
     if (!context.mounted) {
-      print('⚠️ Context not mounted, skipping popup');
       return;
     }
     
     // Check if we're on the current route
     final route = ModalRoute.of(context);
     if (route == null || !route.isCurrent) {
-      print('⚠️ Not on current route, skipping popup');
       return;
     }
     
     // Check if the route is active
     if (route.isActive == false) {
-      print('⚠️ Route not active, skipping popup');
       return;
     }
     
-    print('✅ Showing popup - all checks passed');
+    // Mark popup as showing IMMEDIATELY to prevent race conditions
+    _isPopupShowing = true;
     
     showDialog(
       context: context,
@@ -57,11 +63,27 @@ class ImprovedScorePopupService {
           yesterdaySensorData: yesterdaySensorData,
           onDismiss: () {
             Navigator.of(context).pop();
+            // Mark popup as no longer showing
+            _isPopupShowing = false;
             onDismiss?.call();
           },
         );
       },
-    );
+    ).then((_) {
+      // Ensure popup is marked as not showing when dialog is dismissed
+      _isPopupShowing = false;
+    }).catchError((error) {
+      // Handle any errors and ensure state is reset
+      _isPopupShowing = false;
+    });
+  }
+
+  /// Check if a popup is currently showing
+  bool get isPopupShowing => _isPopupShowing;
+
+  /// Force reset the popup state (for testing/debugging)
+  void resetPopupState() {
+    _isPopupShowing = false;
   }
 }
 
