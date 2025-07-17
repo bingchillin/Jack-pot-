@@ -24,6 +24,8 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
 
   String _getStateText(AppLocalizations localizations, int? state) {
     switch (state) {
+      case 0:
+        return "Perfect";
       case 1:
         return localizations.stateExcellent;
       case 2:
@@ -41,52 +43,58 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
 
   Color _getStateColor(int? state) {
     switch (state) {
+      case 0:
+        return Colors.green[700]!; // Perfect - darker green
       case 1:
-        return Colors.green[600]!;
+        return Colors.green[600]!; // Excellent
       case 2:
-        return Colors.green[500]!;
+        return Colors.green[500]!; // Good
       case 3:
-        return Colors.orange[500]!;
+        return Colors.orange[500]!; // Fair
       case 4:
-        return Colors.orange[600]!;
+        return Colors.orange[600]!; // Needs Attention
       case 5:
-        return Colors.red[600]!;
+        return Colors.red[600]!;    // Critical
       default:
-        return Colors.grey[500]!;
+        return Colors.grey[500]!;   // Unknown
     }
   }
 
   IconData _getStateIcon(int? state) {
     switch (state) {
+      case 0:
+        return Icons.star; // Perfect - star icon
       case 1:
-        return Icons.check_circle;
+        return Icons.check_circle; // Excellent
       case 2:
-        return Icons.check_circle_outline;
+        return Icons.check_circle_outline; // Good
       case 3:
-        return Icons.warning_amber;
+        return Icons.warning_amber; // Fair
       case 4:
-        return Icons.warning;
+        return Icons.warning; // Needs Attention
       case 5:
-        return Icons.error;
+        return Icons.error; // Critical
       default:
-        return Icons.help_outline;
+        return Icons.help_outline; // Unknown
     }
   }
 
   int _getHealthScore() {
     switch (widget.plant.state) {
+      case 0:
+        return 100; // Perfect
       case 1:
-        return 95;
+        return 95;  // Excellent
       case 2:
-        return 85;
+        return 85;  // Good
       case 3:
-        return 70;
+        return 70;  // Fair
       case 4:
-        return 50;
+        return 50;  // Needs Attention
       case 5:
-        return 20;
+        return 20;  // Critical
       default:
-        return 0;
+        return 0;   // Unknown
     }
   }
 

@@ -1,11 +1,47 @@
 import 'package:flutter/material.dart';
 import '../../../models/object_profile.dart';
+import '../../../models/plant_type_requirements.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../services/plant_type_requirements_service.dart';
 
-class PlantSensorsTab extends StatelessWidget {
+class PlantSensorsTab extends StatefulWidget {
   final ObjectProfile plant;
 
   const PlantSensorsTab({Key? key, required this.plant}) : super(key: key);
+
+  @override
+  State<PlantSensorsTab> createState() => _PlantSensorsTabState();
+}
+
+class _PlantSensorsTabState extends State<PlantSensorsTab> {
+  PlantTypeRequirements? _plantRequirements;
+  bool _isLoadingRequirements = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlantRequirements();
+  }
+
+  Future<void> _loadPlantRequirements() async {
+    if (widget.plant.plantType?.idPlantType != null) {
+      try {
+        // For now, we'll use mock requirements since we don't have the token here
+        // In a real implementation, you'd pass the token to this widget
+        setState(() {
+          _isLoadingRequirements = false;
+        });
+      } catch (e) {
+        setState(() {
+          _isLoadingRequirements = false;
+        });
+      }
+    } else {
+      setState(() {
+        _isLoadingRequirements = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,46 +61,46 @@ class PlantSensorsTab extends StatelessWidget {
           const SizedBox(height: 16),
           _buildSensorCard(
             localizations.soilMoisture,
-            plant.humidityGroundSensor,
+            widget.plant.humidityGroundSensor,
             Icons.water_drop,
             '%',
             0,
             100,
             Colors.blue[600]!,
-            'Optimal: 40-80%',
+            _getOptimalRange('humidity_ground', '40-80%'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
             localizations.soilPH,
-            plant.phGroundSensor,
+            widget.plant.phGroundSensor,
             Icons.science,
             ' pH',
             0,
             14,
             Colors.purple[600]!,
-            'Optimal: 6.0-7.0',
+            _getOptimalRange('ph', '6.0-7.0'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
             localizations.fertility,
-            plant.conductivityElectriqueFertilitySensor,
+            widget.plant.conductivityElectriqueFertilitySensor,
             Icons.eco,
             ' µS/cm',
             0,
             3000,
             Colors.green[600]!,
-            'Optimal: 500-1500',
+            _getOptimalRange('conductivity', '500-1500'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
             localizations.groundTemp,
-            plant.temperatureSensorGround,
+            widget.plant.temperatureSensorGround,
             Icons.device_thermostat,
             '°C',
             0,
             40,
             Colors.orange[600]!,
-            'Optimal: 18-24°C',
+            _getOptimalRange('temperature_ground', '18-24°C'),
           ),
 
           const SizedBox(height: 32),
@@ -78,24 +114,24 @@ class PlantSensorsTab extends StatelessWidget {
           const SizedBox(height: 16),
           _buildSensorCard(
             localizations.airHumidity,
-            plant.humidityAirSensor,
+            widget.plant.humidityAirSensor,
             Icons.air,
             '%',
             0,
             100,
             Colors.cyan[600]!,
-            'Optimal: 40-60%',
+            _getOptimalRange('humidity_air', '40-60%'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
             localizations.temperature,
-            plant.temperatureSensorExtern,
+            widget.plant.temperatureSensorExtern,
             Icons.thermostat,
             '°C',
             0,
             40,
             Colors.red[600]!,
-            'Optimal: 20-26°C',
+            _getOptimalRange('temperature_extern', '20-26°C'),
           ),
 
           const SizedBox(height: 32),
@@ -109,24 +145,24 @@ class PlantSensorsTab extends StatelessWidget {
           const SizedBox(height: 16),
           _buildSensorCard(
             localizations.lightLevel,
-            plant.lightSensor,
+            widget.plant.lightSensor,
             Icons.wb_sunny,
             ' lux',
             0,
-            2000,
+            100000,
             Colors.yellow[600]!,
-            'Optimal: 800-1500',
+            _getOptimalRange('light', '800-1500'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
             localizations.sunExposure,
-            plant.expositionTimeSun,
+            widget.plant.expositionTimeSun,
             Icons.wb_sunny_outlined,
             ' hrs',
             0,
             12,
             Colors.orange[600]!,
-            'Optimal: 6-8 hours',
+            _getOptimalRange('exposition_time', '6-8 hours'),
           ),
 
           const SizedBox(height: 40),
@@ -345,5 +381,54 @@ class PlantSensorsTab extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getOptimalRange(String sensorType, String defaultRange) {
+    if (_plantRequirements != null) {
+      // Return plant-specific range if available
+      switch (sensorType) {
+        case 'humidity_ground':
+          if (_plantRequirements!.humidityGroundSensorMin != null && _plantRequirements!.humidityGroundSensorMax != null) {
+            return '${_plantRequirements!.humidityGroundSensorMin!.toStringAsFixed(0)}-${_plantRequirements!.humidityGroundSensorMax!.toStringAsFixed(0)}%';
+          }
+          break;
+        case 'ph':
+          if (_plantRequirements!.phMin != null && _plantRequirements!.phMax != null) {
+            return '${_plantRequirements!.phMin!.toStringAsFixed(1)}-${_plantRequirements!.phMax!.toStringAsFixed(1)}';
+          }
+          break;
+        case 'conductivity':
+          if (_plantRequirements!.conductivityElectriqueFertilityMin != null && _plantRequirements!.conductivityElectriqueFertilityMax != null) {
+            return '${_plantRequirements!.conductivityElectriqueFertilityMin!.toStringAsFixed(0)}-${_plantRequirements!.conductivityElectriqueFertilityMax!.toStringAsFixed(0)} µS/cm';
+          }
+          break;
+        case 'temperature_ground':
+          if (_plantRequirements!.temperatureSensorGroundMin != null && _plantRequirements!.temperatureSensorGroundMax != null) {
+            return '${_plantRequirements!.temperatureSensorGroundMin!.toStringAsFixed(1)}-${_plantRequirements!.temperatureSensorGroundMax!.toStringAsFixed(1)}°C';
+          }
+          break;
+        case 'humidity_air':
+          if (_plantRequirements!.humidityAirSensorMin != null && _plantRequirements!.humidityAirSensorMax != null) {
+            return '${_plantRequirements!.humidityAirSensorMin!.toStringAsFixed(0)}-${_plantRequirements!.humidityAirSensorMax!.toStringAsFixed(0)}%';
+          }
+          break;
+        case 'temperature_extern':
+          if (_plantRequirements!.temperatureSensorExternMin != null && _plantRequirements!.temperatureSensorExternMax != null) {
+            return '${_plantRequirements!.temperatureSensorExternMin!.toStringAsFixed(1)}-${_plantRequirements!.temperatureSensorExternMax!.toStringAsFixed(1)}°C';
+          }
+          break;
+        case 'light':
+          if (_plantRequirements!.lightSensorMin != null && _plantRequirements!.lightSensorMax != null) {
+            return '${_plantRequirements!.lightSensorMin!.toStringAsFixed(0)}-${_plantRequirements!.lightSensorMax!.toStringAsFixed(0)} lux';
+          }
+          break;
+        case 'exposition_time':
+          if (_plantRequirements!.expositionTimeSunMin != null && _plantRequirements!.expositionTimeSunMax != null) {
+            return '${_plantRequirements!.expositionTimeSunMin!.toStringAsFixed(1)}-${_plantRequirements!.expositionTimeSunMax!.toStringAsFixed(1)} hours';
+          }
+          break;
+      }
+    }
+    return 'Optimal: $defaultRange';
   }
 } 

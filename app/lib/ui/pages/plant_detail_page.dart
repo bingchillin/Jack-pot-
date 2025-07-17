@@ -14,7 +14,6 @@ import '../../models/plant_type.dart';
 import '../../l10n/app_localizations.dart';
 import 'plant_detail/plant_overview_tab.dart';
 import 'plant_detail/plant_sensors_tab.dart';
-import 'plant_detail/plant_care_tab.dart';
 import 'widget/favorite_toggle_button.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -361,8 +360,6 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 _buildTabButton(0, localizations.plantOverview, Icons.dashboard),
                 const SizedBox(width: 8),
                 _buildTabButton(1, localizations.sensorData, Icons.sensors),
-                const SizedBox(width: 8),
-                _buildTabButton(2, localizations.plantCareAdvice, Icons.lightbulb_outline),
               ],
             ),
           ),
@@ -433,8 +430,6 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 _buildTabButton(0, localizations.plantOverview, Icons.dashboard),
                 const SizedBox(width: 8),
                 _buildTabButton(1, localizations.sensorData, Icons.sensors),
-                const SizedBox(width: 8),
-                _buildTabButton(2, localizations.plantCareAdvice, Icons.lightbulb_outline),
               ],
             ),
           ),
@@ -548,7 +543,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: isSelected ? Colors.white : Colors.green[600],
                 ),
@@ -569,8 +564,6 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
         return PlantOverviewTab(plant: plant);
       case 1:
         return PlantSensorsTab(plant: plant);
-      case 2:
-        return PlantCareTab(plant: plant);
       default:
         return PlantOverviewTab(plant: plant);
     }
@@ -625,8 +618,6 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 _buildTabButton(0, localizations.plantOverview, Icons.dashboard),
                 const SizedBox(width: 8),
                 _buildTabButton(1, localizations.sensorData, Icons.sensors),
-                const SizedBox(width: 8),
-                _buildTabButton(2, localizations.plantCareAdvice, Icons.lightbulb_outline),
               ],
             ),
           ),
@@ -731,8 +722,6 @@ Widget _buildShimmerForTab(int index) {
       return _buildOverviewShimmer();
     case 1:
       return _buildSensorsShimmer();
-    case 2:
-      return _buildCareShimmer();
     default:
       return _buildOverviewShimmer();
   }
@@ -901,64 +890,6 @@ Widget _buildSensorsShimmer() {
                 ),
               );
             },
-          ),
-          const SizedBox(height: 24),
-        ],
-      ],
-    ),
-  );
-}
-
-Widget _buildCareShimmer() {
-  return SingleChildScrollView(
-    padding: const EdgeInsets.all(24),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (int i = 0; i < 3; i++) ...[
-          // Section header shimmer
-          Row(
-            children: [
-              Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  width: 120,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          
-          // Content card shimmer
-          Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              height: 120,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
           ),
           const SizedBox(height: 24),
         ],
