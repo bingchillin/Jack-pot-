@@ -8,7 +8,12 @@ import 'user_profile_page.dart';
 import '../../main.dart';
 
 class FriendsManagementPage extends StatefulWidget {
-  const FriendsManagementPage({super.key});
+  final int initialTabIndex;
+  
+  const FriendsManagementPage({
+    super.key,
+    this.initialTabIndex = 0,
+  });
 
   @override
   State<FriendsManagementPage> createState() => _FriendsManagementPageState();
@@ -30,7 +35,11 @@ class _FriendsManagementPageState extends State<FriendsManagementPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(
+      length: 4, 
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
     _loadAllContacts();
   }
 

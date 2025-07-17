@@ -5,6 +5,7 @@ import '../../services/enhanced_notification_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../l10n/app_localizations.dart';
 import 'comment_detail_page.dart';
+import 'friends_management_page.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -317,17 +318,7 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
         duration: const Duration(milliseconds: 400),
         opacity: isAnimating ? 0.7 : 1.0,
         child: InkWell(
-        onTap: () {
-          // Handle tap - navigate to comment if social notification
-          if (notification.isSocialNotification && notification.idComment != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CommentDetailPage(commentId: notification.idComment!),
-              ),
-            );
-          }
-        },
+        onTap: () => _handleNotificationTap(notification),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
           child: Row(
@@ -426,8 +417,28 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
   }
 
   IconData _getNotificationIcon(NotificationModel notification) {
-    if (notification.isSocialNotification) {
-      return Icons.chat_bubble_outline;
+    if (notification.isFriendNotification) {
+      switch (notification.notificationType) {
+        case 'friend_request_received':
+          return Icons.person_add;
+        case 'friend_request_accepted':
+          return Icons.check_circle;
+        case 'friend_request_rejected':
+          return Icons.cancel;
+        default:
+          return Icons.people;
+      }
+    } else if (notification.isSocialNotification) {
+      switch (notification.notificationType) {
+        case 'comment_like':
+          return Icons.favorite;
+        case 'comment_mention':
+          return Icons.alternate_email;
+        case 'comment_reply':
+          return Icons.reply;
+        default:
+          return Icons.chat_bubble_outline;
+      }
     } else if (notification.isPlantNotification) {
       return Icons.eco;
     }
@@ -435,8 +446,28 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
   }
 
   Color _getNotificationColor(NotificationModel notification) {
-    if (notification.isSocialNotification) {
-      return Colors.blue[600]!;
+    if (notification.isFriendNotification) {
+      switch (notification.notificationType) {
+        case 'friend_request_received':
+          return Colors.orange[600]!;
+        case 'friend_request_accepted':
+          return Colors.green[600]!;
+        case 'friend_request_rejected':
+          return Colors.red[600]!;
+        default:
+          return Colors.purple[600]!;
+      }
+    } else if (notification.isSocialNotification) {
+      switch (notification.notificationType) {
+        case 'comment_like':
+          return Colors.pink[600]!;
+        case 'comment_mention':
+          return Colors.blue[600]!;
+        case 'comment_reply':
+          return Colors.indigo[600]!;
+        default:
+          return Colors.blue[600]!;
+      }
     } else if (notification.isPlantNotification) {
       return Colors.green[600]!;
     }
@@ -548,6 +579,100 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
           _animatingNotifications.clear();
         });
       }
+    }
+  }
+
+  void _handleNotificationTap(NotificationModel notification) {
+    // Mark as read if not already read
+    if (!notification.isRead) {
+      _markNotificationAsRead(notification);
+    }
+
+    // Navigate based on notification type
+    if (notification.isFriendNotification) {
+      _handleFriendNotificationTap(notification);
+    } else if (notification.notificationType == 'comment_like' || 
+               notification.notificationType == 'comment_mention' || 
+               notification.notificationType == 'comment_reply') {
+      _handleCommentNotificationTap(notification);
+    } else if (notification.isPlantNotification) {
+      _handlePlantNotificationTap(notification);
+    }
+  }
+
+  void _handleFriendNotificationTap(NotificationModel notification) {
+    switch (notification.notificationType) {
+      case 'friend_request_received':
+        // Navigate to friends management page with focus on pending requests tab
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const FriendsManagementPage(initialTabIndex: 1), // Tab index 1 = Pending requests
+          ),
+        );
+        break;
+      case 'friend_request_accepted':
+      case 'friend_request_rejected':
+        // Navigate to the user's profile if we have the triggering person
+        if (notification.triggeringPerson != null) {
+          Navigator.pushNamed(
+            context, 
+            '/user-profile',
+            arguments: notification.triggeringPerson!.idPerson,
+          );
+        } else {
+          // Fallback to friends list
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FriendsManagementPage(initialTabIndex: 0), // Tab index 0 = Friends list
+            ),
+          );
+        }
+        break;
+    }
+  }
+
+  void _handleCommentNotificationTap(NotificationModel notification) {
+    if (notification.idComment != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CommentDetailPage(commentId: notification.idComment!),
+        ),
+      );
+    }
+  }
+
+  void _handlePlantNotificationTap(NotificationModel notification) {
+    if (notification.idObject != null) {
+      // Navigate to plant detail page
+      Navigator.pushNamed(
+        context,
+        '/plant-detail',
+        arguments: notification.idObject,
+      );
+    } else {
+      // Fallback to plants list
+      Navigator.pushNamed(context, '/my-plants');
+    }
+  }
+
+  Future<void> _markNotificationAsRead(NotificationModel notification) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final token = authProvider.accessToken;
+
+    if (token == null) return;
+
+    try {
+      final success = await _notificationService.markAsRead(token, notification.idNotification);
+      if (success && mounted) {
+        setState(() {
+          notification.isRead = true;
+        });
+      }
+    } catch (e) {
+      print('Error marking notification as read: $e');
     }
   }
 }

@@ -143,4 +143,26 @@ class EnhancedNotificationService {
     }
     return '/plants';
   }
+
+  /// Get friend notifications
+  Future<List<NotificationModel>> getFriendNotifications(String token) async {
+    try {
+      final allNotifications = await getAllNotifications(token);
+      return allNotifications.where((notification) => 
+        notification.notificationType == 'friend_request_received' ||
+        notification.notificationType == 'friend_request_accepted' ||
+        notification.notificationType == 'friend_request_rejected'
+      ).toList();
+    } catch (e) {
+      throw Exception('Error fetching friend notifications: $e');
+    }
+  }
+
+  /// Get user route from notification
+  String getUserProfileRoute(NotificationModel notification) {
+    if (notification.idTriggeringPerson != null) {
+      return '/user-profile/${notification.idTriggeringPerson}';
+    }
+    return '/friends-management';
+  }
 } 
