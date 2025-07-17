@@ -7,6 +7,7 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { FirebaseService } from '../firebase/firebase.service';
 import { Person } from '../person/entities/person.entity';
 import { Contact, ContactStatus } from '../contact/entities/contact.entity';
+import { NotificationLocalizationService } from './notification-localization.service';
 
 @Injectable()
 export class NotificationService {
@@ -18,6 +19,7 @@ export class NotificationService {
     @InjectRepository(Contact)
     private readonly contactRepository: Repository<Contact>,
     private readonly firebaseService: FirebaseService,
+    private readonly localizationService: NotificationLocalizationService,
   ) {}
 
   async create(createNotificationDto: CreateNotificationDto): Promise<Notification> {
@@ -473,5 +475,138 @@ export class NotificationService {
       console.error('Error checking blocking status:', error);
       return false; // If there's an error, don't block notifications
     }
+  }
+
+  // ===============================
+  // FRIEND REQUEST NOTIFICATIONS
+  // ===============================
+
+  /**
+   * Create notification when someone sends a friend request
+   */
+  async createFriendRequestNotification(
+    requesterId: number,
+    receiverId: number,
+    locale: string = 'en',
+  ): Promise<Notification | null> {
+    // Don't notify if user sends request to themselves (shouldn't happen)
+    if (requesterId === receiverId) {
+      return null;
+    }
+
+    // Get requester info for the notification
+    const requester = await this.personRepository.findOne({
+      where: { idPerson: requesterId },
+    });
+
+    if (!requester) {
+      return null;
+    }
+
+    const requesterName = requester.firstname && requester.surname 
+      ? `${requester.firstname} ${requester.surname}`
+      : requester.email.split('@')[0];
+
+    const content = this.localizationService.getFriendRequestNotification(
+      locale,
+      'sent',
+      requesterName,
+    );
+
+    const notification = await this.create({
+      idPerson: receiverId,
+      title: content.title,
+      description: content.body,
+      notificationType: 'friend_request_received',
+      idTriggeringPerson: requesterId,
+    });
+
+    return notification;
+  }
+
+  /**
+   * Create notification when someone accepts a friend request
+   */
+  async createFriendRequestAcceptedNotification(
+    accepterId: number,
+    requesterId: number,
+    locale: string = 'en',
+  ): Promise<Notification | null> {
+    // Don't notify if user accepts their own request (shouldn't happen)
+    if (accepterId === requesterId) {
+      return null;
+    }
+
+    // Get accepter info for the notification
+    const accepter = await this.personRepository.findOne({
+      where: { idPerson: accepterId },
+    });
+
+    if (!accepter) {
+      return null;
+    }
+
+    const accepterName = accepter.firstname && accepter.surname 
+      ? `${accepter.firstname} ${accepter.surname}`
+      : accepter.email.split('@')[0];
+
+    const content = this.localizationService.getFriendRequestNotification(
+      locale,
+      'accepted',
+      accepterName,
+    );
+
+    const notification = await this.create({
+      idPerson: requesterId,
+      title: content.title,
+      description: content.body,
+      notificationType: 'friend_request_accepted',
+      idTriggeringPerson: accepterId,
+    });
+
+    return notification;
+  }
+
+  /**
+   * Create notification when someone rejects a friend request
+   */
+  async createFriendRequestRejectedNotification(
+    rejecterId: number,
+    requesterId: number,
+    locale: string = 'en',
+  ): Promise<Notification | null> {
+    // Don't notify if user rejects their own request (shouldn't happen)
+    if (rejecterId === requesterId) {
+      return null;
+    }
+
+    // Get rejecter info for the notification
+    const rejecter = await this.personRepository.findOne({
+      where: { idPerson: rejecterId },
+    });
+
+    if (!rejecter) {
+      return null;
+    }
+
+    const rejecterName = rejecter.firstname && rejecter.surname 
+      ? `${rejecter.firstname} ${rejecter.surname}`
+      : rejecter.email.split('@')[0];
+
+    const content = this.localizationService.getFriendRequestNotification(
+      locale,
+      'rejected',
+      rejecterName,
+    );
+
+    const notification = await this.create({
+      idPerson: requesterId,
+      title: content.title,
+      description: content.body,
+      notificationType: 'friend_request_rejected',
+      idTriggeringPerson: rejecterId,
+    });
+
+    return notification;
   }
 } 

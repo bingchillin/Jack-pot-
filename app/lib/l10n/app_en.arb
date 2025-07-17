@@ -1801,6 +1801,51 @@
     "description": "Success message when friend request is sent"
   },
 
+  "notificationFriendRequestReceived": "New friend request",
+  "@notificationFriendRequestReceived": {
+    "description": "Notification title when receiving a friend request"
+  },
+
+  "notificationFriendRequestAccepted": "Friend request accepted",
+  "@notificationFriendRequestAccepted": {
+    "description": "Notification title when friend request is accepted"
+  },
+
+  "notificationFriendRequestRejected": "Friend request rejected",
+  "@notificationFriendRequestRejected": {
+    "description": "Notification title when friend request is rejected"
+  },
+
+  "notificationFriendRequestSentBy": "{name} sent you a friend request",
+  "@notificationFriendRequestSentBy": {
+    "description": "Notification body when someone sends a friend request",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationFriendRequestAcceptedBy": "{name} accepted your friend request",
+  "@notificationFriendRequestAcceptedBy": {
+    "description": "Notification body when someone accepts your friend request",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationFriendRequestRejectedBy": "{name} rejected your friend request",
+  "@notificationFriendRequestRejectedBy": {
+    "description": "Notification body when someone rejects your friend request",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
   "userBlocked": "This user is blocked",
   "@userBlocked": {
     "description": "Message shown when viewing blocked user's profile"

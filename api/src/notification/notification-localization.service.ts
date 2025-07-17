@@ -36,6 +36,14 @@ export class NotificationLocalizationService {
       adviceNutrients: 'Consider adding fertilizer to improve soil nutrients',
       adviceWaterLevel: 'Check water reservoir and drainage system',
       adviceGeneral: 'Please check your plant\'s overall health and environment.',
+      // Friend request notifications
+      friendRequestReceived: 'New friend request',
+      friendRequestAccepted: 'Friend request accepted',
+      friendRequestRejected: 'Friend request rejected',
+      friendRequestSent: '{name} sent you a friend request',
+      friendRequestAcceptedBy: '{name} accepted your friend request',
+      friendRequestRejectedBy: '{name} rejected your friend request',
+      newFriend: 'You are now friends with {name}',
     },
     fr: {
       urgent: 'Urgent !',
@@ -57,6 +65,14 @@ export class NotificationLocalizationService {
       adviceNutrients: 'Envisagez d\'ajouter de l\'engrais pour améliorer les nutriments du sol',
       adviceWaterLevel: 'Vérifiez le réservoir d\'eau et le système de drainage',
       adviceGeneral: 'Veuillez vérifier la santé générale de votre plante et son environnement.',
+      // Friend request notifications
+      friendRequestReceived: 'Nouvelle demande d\'ami',
+      friendRequestAccepted: 'Demande d\'ami acceptée',
+      friendRequestRejected: 'Demande d\'ami rejetée',
+      friendRequestSent: '{name} vous a envoyé une demande d\'ami',
+      friendRequestAcceptedBy: '{name} a accepté votre demande d\'ami',
+      friendRequestRejectedBy: '{name} a rejeté votre demande d\'ami',
+      newFriend: 'Vous êtes maintenant ami avec {name}',
     },
     es: {
       urgent: '¡Urgente!',
@@ -78,6 +94,14 @@ export class NotificationLocalizationService {
       adviceNutrients: 'Considera agregar fertilizante para mejorar los nutrientes del suelo',
       adviceWaterLevel: 'Verifica el depósito de agua y el sistema de drenaje',
       adviceGeneral: 'Por favor verifica la salud general de tu planta y su entorno.',
+      // Friend request notifications
+      friendRequestReceived: 'Nueva solicitud de amistad',
+      friendRequestAccepted: 'Solicitud de amistad aceptada',
+      friendRequestRejected: 'Solicitud de amistad rechazada',
+      friendRequestSent: '{name} te envió una solicitud de amistad',
+      friendRequestAcceptedBy: '{name} aceptó tu solicitud de amistad',
+      friendRequestRejectedBy: '{name} rechazó tu solicitud de amistad',
+      newFriend: 'Ahora eres amigo de {name}',
     },
   };
 
@@ -217,5 +241,36 @@ export class NotificationLocalizationService {
    */
   isLocaleSupported(locale: string): boolean {
     return locale in this.translations;
+  }
+
+  /**
+   * Get localized friend request notification content
+   */
+  getFriendRequestNotification(
+    locale: string = 'en',
+    type: 'sent' | 'accepted' | 'rejected',
+    senderName: string,
+  ): NotificationContent {
+    const lang = this.translations[locale] || this.translations.en;
+
+    let title: string;
+    let body: string;
+
+    switch (type) {
+      case 'sent':
+        title = lang.friendRequestReceived;
+        body = lang.friendRequestSent.replace('{name}', senderName);
+        break;
+      case 'accepted':
+        title = lang.friendRequestAccepted;
+        body = lang.friendRequestAcceptedBy.replace('{name}', senderName);
+        break;
+      case 'rejected':
+        title = lang.friendRequestRejected;
+        body = lang.friendRequestRejectedBy.replace('{name}', senderName);
+        break;
+    }
+
+    return { title, body };
   }
 } 

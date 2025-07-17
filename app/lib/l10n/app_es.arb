@@ -1636,6 +1636,51 @@
     "description": "Success message when friend request is sent"
   },
 
+  "notificationFriendRequestReceived": "Nueva solicitud de amistad",
+  "@notificationFriendRequestReceived": {
+    "description": "Notification title when receiving a friend request"
+  },
+
+  "notificationFriendRequestAccepted": "Solicitud de amistad aceptada",
+  "@notificationFriendRequestAccepted": {
+    "description": "Notification title when friend request is accepted"
+  },
+
+  "notificationFriendRequestRejected": "Solicitud de amistad rechazada",
+  "@notificationFriendRequestRejected": {
+    "description": "Notification title when friend request is rejected"
+  },
+
+  "notificationFriendRequestSentBy": "{name} te envió una solicitud de amistad",
+  "@notificationFriendRequestSentBy": {
+    "description": "Notification body when someone sends a friend request",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationFriendRequestAcceptedBy": "{name} aceptó tu solicitud de amistad",
+  "@notificationFriendRequestAcceptedBy": {
+    "description": "Notification body when someone accepts your friend request",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "notificationFriendRequestRejectedBy": "{name} rechazó tu solicitud de amistad",
+  "@notificationFriendRequestRejectedBy": {
+    "description": "Notification body when someone rejects your friend request",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
   "userBlocked": "Este usuario está bloqueado",
   "@userBlocked": {
     "description": "Message shown when viewing blocked user's profile"

@@ -6,6 +6,7 @@ import { CreateContactDto } from './dto/create-contact.dto';
 import { Person } from '../person/entities/person.entity';
 import { ContactResponseDto } from './dto/contact-response.dto';
 import { ContactQueryDto, ContactStatsDto } from './dto/contact-query.dto';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class ContactsService {
@@ -14,6 +15,7 @@ export class ContactsService {
     private contactRepository: Repository<Contact>,
     @InjectRepository(Person)
     private personRepository: Repository<Person>,
+    private notificationService: NotificationService,
   ) {}
 
   private transformContactToResponse(contact: Contact): ContactResponseDto {
@@ -95,6 +97,19 @@ export class ContactsService {
       where: { id: savedContact.id },
       relations: ['requester', 'receiver']
     });
+
+    // Send friend request notification to receiver
+    try {
+      await this.notificationService.createFriendRequestNotification(
+        requesterId,
+        receiverId,
+        'fr', // Default to French, could be made dynamic based on user preference
+      );
+    } catch (error) {
+      console.error('Error sending friend request notification:', error);
+      // Don't fail the friend request if notification fails
+    }
+
     return this.transformContactToResponse(contactWithRelations);
   }
 
@@ -134,6 +149,27 @@ export class ContactsService {
     }
 
     const savedContact = await this.contactRepository.save(contact);
+
+    // Send notification based on response
+    try {
+      if (status === ContactStatus.ACCEPTED) {
+        await this.notificationService.createFriendRequestAcceptedNotification(
+          userId, // accepter
+          contact.requesterId, // original requester
+          'fr',
+        );
+      } else if (status === ContactStatus.REJECTED) {
+        await this.notificationService.createFriendRequestRejectedNotification(
+          userId, // rejecter
+          contact.requesterId, // original requester
+          'fr',
+        );
+      }
+    } catch (error) {
+      console.error('Error sending friend request response notification:', error);
+      // Don't fail the response if notification fails
+    }
+
     return this.transformContactToResponse(savedContact);
   }
 
