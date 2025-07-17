@@ -20,13 +20,18 @@ Une fois détecté, la configuration démarrera automatiquement.
 ''';
 
 class AddMyObjectPage extends StatefulWidget {
-  final int? goToSearch;
 
-  const AddMyObjectPage({Key? key, this.goToSearch}) : super(key: key);
+  const AddMyObjectPage({Key? key}) : super(key: key);
+
+  static Route routeFromArguments(RouteSettings settings) {
+    return MaterialPageRoute(
+      builder: (_) => const AddMyObjectPage(),
+      settings: settings,
+    );
+  }
 
   @override
   _AddMyObjectPageState createState() => _AddMyObjectPageState();
-
 }
 
 enum ScanState {
@@ -38,6 +43,7 @@ enum ScanState {
 }
 
 class _AddMyObjectPageState extends State<AddMyObjectPage> {
+
   BluetoothDevice? targetDevice;
 
   String statusMessage = instructionText;
@@ -61,6 +67,11 @@ class _AddMyObjectPageState extends State<AddMyObjectPage> {
 
   StreamSubscription<List<ScanResult>>? scanSubscription;
   StreamSubscription<List<int>>? notifySubscription;
+
+  int? getGoToSearch() {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    return args?['goToSearch'];
+  }
 
   @override
   void initState() {
@@ -245,17 +256,7 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
         isSending = false;
       });
 
-      if (responseRaw == "wifi_ok" && widget.goToSearch != 0) {
-        Navigator.pushNamed(
-          context,
-          '/choose_your_plant',
-          arguments: {
-            "plantName": plantNameController.text,
-            "idObject": idObjectSave,
-          },
-        );
-        return;
-      }
+
 
       if (responseRaw == "wifi_fail") {
         setState(() => statusMessage =
@@ -271,7 +272,19 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
         return;
       }
 
-      // Traitement JSO
+      if (responseRaw == "wifi_ok" && getGoToSearch() != 0) {
+        Navigator.pushNamed(
+          context,
+          '/choose_your_plant',
+          arguments: {
+            "plantName": plantNameController.text,
+            "idObject": idObjectSave,
+          },
+        );
+        return;
+      }
+
+      // Traitement JSON
       try {
         final jsonResponse = jsonDecode(responseRaw);
         final idStr = jsonResponse['id_object_profile'];
@@ -314,7 +327,11 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
       } catch (e) {
         print("Pas un JSON valide ou erreur parsing JSON (après filtre): $e");
       }
+
+
     });
+
+
 
   }
 
@@ -323,6 +340,11 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
   @override
   Widget build(BuildContext context) {
     Widget body;
+
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    final int? goToSearch = args?['goToSearch'];
+
 
     switch (scanState) {
       case ScanState.waitingForUser:
@@ -411,10 +433,11 @@ Appuyez sur “Réessayer” pour relancer la détection.''';
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 16),
-                TextField(
-                  controller: plantNameController,
-                  decoration: InputDecoration(labelText: "Prénom de la plante"),
-                ),
+                if (goToSearch != 0)
+                  TextField(
+                    controller: plantNameController,
+                    decoration: InputDecoration(labelText: "Prénom de la plante"),
+                  ),
                 SizedBox(height: 16),
                 TextField(
                   controller: wifiUserController,

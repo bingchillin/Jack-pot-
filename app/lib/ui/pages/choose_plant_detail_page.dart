@@ -9,6 +9,7 @@ import 'package:jackpote/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../app_config.dart';
+import '../../models/avatar.dart';
 import '../../services/my_bluetooth_service.dart';
 import '../../services/object_profile_service.dart';
 
@@ -41,11 +42,11 @@ class _ChoosePlantDetailPageState extends State<ChoosePlantDetailPage> {
       print("idObject brut : $idObj");
 
       final createdProfile = await objectProfileService.createObjectProfile(
-        token: token.toString(),
+        token: authProvider.accessToken!,
         idPlantType: widget.plant.idPlantType,
-        userId: authProvider.userId!,
+        userId: int.parse(authProvider.userId!),
         title: widget.plantName ?? widget.plant.title,
-        idObject: widget.idObject != null ? int.tryParse(widget.idObject!) : 1,
+        idObject: 1,
       );
 
       final Map<String, dynamic> config = {
@@ -63,6 +64,14 @@ class _ChoosePlantDetailPageState extends State<ChoosePlantDetailPage> {
 
       Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
     } catch (e) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      print("token:${authProvider.accessToken}");
+      print("idPlantType:" + widget.plant.idPlantType.toString());
+      print("userId:${authProvider.userId}");
+      print("title2:" + widget.plantName!);
+      print("idObject:" + widget.idObject!);
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -96,13 +105,14 @@ class _ChoosePlantDetailPageState extends State<ChoosePlantDetailPage> {
     subscription = readChar.value.listen((data) {
       final received = utf8.decode(data);
       if (received.isNotEmpty && !completer.isCompleted) {
+        writeChar.write(utf8.encode(jsonEncode(config)));
         completer.complete(received);
         //writeChar.write(utf8.encode("stopBle"));
         subscription?.cancel();
       }
     });
 
-    await writeChar.write(utf8.encode(jsonEncode(config)));
+
 
     try {
       await completer.future.timeout(const Duration(seconds: 15));
@@ -119,6 +129,9 @@ class _ChoosePlantDetailPageState extends State<ChoosePlantDetailPage> {
     final plant = widget.plant;
     final plantName = widget.plantName;
 
+    final List<Avatar> filteredAvatars = plant.avatars.where((a) => a.typeP == 1 && a.pathPicture.isNotEmpty).toList();
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Ta plante : ${plantName?.isNotEmpty == true ? plantName : plant.title}"),
@@ -129,29 +142,30 @@ class _ChoosePlantDetailPageState extends State<ChoosePlantDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 100,
+              height: 300,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: plant.avatars.length,
+                itemCount: filteredAvatars.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
-                  final avatar = plant.avatars[index];
-                  if (avatar.pathPicture.isEmpty) {
-                    return const Icon(Icons.image_not_supported, size: 80);
-                  }
+                  final avatar = filteredAvatars[index];
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      avatar.pathPicture,
-                      width: 100,
-                      height: 100,
+                      Uri.parse(AppConfig.baseUrlSrc)
+                          .resolve(avatar.pathPicture)
+                          .toString(),
+                      width: 300,
+                      height: 300,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 80),
+                      errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.broken_image, size: 80),
                     ),
                   );
                 },
               ),
             ),
+
 
             const SizedBox(height: 16),
 

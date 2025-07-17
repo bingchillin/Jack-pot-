@@ -21,6 +21,7 @@ APP Mobile
 - Dans avatar mettre advise et description en option (si c'est null on ne doit pas avoir une erreur infini pour rien)
 - bug lorsque l'on rentre avec un score qui nous redirige vers login au lieu de home
 - Pas assez alimenter - faire un vrai forum ave message... de vrai compte avec plantes...
+- Deconnesion lag pas mal et aucun load
 
 Electronique:
 

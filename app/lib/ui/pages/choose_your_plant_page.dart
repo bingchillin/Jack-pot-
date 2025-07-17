@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:jackpote/models/plant_type.dart';
 import 'package:jackpote/services/plant_service.dart';
+import '../../app_config.dart';
 import '../../models/avatar.dart';
 import 'choose_plant_detail_page.dart';
 
@@ -87,8 +88,11 @@ class _ChooseYourPlantPageState extends State<ChooseYourPlantPage> {
   String? _getImageUrl(PlantType plant) {
     try {
       for (final avatar in plant.avatars) {
-        if (avatar.typeP == 1 && avatar.pathPicture.isNotEmpty) {
-          return avatar.pathPicture;
+        print("kqdnf: ${avatar.typeP} jldkjlk ${avatar.pathPicture}");
+        if (avatar.typeP.toString() == '1' && avatar.pathPicture.isNotEmpty) {
+          return Uri.parse(AppConfig.baseUrlSrc)
+              .resolve(avatar.pathPicture)
+              .toString();
         }
       }
       return null;

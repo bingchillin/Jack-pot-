@@ -4,7 +4,7 @@ import 'plant_type.dart';
 class ObjectProfile {
   final int idObjectProfile;
   final String title;
-  final String description;
+  final String? description;
   final String? advise;
   final String? recipe;
   final int? state;
@@ -25,7 +25,7 @@ class ObjectProfile {
   ObjectProfile({
     required this.idObjectProfile,
     required this.title,
-    required this.description,
+    this.description,
     this.advise,
     this.recipe,
     this.state,

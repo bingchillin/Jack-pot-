@@ -1,4 +1,4 @@
-import { Controller, Body, Patch, Param, ClassSerializerInterceptor, UseInterceptors, Logger } from '@nestjs/common';
+import { Controller, Body, Patch, Param, ClassSerializerInterceptor, UseInterceptors, Logger, Get } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiBody, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ObjectProfileService } from './object-profile.service';
 import { PlantCareService } from '../plant-care/plant-care.service';
@@ -48,6 +48,12 @@ export class ObjectProfileElecController {
     @ApiBody({ type: UpdateObjectProfileDto })
     update(@Param('id') id: string, @Body() updateObjectProfileDto: UpdateObjectProfileDto) {
         return this.objectProfileService.update(+id, updateObjectProfileDto);
+    }
+
+    @Get(':id')
+    @ApiExcludeEndpoint()
+    findOne(@Param('id') id: string) {
+        return this.objectProfileService.findOne(+id);
     }
 
 } 

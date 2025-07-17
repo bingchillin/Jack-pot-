@@ -5,8 +5,8 @@ class Avatar {
   final int idPlantType;
   final String? advise;
   final String pathPicture;
-  final dynamic typeP;
-  final dynamic stateP;
+  final int? typeP;
+  final int? stateP;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -31,8 +31,8 @@ class Avatar {
       idPlantType: json['idPlantType'],
       advise: json['advise'],
       pathPicture: json['pathPicture'],
-      typeP: json['type_p'],
-      stateP: json['state_p'],
+      typeP: json['type_p'] is int ? json['type_p'] : int.tryParse(json['type_p'].toString()) ?? 0,
+      stateP: json['state_p'] is int ? json['state_p'] : int.tryParse(json['state_p'].toString()) ?? 0,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );

@@ -27,11 +27,10 @@ class ObjectProfileService {
   static final StreamController<int> _plantUpdateController = StreamController<int>.broadcast();
   static Stream<int> get plantUpdateStream => _plantUpdateController.stream;
 
-
   Future<ObjectProfile> createObjectProfile({
     required String token,
-    String title = "Watering Can Profile",
-    required String userId,
+    required String title,
+    required int userId,
     int? idPlantType,
     int? idObject,
   }) async {
@@ -40,8 +39,8 @@ class ObjectProfileService {
     final body = {
       "title": title,
       "idPerson": userId,
-      if (idObject != null) "idObject": idObject,
-      if (idPlantType != null) "idPlantType": idPlantType,
+      "idPlantType": idPlantType,
+      "idObject": idObject,
     };
 
     final response = await http.post(
