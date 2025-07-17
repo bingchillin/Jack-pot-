@@ -4,6 +4,7 @@ import 'package:jackpote/ui/pages/widget/plant_card_my_list/plant_item_my_list_w
 import 'package:jackpote/ui/pages/widget/plant_card_favorite/plant_item_widget.dart';
 import '../../bloc/object_profile/object_profile_bloc.dart';
 import '../../bloc/object_profile/object_profile_event.dart';
+import '../../bloc/object_profile/object_profile_state.dart';
 import '../../bloc/object_profile_my_list/object_profile_my_list_bloc.dart';
 import '../../bloc/object_profile_my_list/object_profile_my_list_event.dart';
 import '../../bloc/object_profile_my_list/object_profile_my_list_state.dart' as mylist_state;
@@ -125,17 +126,28 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.accessToken;
       
-      // Get a plant to show score for (first from my list or favorites)
-      ObjectProfile? targetPlant;
+      if (token == null) return;
+      
+      // Get all plants to show scores for
+      List<ObjectProfile> plantsToShow = [];
       
       // Try to get from my list first
       final myListState = myListBloc.state;
       if (myListState is mylist_state.ProfileLoaded && myListState.profiles.isNotEmpty) {
-        targetPlant = myListState.profiles.first;
-      } else {
-        // Fallback to favorites - simplified approach
-        // For now, create a mock plant if no real plants available
-        targetPlant = ObjectProfile(
+        plantsToShow.addAll(myListState.profiles);
+      }
+      
+      // If no plants in my list, try favorites
+      if (plantsToShow.isEmpty) {
+        final favoriteState = favoriteBloc.state;
+        if (favoriteState is ProfileLoaded && favoriteState.profiles.isNotEmpty) {
+          plantsToShow.addAll(favoriteState.profiles);
+        }
+      }
+      
+      // If still no plants, create a mock plant
+      if (plantsToShow.isEmpty) {
+        plantsToShow.add(ObjectProfile(
           idObjectProfile: 1,
           title: "Daily Care Plant",
           description: "Your plant care summary",
@@ -146,23 +158,42 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           isWillWatering: false,
           object: null,
           plantType: null,
-        );
+        ));
       }
       
-      // Show popup for the selected plant
-      if (targetPlant != null && token != null) {
-        // Get yesterday's score from the database
-        final scoreService = PlantCareScoreService();
-        final autoScoreService = AutomaticScoreService(scoreService);
+      // Show popup for each plant with a delay between them
+      await _showPopupsForPlants(plantsToShow, token);
+      
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  /// Show popups for multiple plants with delays between them
+  Future<void> _showPopupsForPlants(List<ObjectProfile> plants, String token) async {
+    final scoreService = PlantCareScoreService();
+    final autoScoreService = AutomaticScoreService(scoreService);
+    
+    // Store all plant data for dynamic updates
+    List<Map<String, dynamic>> plantData = [];
+    
+    // Prepare all plant data first
+    for (int i = 0; i < plants.length; i++) {
+      final plant = plants[i];
+      
+      try {
+        // Get yesterday's score for this plant
         final yesterdayScore = await autoScoreService.getYesterdayScore(
-          targetPlant.idObjectProfile,
+          plant.idObjectProfile,
           token,
         );
 
-        // Final check before showing popup
-        if (yesterdayScore != null && mounted && !ImprovedScorePopupService().isPopupShowing) {
-          // Extract yesterday's sensor data from the score
-          Map<String, double>? yesterdayData;
+        // Extract yesterday's sensor data from the score or use mock data
+        Map<String, double>? yesterdayData;
+        int moistureScore, temperatureScore, lightScore, phScore, bonusScore, totalScore;
+        
+        if (yesterdayScore != null) {
+          // Use real score data
           if (yesterdayScore.sensorData != null) {
             final data = yesterdayScore.sensorData as Map<String, dynamic>;
             yesterdayData = {
@@ -172,22 +203,123 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
               'ph': (data['ph'] ?? 0).toDouble(),
             };
           }
-          
+          moistureScore = yesterdayScore.moistureScore;
+          temperatureScore = yesterdayScore.temperatureScore;
+          lightScore = yesterdayScore.lightScore;
+          phScore = yesterdayScore.phScore;
+          bonusScore = yesterdayScore.consistencyBonus;
+          totalScore = yesterdayScore.dailyScore;
+        } else {
+          // Use mock data for plants without scores
+          yesterdayData = {
+            'moisture': plant.humidityGroundSensor?.toDouble() ?? 45.0,
+            'temperature': plant.temperatureSensorExtern?.toDouble() ?? 22.0,
+            'light': plant.lightSensor?.toDouble() ?? 25000.0,
+            'ph': plant.phGroundSensor?.toDouble() ?? 6.2,
+          };
+          moistureScore = 8;
+          temperatureScore = 7;
+          lightScore = 5;
+          phScore = 3;
+          bonusScore = 2;
+          totalScore = 25;
+        }
+        
+        plantData.add({
+          'plant': plant,
+          'moistureScore': moistureScore,
+          'temperatureScore': temperatureScore,
+          'lightScore': lightScore,
+          'phScore': phScore,
+          'bonusScore': bonusScore,
+          'totalScore': totalScore,
+          'yesterdayData': yesterdayData,
+          'plantIndex': i, // Use original index
+          'totalPlants': plants.length, // Use original total
+        });
+        
+      } catch (e) {
+        // If there's an error, still add the plant with mock data
+        plantData.add({
+          'plant': plant,
+          'moistureScore': 6,
+          'temperatureScore': 5,
+          'lightScore': 4,
+          'phScore': 2,
+          'bonusScore': 0,
+          'totalScore': 17,
+          'yesterdayData': {
+            'moisture': 45.0,
+            'temperature': 22.0,
+            'light': 25000.0,
+            'ph': 6.2,
+          },
+          'plantIndex': i,
+          'totalPlants': plants.length,
+        });
+      }
+    }
+    
+    print('🔍 Total plants to show: ${plantData.length}');
+    
+    // If we have plant data, show the first popup
+    if (plantData.isNotEmpty && mounted && !ImprovedScorePopupService().isPopupShowing) {
+      final firstPlantData = plantData[0];
+      
+      print('🔍 Showing first popup: Plant ${firstPlantData['plantIndex'] + 1} of ${firstPlantData['totalPlants']}');
+      
+      ImprovedScorePopupService().showScorePopup(
+        context: context,
+        plant: firstPlantData['plant'],
+        moistureScore: firstPlantData['moistureScore'],
+        temperatureScore: firstPlantData['temperatureScore'],
+        lightScore: firstPlantData['lightScore'],
+        phScore: firstPlantData['phScore'],
+        bonusScore: firstPlantData['bonusScore'],
+        totalScore: firstPlantData['totalScore'],
+        yesterdaySensorData: firstPlantData['yesterdayData'],
+        plantIndex: firstPlantData['plantIndex'],
+        totalPlants: firstPlantData['totalPlants'],
+        onNextPlant: () {
+          // Handle next plant - this will be called when the user clicks "Next"
+          _showNextPlant(plantData, 1);
+        },
+      );
+    }
+  }
+
+  /// Show the next plant in the sequence
+  void _showNextPlant(List<Map<String, dynamic>> plantData, int currentIndex) {
+    if (currentIndex < plantData.length && mounted) {
+      final plantDataItem = plantData[currentIndex];
+      
+      print('🔍 Showing next popup: Plant ${plantDataItem['plantIndex'] + 1} of ${plantDataItem['totalPlants']}');
+      
+      // Close current popup and show next one
+      Navigator.of(context).pop();
+      
+      // Small delay to ensure popup is closed
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted && !ImprovedScorePopupService().isPopupShowing) {
           ImprovedScorePopupService().showScorePopup(
             context: context,
-            plant: targetPlant,
-            moistureScore: yesterdayScore.moistureScore,
-            temperatureScore: yesterdayScore.temperatureScore,
-            lightScore: yesterdayScore.lightScore,
-            phScore: yesterdayScore.phScore,
-            bonusScore: yesterdayScore.consistencyBonus,
-            totalScore: yesterdayScore.dailyScore,
-            yesterdaySensorData: yesterdayData,
+            plant: plantDataItem['plant'],
+            moistureScore: plantDataItem['moistureScore'],
+            temperatureScore: plantDataItem['temperatureScore'],
+            lightScore: plantDataItem['lightScore'],
+            phScore: plantDataItem['phScore'],
+            bonusScore: plantDataItem['bonusScore'],
+            totalScore: plantDataItem['totalScore'],
+            yesterdaySensorData: plantDataItem['yesterdayData'],
+            plantIndex: plantDataItem['plantIndex'],
+            totalPlants: plantDataItem['totalPlants'],
+            onNextPlant: () {
+              // Recursive call for next plant
+              _showNextPlant(plantData, currentIndex + 1);
+            },
           );
         }
-      }
-    } catch (e) {
-      // Silent fail
+      });
     }
   }
 
@@ -789,3 +921,4 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
     );
   }
 }
+

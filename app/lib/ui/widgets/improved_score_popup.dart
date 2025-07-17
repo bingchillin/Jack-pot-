@@ -10,6 +10,12 @@ class ImprovedScorePopupService {
 
   // Track if a popup is currently showing
   bool _isPopupShowing = false;
+  
+  // Callback for next plant functionality
+  VoidCallback? _onNextPlant;
+  
+  // Current popup context for dynamic updates
+  BuildContext? _currentPopupContext;
 
   void showScorePopup({
     required BuildContext context,
@@ -22,6 +28,9 @@ class ImprovedScorePopupService {
     required int totalScore,
     VoidCallback? onDismiss,
     Map<String, double>? yesterdaySensorData,
+    int? plantIndex,
+    int? totalPlants,
+    VoidCallback? onNextPlant,
   }) {
     // Prevent multiple popups from showing simultaneously
     if (_isPopupShowing) {
@@ -44,6 +53,10 @@ class ImprovedScorePopupService {
       return;
     }
     
+    // Store callback and context for next plant functionality
+    _onNextPlant = onNextPlant;
+    _currentPopupContext = context;
+    
     // Mark popup as showing IMMEDIATELY to prevent race conditions
     _isPopupShowing = true;
     
@@ -61,20 +74,29 @@ class ImprovedScorePopupService {
           bonusScore: bonusScore,
           totalScore: totalScore,
           yesterdaySensorData: yesterdaySensorData,
+          plantIndex: plantIndex,
+          totalPlants: totalPlants,
           onDismiss: () {
             Navigator.of(context).pop();
             // Mark popup as no longer showing
             _isPopupShowing = false;
+            _onNextPlant = null;
+            _currentPopupContext = null;
             onDismiss?.call();
           },
+          onNextPlant: _onNextPlant,
         );
       },
     ).then((_) {
       // Ensure popup is marked as not showing when dialog is dismissed
       _isPopupShowing = false;
+      _onNextPlant = null;
+      _currentPopupContext = null;
     }).catchError((error) {
       // Handle any errors and ensure state is reset
       _isPopupShowing = false;
+      _onNextPlant = null;
+      _currentPopupContext = null;
     });
   }
 
@@ -84,6 +106,8 @@ class ImprovedScorePopupService {
   /// Force reset the popup state (for testing/debugging)
   void resetPopupState() {
     _isPopupShowing = false;
+    _onNextPlant = null;
+    _currentPopupContext = null;
   }
 }
 
@@ -97,6 +121,9 @@ class ImprovedScorePopupWidget extends StatefulWidget {
   final int totalScore;
   final VoidCallback onDismiss;
   final Map<String, double>? yesterdaySensorData;
+  final int? plantIndex; // New parameter for showing plant number
+  final int? totalPlants; // New parameter for total number of plants
+  final VoidCallback? onNextPlant; // New parameter for next plant callback
 
   const ImprovedScorePopupWidget({
     super.key,
@@ -109,6 +136,9 @@ class ImprovedScorePopupWidget extends StatefulWidget {
     required this.totalScore,
     required this.onDismiss,
     this.yesterdaySensorData,
+    this.plantIndex,
+    this.totalPlants,
+    this.onNextPlant,
   });
 
   @override
@@ -233,6 +263,30 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
     widget.onDismiss();
   }
 
+  void _handleButtonPress() {
+    // If there are more plants and we have a next plant callback, call it
+    if (widget.onNextPlant != null && 
+        widget.plantIndex != null && 
+        widget.totalPlants != null &&
+        widget.plantIndex! < widget.totalPlants! - 1) {
+      widget.onNextPlant!();
+    } else {
+      // Otherwise, dismiss the popup
+      _dismissPopup();
+    }
+  }
+
+  String _getButtonText() {
+    // If there are more plants, show "Next", otherwise show "Close"
+    if (widget.plantIndex != null && 
+        widget.totalPlants != null &&
+        widget.plantIndex! < widget.totalPlants! - 1) {
+      return 'Next';
+    } else {
+      return 'Close';
+    }
+  }
+
   @override
   void dispose() {
     _containerController.dispose();
@@ -355,21 +409,31 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
                                                   Text(
                                                     widget.plant.title ?? 'My Plant',
                                                     style: TextStyle(
-                                                      fontSize: 18,
+                                                      fontSize: 20,
                                                       fontWeight: FontWeight.bold,
                                                       color: Colors.grey[800],
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
                                                   ),
-                                                  const SizedBox(height: 2),
-                                                  Text(
-                                                    'Daily Care Score',
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: Colors.grey[600],
+                                                  const SizedBox(height: 4),
+                                                  if (widget.plantIndex != null && widget.totalPlants != null)
+                                                    Text(
+                                                      'Plant ${widget.plantIndex! + 1} of ${widget.totalPlants}',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Colors.grey[600],
+                                                      ),
+                                                    )
+                                                  else
+                                                    Text(
+                                                      'Daily Care Score',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Colors.grey[600],
+                                                      ),
                                                     ),
-                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -516,7 +580,7 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: _dismissPopup,
+                              onPressed: _handleButtonPress,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: scoreColor,
                                 foregroundColor: Colors.white,
@@ -527,7 +591,7 @@ class _ImprovedScorePopupWidgetState extends State<ImprovedScorePopupWidget>
                                 elevation: 4,
                               ),
                               child: Text(
-                                localizations.close,
+                                _getButtonText(),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,

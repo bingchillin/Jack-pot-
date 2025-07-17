@@ -48,6 +48,8 @@ class PlantItemMyListWidget extends StatelessWidget {
             phScore: score.phScore,
             bonusScore: score.consistencyBonus,
             totalScore: score.dailyScore,
+            plantIndex: null,
+            totalPlants: null,
           );
         }
       } else {
@@ -62,6 +64,8 @@ class PlantItemMyListWidget extends StatelessWidget {
             phScore: 3,
             bonusScore: 2,
             totalScore: 25,
+            plantIndex: null,
+            totalPlants: null,
           );
         }
       }
@@ -77,6 +81,8 @@ class PlantItemMyListWidget extends StatelessWidget {
           phScore: 2,
           bonusScore: 0,
           totalScore: 17,
+          plantIndex: null,
+          totalPlants: null,
         );
       }
     }
