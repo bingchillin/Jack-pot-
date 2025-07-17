@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Query, Request, NotFoundException, BadRequestException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Query, Request, NotFoundException, BadRequestException, ParseIntPipe, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
 import { PersonService } from '../person/person.service';
 import { PersonDocs } from './swagger/person.docs';
 import { CreatePersonDto } from '../person/dto/create-person.dto';
@@ -76,6 +76,7 @@ import { ContactStatus } from '../contact/entities/contact.entity';
 import { ContactQueryDto } from '../contact/dto/contact-query.dto';
 import { MoreThan } from 'typeorm';
 
+@UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('z-API')
 @Controller('api')
 export class ApiController {

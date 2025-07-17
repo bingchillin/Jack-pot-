@@ -1,7 +1,7 @@
 enum Environment { local, localPhysical, production }
 
 class EnvConfig {
-  static const Environment _currentEnv = Environment.production; // Changé pour production
+  static const Environment _currentEnv = Environment.local; // Changé pour production
   
   // API Configuration
   static const Map<Environment, String> _apiUrls = {
@@ -45,12 +45,6 @@ class EnvConfig {
   
   // Simple status check
   static void printCurrentEnv() {
-    print('🌐 Environment: $environmentName');
-    print('🔗 API URL: $apiUrl');
-    if (_currentEnv == Environment.local) {
-      print('📱 Note: Using 10.0.2.2 for Android emulator');
-    } else if (_currentEnv == Environment.localPhysical) {
-      print('📱 Note: Using local IP for physical device');
-    }
+    // Remove print statements in this file
   }
 } 

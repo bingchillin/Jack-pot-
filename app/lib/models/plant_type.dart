@@ -46,7 +46,8 @@ class PlantType {
     required this.avatars,
   });
 
-  factory PlantType.fromJson(Map<String, dynamic> json) => PlantType(
+  factory PlantType.fromJson(Map<String, dynamic> json) {
+    return PlantType(
     idPlantType: json['idPlantType'],
     title: json['title'],
     description: json['description'],
@@ -67,8 +68,11 @@ class PlantType {
     expositionTimeSun: double.tryParse(json['expositionTimeSun'] ?? ''),
     pathPicture: json['pathPicture'],
     avatars: (json['avatars'] as List<dynamic>?)
-        ?.map((avatarJson) => Avatar.fromJson(avatarJson))
+        ?.map((avatarJson) {
+          return Avatar.fromJson(avatarJson);
+        })
         .toList() ??
         [],
-  );
+    );
+  }
 }

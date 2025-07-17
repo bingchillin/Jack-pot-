@@ -448,24 +448,25 @@ class _EncyclopediaPageState extends State<EncyclopediaPage> {
     if (avatars == null || avatars.isEmpty) {
       avatar = null;
     } else {
-      try {
-        // Pour l'encyclopédie, on prend l'avatar par défaut (stateP = 0) si dispo
-        avatar = avatars.firstWhere((a) => a.stateP == 0);
-      } catch (e) {
-        try {
-          // Sinon, on prend le premier avatar disponible
-          avatar = avatars.first;
-        } catch (e) {
-          avatar = null;
-        }
-      }
+      // Prefer stateP == 0 (default), then typeP == 1 (real photo), then any
+      avatar = avatars.firstWhere(
+        (a) => a.stateP == 0,
+        orElse: () => avatars.firstWhere(
+          (a) => a.typeP == 1,
+          orElse: () => avatars.first,
+        ),
+      );
     }
     final pathPicture = avatar?.pathPicture?.toString();
+    String? imageUrl;
     if (pathPicture != null && pathPicture.isNotEmpty) {
+      imageUrl = Uri.parse(AppConfig.baseUrlSrc).resolve(pathPicture).toString();
+    }
+    if (imageUrl != null && imageUrl.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Image.network(
-          Uri.parse(AppConfig.baseUrlSrc).resolve(pathPicture).toString(),
+          imageUrl,
           fit: BoxFit.cover,
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;

@@ -20,8 +20,9 @@ export class PlantTypeService {
     }
 
     async findAll() {
-        return await this.plantTypeRepository.find(
-        );
+        return await this.plantTypeRepository.find({
+            relations: ['avatars']
+        });
     }
 
     async findOne(id: number): Promise<PlantType> {
