@@ -274,12 +274,11 @@ class _PlantControlSwitchesState extends State<PlantControlSwitches> {
             label: localizations.autoMode,
             value: isAutomatic,
             onChanged: (val) {
-              setState(() => isAutomatic = val);
-              _updateField("isAutomatic", val);
+              // Auto button is now disabled - no action
             },
             activeColor: Colors.green[600]!,
             icon: Icons.settings,
-            isEnabled: isEnabled,
+            isEnabled: false, // Always disabled for auto button
           ),
           const SizedBox(width: 8), // More spacing between toggles
           _buildFloatingToggle(

@@ -145,20 +145,9 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
         }
       }
       
-      // If still no plants, create a mock plant
+      // If still no plants, don't show popup
       if (plantsToShow.isEmpty) {
-        plantsToShow.add(ObjectProfile(
-          idObjectProfile: 1,
-          title: "Daily Care Plant",
-          description: "Your plant care summary",
-          advise: "Keep up the good work!",
-          recipe: "Daily care routine",
-          state: 1,
-          isAutomatic: true,
-          isWillWatering: false,
-          object: null,
-          plantType: null,
-        ));
+        return; // Don't show popup for users without plants
       }
       
       // Show popup for each plant with a delay between them
