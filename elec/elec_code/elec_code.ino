@@ -33,7 +33,7 @@
 #define MOTOR 16
 #define UVLED 18
 #define BUTTON_PIN_BLUETOOTH 33
-#define BUTTON_PIN_RED_WATER 2
+#define BUTTON_PIN_RED_WATER 13
 #define BUTTON_PIN_WHITE_UV_LED 4
 
 #define LED_PIN_BLUE 19
@@ -88,6 +88,10 @@ volatile bool ledBlinking = false;
 bool ledBlinkingVar = false;
 
 
+//// var control //
+bool activateBle = false;
+
+
 ////////// End variable bluetooth
 
 // retrieve from database
@@ -135,10 +139,11 @@ bool isButtonPressedW = false;
 const unsigned long NETWORK_SEND_INTERVAL_PATCH_ALL = 1800000; // 30min
 const unsigned long NETWORK_SEND_INTERVAL_GET_ALL = 3000; // 5s 
 
-// Glosary button
+// Glosary func
 void IRAM_ATTR onButtonPressedBluetooth();
 void IRAM_ATTR onButtonPressedWater();
 void IRAM_ATTR onButtonPressedUVLed();
+void loadPreferences();
 
 void setup() {
   Serial.begin(115200);
@@ -306,7 +311,9 @@ void sendPatchRequest(String endpoint, const String& jsonPayload) {
 
 void taskPatchDataBase(void* parameter) {
   while (true) {
-    PatchDataBase();
+    if (activateBle == false){
+      PatchDataBase();
+    }
 
     vTaskDelay(NETWORK_SEND_INTERVAL_PATCH_ALL / portTICK_PERIOD_MS);
   }
@@ -345,7 +352,7 @@ void fetchObjectProfileData() {
 
   HTTPClient http;
   String url = base_url + "/object-profile-elec/" + id_object_profile;
-
+Serial.println("URL GET: " + url);
   http.begin(url);
   int httpResponseCode = http.GET();
 
@@ -395,11 +402,13 @@ void parseObjectProfileData(String payload) {
 
 void taskGetAllDataBase(void* parameter) {
   while (true) {
-    checkWiFiConnection();
-    
-    if (WiFi.status() == WL_CONNECTED && id_object_profile != "") {
-      fetchObjectProfileData();
-    }
+     if (activateBle == false){
+        checkWiFiConnection();
+        
+        if (WiFi.status() == WL_CONNECTED && id_object_profile != "") {
+          fetchObjectProfileData();
+        }
+     }
 
     vTaskDelay(NETWORK_SEND_INTERVAL_GET_ALL / portTICK_PERIOD_MS);
   }
@@ -412,7 +421,10 @@ void taskGetAllDataBase(void* parameter) {
 ///// Get Temperature ground /////
 void taskGetSensorTemperatureGround(void * parameter) {
   while (1) {
-    handleGetSensorTemperatureGround();
+    if(activateBle == false){
+      handleGetSensorTemperatureGround();
+    }
+    
     vTaskDelay(5000 / portTICK_PERIOD_MS); // Delay 1 second
   }
 }
@@ -437,7 +449,9 @@ void handleGetSensorTemperatureGround() {
 ///// Get water level /////
 void taskGetSensorWater(void * parameter) {
   while (1) {
-    handleGetSensorWater();
+     if(activateBle == false){
+        handleGetSensorWater();
+     }
     vTaskDelay(5000 / portTICK_PERIOD_MS); // Delay 1 second
   }
 }
@@ -460,7 +474,10 @@ void handleGetSensorWater() {
 ///// Get humidity ground /////
 void taskGetSensorHumidityGround(void * parameter) {
   while (1) {
-    handleGetSensorHumidityGround();
+    if(activateBle == false){
+      handleGetSensorHumidityGround();
+    }
+    
     vTaskDelay(5000 / portTICK_PERIOD_MS); // Delay 1 second
   }
 }
@@ -478,7 +495,9 @@ void handleGetSensorHumidityGround() {
 ///// Get temperature humidity extern /////
 void taskGetSensorTemperatureHumidityExtern(void * parameter) {
   while (1) {
-    handleGetSensorTemperatureHumidityExtern();
+    if(activateBle == false){
+      handleGetSensorTemperatureHumidityExtern();
+    }
     vTaskDelay(5000 / portTICK_PERIOD_MS); // Delay 1 second
   }
 }
@@ -507,7 +526,9 @@ void handleGetSensorTemperatureHumidityExtern() {
 ///// Get UV and voltage /////
 void taskGetSensorUVVoltage(void * parameter) {
   while (1) {
-    handleGetSensorUVVoltage();
+    if(activateBle == false){
+      handleGetSensorUVVoltage();
+    }
     vTaskDelay(5000 / portTICK_PERIOD_MS); // Delay 1 second
   }
 }
@@ -533,7 +554,9 @@ void handleGetSensorUVVoltage() {
 ///// Get Motor /////
 void taskGetMotor(void * parameter) {
   while (1) {
-    handleGetMotor();
+    if(activateBle == false){
+      handleGetMotor();
+    }
     vTaskDelay(2000 / portTICK_PERIOD_MS); // Delay 5 second
   }
 }
@@ -569,8 +592,10 @@ void handleGetMotor() {
 
 void taskGetUVLed(void * parameter) {
   while (1) {
-    handleGetUVLed();
-    vTaskDelay(5000 / portTICK_PERIOD_MS); // Delay 1 second
+    if(activateBle == false){
+      handleGetUVLed();
+    }
+    vTaskDelay(1000 / portTICK_PERIOD_MS); // Delay 1 second
   }
 }
 
@@ -578,9 +603,8 @@ void taskGetUVLed(void * parameter) {
 void handleGetUVLed() {
   
   digitalWrite(UVLED, lightSensorData); 
+  Serial.println("HOLSODKOSJDJCKDSJOCDSC?DSOCJDSOJ3 : " + lightSensorData);
 
-  Serial.print("UV Led : ");
-  Serial.println(uv_led);
 
 }
 
@@ -588,8 +612,10 @@ void handleGetUVLed() {
 
 void taskGetInformationLed(void * parameter) {
   while (1) {
-    handleGetInformationLed();
-    vTaskDelay(1000 / portTICK_PERIOD_MS); // Exécution toutes les 200 ms
+    if(activateBle == false){
+      handleGetInformationLed();
+    }
+    vTaskDelay(1000 / portTICK_PERIOD_MS); 
   }
 }
 
@@ -645,20 +671,24 @@ void IRAM_ATTR onButtonPressedUVLed() {
 
 void taskPatchDynamic(void* parameter) {
   while (true) {
-    if (isButtonPressedR){
-      Serial.println("Enter task R");
-      isButtonPressedR = false;
-      isWillWateringDataPatch = true;
-    }
-    
-    if (isButtonPressedW){
-      Serial.println("Enter task W");
-      isButtonPressedW = false;
-      lightSensorDataPatch = !lightSensorDataPatch;
-    }
-    PatchDataBase();
 
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    if(activateBle == false){
+       Serial.println("HOLA !");
+      if (isButtonPressedR){
+        Serial.println("Enter task R");
+        isButtonPressedR = false;
+        isWillWateringDataPatch = true;
+      }
+      
+      if (isButtonPressedW){
+        Serial.println("Enter task W");
+        isButtonPressedW = false;
+        lightSensorDataPatch = !lightSensorDataPatch;
+      }
+      PatchDataBase();
+    }
+
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
   }
 }
 
@@ -697,7 +727,7 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
     } else {
       
       // On tente de parser comme un JSON
-      StaticJsonDocument<512> doc;
+      StaticJsonDocument<1048> doc;
       DeserializationError error = deserializeJson(doc, value);
 
       if (!error) {
@@ -827,6 +857,8 @@ void stopBLE() {
   ledBlinking = false;
   digitalWrite(LED_PIN_BLUE, LOW);
   bleStarted = false;
+  Serial.println("activateBle FAlse.");
+  activateBle = false;
 }
 
 // ==== BLE TASK ====
@@ -834,6 +866,8 @@ void taskBleUse(void * parameter) {
   while (1) {
     if (startBLERequested && !bleStarted) {
       startBLERequested = false;
+      Serial.println("activateBle TRue.");
+      activateBle = true;
       startBLE();
     }
 
@@ -879,6 +913,7 @@ void taskPushIdObject(void *parameter) {
       notifyChr->setValue(msg.c_str());
       notifyChr->notify();
       Serial.println("📤 Envoyé : " + msg);
+
     }
     
     vTaskDelay(3000 / portTICK_PERIOD_MS);
@@ -890,13 +925,16 @@ void taskPushIdObject(void *parameter) {
 
 ////// TEST WIFI ////////
 bool testWiFiConnection(const String& ssid, const String& password) {
-  WiFi.disconnect(true);
+  WiFi.disconnect(true, true); 
+  delay(200);                  
+  WiFi.mode(WIFI_STA);         
+  delay(100);         
   WiFi.begin(ssid.c_str(), password.c_str());
 
   Serial.println("🔌 Connexion Wi-Fi en cours...");
 
   unsigned long startAttemptTime = millis();
-  const unsigned long timeout = 10000; // 10 secondes
+  const unsigned long timeout = 15000; // 10 secondes
 
   while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
     delay(500);
