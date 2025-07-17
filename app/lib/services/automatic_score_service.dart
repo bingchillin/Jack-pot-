@@ -93,7 +93,17 @@ class AutomaticScoreService {
   Future<PlantCareScore?> getYesterdayScore(int plantId, String token) async {
     try {
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      print('🔍 getYesterdayScore for plant $plantId:');
+      print('   Yesterday date: $yesterday');
+      print('   Yesterday ISO: ${yesterday.toIso8601String()}');
+      
       final score = await _scoreService.getDailyScore(plantId, yesterday, token);
+      
+      print('   Score found: ${score != null}');
+      if (score != null) {
+        print('   Score date: ${score.scoreDate}');
+        print('   Score points: ${score.dailyScore}');
+      }
       
       if (score != null) {
         // print('✅ Found yesterday\'s score for plant $plantId: ${score.dailyScore} points');
@@ -103,6 +113,7 @@ class AutomaticScoreService {
         return null;
       }
     } catch (e) {
+      print('❌ Error in getYesterdayScore: $e');
       // print('❌ Error getting yesterday\'s score: $e');
       return null;
     }

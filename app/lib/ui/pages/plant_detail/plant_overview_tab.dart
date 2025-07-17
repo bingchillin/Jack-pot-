@@ -6,7 +6,6 @@ import '../../../app_config.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../services/automatic_score_service.dart';
 import '../../../services/plant_care_score_service.dart';
-import '../../../services/score_popup_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/plant_care_score.dart';
 import '../widget/plant_card_favorite/plant_control_switches_widget.dart';

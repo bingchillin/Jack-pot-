@@ -13,6 +13,12 @@ class PlantCareScoreService {
       final dateString = date.toIso8601String().split('T')[0]; // YYYY-MM-DD format
       final uri = Uri.parse('$baseUrl/plant-care-scores/plant/$plantId/daily/$dateString');
       
+      print('🔍 getDailyScore API call:');
+      print('   Plant ID: $plantId');
+      print('   Date: $date');
+      print('   Date string: $dateString');
+      print('   URL: $uri');
+      
       final response = await http.get(
         uri,
         headers: {
@@ -21,22 +27,35 @@ class PlantCareScoreService {
         },
       );
 
+      print('   Response status: ${response.statusCode}');
+      print('   Response body length: ${response.body.length}');
+      if (response.body.isNotEmpty) {
+        print('   Response body preview: ${response.body.substring(0, response.body.length > 100 ? 100 : response.body.length)}...');
+      }
+
       if (response.statusCode == 200) {
         // Check if response body is empty
         if (response.body.isEmpty || response.body.trim() == '') {
+          print('   Empty response body, returning null');
           return null; // No score for this date
         }
         
         final data = json.decode(response.body);
-        return data != null ? PlantCareScore.fromJson(data) : null;
+        final score = data != null ? PlantCareScore.fromJson(data) : null;
+        print('   Score parsed: ${score != null}');
+        return score;
       } else if (response.statusCode == 404 || response.statusCode == 204) {
+        print('   No score found (${response.statusCode})');
         return null; // No score for this date
       } else {
+        print('   Error response: ${response.statusCode} - ${response.body}');
         throw Exception('Failed to get daily score: ${response.statusCode}');
       }
     } catch (e) {
+      print('❌ Error in getDailyScore: $e');
       // If it's a JSON parsing error due to empty response, return null
       if (e.toString().contains('Unexpected end of input')) {
+        print('   JSON parsing error due to empty response');
         return null; // No score for this date
       }
       throw Exception('Error getting daily score: $e');

@@ -73,18 +73,41 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       final lastPopupDate = prefs.getString('last_daily_popup_date');
       final today = DateTime.now().toIso8601String().split('T')[0];
       
+      print('🔍 Daily popup check:');
+      print('   Last popup date: $lastPopupDate');
+      print('   Today: $today');
+      print('   Should show: ${lastPopupDate != today}');
+      
       if (lastPopupDate != today) {
         // Wait a bit for the page to load
         await Future.delayed(const Duration(milliseconds: 1500));
         
         if (mounted) {
+          print('🚀 Showing daily score popup...');
           await _showDailyScorePopup();
           // Save today's date
           await prefs.setString('last_daily_popup_date', today);
         }
+      } else {
+        print('⏭️ Popup already shown today, skipping');
       }
     } catch (e) {
-      // Silent fail
+      print('❌ Error in daily popup check: $e');
+    }
+  }
+
+  // Temporary test method to force popup display
+  Future<void> _testPopup() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // Clear the stored date to force popup
+      await prefs.remove('last_daily_popup_date');
+      print('🧪 Test: Cleared popup date, popup should show on next check');
+      
+      // Trigger popup check
+      await _checkDailyPopup();
+    } catch (e) {
+      print('❌ Error in test popup: $e');
     }
   }
 
@@ -94,6 +117,9 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.accessToken;
       
+      print('🔍 _showDailyScorePopup:');
+      print('   Token available: ${token != null}');
+      
       // Get a plant to show score for (first from my list or favorites)
       ObjectProfile? targetPlant;
       
@@ -101,6 +127,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       final myListState = myListBloc.state;
       if (myListState is mylist_state.ProfileLoaded && myListState.profiles.isNotEmpty) {
         targetPlant = myListState.profiles.first;
+        print('   Found plant from my list: ${targetPlant.title}');
       } else {
         // Fallback to favorites - simplified approach
         // For now, create a mock plant if no real plants available
@@ -116,10 +143,13 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           object: null,
           plantType: null,
         );
+        print('   Using mock plant: ${targetPlant.title}');
       }
       
       // Show popup for the selected plant
       if (targetPlant != null && token != null) {
+        print('   Getting yesterday\'s score for plant ${targetPlant.idObjectProfile}...');
+        
         // Get yesterday's score from the database
         final scoreService = PlantCareScoreService();
         final autoScoreService = AutomaticScoreService(scoreService);
@@ -128,8 +158,15 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           token,
         );
 
+        print('   Yesterday\'s score found: ${yesterdayScore != null}');
+        if (yesterdayScore != null) {
+          print('   Score details: ${yesterdayScore.dailyScore} points');
+        }
+
         // Only show popup if yesterday's score exists
         if (yesterdayScore != null && mounted) {
+          print('   Showing popup with yesterday\'s score...');
+          
           // Extract yesterday's sensor data from the score
           Map<String, double>? yesterdayData;
           if (yesterdayScore.sensorData != null) {
@@ -153,10 +190,15 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
             totalScore: yesterdayScore.dailyScore,
             yesterdaySensorData: yesterdayData,
           );
+          print('✅ Popup shown successfully');
+        } else {
+          print('❌ Cannot show popup: yesterdayScore=${yesterdayScore != null}, mounted=$mounted');
         }
+      } else {
+        print('❌ Cannot show popup: targetPlant=${targetPlant != null}, token=${token != null}');
       }
     } catch (e) {
-      // Silent fail
+      print('❌ Error in _showDailyScorePopup: $e');
     }
   }
 
@@ -625,6 +667,41 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Test Popup Button (Temporary)
+          Container(
+            width: 56,
+            height: 56,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.red[600]!, Colors.red[700]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.red[300]!.withValues(alpha: 0.6),
+                  blurRadius: 15,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: FloatingActionButton(
+              onPressed: () {
+                _testPopup();
+              },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              heroTag: "test_popup",
+              child: const Icon(
+                Icons.bug_report,
+                size: 28,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          
           // AI Classification Button
           Container(
             width: 56,
