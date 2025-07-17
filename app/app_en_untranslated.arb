@@ -35,7 +35,15 @@
     "orchid",
     "ficusLyrata",
     "lavender",
-    "monsteraDeliciosa"
+    "monsteraDeliciosa",
+    "encyclopedia",
+    "searchPlants",
+    "plantsFound",
+    "errorLoadingPlants",
+    "noPlantsFound",
+    "noPlantsAvailable",
+    "tryDifferentSearch",
+    "checkBackLater"
   ],
 
   "fr": [

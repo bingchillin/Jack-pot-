@@ -94,6 +94,7 @@ class PlantCareScoreBloc extends Bloc<PlantCareScoreEvent, PlantCareScoreState> 
         isPerfectWeek: false,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        currentStreak: 0,
       );
       
       final newScore = await service.createScore(score, event.token);

@@ -475,7 +475,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newPost => 'New Post';
 
   @override
-  String get retry => 'Try Again';
+  String get retry => 'Retry';
 
   @override
   String get loginToSeeFriends => 'Sign in to see your friends\' posts';
@@ -1208,6 +1208,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorCalculatingScore => 'Error calculating score';
+
+  @override
+  String get encyclopedia => 'Encyclopedia';
+
+  @override
+  String get searchPlants => 'Search plants...';
+
+  @override
+  String get plantsFound => 'plants found';
+
+  @override
+  String get errorLoadingPlants => 'Error loading plants';
+
+  @override
+  String get noPlantsFound => 'No plants found';
+
+  @override
+  String get noPlantsAvailable => 'No plants available';
+
+  @override
+  String get tryDifferentSearch => 'Try a different search';
+
+  @override
+  String get checkBackLater => 'Check back later';
 
   @override
   String get bonusScore => 'Bonus';

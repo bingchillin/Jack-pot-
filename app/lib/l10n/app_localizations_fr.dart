@@ -1224,6 +1224,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorCalculatingScore => 'Erreur lors du calcul du score';
 
   @override
+  String get encyclopedia => 'Encyclopédie';
+
+  @override
+  String get searchPlants => 'Rechercher des plantes...';
+
+  @override
+  String get plantsFound => 'plantes trouvées';
+
+  @override
+  String get errorLoadingPlants => 'Erreur de chargement des plantes';
+
+  @override
+  String get noPlantsFound => 'Aucune plante trouvée';
+
+  @override
+  String get noPlantsAvailable => 'Aucune plante disponible';
+
+  @override
+  String get tryDifferentSearch => 'Essayez une autre recherche';
+
+  @override
+  String get checkBackLater => 'Revenez plus tard';
+
+  @override
   String get bonusScore => 'Bonus';
 
   @override

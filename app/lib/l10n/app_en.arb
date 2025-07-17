@@ -2134,6 +2134,52 @@
   "@errorCalculatingScore": {
     "description": "Error message when score calculation fails"
   },
+
+  "encyclopedia": "Encyclopedia",
+  "@encyclopedia": {
+    "description": "Encyclopedia page title"
+  },
+
+  "searchPlants": "Search plants...",
+  "@searchPlants": {
+    "description": "Search plants placeholder text"
+  },
+
+  "plantsFound": "plants found",
+  "@plantsFound": {
+    "description": "Plants found count text"
+  },
+
+  "errorLoadingPlants": "Error loading plants",
+  "@errorLoadingPlants": {
+    "description": "Error loading plants message"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+
+  "noPlantsFound": "No plants found",
+  "@noPlantsFound": {
+    "description": "No plants found message"
+  },
+
+  "noPlantsAvailable": "No plants available",
+  "@noPlantsAvailable": {
+    "description": "No plants available message"
+  },
+
+  "tryDifferentSearch": "Try a different search",
+  "@tryDifferentSearch": {
+    "description": "Try different search suggestion"
+  },
+
+  "checkBackLater": "Check back later",
+  "@checkBackLater": {
+    "description": "Check back later suggestion"
+  },
+
   "bonusScore": "Bonus",
   "moisture": "Moisture",
   "temperature": "Temperature",

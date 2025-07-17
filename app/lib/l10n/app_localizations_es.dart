@@ -1222,6 +1222,30 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorCalculatingScore => 'Error al calcular la puntuación';
 
   @override
+  String get encyclopedia => 'Encyclopedia';
+
+  @override
+  String get searchPlants => 'Search plants...';
+
+  @override
+  String get plantsFound => 'plants found';
+
+  @override
+  String get errorLoadingPlants => 'Error loading plants';
+
+  @override
+  String get noPlantsFound => 'No plants found';
+
+  @override
+  String get noPlantsAvailable => 'No plants available';
+
+  @override
+  String get tryDifferentSearch => 'Try a different search';
+
+  @override
+  String get checkBackLater => 'Check back later';
+
+  @override
   String get bonusScore => 'Bono';
 
   @override

@@ -444,6 +444,122 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
     );
   }
 
+  Widget _buildEncyclopediaCard(AppLocalizations localizations) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+        border: Border.all(
+          color: Colors.orange[300]!.withValues(alpha: 0.3),
+          width: 2,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, '/encyclopedia');
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Row(
+              children: [
+                // Encyclopedia Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.orange[600]!, Colors.orange[700]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange[300]!.withValues(alpha: 0.6),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.book,
+                    size: 40,
+                    color: Colors.white,
+                  ),
+                ),
+                
+                const SizedBox(width: 20),
+                
+                // Text Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        localizations.encyclopedia,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Découvrez toutes les plantes disponibles',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.search,
+                            size: 16,
+                            color: Colors.orange[600],
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Rechercher et explorer',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.orange[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Arrow
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.orange[600],
+                  size: 24,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -569,6 +685,24 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
                         ),
                       );
                     },
+                  ),
+
+                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+
+                  // Encyclopedia Section
+                  SliverToBoxAdapter(
+                    child: _buildSectionHeader(
+                      localizations.encyclopedia,
+                      localizations.encyclopedia,
+                      Icons.book,
+                    ),
+                  ),
+
+                  SliverToBoxAdapter(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 24),
+                      child: _buildEncyclopediaCard(localizations),
+                    ),
                   ),
 
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),

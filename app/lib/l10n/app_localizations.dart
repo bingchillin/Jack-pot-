@@ -1015,7 +1015,7 @@ abstract class AppLocalizations {
   /// Retry button text
   ///
   /// In en, this message translates to:
-  /// **'Try Again'**
+  /// **'Retry'**
   String get retry;
 
   /// Message when user needs to login to see friends' posts
@@ -2379,6 +2379,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error calculating score'**
   String get errorCalculatingScore;
+
+  /// Encyclopedia page title
+  ///
+  /// In en, this message translates to:
+  /// **'Encyclopedia'**
+  String get encyclopedia;
+
+  /// Search plants placeholder text
+  ///
+  /// In en, this message translates to:
+  /// **'Search plants...'**
+  String get searchPlants;
+
+  /// Plants found count text
+  ///
+  /// In en, this message translates to:
+  /// **'plants found'**
+  String get plantsFound;
+
+  /// Error loading plants message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading plants'**
+  String get errorLoadingPlants;
+
+  /// No plants found message
+  ///
+  /// In en, this message translates to:
+  /// **'No plants found'**
+  String get noPlantsFound;
+
+  /// No plants available message
+  ///
+  /// In en, this message translates to:
+  /// **'No plants available'**
+  String get noPlantsAvailable;
+
+  /// Try different search suggestion
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different search'**
+  String get tryDifferentSearch;
+
+  /// Check back later suggestion
+  ///
+  /// In en, this message translates to:
+  /// **'Check back later'**
+  String get checkBackLater;
 
   /// No description provided for @bonusScore.
   ///

@@ -166,6 +166,7 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
       isPerfectWeek: false,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      currentStreak: 0,
     );
 
     // Mock score calculation completed - no popup shown here anymore

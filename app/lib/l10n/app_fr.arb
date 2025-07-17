@@ -1911,6 +1911,51 @@
     "description": "Error message when score calculation fails"
   },
 
+  "encyclopedia": "Encyclopédie",
+  "@encyclopedia": {
+    "description": "Encyclopedia page title"
+  },
+
+  "searchPlants": "Rechercher des plantes...",
+  "@searchPlants": {
+    "description": "Search plants placeholder text"
+  },
+
+  "plantsFound": "plantes trouvées",
+  "@plantsFound": {
+    "description": "Plants found count text"
+  },
+
+  "errorLoadingPlants": "Erreur de chargement des plantes",
+  "@errorLoadingPlants": {
+    "description": "Error loading plants message"
+  },
+
+  "retry": "Réessayer",
+  "@retry": {
+    "description": "Retry button text"
+  },
+
+  "noPlantsFound": "Aucune plante trouvée",
+  "@noPlantsFound": {
+    "description": "No plants found message"
+  },
+
+  "noPlantsAvailable": "Aucune plante disponible",
+  "@noPlantsAvailable": {
+    "description": "No plants available message"
+  },
+
+  "tryDifferentSearch": "Essayez une autre recherche",
+  "@tryDifferentSearch": {
+    "description": "Try different search suggestion"
+  },
+
+  "checkBackLater": "Revenez plus tard",
+  "@checkBackLater": {
+    "description": "Check back later suggestion"
+  },
+
   "bonusScore": "Bonus",
   "moisture": "Humidité",
   "temperature": "Température",
