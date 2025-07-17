@@ -134,85 +134,84 @@ export class ObjectProfileService {
             throw new NotFoundException(`Object profile with ID ${id} not found`);
         }
 
-        // If healthPercentage is null, trigger health calculation and update
-        if (objectProfile.healthPercentage == null) {
-            const sensorData = {
-                humidityAirSensor: objectProfile.humidityAirSensor || 0,
-                humidityGroundSensor: objectProfile.humidityGroundSensor || 0,
-                phGroundSensor: objectProfile.phGroundSensor || 0,
-                conductivityElectriqueFertilitySensor: objectProfile.conductivityElectriqueFertilitySensor || 0,
-                lightSensor: objectProfile.lightSensor || 0,
-                temperatureSensorGround: objectProfile.temperatureSensorGround || 0,
-                temperatureSensorExtern: objectProfile.temperatureSensorExtern || 0,
-                expositionTimeSun: objectProfile.expositionTimeSun || 0,
-                water_sensor: objectProfile.water_sensor || 0,
-            };
-            const healthResult = await this.plantHealthCalculationService.calculatePlantHealth(id, sensorData);
-            await this.objectProfileRepository.update(
-                { idObjectProfile: id },
-                {
-                    healthPercentage: healthResult.overallHealth,
-                    state: healthResult.state,
-                    updatedAt: new Date(),
-                },
-            );
-            // Refetch with updated healthPercentage
-            objectProfile = await this.objectProfileRepository.findOne({
-                where: { idObjectProfile: id },
-                relations: ['object', 'plantType', 'person', 'plants', 'plantType.avatars'],
-                select: {
-                    idObjectProfile: true,
-                    idPerson: true,
+        // Always trigger health calculation and update (for real-time updates)
+        const sensorData = {
+            humidityAirSensor: objectProfile.humidityAirSensor || 0,
+            humidityGroundSensor: objectProfile.humidityGroundSensor || 0,
+            phGroundSensor: objectProfile.phGroundSensor || 0,
+            conductivityElectriqueFertilitySensor: objectProfile.conductivityElectriqueFertilitySensor || 0,
+            lightSensor: objectProfile.lightSensor || 0,
+            temperatureSensorGround: objectProfile.temperatureSensorGround || 0,
+            temperatureSensorExtern: objectProfile.temperatureSensorExtern || 0,
+            expositionTimeSun: objectProfile.expositionTimeSun || 0,
+            water_sensor: objectProfile.water_sensor || 0,
+        };
+        const healthResult = await this.plantHealthCalculationService.calculatePlantHealth(id, sensorData);
+        await this.objectProfileRepository.update(
+            { idObjectProfile: id },
+            {
+                healthPercentage: healthResult.overallHealth,
+                state: healthResult.state,
+                updatedAt: new Date(),
+            },
+        );
+        
+        // Refetch with updated healthPercentage
+        objectProfile = await this.objectProfileRepository.findOne({
+            where: { idObjectProfile: id },
+            relations: ['object', 'plantType', 'person', 'plants', 'plantType.avatars'],
+            select: {
+                idObjectProfile: true,
+                idPerson: true,
+                idObject: true,
+                idPlantType: true,
+                title: true,
+                description: true,
+                advise: true,
+                isAutomatic: true,
+                isWillWatering: true,
+                state: true,
+                favoris: true,
+                healthPercentage: true,
+                humidityAirSensor: true,
+                humidityGroundSensor: true,
+                phGroundSensor: true,
+                conductivityElectriqueFertilitySensor: true,
+                lightSensor: true,
+                temperatureSensorGround: true,
+                temperatureSensorExtern: true,
+                expositionTimeSun: true,
+                createdAt: true,
+                updatedAt: true,
+                object: {
                     idObject: true,
-                    idPlantType: true,
                     title: true,
                     description: true,
                     advise: true,
-                    isAutomatic: true,
-                    isWillWatering: true,
-                    state: true,
-                    favoris: true,
-                    healthPercentage: true,
-                    humidityAirSensor: true,
-                    humidityGroundSensor: true,
-                    phGroundSensor: true,
-                    conductivityElectriqueFertilitySensor: true,
-                    lightSensor: true,
-                    temperatureSensorGround: true,
-                    temperatureSensorExtern: true,
-                    expositionTimeSun: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    object: {
-                        idObject: true,
-                        title: true,
-                        description: true,
-                        advise: true,
-                        preferenceNumber: true,
-                        isReset: true
-                    },
-                    plantType: {
-                        idPlantType: true,
-                        title: true,
-                        description: true,
-                        advise: true
-                    },
-                    person: {
-                        idPerson: true,
-                        email: true,
-                        firstname: true,
-                        surname: true
-                    },
-                    plants: {
-                        idPlant: true,
-                        name: true,
-                        description: true,
-                        category: true,
-                        isAvailable: true
-                    }
+                    preferenceNumber: true,
+                    isReset: true
+                },
+                plantType: {
+                    idPlantType: true,
+                    title: true,
+                    description: true,
+                    advise: true
+                },
+                person: {
+                    idPerson: true,
+                    email: true,
+                    firstname: true,
+                    surname: true
+                },
+                plants: {
+                    idPlant: true,
+                    name: true,
+                    description: true,
+                    category: true,
+                    isAvailable: true
                 }
-            });
-        }
+            }
+        });
 
         return objectProfile;
     }
@@ -413,5 +412,49 @@ export class ObjectProfileService {
 
     async count(options?: FindManyOptions<ObjectProfile>): Promise<number> {
         return await this.objectProfileRepository.count(options);
+    }
+
+    async recalculateHealth(id: number) {
+        // Use the existing method from PlantHealthCalculationService
+        return this.plantHealthCalculationService.recalculateHealthFromDatabase(id);
+    }
+
+    async testHealthCalculation(id: number, sensorData: any) {
+        // Test health calculation with specific sensor data
+        return this.plantHealthCalculationService.calculatePlantHealth(id, sensorData);
+    }
+
+    async debugHealth(id: number) {
+        // Get current plant data and calculate health without updating
+        const objectProfile = await this.objectProfileRepository.findOne({
+            where: { idObjectProfile: id },
+            relations: ['plantType'],
+        });
+
+        if (!objectProfile || !objectProfile.plantType) {
+            throw new Error(`Object profile ${id} or plant type not found`);
+        }
+
+        const sensorData = {
+            humidityAirSensor: objectProfile.humidityAirSensor || 0,
+            humidityGroundSensor: objectProfile.humidityGroundSensor || 0,
+            phGroundSensor: objectProfile.phGroundSensor || 0,
+            conductivityElectriqueFertilitySensor: objectProfile.conductivityElectriqueFertilitySensor || 0,
+            lightSensor: objectProfile.lightSensor || 0,
+            temperatureSensorGround: objectProfile.temperatureSensorGround || 0,
+            temperatureSensorExtern: objectProfile.temperatureSensorExtern || 0,
+            expositionTimeSun: objectProfile.expositionTimeSun || 0,
+            water_sensor: objectProfile.water_sensor || 0,
+        };
+
+        const healthResult = await this.plantHealthCalculationService.calculatePlantHealth(id, sensorData);
+
+        return {
+            currentHealth: objectProfile.healthPercentage,
+            calculatedHealth: healthResult.overallHealth,
+            plantType: objectProfile.plantType.title,
+            sensorData,
+            healthResult,
+        };
     }
 } 

@@ -55,4 +55,22 @@ export class ObjectProfileController {
     remove(@Param('id') id: string) {
         return this.objectProfileService.remove(+id);
     }
+
+    @Post(':id/recalculate-health')
+    @ApiExcludeEndpoint()
+    recalculateHealth(@Param('id') id: string) {
+        return this.objectProfileService.recalculateHealth(+id);
+    }
+
+    @Post(':id/test-health-calculation')
+    @ApiExcludeEndpoint()
+    testHealthCalculation(@Param('id') id: string, @Body() sensorData: any) {
+        return this.objectProfileService.testHealthCalculation(+id, sensorData);
+    }
+
+    @Get(':id/debug-health')
+    @ApiExcludeEndpoint()
+    debugHealth(@Param('id') id: string) {
+        return this.objectProfileService.debugHealth(+id);
+    }
 } 

@@ -19,9 +19,9 @@ class _CacheEntry {
 class ObjectProfileService {
   final String baseUrl = AppConfig.baseUrl;
   
-  // Cache for plant details with 5 minute expiration
+  // Cache for plant details with 30 second expiration (reduced for testing)
   static final Map<int, _CacheEntry> _plantCache = {};
-  static const Duration _cacheExpiration = Duration(minutes: 5);
+  static const Duration _cacheExpiration = Duration(seconds: 30);
   
   // Global notification stream for when plant data changes
   static final StreamController<int> _plantUpdateController = StreamController<int>.broadcast();
@@ -125,9 +125,11 @@ class ObjectProfileService {
     // Check cache first
     final cached = _plantCache[plantId];
     if (cached != null && !cached.isExpired(_cacheExpiration)) {
+      print('📦 ObjectProfileService: Using cached data for plant $plantId');
       return cached.data;
     }
 
+    print('🌐 ObjectProfileService: Fetching fresh data for plant $plantId');
     final url = Uri.parse("${AppConfig.baseUrl}/api/object-profile/$plantId");
 
     final response = await http.get(url, headers: {
@@ -140,6 +142,7 @@ class ObjectProfileService {
       
       // Cache the result
       _plantCache[plantId] = _CacheEntry(plant, DateTime.now());
+      print('💾 ObjectProfileService: Cached fresh data for plant $plantId - Health: ${plant.healthPercentage}%, pH: ${plant.phGroundSensor}');
       
       return plant;
     } else {
@@ -170,6 +173,12 @@ class ObjectProfileService {
   // Method to clear cache (useful for refresh)
   static void clearCache() {
     _plantCache.clear();
+  }
+
+  // Method to clear cache for a specific plant
+  static void clearCacheForPlant(int plantId) {
+    _plantCache.remove(plantId);
+    print('🗑️ ObjectProfileService: Cleared cache for plant $plantId');
   }
 
   // Method to clear expired entries
@@ -214,4 +223,6 @@ class ObjectProfileService {
       throw Exception('Failed to toggle favorite: $e');
     }
   }
+
+
 }

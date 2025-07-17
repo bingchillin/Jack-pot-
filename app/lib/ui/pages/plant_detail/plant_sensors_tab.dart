@@ -63,11 +63,11 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
             localizations.soilMoisture,
             widget.plant.humidityGroundSensor,
             Icons.water_drop,
-            '%',
+            ' (raw)',
             0,
-            100,
+            4095,
             Colors.blue[600]!,
-            _getOptimalRange('humidity_ground', '40-80%'),
+            _getOptimalRange('humidity_ground', '1500-3000'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
@@ -87,18 +87,18 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
             Icons.eco,
             ' µS/cm',
             0,
-            3000,
+            1000,
             Colors.green[600]!,
-            _getOptimalRange('conductivity', '500-1500'),
+            _getOptimalRange('conductivity', '300-700'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
             localizations.groundTemp,
-            widget.plant.temperatureSensorGround,
+            _processTemperatureSensor(widget.plant.temperatureSensorGround),
             Icons.device_thermostat,
             '°C',
-            0,
-            40,
+            -40,
+            80,
             Colors.orange[600]!,
             _getOptimalRange('temperature_ground', '18-24°C'),
           ),
@@ -114,7 +114,7 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
           const SizedBox(height: 16),
           _buildSensorCard(
             localizations.airHumidity,
-            widget.plant.humidityAirSensor,
+            _processAirHumiditySensor(widget.plant.humidityAirSensor),
             Icons.air,
             '%',
             0,
@@ -125,11 +125,11 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
           const SizedBox(height: 12),
           _buildSensorCard(
             localizations.temperature,
-            widget.plant.temperatureSensorExtern,
+            _processTemperatureSensor(widget.plant.temperatureSensorExtern),
             Icons.thermostat,
             '°C',
-            0,
-            40,
+            -40,
+            80,
             Colors.red[600]!,
             _getOptimalRange('temperature_extern', '20-26°C'),
           ),
@@ -147,11 +147,11 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
             localizations.lightLevel,
             widget.plant.lightSensor,
             Icons.wb_sunny,
-            ' lux',
+            ' (0/1)',
             0,
-            100000,
+            1,
             Colors.yellow[600]!,
-            _getOptimalRange('light', '800-1500'),
+            _getOptimalRange('light', '1-1'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
@@ -217,21 +217,46 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
     if (value != null) {
       final numValue = value is String ? double.tryParse(value) : value as double?;
       if (numValue != null) {
-        progress = ((numValue - minValue) / (maxValue - minValue)).clamp(0.0, 1.0);
+        // Use plant-specific optimal ranges if available, otherwise fall back to generic ranges
+        double optimalMin = minValue;
+        double optimalMax = maxValue;
         
-        // Determine status based on progress
-        if (progress < 0.2) {
-          statusText = 'Low';
+        // Try to parse optimal range from the string (e.g., "40-80%" -> 40, 80)
+        final rangeMatch = RegExp(r'(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)').firstMatch(optimalRange);
+        if (rangeMatch != null) {
+          optimalMin = double.parse(rangeMatch.group(1)!);
+          optimalMax = double.parse(rangeMatch.group(2)!);
+        }
+        
+        // Calculate progress based on optimal range
+        if (numValue < optimalMin) {
+          progress = (numValue / optimalMin).clamp(0.0, 1.0) * 0.4; // Below optimal = 0-40%
+        } else if (numValue <= optimalMax) {
+          progress = 0.4 + ((numValue - optimalMin) / (optimalMax - optimalMin)) * 0.4; // Optimal = 40-80%
+        } else {
+          // Cap the progress at 1.0 to prevent overflow
+          progress = 0.8 + ((numValue - optimalMax) / (maxValue - optimalMax)).clamp(0.0, 1.0) * 0.2; // Above optimal = 80-100%
+        }
+        
+        // Ensure progress never exceeds 1.0
+        progress = progress.clamp(0.0, 1.0);
+        
+        // Determine status based on optimal ranges (similar to health calculation)
+        if (numValue < optimalMin * 0.7) {
+          statusText = 'Critical';
           statusColor = Colors.red[600]!;
-        } else if (progress < 0.4) {
-          statusText = 'Below';
+        } else if (numValue < optimalMin) {
+          statusText = 'Low';
           statusColor = Colors.orange[600]!;
-        } else if (progress <= 0.8) {
+        } else if (numValue <= optimalMax) {
           statusText = 'Good';
           statusColor = Colors.green[600]!;
-        } else {
+        } else if (numValue <= optimalMax * 1.3) {
           statusText = 'High';
           statusColor = Colors.orange[600]!;
+        } else {
+          statusText = 'Critical';
+          statusColor = Colors.red[600]!;
         }
       }
     }
@@ -430,5 +455,44 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
       }
     }
     return 'Optimal: $defaultRange';
+  }
+
+  // Sensor processing methods (same as backend)
+  double? _processMoistureSensor(double? rawValue) {
+    if (rawValue == null) return null;
+    // Same logic as backend: ((4095 - rawValue) / 4095) * 100
+    final moisturePercentage = ((4095 - rawValue) / 4095) * 100;
+    return moisturePercentage.clamp(0.0, 100.0);
+  }
+
+  double? _processLightSensor(double? rawValue) {
+    if (rawValue == null) return null;
+    // Same logic as backend: rawValue > 0 ? 800 : 200
+    return rawValue > 0 ? 800.0 : 200.0;
+  }
+
+  double? _processTemperatureSensor(double? rawValue) {
+    if (rawValue == null) return null;
+    // Same logic as backend: clamp between -40 and 80
+    return rawValue.clamp(-40.0, 80.0);
+  }
+
+  double? _processNutrientSensor(double? rawValue) {
+    if (rawValue == null) return null;
+    // Same logic as backend: clamp between 0 and 100
+    return rawValue.clamp(0.0, 100.0);
+  }
+
+  double? _processAirHumiditySensor(double? rawValue) {
+    if (rawValue == null) return null;
+    // Same logic as backend: clamp between 0 and 100
+    return rawValue.clamp(0.0, 100.0);
+  }
+
+  double? _processWaterSensor(double? rawValue) {
+    if (rawValue == null) return null;
+    // Same logic as backend: (rawValue / 700) * 100
+    final waterPercentage = (rawValue / 700) * 100;
+    return waterPercentage.clamp(0.0, 100.0);
   }
 } 

@@ -92,7 +92,7 @@ export class PlantCareService {
       const healthResult = await this.plantHealthCalculationService.calculatePlantHealth(objectId, rawData);
       
       // Update plant health in database
-      await this.updatePlantHealth(objectId, healthResult);
+      await this.updatePlantHealth(objectId, healthResult, rawData);
       
       // Analyze plant conditions
       const analysis = await this.analyzePlantConditions(objectId, processedData);
@@ -491,17 +491,27 @@ export class PlantCareService {
   /**
    * Update plant health in database
    */
-  async updatePlantHealth(objectId: number, healthResult: any): Promise<void> {
+  async updatePlantHealth(objectId: number, healthResult: any, rawSensorData: SensorData): Promise<void> {
     await this.objectProfileRepository.update(
       { idObjectProfile: objectId },
       {
         healthPercentage: healthResult.overallHealth,
         state: healthResult.state, // Update state for backward compatibility
+        // Store the latest sensor data
+        humidityAirSensor: rawSensorData.humidityAirSensor,
+        humidityGroundSensor: rawSensorData.humidityGroundSensor,
+        phGroundSensor: rawSensorData.phGroundSensor,
+        conductivityElectriqueFertilitySensor: rawSensorData.conductivityElectriqueFertilitySensor,
+        lightSensor: rawSensorData.lightSensor,
+        temperatureSensorGround: rawSensorData.temperatureSensorGround,
+        temperatureSensorExtern: rawSensorData.temperatureSensorExtern,
+        expositionTimeSun: rawSensorData.expositionTimeSun,
+        water_sensor: rawSensorData.water_sensor,
         updatedAt: new Date(),
       },
     );
     
-    this.logger.log(`🏥 Updated plant health for object ${objectId}: ${healthResult.overallHealth}% (state: ${healthResult.state})`);
+    this.logger.log(`🏥 Updated plant health and sensor data for object ${objectId}: ${healthResult.overallHealth}% (state: ${healthResult.state})`);
   }
 
   /**

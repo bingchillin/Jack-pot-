@@ -317,6 +317,8 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
             ),
           ),
 
+
+
           // Delete button
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
@@ -373,7 +375,8 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
           context.read<PlantDetailBloc>().add(LoadPlantDetail(widget.plantId, context.read<AuthProvider>().accessToken!));
           
           // Wait for the new data to load
-          await context.read<PlantDetailBloc>().stream.firstWhere((state) => state is PlantDetailLoaded || state is PlantDetailError);
+          await context.read<PlantDetailBloc>().stream
+              .firstWhere((state) => state is PlantDetailLoaded || state is PlantDetailError);
         },
         child: Container(
           padding: const EdgeInsets.all(16),

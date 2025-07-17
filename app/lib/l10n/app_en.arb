@@ -466,6 +466,8 @@
     "description": "Health score label"
   },
 
+
+
   "sensorData": "Sensor Data",
   "@sensorData": {
     "description": "Sensor data section title"

@@ -91,6 +91,18 @@ export class PlantHealthCalculationService {
       this.logger.log(`📊 Raw sensor data for object ${objectId}:`, rawSensorData);
       this.logger.log(`🔧 Processed sensor data for object ${objectId}:`, processedData);
       
+      // Log plant type requirements for debugging
+      this.logger.log(`🌱 Plant type requirements for ${plantType.title}:`, {
+        humidityGroundSensorMin: plantType.humidityGroundSensorMin,
+        humidityGroundSensorMax: plantType.humidityGroundSensorMax,
+        temperatureSensorGroundMin: plantType.temperatureSensorGroundMin,
+        temperatureSensorGroundMax: plantType.temperatureSensorGroundMax,
+        lightSensorMin: plantType.lightSensorMin,
+        lightSensorMax: plantType.lightSensorMax,
+        phMin: plantType.phMin,
+        phMax: plantType.phMax,
+      });
+      
       const sensorScores: SensorHealthScore[] = [];
       const recommendations: string[] = [];
 
@@ -104,6 +116,7 @@ export class PlantHealthCalculationService {
         '%'
       );
       sensorScores.push(moistureScore);
+      this.logger.log(`💧 Moisture score: ${moistureScore.score}% (${moistureScore.status}) - Raw: ${rawSensorData.humidityGroundSensor}, Processed: ${processedData.moisture}%, Optimal: ${moistureScore.optimalMin}-${moistureScore.optimalMax}%`);
 
       const temperatureScore = this.calculateTemperatureHealth(
         processedData.temperature,
@@ -114,6 +127,7 @@ export class PlantHealthCalculationService {
         plantType.temperatureSensorExternMax
       );
       sensorScores.push(temperatureScore);
+      this.logger.log(`🌡️ Temperature score: ${temperatureScore.score}% (${temperatureScore.status}) - Ground: ${processedData.temperature}°C, External: ${rawSensorData.temperatureSensorExtern}°C, Optimal: ${temperatureScore.optimalMin}-${temperatureScore.optimalMax}°C`);
 
       const lightScore = this.calculateSensorHealth(
         'light',
@@ -124,6 +138,7 @@ export class PlantHealthCalculationService {
         'lux'
       );
       sensorScores.push(lightScore);
+      this.logger.log(`☀️ Light score: ${lightScore.score}% (${lightScore.status}) - Raw: ${rawSensorData.lightSensor}, Processed: ${processedData.light} lux, Optimal: ${lightScore.optimalMin}-${lightScore.optimalMax} lux`);
 
       const phScore = this.calculateSensorHealth(
         'ph',
@@ -134,6 +149,7 @@ export class PlantHealthCalculationService {
         ''
       );
       sensorScores.push(phScore);
+      this.logger.log(`🧪 pH score: ${phScore.score}% (${phScore.status}) - Value: ${rawSensorData.phGroundSensor}, Optimal: ${phScore.optimalMin}-${phScore.optimalMax}`);
 
       const airHumidityScore = this.calculateSensorHealth(
         'air_humidity',
@@ -144,6 +160,7 @@ export class PlantHealthCalculationService {
         '%'
       );
       sensorScores.push(airHumidityScore);
+      this.logger.log(`💨 Air humidity score: ${airHumidityScore.score}% (${airHumidityScore.status}) - Raw: ${rawSensorData.humidityAirSensor}, Processed: ${processedData.airHumidity}%, Optimal: ${airHumidityScore.optimalMin}-${airHumidityScore.optimalMax}%`);
 
       const conductivityScore = this.calculateSensorHealth(
         'conductivity',
@@ -154,9 +171,11 @@ export class PlantHealthCalculationService {
         'µS/cm'
       );
       sensorScores.push(conductivityScore);
+      this.logger.log(`🌱 Conductivity score: ${conductivityScore.score}% (${conductivityScore.status}) - Value: ${rawSensorData.conductivityElectriqueFertilitySensor}, Optimal: ${conductivityScore.optimalMin}-${conductivityScore.optimalMax} µS/cm`);
 
       // Calculate overall health (weighted average)
       const overallHealth = this.calculateOverallHealth(sensorScores);
+      this.logger.log(`🏥 Overall health calculation: ${overallHealth.toFixed(1)}%`);
 
       // Generate recommendations
       this.generateRecommendations(sensorScores, recommendations);
@@ -223,6 +242,18 @@ export class PlantHealthCalculationService {
 
       // Calculate health using current sensor data
       const healthResult = await this.calculatePlantHealth(objectId, sensorData);
+      
+      this.logger.log(`🔍 Health calculation result for object ${objectId}:`, {
+        overallHealth: healthResult.overallHealth,
+        state: healthResult.state,
+        sensorScores: healthResult.sensorScores.map(score => ({
+          sensor: score.sensor,
+          currentValue: score.currentValue,
+          optimalRange: `${score.optimalMin}-${score.optimalMax}`,
+          score: score.score,
+          status: score.status
+        }))
+      });
 
       // Update the database with new health calculation
       await this.objectProfileRepository.update(
