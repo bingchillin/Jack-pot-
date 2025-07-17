@@ -19,7 +19,6 @@ export class PlantType {
   @Column({ name: 'family_name', length: 250, nullable: true })
   familyName: string;
 
-
   @Column({ name: 'exposition_type', length: 250, nullable: true })
   expositionType: string;
 

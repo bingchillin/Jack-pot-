@@ -217,6 +217,12 @@ class AutomaticScoreService {
       Map<String, int> scores;
       if (plantTypeId != null) {
         scores = await _plantTypeService.calculatePlantScores(plantTypeId, sensorData, token);
+        
+        // Debug: Print plant type requirements summary
+        final summary = await _plantTypeService.getPlantTypeRequirementsSummary(plantTypeId, token);
+        print('🌱 Plant Type Requirements Summary for Plant $plantId:');
+        print(summary);
+        print('📊 Calculated Scores: $scores');
       } else {
         // Fallback to default scoring if no plant type
         scores = {
@@ -225,12 +231,20 @@ class AutomaticScoreService {
           'light': _calculateLightScore(sensorData['light'] ?? 0),
           'ph': _calculatePhScore(sensorData['ph'] ?? 0),
         };
+        print('⚠️ No plant type found for Plant $plantId, using default scoring');
       }
       
+      // Extract scores for the main sensors (used in total calculation)
       final moistureScore = scores['moisture'] ?? 0;
       final temperatureScore = scores['temperature'] ?? 0;
       final lightScore = scores['light'] ?? 0;
       final phScore = scores['ph'] ?? 0;
+      
+      // Calculate additional sensor scores (for reference, not included in total)
+      final temperatureExternScore = scores['temperature_extern'] ?? 0;
+      final humidityAirScore = scores['humidity_air'] ?? 0;
+      final conductivityScore = scores['conductivity'] ?? 0;
+      final expositionTimeScore = scores['exposition_time'] ?? 0;
       
       // Calculate streak and consistency bonus
       final streakInfo = await _calculateStreakAndBonus(plantId, token);
@@ -239,6 +253,7 @@ class AutomaticScoreService {
       
       final improvementBonus = await _sensorDataService.calculateImprovementBonus(plantId, sensorData);
       
+      // Calculate total daily score (main sensors only)
       final dailyScore = moistureScore + temperatureScore + lightScore + phScore + consistencyBonus + improvementBonus;
 
       // Calculate weekly score
@@ -260,7 +275,14 @@ class AutomaticScoreService {
         currentStreak: currentStreak,
         dailyMessage: _getScoreMessage(dailyScore),
         weeklyMessage: _getWeeklyMessage(weeklyScore),
-        sensorData: sensorData,
+        sensorData: {
+          ...sensorData,
+          // Add additional sensor scores to sensorData for reference
+          'temperature_extern_score': temperatureExternScore.toDouble(),
+          'humidity_air_score': humidityAirScore.toDouble(),
+          'conductivity_score': conductivityScore.toDouble(),
+          'exposition_time_score': expositionTimeScore.toDouble(),
+        },
         isPerfectDay: dailyScore >= 25,
         isPerfectWeek: weeklyScore >= 150, // 25 * 6 days = 150
         createdAt: DateTime.now(),
@@ -275,7 +297,7 @@ class AutomaticScoreService {
       return savedScore;
     } catch (e) {
       // Log error but don't throw - automatic scoring should be silent
-      // print('Error calculating score from data: $e');
+      print('Error calculating score from data: $e');
       return null;
     }
   }
