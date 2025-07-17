@@ -1024,6 +1024,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get friendRequestSent => 'Demande d\'ami envoyée';
 
   @override
+  String get notificationFriendRequestReceived => 'Nouvelle demande d\'ami';
+
+  @override
+  String get notificationFriendRequestAccepted => 'Demande d\'ami acceptée';
+
+  @override
+  String get notificationFriendRequestRejected => 'Demande d\'ami rejetée';
+
+  @override
+  String notificationFriendRequestSentBy(String name) {
+    return '$name vous a envoyé une demande d\'ami';
+  }
+
+  @override
+  String notificationFriendRequestAcceptedBy(String name) {
+    return '$name a accepté votre demande d\'ami';
+  }
+
+  @override
+  String notificationFriendRequestRejectedBy(String name) {
+    return '$name a rejeté votre demande d\'ami';
+  }
+
+  @override
   String get unblockToSee => 'Débloquer pour voir les publications';
 
   @override

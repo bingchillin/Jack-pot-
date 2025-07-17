@@ -2014,6 +2014,42 @@ abstract class AppLocalizations {
   /// **'Friend request sent'**
   String get friendRequestSent;
 
+  /// Notification title when receiving a friend request
+  ///
+  /// In en, this message translates to:
+  /// **'New friend request'**
+  String get notificationFriendRequestReceived;
+
+  /// Notification title when friend request is accepted
+  ///
+  /// In en, this message translates to:
+  /// **'Friend request accepted'**
+  String get notificationFriendRequestAccepted;
+
+  /// Notification title when friend request is rejected
+  ///
+  /// In en, this message translates to:
+  /// **'Friend request rejected'**
+  String get notificationFriendRequestRejected;
+
+  /// Notification body when someone sends a friend request
+  ///
+  /// In en, this message translates to:
+  /// **'{name} sent you a friend request'**
+  String notificationFriendRequestSentBy(String name);
+
+  /// Notification body when someone accepts your friend request
+  ///
+  /// In en, this message translates to:
+  /// **'{name} accepted your friend request'**
+  String notificationFriendRequestAcceptedBy(String name);
+
+  /// Notification body when someone rejects your friend request
+  ///
+  /// In en, this message translates to:
+  /// **'{name} rejected your friend request'**
+  String notificationFriendRequestRejectedBy(String name);
+
   /// Message to unblock user to see their content
   ///
   /// In en, this message translates to:
