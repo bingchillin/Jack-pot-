@@ -351,63 +351,57 @@ class AutomaticScoreService {
   /// Calculate streak and consistency bonus
   Future<Map<String, int>> _calculateStreakAndBonus(int plantId, String token) async {
     try {
-      // Get the last 3 days of scores to check streak
-      final threeDaysAgo = DateTime.now().subtract(const Duration(days: 3));
-      final recentScores = await _scoreService.getScoresByRange(plantId, threeDaysAgo, DateTime.now(), token);
+      // Get the last 10 days of scores to check streak (extended from 3 days)
+      final tenDaysAgo = DateTime.now().subtract(const Duration(days: 10));
+      final recentScores = await _scoreService.getScoresByRange(plantId, tenDaysAgo, DateTime.now(), token);
       
       int currentStreak = 0;
       int consistencyBonus = 0;
       
-      // Check if we have consecutive days with good scores (≥75 points)
-      final goodScoreThreshold = 75;
+      // Lower threshold for "good score" (was 20, now 15)
+      final goodScoreThreshold = 15;
       
       // Sort scores by date (most recent first)
       recentScores.sort((a, b) => b.scoreDate.compareTo(a.scoreDate));
       
-      // Check for consecutive days with good scores
-      DateTime? lastDate;
+      // Simplified streak calculation
       int consecutiveGoodDays = 0;
+      DateTime? lastGoodDate;
       
       for (final score in recentScores) {
-        // Check if this score is from a consecutive day
-        if (lastDate == null) {
-          // First score
-          lastDate = score.scoreDate;
-          if (score.dailyScore >= goodScoreThreshold) {
+        final scoreDate = DateTime(score.scoreDate.year, score.scoreDate.month, score.scoreDate.day);
+        
+        if (score.dailyScore >= goodScoreThreshold) {
+          if (lastGoodDate == null) {
+            // First good score
             consecutiveGoodDays = 1;
+            lastGoodDate = scoreDate;
           } else {
-            consecutiveGoodDays = 0;
+            // Check if this is the next consecutive day
+            final expectedDate = lastGoodDate.add(const Duration(days: 1));
+            if (scoreDate.isAtSameMomentAs(expectedDate)) {
+              // Consecutive day
+              consecutiveGoodDays++;
+              lastGoodDate = scoreDate;
+            } else if (scoreDate.isAfter(expectedDate)) {
+              // Gap in days - reset streak
+              consecutiveGoodDays = 1;
+              lastGoodDate = scoreDate;
+            }
+            // If scoreDate is before expectedDate, skip (out of order)
           }
         } else {
-          // Check if this score is from the day before the last score
-          final expectedDate = lastDate.subtract(const Duration(days: 1));
-          if (score.scoreDate.year == expectedDate.year &&
-              score.scoreDate.month == expectedDate.month &&
-              score.scoreDate.day == expectedDate.day) {
-            // Consecutive day
-            if (score.dailyScore >= goodScoreThreshold) {
-              consecutiveGoodDays++;
-            } else {
-              // Break in streak
-              consecutiveGoodDays = 0;
-            }
-            lastDate = score.scoreDate;
-          } else {
-            // Gap in days - reset streak
-            consecutiveGoodDays = 0;
-            lastDate = score.scoreDate;
-            if (score.dailyScore >= goodScoreThreshold) {
-              consecutiveGoodDays = 1;
-            }
-          }
+          // Bad score - reset streak
+          consecutiveGoodDays = 0;
+          lastGoodDate = null;
         }
       }
       
-      // Set current streak
-      currentStreak = consecutiveGoodDays;
+      // Cap streak at 3 days maximum
+      currentStreak = consecutiveGoodDays.clamp(0, 3);
       
-      // Award consistency bonus only if streak is 3 or more
-      if (currentStreak >= 3) {
+      // Award consistency bonus only if streak is exactly 3
+      if (currentStreak == 3) {
         consistencyBonus = 10;
       }
       
