@@ -532,12 +532,15 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
                             color: Colors.orange[600],
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            'Rechercher et explorer',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.orange[600],
-                              fontWeight: FontWeight.w500,
+                          Flexible(
+                            child: Text(
+                              'Rechercher et explorer',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.orange[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],

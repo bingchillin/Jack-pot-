@@ -3,6 +3,8 @@ import 'package:shimmer/shimmer.dart';
 import '../../models/plant_type.dart';
 import '../../services/plant_type_service.dart';
 import '../../l10n/app_localizations.dart';
+import '../../app_config.dart';
+import '../../models/avatar.dart';
 
 class EncyclopediaPage extends StatefulWidget {
   const EncyclopediaPage({Key? key}) : super(key: key);
@@ -223,26 +225,7 @@ class _EncyclopediaPageState extends State<EncyclopediaPage> {
                       width: 2,
                     ),
                   ),
-                  child: plantType.avatars != null && plantType.avatars!.isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            plantType.avatars!.first.pathPicture ?? '',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Icons.local_florist,
-                                size: 40,
-                                color: Colors.green[600],
-                              );
-                            },
-                          ),
-                        )
-                      : Icon(
-                          Icons.local_florist,
-                          size: 40,
-                          color: Colors.green[600],
-                        ),
+                  child: _buildPlantAvatar(plantType),
                 ),
                 
                 const SizedBox(width: 16),
@@ -457,5 +440,72 @@ class _EncyclopediaPageState extends State<EncyclopediaPage> {
         ],
       ),
     );
+  }
+
+  Widget _buildPlantAvatar(PlantType plantType) {
+    final avatars = plantType.avatars;
+    Avatar? avatar;
+    if (avatars == null || avatars.isEmpty) {
+      avatar = null;
+    } else {
+      try {
+        // Pour l'encyclopédie, on prend l'avatar par défaut (stateP = 0) si dispo
+        avatar = avatars.firstWhere((a) => a.stateP == 0);
+      } catch (e) {
+        try {
+          // Sinon, on prend le premier avatar disponible
+          avatar = avatars.first;
+        } catch (e) {
+          avatar = null;
+        }
+      }
+    }
+    final pathPicture = avatar?.pathPicture?.toString();
+    if (pathPicture != null && pathPicture.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.network(
+          Uri.parse(AppConfig.baseUrlSrc).resolve(pathPicture).toString(),
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.white,
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.green[100],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.local_florist,
+                size: 40,
+                color: Colors.green[600],
+              ),
+            );
+          },
+        ),
+      );
+    } else {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.green[100],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(
+          Icons.local_florist,
+          size: 40,
+          color: Colors.green[600],
+        ),
+      );
+    }
   }
 } 
