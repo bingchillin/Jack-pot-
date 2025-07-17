@@ -45,11 +45,8 @@ class AutomaticScoreService {
       // Check if we already collected data today
       final lastCollectionDate = prefs.getString(_lastDataCollectionDateKey);
       if (lastCollectionDate == today) {
-        print('ℹ️ End-of-day data already collected today');
         return;
       }
-      
-      print('🌙 Collecting end-of-day sensor data...');
       
       // Get all plants
       final plants = await _objectProfileService.fetchProfilesAll(token);
@@ -66,19 +63,17 @@ class AutomaticScoreService {
           final score = await _calculateScoreFromData(plant.idObjectProfile, currentSensorData, token);
           
           if (score != null) {
-            print('✅ Calculated end-of-day score for plant ${plant.idObjectProfile}: ${score.dailyScore} points');
+            // print('✅ Calculated end-of-day score for plant ${plant.idObjectProfile}: ${score.dailyScore} points');
           }
         } catch (e) {
-          print('❌ Error processing plant ${plant.idObjectProfile}: $e');
+          // print('❌ Error processing plant ${plant.idObjectProfile}: $e');
         }
       }
       
       // Mark today as collected
       await prefs.setString(_lastDataCollectionDateKey, today);
-      print('✅ End-of-day data collection completed');
-      
     } catch (e) {
-      print('❌ Error in end-of-day data collection: $e');
+      // print('❌ Error in end-of-day data collection: $e');
     }
   }
 
@@ -101,14 +96,14 @@ class AutomaticScoreService {
       final score = await _scoreService.getDailyScore(plantId, yesterday, token);
       
       if (score != null) {
-        print('✅ Found yesterday\'s score for plant $plantId: ${score.dailyScore} points');
+        // print('✅ Found yesterday\'s score for plant $plantId: ${score.dailyScore} points');
         return score;
       } else {
-        print('ℹ️ No yesterday\'s score found for plant $plantId');
+        // print('ℹ️ No yesterday\'s score found for plant $plantId');
         return null;
       }
     } catch (e) {
-      print('❌ Error getting yesterday\'s score: $e');
+      // print('❌ Error getting yesterday\'s score: $e');
       return null;
     }
   }
@@ -180,23 +175,23 @@ class AutomaticScoreService {
             // Calculate and save score for this plant
             final score = await calculateAutomaticScore(plant.idObjectProfile, token);
             if (score != null) {
-              print('✅ Calculated and saved score for plant ${plant.idObjectProfile}: ${score.dailyScore} points');
+              // print('✅ Calculated and saved score for plant ${plant.idObjectProfile}: ${score.dailyScore} points');
             } else {
-              print('⚠️ Failed to calculate score for plant ${plant.idObjectProfile}');
+              // print('⚠️ Failed to calculate score for plant ${plant.idObjectProfile}');
             }
           } else {
-            print('ℹ️ Score already exists for plant ${plant.idObjectProfile} today');
+            // print('ℹ️ Score already exists for plant ${plant.idObjectProfile} today');
           }
         } catch (e) {
           // Continue with other plants if one fails
-          print('❌ Error calculating score for plant ${plant.idObjectProfile}: $e');
+          // print('❌ Error calculating score for plant ${plant.idObjectProfile}: $e');
         }
       }
       
       // Mark today as processed
       await prefs.setString(_lastAutoScoreTimeKey, today);
     } catch (e) {
-      print('Error in calculateAndSaveAllPlantScores: $e');
+      // print('Error in calculateAndSaveAllPlantScores: $e');
     }
   }
 
@@ -269,7 +264,7 @@ class AutomaticScoreService {
       return savedScore;
     } catch (e) {
       // Log error but don't throw - automatic scoring should be silent
-      print('Error calculating score from data: $e');
+      // print('Error calculating score from data: $e');
       return null;
     }
   }
@@ -405,14 +400,14 @@ class AutomaticScoreService {
         consistencyBonus = 10;
       }
       
-      print('🌱 Plant $plantId: Current streak = $currentStreak, Consistency bonus = $consistencyBonus');
+      // print('🌱 Plant $plantId: Current streak = $currentStreak, Consistency bonus = $consistencyBonus');
       
       return {
         'currentStreak': currentStreak,
         'consistencyBonus': consistencyBonus,
       };
     } catch (e) {
-      print('❌ Error calculating streak: $e');
+      // print('❌ Error calculating streak: $e');
       // Return default values on error
       return {
         'currentStreak': 0,

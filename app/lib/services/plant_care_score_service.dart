@@ -32,7 +32,6 @@ class PlantCareScoreService {
       } else if (response.statusCode == 404 || response.statusCode == 204) {
         return null; // No score for this date
       } else {
-        print('API Error: ${response.statusCode} - ${response.body}');
         throw Exception('Failed to get daily score: ${response.statusCode}');
       }
     } catch (e) {
@@ -193,10 +192,6 @@ class PlantCareScoreService {
       final uri = Uri.parse('$baseUrl/plant-care-scores');
       final requestBody = score.toJson();
       
-      print('📤 Sending score data to API:');
-      print('   URL: $uri');
-      print('   Body: ${json.encode(requestBody)}');
-      
       final response = await http.post(
         uri,
         headers: {
@@ -205,10 +200,6 @@ class PlantCareScoreService {
         },
         body: json.encode(requestBody),
       );
-
-      print('📥 API Response:');
-      print('   Status: ${response.statusCode}');
-      print('   Body: ${response.body}');
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);

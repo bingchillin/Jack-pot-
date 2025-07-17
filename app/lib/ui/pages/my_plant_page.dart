@@ -153,73 +153,10 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
             totalScore: yesterdayScore.dailyScore,
             yesterdaySensorData: yesterdayData,
           );
-        } else {
-          print('ℹ️ No yesterday\'s score available - not showing popup');
         }
       }
     } catch (e) {
-      print('❌ Error showing daily score popup: $e');
-    }
-  }
-
-  // Test score popup method (for development)
-  Future<void> _testScorePopup() async {
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final token = authProvider.accessToken;
-      
-      if (token == null) {
-        print('❌ No auth token available for test popup');
-        return;
-      }
-      
-      // Get the first available plant
-      ObjectProfile? targetPlant;
-      final myListState = myListBloc.state;
-      if (myListState is mylist_state.ProfileLoaded && myListState.profiles.isNotEmpty) {
-        targetPlant = myListState.profiles.first;
-      } else {
-        print('❌ No plants available for test popup');
-        return;
-      }
-      
-      // Get yesterday's score from the database
-      final scoreService = PlantCareScoreService();
-      final autoScoreService = AutomaticScoreService(scoreService);
-      final yesterdayScore = await autoScoreService.getYesterdayScore(
-        targetPlant.idObjectProfile,
-        token,
-      );
-
-      if (yesterdayScore != null) {
-        // Extract yesterday's sensor data from the score
-        Map<String, double>? yesterdayData;
-        if (yesterdayScore.sensorData != null) {
-          final data = yesterdayScore.sensorData as Map<String, dynamic>;
-          yesterdayData = {
-            'moisture': (data['moisture'] ?? 0).toDouble(),
-            'temperature': (data['temperature'] ?? 0).toDouble(),
-            'light': (data['light'] ?? 0).toDouble(),
-            'ph': (data['ph'] ?? 0).toDouble(),
-          };
-        }
-        
-        ImprovedScorePopupService().showScorePopup(
-          context: context,
-          plant: targetPlant,
-          moistureScore: yesterdayScore.moistureScore,
-          temperatureScore: yesterdayScore.temperatureScore,
-          lightScore: yesterdayScore.lightScore,
-          phScore: yesterdayScore.phScore,
-          bonusScore: yesterdayScore.consistencyBonus,
-          totalScore: yesterdayScore.dailyScore,
-          yesterdaySensorData: yesterdayData,
-        );
-      } else {
-        print('ℹ️ No yesterday\'s score available for test popup');
-      }
-    } catch (e) {
-      print('❌ Error in test score popup: $e');
+      // Silent fail
     }
   }
 
@@ -249,40 +186,10 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
         await backgroundService.triggerDailyScoring(token);
       }
     } catch (e) {
-      print('Error triggering daily score service: $e');
+      // Silent fail
     }
   }
 
-  /// Test the automatic scoring system
-  Future<void> _testSystem() async {
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final token = authProvider.accessToken;
-      
-      if (token != null) {
-        final backgroundService = DailyScoreBackgroundService();
-        await backgroundService.testSystem(token);
-      }
-    } catch (e) {
-      print('Error testing system: $e');
-    }
-  }
-
-  /// Trigger end-of-day data collection (for testing)
-  Future<void> _triggerEndOfDayCollection() async {
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final token = authProvider.accessToken;
-      
-      if (token != null) {
-        final autoScoreService = AutomaticScoreService(PlantCareScoreService());
-        await autoScoreService.collectEndOfDayDataAndCalculateScores(token);
-        print('✅ End-of-day data collection triggered successfully');
-      }
-    } catch (e) {
-      print('❌ Error triggering end-of-day collection: $e');
-    }
-  }
 
   Future<void> _refreshFavorite() async {
     ObjectProfileService.clearCache();

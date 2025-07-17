@@ -119,7 +119,6 @@ class ObjectProfileService {
       
       // Notify all listeners that this plant was updated
       _plantUpdateController.add(plantId);
-      print('📢 Notified all listeners that plant $plantId was updated');
     }
   }
 
@@ -127,11 +126,9 @@ class ObjectProfileService {
     // Check cache first
     final cached = _plantCache[plantId];
     if (cached != null && !cached.isExpired(_cacheExpiration)) {
-      print('🔄 Using cached data for plant $plantId');
       return cached.data;
     }
 
-    print('📡 Fetching fresh data for plant $plantId');
     final url = Uri.parse("${AppConfig.baseUrl}/api/object-profile/$plantId");
 
     final response = await http.get(url, headers: {
@@ -193,7 +190,6 @@ class ObjectProfileService {
   // Method to force refresh all plant data
   static void notifyGlobalPlantDataChanged() {
     _plantUpdateController.add(-1); // -1 means "refresh all"
-    print('📢 Notified all listeners to refresh all plant data');
   }
 
   /// Toggle favorite status for a plant
@@ -213,12 +209,9 @@ class ObjectProfileService {
         token: token,
       );
 
-      print('✅ Successfully toggled favorite for plant $plantId: ${newFavorisValue != null ? 'added' : 'removed'}');
-      
       // Return the new favorite status
       return newFavorisValue != null;
     } catch (e) {
-      print('❌ Error toggling favorite for plant $plantId: $e');
       throw Exception('Failed to toggle favorite: $e');
     }
   }

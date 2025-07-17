@@ -85,7 +85,6 @@ class EnhancedNotificationService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Error marking notification as read: $e');
       return false;
     }
   }
@@ -103,7 +102,6 @@ class EnhancedNotificationService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Error marking all notifications as read: $e');
       return false;
     }
   }
@@ -126,7 +124,6 @@ class EnhancedNotificationService {
         return 0;
       }
     } catch (e) {
-      print('Error getting unread count: $e');
       return 0;
     }
   }

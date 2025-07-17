@@ -24,26 +24,11 @@ class CommentService {
       headers['Authorization'] = 'Bearer $token';
     }
     
-    // Log de l'URL complet utilisé
-    print('==== URL endpoint utilisé ====');
-    print(url.toString());
-    
     final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
-      // Log du JSON brut reçu
-      print('==== JSON BRUT /comments/timeline ====');
-      print(response.body);
-      try {
-        return data.map((json) => Comment.fromJson(json)).toList();
-      } catch (e, stack) {
-        print('Erreur lors du mapping d\'un commentaire : $e');
-        print('Stacktrace : $stack');
-        print('JSON fautif :');
-        print(data);
-        rethrow;
-      }
+      return data.map((json) => Comment.fromJson(json)).toList();
     } else {
       throw Exception('Erreur de chargement des commentaires: ${response.statusCode}');
     }
@@ -114,10 +99,6 @@ class CommentService {
       if (userId != null) 'idPerson': int.tryParse(userId),
     };
 
-    print('Flutter - Creating comment with body: $body');
-    print('Flutter - URL: $url');
-    print('Flutter - Token: ${token.substring(0, 20)}...');
-
     final response = await http.post(
       url,
       headers: {
@@ -126,9 +107,6 @@ class CommentService {
       },
       body: jsonEncode(body),
     );
-
-    print('Flutter - Response status: ${response.statusCode}');
-    print('Flutter - Response body: ${response.body}');
 
     if (response.statusCode == 201) {
       return Comment.fromJson(jsonDecode(response.body));
@@ -260,14 +238,12 @@ class CommentService {
       if (response.statusCode == 200) {
         return UserProfile.fromJson(json.decode(response.body));
       } else if (response.statusCode == 401) {
-        print('JWT authentication failed for user $userId, trying alternative method...');
         // Fallback: récupérer via les commentaires de l'utilisateur
         return await _fetchUserProfileFromComments(userId, token);
       } else {
         throw Exception('Erreur de chargement du profil utilisateur: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching user profile for user $userId: $e');
       // Fallback: récupérer via les commentaires de l'utilisateur
       return await _fetchUserProfileFromComments(userId, token);
     }
@@ -294,7 +270,6 @@ class CommentService {
         createdAt: userComment.createdAt, // Date approximative
       );
     } catch (e) {
-      print('Fallback profile creation failed: $e');
       // Dernière solution : profil minimal avec nom générique
       return UserProfile(
         idPerson: userId,
@@ -329,7 +304,6 @@ class CommentService {
   // Récupérer uniquement les commentaires des amis (avec filtrage des bloqués)
   Future<List<Comment>> fetchFriendsComments(String token, int userId) async {
     try {
-      print('Flutter - Loading friends comments for user $userId');
       
       // D'abord, récupérer tous les commentaires avec filtrage des bloqués
       final allComments = await fetchMainCommentsWithoutBlocked(token, userId: userId.toString());
@@ -351,11 +325,8 @@ class CommentService {
           .where((comment) => friendIds.contains(comment.idPerson))
           .toList();
       
-      print('Flutter - Found ${friendsComments.length} comments from ${friendIds.length} friends');
-      
       return friendsComments;
     } catch (e) {
-      print('Error loading friends comments: $e');
       throw Exception('Error loading friends comments: $e');
     }
   }
@@ -363,10 +334,8 @@ class CommentService {
   // Filtrer les commentaires en excluant les utilisateurs bloqués
   Future<List<Comment>> _filterBlockedUsers(List<Comment> comments, String token, int currentUserId) async {
     try {
-      print('🔍 Flutter - Filtering blocked users for user $currentUserId');
       
       // Toujours récupérer les contacts frais (pas de cache)
-      print('🔄 Flutter - Fetching fresh contacts data');
       final contactService = ContactService();
       
       // Récupérer TOUS les types de contacts (acceptés, en attente, envoyés, bloqués)
@@ -378,32 +347,14 @@ class CommentService {
       // Combiner tous les contacts
       final allContacts = [...myContacts, ...pendingRequests, ...sentRequests, ...blockedContacts];
       
-              print('📞 Flutter - Found ${allContacts.length} total contacts');
-      
-      // Debug détaillé de tous les contacts
-      for (var contact in allContacts) {
-        print('📱 Contact ${contact.id}: status=${contact.status.value}, requester=${contact.requesterId}, receiver=${contact.receiverId}, blockedBy=${contact.blockedBy}');
-      }
-      
       // Obtenir les IDs des utilisateurs bloqués
       final filteredBlockedContacts = allContacts.where((contact) {
         try {
           return contact.isBlocked;
         } catch (e) {
-          print('Error checking if contact is blocked: $e');
           return false;
         }
       }).toList();
-      print('🚫 Flutter - Blocked contacts: ${filteredBlockedContacts.length}');
-      
-      for (var contact in filteredBlockedContacts) {
-        try {
-          final otherUser = contact.getOtherUser(currentUserId);
-          print('👤 Blocked user: ${otherUser?.id} (${otherUser?.displayName})');
-        } catch (e) {
-          print('Error getting other user: $e');
-        }
-      }
       
       final blockedUserIds = <int>{};
       for (var contact in filteredBlockedContacts) {
@@ -413,26 +364,17 @@ class CommentService {
             blockedUserIds.add(otherUser!.id);
           }
         } catch (e) {
-          print('Error getting blocked user ID: $e');
+          // print('Error getting blocked user ID: $e'); // Removed print
         }
       }
-      
-      print('🎯 Flutter - Final blocked user IDs: $blockedUserIds');
-      
-      // Debug des commentaires à filtrer
-      print('💬 Comments to filter: ${comments.map((c) => 'Comment from user ${c.idPerson}')}');
       
       // Filtrer les commentaires pour exclure ceux des utilisateurs bloqués
       final filteredComments = comments
           .where((comment) => !blockedUserIds.contains(comment.idPerson))
           .toList();
           
-      print('✅ Flutter - Filtered ${comments.length - filteredComments.length} comments from blocked users');
-      print('📝 Remaining comments: ${filteredComments.map((c) => 'Comment from user ${c.idPerson}')}');
-      
       return filteredComments;
     } catch (e) {
-      print('❌ Error filtering blocked users: $e');
       // En cas d'erreur, retourner la liste originale
       return comments;
     }
@@ -458,11 +400,8 @@ class CommentService {
         int.parse(userId)
       );
       
-      print('Filtered ${allComments.length - filteredComments.length} comments from blocked users');
-      
       return filteredComments;
     } catch (e) {
-      print('Error loading comments without blocked users: $e');
       // En cas d'erreur, retourner la méthode normale
       return fetchMainComments(token, userId: userId);
     }

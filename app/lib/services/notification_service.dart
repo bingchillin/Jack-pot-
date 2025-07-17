@@ -31,13 +31,7 @@ class NotificationService {
       
       // Get FCM token for device registration
       String? token = await getDeviceToken();
-      if (kDebugMode) {
-        print('🔥 FCM Token: $token');
-      }
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error initializing notifications: $e');
-      }
     }
   }
 
@@ -54,14 +48,6 @@ class NotificationService {
       sound: true,
     );
 
-    if (kDebugMode) {
-      print('🔔 Notification permission status: ${settings.authorizationStatus}');
-    }
-
-    // For Android, also request notification permission through permission_handler
-    if (await Permission.notification.isDenied) {
-      await Permission.notification.request();
-    }
   }
 
   /// Initialize local notifications plugin
@@ -103,22 +89,12 @@ class NotificationService {
 
   /// Handle notification when app is in foreground
   void _handleForegroundMessage(RemoteMessage message) {
-    if (kDebugMode) {
-      print('🔥 Foreground message: ${message.messageId}');
-      print('📱 Title: ${message.notification?.title}');
-      print('📱 Body: ${message.notification?.body}');
-    }
-
     // Show local notification for foreground messages
     _showLocalNotification(message);
   }
 
   /// Handle notification when app is opened from background/terminated
   void _handleBackgroundMessage(RemoteMessage message) {
-    if (kDebugMode) {
-      print('🔥 Background message opened: ${message.messageId}');
-    }
-
     // Navigate to specific screen based on notification data
     String? route = message.data['route'];
     _handleNotificationTap(route);
@@ -167,9 +143,6 @@ class NotificationService {
     try {
       return await _firebaseMessaging.getToken();
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error getting FCM token: $e');
-      }
       return null;
     }
   }
@@ -178,13 +151,7 @@ class NotificationService {
   Future<void> subscribeToTopic(String topic) async {
     try {
       await _firebaseMessaging.subscribeToTopic(topic);
-      if (kDebugMode) {
-        print('✅ Subscribed to topic: $topic');
-      }
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error subscribing to topic $topic: $e');
-      }
     }
   }
 
@@ -192,13 +159,7 @@ class NotificationService {
   Future<void> unsubscribeFromTopic(String topic) async {
     try {
       await _firebaseMessaging.unsubscribeFromTopic(topic);
-      if (kDebugMode) {
-        print('✅ Unsubscribed from topic: $topic');
-      }
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error unsubscribing from topic $topic: $e');
-      }
     }
   }
 
@@ -210,9 +171,6 @@ class NotificationService {
     try {
       String? fcmToken = await getDeviceToken();
       if (fcmToken == null) {
-        if (kDebugMode) {
-          print('❌ No FCM token to remove');
-        }
         return false;
       }
 
@@ -228,20 +186,11 @@ class NotificationService {
       );
 
       if (response.statusCode == 200) {
-        if (kDebugMode) {
-          print('✅ FCM token removed from backend successfully');
-        }
         return true;
       } else {
-        if (kDebugMode) {
-          print('❌ Failed to remove FCM token from backend: ${response.statusCode}');
-        }
         return false;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error removing FCM token from backend: $e');
-      }
       return false;
     }
   }
@@ -271,20 +220,11 @@ class NotificationService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (kDebugMode) {
-          print('✅ Plant care notification sent successfully');
-        }
         return true;
       } else {
-        if (kDebugMode) {
-          print('❌ Failed to send plant care notification: ${response.statusCode}');
-        }
         return false;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error sending plant care notification: $e');
-      }
       return false;
     }
   }
@@ -297,9 +237,6 @@ class NotificationService {
     try {
       String? fcmToken = await getDeviceToken();
       if (fcmToken == null) {
-        if (kDebugMode) {
-          print('❌ No FCM token available');
-        }
         return false;
       }
 
@@ -319,20 +256,11 @@ class NotificationService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = json.decode(response.body);
-        if (kDebugMode) {
-          print('✅ FCM token registered successfully: ${responseData['message']}');
-        }
         return responseData['success'] ?? true;
       } else {
-        if (kDebugMode) {
-          print('❌ Failed to register FCM token: ${response.statusCode} - ${response.body}');
-        }
         return false;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error registering FCM token with backend: $e');
-      }
       return false;
     }
   }
@@ -359,20 +287,11 @@ class NotificationService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = json.decode(response.body);
-        if (kDebugMode) {
-          print('✅ Test notification sent: ${responseData['message']}');
-        }
         return responseData['success'] ?? true;
       } else {
-        if (kDebugMode) {
-          print('❌ Failed to send test notification: ${response.statusCode} - ${response.body}');
-        }
         return false;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error sending test notification: $e');
-      }
       return false;
     }
   }
@@ -381,8 +300,5 @@ class NotificationService {
 /// Background message handler (must be top-level function)
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  if (kDebugMode) {
-    print('🔥 Background message: ${message.messageId}');
-  }
   // Handle background processing if needed
 } 

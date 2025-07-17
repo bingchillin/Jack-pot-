@@ -36,9 +36,6 @@ class UploadService {
           contentType = MediaType('image', 'jpeg'); // Default fallback
       }
       
-      print('Flutter - File extension: $extension');
-      print('Flutter - Content type: ${contentType.mimeType}');
-      
       request.files.add(
         await http.MultipartFile.fromPath(
           'file', 
@@ -52,15 +49,8 @@ class UploadService {
         request.headers['Authorization'] = 'Bearer $token';
       }
       
-      print('Flutter - Uploading to: $uri');
-      print('Flutter - File path: ${imageFile.path}');
-      print('Flutter - File exists: ${await imageFile.exists()}');
-      
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
-      
-      print('Flutter - Upload response status: ${response.statusCode}');
-      print('Flutter - Upload response body: $responseData');
       
       if (response.statusCode == 200 || response.statusCode == 201) {
         var jsonResponse = json.decode(responseData);
@@ -69,7 +59,6 @@ class UploadService {
         throw Exception('Failed to upload image: ${response.statusCode} - $responseData');
       }
     } catch (e) {
-      print('Error uploading image: $e');
       rethrow;
     }
   }

@@ -28,7 +28,6 @@ class ObjectProfileMyListBloc extends Bloc<ObjectProfileMyListEvent, ObjectProfi
 
     // Listen for global plant updates
     _plantUpdateSubscription = ObjectProfileService.plantUpdateStream.listen((plantId) {
-      print('🔔 ObjectProfileMyListBloc received update notification for plant $plantId');
       // Refresh our data when any plant is updated
       add(LoadProfilesMyList());
     });
