@@ -20,6 +20,27 @@ class ImprovedScorePopupService {
     VoidCallback? onDismiss,
     Map<String, double>? yesterdaySensorData,
   }) {
+    // Safety checks to prevent popup during navigation transitions
+    if (!context.mounted) {
+      print('⚠️ Context not mounted, skipping popup');
+      return;
+    }
+    
+    // Check if we're on the current route
+    final route = ModalRoute.of(context);
+    if (route == null || !route.isCurrent) {
+      print('⚠️ Not on current route, skipping popup');
+      return;
+    }
+    
+    // Check if the route is active
+    if (route.isActive == false) {
+      print('⚠️ Route not active, skipping popup');
+      return;
+    }
+    
+    print('✅ Showing popup - all checks passed');
+    
     showDialog(
       context: context,
       barrierDismissible: true,

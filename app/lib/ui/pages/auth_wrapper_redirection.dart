@@ -12,6 +12,31 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
+    // Show loading screen while authentication is being initialized
+    if (authProvider.isLoadingUser) {
+      return Scaffold(
+        backgroundColor: Colors.green[50],
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Loading...',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     // If user is authenticated, show main app
     if (authProvider.isLoggedIn) {
       return const HomePage();

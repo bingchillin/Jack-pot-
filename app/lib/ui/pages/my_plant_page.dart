@@ -55,8 +55,19 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
     
     _animationController.forward();
     
-    // Check for daily popup
-    _checkDailyPopup();
+    // Check for daily popup with longer delay to ensure app is fully loaded
+    _initializePopupCheck();
+  }
+
+  /// Initialize popup check with proper timing
+  Future<void> _initializePopupCheck() async {
+    // Wait for the page to fully load and animations to complete
+    await Future.delayed(const Duration(milliseconds: 2000));
+    
+    // Only check for popup if the widget is still mounted and we're on the current route
+    if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+      await _checkDailyPopup();
+    }
   }
 
   @override
@@ -79,14 +90,17 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       print('   Should show: ${lastPopupDate != today}');
       
       if (lastPopupDate != today) {
-        // Wait a bit for the page to load
-        await Future.delayed(const Duration(milliseconds: 1500));
+        // Wait longer for the page to fully load and navigation to complete
+        await Future.delayed(const Duration(milliseconds: 3000));
         
-        if (mounted) {
+        // Additional check to ensure we're still on the plants page
+        if (mounted && ModalRoute.of(context)?.isCurrent == true) {
           print('🚀 Showing daily score popup...');
           await _showDailyScorePopup();
           // Save today's date
           await prefs.setString('last_daily_popup_date', today);
+        } else {
+          print('⏭️ Page not ready or navigation changed, skipping popup');
         }
       } else {
         print('⏭️ Popup already shown today, skipping');
