@@ -270,7 +270,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin, Pa
                                   crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
                                     Text(
-                                      localizations.newToJackPot,
+                                      localizations.newToJack,
                                       style: TextStyle(color: Colors.grey[600]),
                                     ),
                                     SimpleTextButton(

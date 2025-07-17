@@ -103,7 +103,7 @@ abstract class AppLocalizations {
   /// The name of the application
   ///
   /// In en, this message translates to:
-  /// **'Jack Pot'**
+  /// **'Jackpote'**
   String get appName;
 
   /// Title of the login page
@@ -145,8 +145,8 @@ abstract class AppLocalizations {
   /// Text before create account link
   ///
   /// In en, this message translates to:
-  /// **'New to Jack Pot? '**
-  String get newToJackPot;
+  /// **'New to Jackpote? '**
+  String get newToJack;
 
   /// Create account link text
   ///
@@ -866,7 +866,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Welcome to the Future of Plant Care'**
-  String get welcomeToJackPot;
+  String get welcomeToJack;
 
   /// App tagline on welcome page
   ///
@@ -1123,7 +1123,7 @@ abstract class AppLocalizations {
   /// Add plants restriction message
   ///
   /// In en, this message translates to:
-  /// **'You need to sign up to add your own plants and access smart monitoring features. Join thousands of plant parents who trust Jack Pot!'**
+  /// **'You need to sign up to add your own plants and access smart monitoring features. Join thousands of plant parents who trust Jackpote!'**
   String get addPlantsMessage;
 
   /// Generic unlock feature message

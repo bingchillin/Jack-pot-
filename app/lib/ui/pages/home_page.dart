@@ -23,7 +23,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Jack Pot',
+          'Jackpote',
           style: TextStyle(
             fontFamily: '04B_30__',
             fontSize: 20,

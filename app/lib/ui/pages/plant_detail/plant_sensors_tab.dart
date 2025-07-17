@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../models/object_profile.dart';
-import '../../../models/plant_type_requirements.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../services/plant_type_requirements_service.dart';
 
 class PlantSensorsTab extends StatefulWidget {
   final ObjectProfile plant;
@@ -14,35 +12,6 @@ class PlantSensorsTab extends StatefulWidget {
 }
 
 class _PlantSensorsTabState extends State<PlantSensorsTab> {
-  PlantTypeRequirements? _plantRequirements;
-  bool _isLoadingRequirements = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPlantRequirements();
-  }
-
-  Future<void> _loadPlantRequirements() async {
-    if (widget.plant.plantType?.idPlantType != null) {
-      try {
-        // For now, we'll use mock requirements since we don't have the token here
-        // In a real implementation, you'd pass the token to this widget
-        setState(() {
-          _isLoadingRequirements = false;
-        });
-      } catch (e) {
-        setState(() {
-          _isLoadingRequirements = false;
-        });
-      }
-    } else {
-      setState(() {
-        _isLoadingRequirements = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -61,20 +30,20 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
           const SizedBox(height: 16),
           _buildSensorCard(
             localizations.soilMoisture,
-            widget.plant.humidityGroundSensor,
+            _processMoistureSensor(widget.plant.humidityGroundSensor),
             Icons.water_drop,
-            ' (raw)',
+            '%',
             0,
-            4095,
+            100,
             Colors.blue[600]!,
-            _getOptimalRange('humidity_ground', '1500-3000'),
+            _getOptimalRange('humidity_ground', '40-70%'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
             localizations.soilPH,
             widget.plant.phGroundSensor,
             Icons.science,
-            ' pH',
+            'pH',
             0,
             14,
             Colors.purple[600]!,
@@ -145,13 +114,13 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
           const SizedBox(height: 16),
           _buildSensorCard(
             localizations.lightLevel,
-            widget.plant.lightSensor,
+            _processLightSensor(widget.plant.lightSensor),
             Icons.wb_sunny,
-            ' (0/1)',
+            ' lux',
             0,
-            1,
+            1000,
             Colors.yellow[600]!,
-            _getOptimalRange('light', '1-1'),
+            _getOptimalRange('light', '200-800 lux'),
           ),
           const SizedBox(height: 12),
           _buildSensorCard(
@@ -209,7 +178,7 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
     Color color,
     String optimalRange,
   ) {
-    final displayValue = value?.toString() ?? '--';
+    String displayValue = '--';
     double progress = 0.0;
     String statusText = 'No data';
     Color statusColor = Colors.grey[500]!;
@@ -217,6 +186,15 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
     if (value != null) {
       final numValue = value is String ? double.tryParse(value) : value as double?;
       if (numValue != null) {
+        // Format display value - remove decimals for percentages, show 1 decimal for others
+        if (unit == '%') {
+          displayValue = numValue.round().toString();
+        } else if (unit == '°C' || unit == 'pH') {
+          displayValue = numValue.toStringAsFixed(1);
+        } else {
+          displayValue = numValue.round().toString();
+        }
+        
         // Use plant-specific optimal ranges if available, otherwise fall back to generic ranges
         double optimalMin = minValue;
         double optimalMax = maxValue;
@@ -228,20 +206,10 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
           optimalMax = double.parse(rangeMatch.group(2)!);
         }
         
-        // Calculate progress based on optimal range
-        if (numValue < optimalMin) {
-          progress = (numValue / optimalMin).clamp(0.0, 1.0) * 0.4; // Below optimal = 0-40%
-        } else if (numValue <= optimalMax) {
-          progress = 0.4 + ((numValue - optimalMin) / (optimalMax - optimalMin)) * 0.4; // Optimal = 40-80%
-        } else {
-          // Cap the progress at 1.0 to prevent overflow
-          progress = 0.8 + ((numValue - optimalMax) / (maxValue - optimalMax)).clamp(0.0, 1.0) * 0.2; // Above optimal = 80-100%
-        }
+        // Simple progress calculation: percentage of the full range
+        progress = ((numValue - minValue) / (maxValue - minValue)).clamp(0.0, 1.0);
         
-        // Ensure progress never exceeds 1.0
-        progress = progress.clamp(0.0, 1.0);
-        
-        // Determine status based on optimal ranges (similar to health calculation)
+        // Determine status based on optimal ranges
         if (numValue < optimalMin * 0.7) {
           statusText = 'Critical';
           statusColor = Colors.red[600]!;
@@ -409,51 +377,8 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
   }
 
   String _getOptimalRange(String sensorType, String defaultRange) {
-    if (_plantRequirements != null) {
-      // Return plant-specific range if available
-      switch (sensorType) {
-        case 'humidity_ground':
-          if (_plantRequirements!.humidityGroundSensorMin != null && _plantRequirements!.humidityGroundSensorMax != null) {
-            return '${_plantRequirements!.humidityGroundSensorMin!.toStringAsFixed(0)}-${_plantRequirements!.humidityGroundSensorMax!.toStringAsFixed(0)}%';
-          }
-          break;
-        case 'ph':
-          if (_plantRequirements!.phMin != null && _plantRequirements!.phMax != null) {
-            return '${_plantRequirements!.phMin!.toStringAsFixed(1)}-${_plantRequirements!.phMax!.toStringAsFixed(1)}';
-          }
-          break;
-        case 'conductivity':
-          if (_plantRequirements!.conductivityElectriqueFertilityMin != null && _plantRequirements!.conductivityElectriqueFertilityMax != null) {
-            return '${_plantRequirements!.conductivityElectriqueFertilityMin!.toStringAsFixed(0)}-${_plantRequirements!.conductivityElectriqueFertilityMax!.toStringAsFixed(0)} µS/cm';
-          }
-          break;
-        case 'temperature_ground':
-          if (_plantRequirements!.temperatureSensorGroundMin != null && _plantRequirements!.temperatureSensorGroundMax != null) {
-            return '${_plantRequirements!.temperatureSensorGroundMin!.toStringAsFixed(1)}-${_plantRequirements!.temperatureSensorGroundMax!.toStringAsFixed(1)}°C';
-          }
-          break;
-        case 'humidity_air':
-          if (_plantRequirements!.humidityAirSensorMin != null && _plantRequirements!.humidityAirSensorMax != null) {
-            return '${_plantRequirements!.humidityAirSensorMin!.toStringAsFixed(0)}-${_plantRequirements!.humidityAirSensorMax!.toStringAsFixed(0)}%';
-          }
-          break;
-        case 'temperature_extern':
-          if (_plantRequirements!.temperatureSensorExternMin != null && _plantRequirements!.temperatureSensorExternMax != null) {
-            return '${_plantRequirements!.temperatureSensorExternMin!.toStringAsFixed(1)}-${_plantRequirements!.temperatureSensorExternMax!.toStringAsFixed(1)}°C';
-          }
-          break;
-        case 'light':
-          if (_plantRequirements!.lightSensorMin != null && _plantRequirements!.lightSensorMax != null) {
-            return '${_plantRequirements!.lightSensorMin!.toStringAsFixed(0)}-${_plantRequirements!.lightSensorMax!.toStringAsFixed(0)} lux';
-          }
-          break;
-        case 'exposition_time':
-          if (_plantRequirements!.expositionTimeSunMin != null && _plantRequirements!.expositionTimeSunMax != null) {
-            return '${_plantRequirements!.expositionTimeSunMin!.toStringAsFixed(1)}-${_plantRequirements!.expositionTimeSunMax!.toStringAsFixed(1)} hours';
-          }
-          break;
-      }
-    }
+    // This method is no longer dependent on _plantRequirements
+    // It will return the default range for all sensors
     return 'Optimal: $defaultRange';
   }
 
@@ -477,22 +402,9 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
     return rawValue.clamp(-40.0, 80.0);
   }
 
-  double? _processNutrientSensor(double? rawValue) {
-    if (rawValue == null) return null;
-    // Same logic as backend: clamp between 0 and 100
-    return rawValue.clamp(0.0, 100.0);
-  }
-
   double? _processAirHumiditySensor(double? rawValue) {
     if (rawValue == null) return null;
     // Same logic as backend: clamp between 0 and 100
     return rawValue.clamp(0.0, 100.0);
-  }
-
-  double? _processWaterSensor(double? rawValue) {
-    if (rawValue == null) return null;
-    // Same logic as backend: (rawValue / 700) * 100
-    final waterPercentage = (rawValue / 700) * 100;
-    return waterPercentage.clamp(0.0, 100.0);
   }
 } 

@@ -48,7 +48,7 @@ export class NotificationService {
       await this.firebaseService.sendNotificationToUser(
         createNotificationDto.idPerson,
         {
-          title: createNotificationDto.title || 'Jack Pot Notification',
+          title: createNotificationDto.title || 'Jackpote Notification',
           body: createNotificationDto.description || 'You have a new notification',
           route: '/notifications',
           data: {

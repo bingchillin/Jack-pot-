@@ -60,7 +60,7 @@ export class MailerService {
       const html = await render(ContactFormEmail({ name, email, subject, message }));
       
       await this.mailerService.sendMail({
-        to: this.configService.get('ADMIN_EMAIL') || 'admin@jackpot.com',
+        to: this.configService.get('MAIL_USER') || 'admin@jackpot.com',
         subject: `New contact form submission from ${name}`,
         html,
       });

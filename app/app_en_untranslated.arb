@@ -47,6 +47,7 @@
   ],
 
   "fr": [
+    "newToJack",
     "settingsSaved",
     "settingsSaveError",
     "notificationDisabled",

@@ -103,9 +103,9 @@ class NotificationService {
   /// Show local notification
   Future<void> _showLocalNotification(RemoteMessage message) async {
     const androidDetails = AndroidNotificationDetails(
-      'jackpot_channel',
-      'Jackpot Notifications',
-      channelDescription: 'Plant care notifications from Jackpot app',
+      'jackpote_channel',
+      'Jackpote Notifications',
+      channelDescription: 'Plant care notifications from Jackpote app',
       importance: Importance.high,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
@@ -124,7 +124,7 @@ class NotificationService {
 
     await _localNotifications.show(
       message.hashCode,
-      message.notification?.title ?? 'Jackpot',
+      message.notification?.title ?? 'Jackpote',
       message.notification?.body ?? 'You have a new notification',
       notificationDetails,
       payload: message.data['route'],
@@ -280,7 +280,7 @@ class NotificationService {
           'Authorization': 'Bearer $authToken',
         },
         body: json.encode({
-          'title': title ?? '🌱 Jack Pot Test',
+          'title': title ?? '🌱 Jackpote Test',
           'message': message ?? 'This is a test notification from your plant care app!',
         }),
       );

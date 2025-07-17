@@ -299,7 +299,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        centerTitle: true,
+        centerTitle: false,
         actions: [
 
           // Wi-Fi button
@@ -423,7 +423,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        centerTitle: true,
+        centerTitle: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Container(
@@ -611,7 +611,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        centerTitle: true,
+        centerTitle: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Container(
@@ -668,7 +668,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
           color: Colors.grey[800],
         ),
       ),
-      centerTitle: true,
+      centerTitle: false,
     ),
     body: Container(
       padding: const EdgeInsets.all(16),

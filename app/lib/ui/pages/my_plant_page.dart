@@ -260,13 +260,9 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       }
     }
     
-    print('🔍 Total plants to show: ${plantData.length}');
-    
     // If we have plant data, show the first popup
     if (plantData.isNotEmpty && mounted && !ImprovedScorePopupService().isPopupShowing) {
       final firstPlantData = plantData[0];
-      
-      print('🔍 Showing first popup: Plant ${firstPlantData['plantIndex'] + 1} of ${firstPlantData['totalPlants']}');
       
       ImprovedScorePopupService().showScorePopup(
         context: context,
@@ -292,8 +288,6 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
   void _showNextPlant(List<Map<String, dynamic>> plantData, int currentIndex) {
     if (currentIndex < plantData.length && mounted) {
       final plantDataItem = plantData[currentIndex];
-      
-      print('🔍 Showing next popup: Plant ${plantDataItem['plantIndex'] + 1} of ${plantDataItem['totalPlants']}');
       
       // Close current popup and show next one
       Navigator.of(context).pop();
@@ -352,35 +346,6 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       // Silent fail
     }
   }
-
-  /// Debug method to clear popup date (for testing)
-  Future<void> _clearPopupDate() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('last_daily_popup_date');
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Popup date cleared - popup will show on next app launch'),
-            backgroundColor: Colors.blue,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error clearing popup date'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    }
-  }
-
 
   Future<void> _refreshFavorite() async {
     ObjectProfileService.clearCache();
@@ -860,39 +825,6 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Debug Button (for testing popup)
-          Container(
-            width: 40,
-            height: 40,
-            margin: const EdgeInsets.only(bottom: 8),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue[600]!, Colors.blue[700]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blue[300]!.withValues(alpha: 0.6),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: FloatingActionButton(
-              onPressed: _clearPopupDate,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              heroTag: "debug_popup",
-              child: const Icon(
-                Icons.bug_report,
-                size: 20,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          
           // AI Classification Button
           Container(
             width: 56,

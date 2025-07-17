@@ -159,7 +159,7 @@ class _RootAppState extends State<RootApp> {
         ),
       ],
       child: MaterialApp(
-        title: 'Jackpot App',
+        title: 'Jackpote App',
         theme: appTheme,
         routes: appRoutes,
         onGenerateRoute: (settings) {

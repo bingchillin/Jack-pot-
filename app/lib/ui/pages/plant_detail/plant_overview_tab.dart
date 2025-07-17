@@ -153,99 +153,15 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
     }
   }
 
-  void _testScorePopup() {
-    // Create a mock score for testing
-    final mockScore = PlantCareScore(
-      idPlantCareScore: 0,
-      idObjectProfile: widget.plant.idObjectProfile,
-      scoreDate: DateTime.now(),
-      dailyScore: 28, // High score for testing
-      weeklyScore: 0,
-      moistureScore: 10,
-      temperatureScore: 8,
-      lightScore: 6,
-      phScore: 4,
-      consistencyBonus: 2,
-      improvementBonus: 0,
-      dailyMessage: "Excellent! Your plant care is outstanding!",
-      weeklyMessage: null,
-      sensorData: {
-        'moisture': 75.0,
-        'temperature': 22.0,
-        'light': 65.0,
-        'ph': 6.5,
-      },
-      isPerfectDay: true,
-      isPerfectWeek: false,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      currentStreak: 0,
-    );
-
-    // Mock score calculation completed - no popup shown here anymore
-    // Popup is now shown from plant list pages
-    
-    setState(() {
-      _calculatedScore = mockScore;
-    });
-  }
-
-  Widget _buildTestScoreButton(AppLocalizations localizations) {
-    return Column(
-      children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          child: ElevatedButton.icon(
-            onPressed: _testScorePopup,
-            icon: const Icon(Icons.play_arrow),
-            label: Text('Test Score Popup'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue[600],
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          child: ElevatedButton.icon(
-            onPressed: _resetAutomaticScoring,
-            icon: const Icon(Icons.refresh),
-            label: Text('Reset Auto-Scoring'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange[600],
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _resetAutomaticScoring() async {
-    final autoScoreService = AutomaticScoreService(
-      Provider.of<PlantCareScoreService>(context, listen: false),
-    );
-    await autoScoreService.resetLastScoreDate();
-    
-    // Show a snackbar to confirm
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Automatic scoring reset! Next visit will trigger a new score calculation.'),
-          backgroundColor: Colors.green,
-        ),
+  void _calculateAutomaticScore() async {
+    try {
+      final autoScoreService = AutomaticScoreService(
+        Provider.of<PlantCareScoreService>(context, listen: false),
       );
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await autoScoreService.calculateAutomaticScore(widget.plant.idObjectProfile, authProvider.accessToken!);
+    } catch (e) {
+      // Silent fail for automatic scoring
     }
   }
 
@@ -306,8 +222,6 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
           _buildHealthCard(localizations, stateColor, healthScore, healthColor),
 
           const SizedBox(height: 24),
-
-          // Test score button removed - moved to plants page
 
           const SizedBox(height: 40),
         ],

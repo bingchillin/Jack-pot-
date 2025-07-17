@@ -117,7 +117,7 @@ export class NotificationController {
     const userId = req.user.idPerson;
     
     const success = await this.firebaseService.sendNotificationToUser(userId, {
-      title: body.title || '🌱 Jack Pot Test',
+      title: body.title || '🌱 Jackpote Test',
       body: body.message || 'This is a test notification from your plant care app!',
       route: '/plants',
       data: {

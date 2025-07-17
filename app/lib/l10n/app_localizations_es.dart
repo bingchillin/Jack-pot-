@@ -9,7 +9,7 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get appName => 'Jack Pot';
+  String get appName => 'Jackpote';
 
   @override
   String get loginTitle => 'Iniciar Sesión';
@@ -30,7 +30,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get or => 'o';
 
   @override
-  String get newToJackPot => '¿Nuevo en Jack Pot? ';
+  String get newToJack => '¿Nuevo en Jackpote? ';
 
   @override
   String get createAccount => 'Crear cuenta';
@@ -399,7 +399,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tryAgain => 'Intentar de nuevo';
 
   @override
-  String get welcomeToJackPot => 'Bienvenido al Futuro del Cuidado de Plantas';
+  String get welcomeToJack => 'Bienvenido al Futuro del Cuidado de Plantas';
 
   @override
   String get smartPlantCareSimple =>
@@ -539,7 +539,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get addPlantsMessage =>
-      'Necesitas registrarte para agregar tus propias plantas y acceder a las funciones de monitoreo inteligente. ¡Únete a miles de padres de plantas que confían en Jack Pot!';
+      'Necesitas registrarte para agregar tus propias plantas y acceder a las funciones de monitoreo inteligente. ¡Únete a miles de padres de plantas que confían en Jackpote!';
 
   @override
   String get unlockAllFeatures => 'Inicia sesión para desbloquear esta función';

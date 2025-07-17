@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
   
-  "appName": "Jack Pot",
+  "appName": "Jackpote",
   "@appName": {
     "description": "The name of the application"
   },
@@ -36,8 +36,8 @@
     "description": "Divider text between login and signup"
   },
   
-  "newToJackPot": "New to Jack Pot? ",
-  "@newToJackPot": {
+  "newToJack": "New to Jackpote? ",
+  "@newToJack": {
     "description": "Text before create account link"
   },
   
@@ -648,8 +648,8 @@
     "description": "Button text to retry an action"
   },
 
-  "welcomeToJackPot": "Welcome to the Future of Plant Care",
-  "@welcomeToJackPot": {
+  "welcomeToJack": "Welcome to the Future of Plant Care",
+  "@welcomeToJack": {
     "description": "Welcome page main title"
   },
 
@@ -857,7 +857,7 @@
     "description": "Sign up required dialog title"
   },
 
-  "addPlantsMessage": "You need to sign up to add your own plants and access smart monitoring features. Join thousands of plant parents who trust Jack Pot!",
+  "addPlantsMessage": "You need to sign up to add your own plants and access smart monitoring features. Join thousands of plant parents who trust Jackpote!",
   "@addPlantsMessage": {
     "description": "Add plants restriction message"
   },

@@ -20,7 +20,7 @@ import { PdfService } from './pdf.service';
           },
         },
         defaults: {
-          from: `"Jack Pot" <${configService.get('MAIL_FROM')}>`,
+          from: `"Jackpote" <${configService.get('MAIL_FROM')}>`,
         },
       }),
       inject: [ConfigService],

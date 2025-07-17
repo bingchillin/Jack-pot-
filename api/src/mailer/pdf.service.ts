@@ -250,7 +250,7 @@ const OrderReceipt = ({ order, locale, person }: {
     React.createElement(Page, { size: "A4", style: styles.page }, [
       // Header
       React.createElement(View, { key: 'header', style: styles.header }, [
-        React.createElement(Text, { key: 'company', style: styles.companyName }, 'Jack Pot'),
+        React.createElement(Text, { key: 'company', style: styles.companyName }, 'Jackpote'),
         React.createElement(Text, { key: 'title', style: styles.title }, t('receipt'))
       ]),
       

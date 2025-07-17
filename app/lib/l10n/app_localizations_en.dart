@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Jack Pot';
+  String get appName => 'Jackpote';
 
   @override
   String get loginTitle => 'Login';
@@ -30,7 +30,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get or => 'or';
 
   @override
-  String get newToJackPot => 'New to Jack Pot? ';
+  String get newToJack => 'New to Jackpote? ';
 
   @override
   String get createAccount => 'Create account';
@@ -396,7 +396,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tryAgain => 'Try Again';
 
   @override
-  String get welcomeToJackPot => 'Welcome to the Future of Plant Care';
+  String get welcomeToJack => 'Welcome to the Future of Plant Care';
 
   @override
   String get smartPlantCareSimple => 'Smart Plant Care Made Simple';
@@ -534,7 +534,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addPlantsMessage =>
-      'You need to sign up to add your own plants and access smart monitoring features. Join thousands of plant parents who trust Jack Pot!';
+      'You need to sign up to add your own plants and access smart monitoring features. Join thousands of plant parents who trust Jackpote!';
 
   @override
   String get unlockAllFeatures => 'Sign in to unlock this feature';

@@ -156,7 +156,7 @@ class _WelcomePageState extends State<WelcomePage> with TickerProviderStateMixin
                       child: Column(
                         children: [
                           Text(
-                            localizations.welcomeToJackPot,
+                            localizations.welcomeToJack,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,

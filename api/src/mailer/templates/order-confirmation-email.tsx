@@ -47,7 +47,7 @@ export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
   const getLocalizedText = (key: string) => {
     const translations = {
       en: {
-        subject: 'Order Confirmation - Jack Pot',
+        subject: 'Order Confirmation - Jackpote',
         preview: `Thank you for your order #${orderNumber}`,
         title: 'Order Confirmation',
         subtitle: 'Thank you for your purchase!',
@@ -70,7 +70,7 @@ export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
         support: 'Need help?',
         supportDescription: 'If you have questions about your order, our support team is here to help.',
         contactSupport: 'Contact Support',
-        thankYou: 'Thank you for choosing Jack Pot!',
+        thankYou: 'Thank you for choosing Jackpote!',
         orderSummary: 'Order Summary',
         shippingInfo: 'Shipping Information',
         paymentInfo: 'Payment Information',
@@ -86,7 +86,7 @@ export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
         refunded: 'Refunded',
       },
       fr: {
-        subject: 'Confirmation de commande - Jack Pot',
+        subject: 'Confirmation de commande - Jackpote',
         preview: `Merci pour votre commande #${orderNumber}`,
         title: 'Confirmation de commande',
         subtitle: 'Merci pour votre achat !',
@@ -109,7 +109,7 @@ export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
         support: 'Besoin d\'aide ?',
         supportDescription: 'Si vous avez des questions sur votre commande, notre équipe de support est là pour vous aider.',
         contactSupport: 'Contacter le support',
-        thankYou: 'Merci d\'avoir choisi Jack Pot !',
+        thankYou: 'Merci d\'avoir choisi Jackpote !',
         orderSummary: 'Résumé de la commande',
         shippingInfo: 'Informations de livraison',
         paymentInfo: 'Informations de paiement',
@@ -125,7 +125,7 @@ export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
         refunded: 'Remboursé',
       },
       es: {
-        subject: 'Confirmación de pedido - Jack Pot',
+        subject: 'Confirmación de pedido - Jackpote',
         preview: `Gracias por su pedido #${orderNumber}`,
         title: 'Confirmación de pedido',
         subtitle: '¡Gracias por su compra!',
@@ -148,7 +148,7 @@ export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
         support: '¿Necesita ayuda?',
         supportDescription: 'Si tiene preguntas sobre su pedido, nuestro equipo de soporte está aquí para ayudar.',
         contactSupport: 'Contactar soporte',
-        thankYou: '¡Gracias por elegir Jack Pot!',
+        thankYou: '¡Gracias por elegir Jackpote!',
         orderSummary: 'Resumen del pedido',
         shippingInfo: 'Información de envío',
         paymentInfo: 'Información de pago',
@@ -179,7 +179,7 @@ export const OrderConfirmationEmail: React.FC<OrderConfirmationEmailProps> = ({
           <Section style={header}>
             <Row>
               <Column style={headerContent}>
-                <Text style={logo}>🌱 Jack Pot</Text>
+                <Text style={logo}>🌱 Jackpote</Text>
                 <Text style={headerSubtitle}>Smart Gardening Solutions</Text>
               </Column>
             </Row>

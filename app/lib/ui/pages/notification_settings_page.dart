@@ -198,7 +198,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           message = 'Someone replied to your comment!';
           break;
         default:
-          title = '🌱 Jack Pot Test';
+          title = '🌱 Jackpote Test';
           message = 'This is a test notification from your plant care app!';
       }
       

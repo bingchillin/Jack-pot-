@@ -18,10 +18,10 @@ export const VerificationEmail: React.FC<VerificationEmailProps> = ({
 }) => (
   <Html>
     <Head />
-    <Preview>Verify your email address for Jack Pot</Preview>
+    <Preview>Verify your email address for Jackpote</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Welcome to Jack Pot!</Heading>
+        <Heading style={h1}>Welcome to Jackpote!</Heading>
         <Text style={text}>
           Thank you for signing up. Please use the following verification code to verify your email address:
         </Text>

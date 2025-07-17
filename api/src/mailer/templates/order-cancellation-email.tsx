@@ -46,7 +46,7 @@ export const OrderCancellationEmail: React.FC<OrderCancellationEmailProps> = ({
   const getLocalizedText = (key: string) => {
     const translations = {
       en: {
-        subject: 'Order Cancellation - Jack Pot',
+        subject: 'Order Cancellation - Jackpote',
         preview: `Your order #${orderNumber} has been cancelled`,
         title: 'Order Cancelled',
         subtitle: 'Your order has been successfully cancelled',
@@ -64,14 +64,14 @@ export const OrderCancellationEmail: React.FC<OrderCancellationEmailProps> = ({
         support: 'Need help?',
         supportDescription: 'If you have any questions about your cancellation or refund, our support team is here to help.',
         contactSupport: 'Contact Support',
-        thankYou: 'Thank you for choosing Jack Pot!',
+        thankYou: 'Thank you for choosing Jackpote!',
         orderSummary: 'Order Summary',
         cancellationConfirmed: 'Cancellation Confirmed',
         noRefundNeeded: 'No Refund Needed',
         noRefundDescription: 'This order did not require a refund.',
       },
       fr: {
-        subject: 'Annulation de commande - Jack Pot',
+        subject: 'Annulation de commande - Jackpote',
         preview: `Votre commande #${orderNumber} a été annulée`,
         title: 'Commande annulée',
         subtitle: 'Votre commande a été annulée avec succès',
@@ -89,14 +89,14 @@ export const OrderCancellationEmail: React.FC<OrderCancellationEmailProps> = ({
         support: 'Besoin d\'aide ?',
         supportDescription: 'Si vous avez des questions concernant votre annulation ou remboursement, notre équipe de support est là pour vous aider.',
         contactSupport: 'Contacter le support',
-        thankYou: 'Merci d\'avoir choisi Jack Pot !',
+        thankYou: 'Merci d\'avoir choisi Jackpote !',
         orderSummary: 'Résumé de la commande',
         cancellationConfirmed: 'Annulation confirmée',
         noRefundNeeded: 'Pas de remboursement nécessaire',
         noRefundDescription: 'Cette commande ne nécessitait pas de remboursement.',
       },
       es: {
-        subject: 'Cancelación de pedido - Jack Pot',
+        subject: 'Cancelación de pedido - Jackpote',
         preview: `Su pedido #${orderNumber} ha sido cancelado`,
         title: 'Pedido cancelado',
         subtitle: 'Su pedido ha sido cancelado exitosamente',
@@ -114,7 +114,7 @@ export const OrderCancellationEmail: React.FC<OrderCancellationEmailProps> = ({
         support: '¿Necesita ayuda?',
         supportDescription: 'Si tiene preguntas sobre su cancelación o reembolso, nuestro equipo de soporte está aquí para ayudar.',
         contactSupport: 'Contactar soporte',
-        thankYou: '¡Gracias por elegir Jack Pot!',
+        thankYou: '¡Gracias por elegir Jackpote!',
         orderSummary: 'Resumen del pedido',
         cancellationConfirmed: 'Cancelación confirmada',
         noRefundNeeded: 'No se necesita reembolsar',
@@ -134,7 +134,7 @@ export const OrderCancellationEmail: React.FC<OrderCancellationEmailProps> = ({
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <Text style={companyName}>Jack Pot</Text>
+            <Text style={companyName}>Jackpote</Text>
             <Text style={tagline}>Smart Gardening Solutions</Text>
           </Section>
 
@@ -219,7 +219,7 @@ export const OrderCancellationEmail: React.FC<OrderCancellationEmailProps> = ({
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>{t('thankYou')}</Text>
-            <Text style={footerText}>Jack Pot Team</Text>
+            <Text style={footerText}>Jackpote Team</Text>
           </Section>
         </Container>
       </Body>
