@@ -82,6 +82,9 @@ export class ObjectProfile {
   @Column({ default: 0 })
   state: number;
 
+  @Column({ name: 'health_percentage', type: 'decimal', precision: 5, scale: 2, nullable: true })
+  healthPercentage: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

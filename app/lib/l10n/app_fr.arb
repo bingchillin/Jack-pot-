@@ -596,6 +596,11 @@
     "description": "Loading error message"
   },
 
+  "statePerfect": "Parfait",
+  "@statePerfect": {
+    "description": "Perfect plant state"
+  },
+
   "stateExcellent": "Excellent",
   "@stateExcellent": {
     "description": "Excellent plant state"
@@ -1914,6 +1919,11 @@
   "encyclopedia": "Encyclopédie",
   "@encyclopedia": {
     "description": "Encyclopedia page title"
+  },
+
+  "encyclopediaSubtitle": "Découvrez toutes les plantes disponibles",
+  "@encyclopediaSubtitle": {
+    "description": "Sous-titre pour la carte encyclopédie sur la page des plantes"
   },
 
   "searchPlants": "Rechercher des plantes...",

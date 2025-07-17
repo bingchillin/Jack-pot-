@@ -556,7 +556,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           ),
         ],
         border: Border.all(
-          color: Colors.orange[300]!.withValues(alpha: 0.3),
+          color: Colors.green[300]!.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -577,14 +577,14 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
                   height: 80,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.orange[600]!, Colors.orange[700]!],
+                      colors: [Colors.green[600]!, Colors.green[700]!],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.orange[300]!.withValues(alpha: 0.6),
+                        color: Colors.green[300]!.withValues(alpha: 0.6),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -614,34 +614,12 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Découvrez toutes les plantes disponibles',
+                        localizations.encyclopediaSubtitle,
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey[600],
                           height: 1.4,
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.search,
-                            size: 16,
-                            color: Colors.orange[600],
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              'Rechercher et explorer',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.orange[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
@@ -650,7 +628,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
                 // Arrow
                 Icon(
                   Icons.chevron_right,
-                  color: Colors.orange[600],
+                  color: Colors.green[600],
                   size: 24,
                 ),
               ],

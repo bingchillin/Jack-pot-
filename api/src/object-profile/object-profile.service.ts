@@ -4,12 +4,14 @@ import { Repository, FindManyOptions } from 'typeorm';
 import { ObjectProfile } from './entities/object-profile.entity';
 import { CreateObjectProfileDto } from './dto/create-object-profile.dto';
 import { UpdateObjectProfileDto } from './dto/update-object-profile.dto';
+import { PlantHealthCalculationService } from '../plant-care/plant-health-calculation.service';
 
 @Injectable()
 export class ObjectProfileService {
     constructor(
         @InjectRepository(ObjectProfile)
-        private readonly objectProfileRepository: Repository<ObjectProfile>
+        private readonly objectProfileRepository: Repository<ObjectProfile>,
+        private readonly plantHealthCalculationService: PlantHealthCalculationService
     ) {}
 
     create(createObjectProfileDto: CreateObjectProfileDto) {
@@ -29,6 +31,7 @@ export class ObjectProfileService {
                 isWillWatering: true,
                 state: true,
                 favoris: true,
+                healthPercentage: true,
                 humidityAirSensor: true,
                 humidityGroundSensor: true,
                 phGroundSensor: true,
@@ -71,7 +74,7 @@ export class ObjectProfileService {
     }
 
     async findOne(id: number) {
-        const objectProfile = await this.objectProfileRepository.findOne({
+        let objectProfile = await this.objectProfileRepository.findOne({
             where: { idObjectProfile: id },
             relations: ['object', 'plantType', 'person', 'plants', 'plantType.avatars'],
             select: {
@@ -86,6 +89,7 @@ export class ObjectProfileService {
                 isWillWatering: true,
                 state: true,
                 favoris: true,
+                healthPercentage: true,
                 humidityAirSensor: true,
                 humidityGroundSensor: true,
                 phGroundSensor: true,
@@ -130,6 +134,86 @@ export class ObjectProfileService {
             throw new NotFoundException(`Object profile with ID ${id} not found`);
         }
 
+        // If healthPercentage is null, trigger health calculation and update
+        if (objectProfile.healthPercentage == null) {
+            const sensorData = {
+                humidityAirSensor: objectProfile.humidityAirSensor || 0,
+                humidityGroundSensor: objectProfile.humidityGroundSensor || 0,
+                phGroundSensor: objectProfile.phGroundSensor || 0,
+                conductivityElectriqueFertilitySensor: objectProfile.conductivityElectriqueFertilitySensor || 0,
+                lightSensor: objectProfile.lightSensor || 0,
+                temperatureSensorGround: objectProfile.temperatureSensorGround || 0,
+                temperatureSensorExtern: objectProfile.temperatureSensorExtern || 0,
+                expositionTimeSun: objectProfile.expositionTimeSun || 0,
+                water_sensor: objectProfile.water_sensor || 0,
+            };
+            const healthResult = await this.plantHealthCalculationService.calculatePlantHealth(id, sensorData);
+            await this.objectProfileRepository.update(
+                { idObjectProfile: id },
+                {
+                    healthPercentage: healthResult.overallHealth,
+                    state: healthResult.state,
+                    updatedAt: new Date(),
+                },
+            );
+            // Refetch with updated healthPercentage
+            objectProfile = await this.objectProfileRepository.findOne({
+                where: { idObjectProfile: id },
+                relations: ['object', 'plantType', 'person', 'plants', 'plantType.avatars'],
+                select: {
+                    idObjectProfile: true,
+                    idPerson: true,
+                    idObject: true,
+                    idPlantType: true,
+                    title: true,
+                    description: true,
+                    advise: true,
+                    isAutomatic: true,
+                    isWillWatering: true,
+                    state: true,
+                    favoris: true,
+                    healthPercentage: true,
+                    humidityAirSensor: true,
+                    humidityGroundSensor: true,
+                    phGroundSensor: true,
+                    conductivityElectriqueFertilitySensor: true,
+                    lightSensor: true,
+                    temperatureSensorGround: true,
+                    temperatureSensorExtern: true,
+                    expositionTimeSun: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    object: {
+                        idObject: true,
+                        title: true,
+                        description: true,
+                        advise: true,
+                        preferenceNumber: true,
+                        isReset: true
+                    },
+                    plantType: {
+                        idPlantType: true,
+                        title: true,
+                        description: true,
+                        advise: true
+                    },
+                    person: {
+                        idPerson: true,
+                        email: true,
+                        firstname: true,
+                        surname: true
+                    },
+                    plants: {
+                        idPlant: true,
+                        name: true,
+                        description: true,
+                        category: true,
+                        isAvailable: true
+                    }
+                }
+            });
+        }
+
         return objectProfile;
     }
 
@@ -146,6 +230,7 @@ export class ObjectProfileService {
                 isWillWatering: true,
                 state: true,
                 favoris: true,
+                healthPercentage: true,
                 humidityAirSensor: true,
                 humidityGroundSensor: true,
                 phGroundSensor: true,
@@ -206,6 +291,7 @@ export class ObjectProfileService {
                 isWillWatering: true,
                 state: true,
                 favoris: true,
+                healthPercentage: true,
                 humidityAirSensor: true,
                 humidityGroundSensor: true,
                 phGroundSensor: true,
@@ -266,6 +352,7 @@ export class ObjectProfileService {
                 isWillWatering: true,
                 state: true,
                 favoris: true,
+                healthPercentage: true,
                 humidityAirSensor: true,
                 humidityGroundSensor: true,
                 phGroundSensor: true,

@@ -21,6 +21,7 @@ class ObjectProfile {
   final double? temperatureSensorExtern;
   final double? expositionTimeSun;
   final int? favoris; // Add favoris field
+  final double? healthPercentage; // Add health percentage field
 
   ObjectProfile({
     required this.idObjectProfile,
@@ -42,6 +43,7 @@ class ObjectProfile {
     this.temperatureSensorExtern,
     this.expositionTimeSun,
     this.favoris, // Add favoris to constructor
+    this.healthPercentage, // Add health percentage to constructor
   });
 
   factory ObjectProfile.fromJson(Map<String, dynamic> json) {
@@ -69,6 +71,7 @@ class ObjectProfile {
         temperatureSensorExtern: parseDouble(json['temperatureSensorExtern']),
         expositionTimeSun: parseDouble(json['expositionTimeSun']),
         favoris: parseInt(json['favoris']), // Add favoris parsing
+        healthPercentage: parseDouble(json['healthPercentage']), // Add health percentage parsing
       );
     } catch (e, stack) {
       print("Erreur de parsing ObjectProfile: $e");
@@ -97,6 +100,7 @@ class ObjectProfile {
     double? temperatureSensorExtern,
     double? expositionTimeSun,
     int? favoris, // Add favoris to copyWith
+    double? healthPercentage, // Add health percentage to copyWith
   }) {
     return ObjectProfile(
       idObjectProfile: idObjectProfile ?? this.idObjectProfile,
@@ -118,6 +122,7 @@ class ObjectProfile {
       temperatureSensorExtern: temperatureSensorExtern ?? this.temperatureSensorExtern,
       expositionTimeSun: expositionTimeSun ?? this.expositionTimeSun,
       favoris: favoris ?? this.favoris, // Add favoris to copyWith return
+      healthPercentage: healthPercentage ?? this.healthPercentage, // Add health percentage to copyWith return
     );
   }
 }

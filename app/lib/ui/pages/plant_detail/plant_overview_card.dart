@@ -159,8 +159,12 @@ class PlantOverviewCard extends StatelessWidget {
                               child: Container(
                                 height: 6,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[200],
+                                  color: Colors.grey[300],
                                   borderRadius: BorderRadius.circular(3),
+                                  border: Border.all(
+                                    color: Colors.grey[400]!,
+                                    width: 0.5,
+                                  ),
                                 ),
                                 child: FractionallySizedBox(
                                   alignment: Alignment.centerLeft,

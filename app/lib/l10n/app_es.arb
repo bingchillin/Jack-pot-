@@ -596,6 +596,11 @@
     "description": "Loading error message"
   },
 
+  "statePerfect": "Perfecto",
+  "@statePerfect": {
+    "description": "Perfect plant state"
+  },
+
   "stateExcellent": "Excelente",
   "@stateExcellent": {
     "description": "Excellent plant state"
@@ -1915,5 +1920,9 @@
   "temperature": "Temperatura",
   "light": "Luz",
   "ph": "pH",
-  "totalScore": "Puntuación total"
+  "totalScore": "Puntuación total",
+  "encyclopediaSubtitle": "Descubre todas las plantas disponibles",
+  "@encyclopediaSubtitle": {
+    "description": "Subtítulo para la tarjeta de enciclopedia en la página de plantas"
+  }
 } 

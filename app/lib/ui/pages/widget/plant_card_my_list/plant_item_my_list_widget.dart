@@ -89,22 +89,22 @@ class PlantItemMyListWidget extends StatelessWidget {
   }
 
 
-  String _getStateText(int? state) {
+  String _getStateText(AppLocalizations localizations, int? state) {
     switch (state) {
       case 0:
-        return 'Perfect';
+        return localizations.statePerfect;
       case 1:
-        return 'Excellent';
+        return localizations.stateExcellent;
       case 2:
-        return 'Bon';
+        return localizations.stateGood;
       case 3:
-        return 'Moyen';
+        return localizations.stateFair;
       case 4:
-        return 'Faible';
+        return localizations.stateNeedsAttention;
       case 5:
-        return 'Critique';
+        return localizations.stateCritical;
       default:
-        return 'Inconnu';
+        return localizations.stateUnknown;
     }
   }
 
@@ -321,7 +321,7 @@ class PlantItemMyListWidget extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                _getStateText(plant.state),
+                                _getStateText(localizations, plant.state),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,

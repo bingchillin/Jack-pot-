@@ -366,6 +366,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingError => 'Loading Error';
 
   @override
+  String get statePerfect => 'Perfect';
+
+  @override
   String get stateExcellent => 'Excellent';
 
   @override
@@ -1211,6 +1214,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get encyclopedia => 'Encyclopedia';
+
+  @override
+  String get encyclopediaSubtitle => 'Discover all available plants';
 
   @override
   String get searchPlants => 'Search plants...';

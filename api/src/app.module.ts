@@ -56,6 +56,7 @@ import { FirebaseModule } from './firebase/firebase.module';
 import { SensorsModule } from './sensors/sensors.module';
 import { UploadModule } from './upload/upload.module';
 import { PlantCareScoreModule } from './plant-care-score/plant-care-score.module';
+import { PlantCareModule } from './plant-care/plant-care.module';
 
 @Module({
   imports: [
@@ -141,6 +142,7 @@ import { PlantCareScoreModule } from './plant-care-score/plant-care-score.module
     SensorsModule,
     UploadModule,
     PlantCareScoreModule,
+    PlantCareModule,
   ],
   controllers: [AppController],
   providers: [AppService],

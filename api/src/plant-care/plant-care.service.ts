@@ -6,6 +6,7 @@ import { NotificationLocalizationService } from '../notification/notification-lo
 import { PersonService } from '../person/person.service';
 import { ObjectProfile } from '../object-profile/entities/object-profile.entity';
 import { PlantType } from '../plant-type/entities/plant-type.entity';
+import { PlantHealthCalculationService } from './plant-health-calculation.service';
 
 export interface SensorData {
   humidityAirSensor: number;
@@ -54,6 +55,7 @@ export interface PlantCareResult {
   alertsSent: Array<{ type: string; level: string; message: string }>;
   timestamp: string;
   objectId: number;
+  healthResult?: any; // Include health result in response
 }
 
 @Injectable()
@@ -68,6 +70,7 @@ export class PlantCareService {
     private readonly notificationService: NotificationService,
     private readonly notificationLocalizationService: NotificationLocalizationService,
     private readonly personService: PersonService,
+    private readonly plantHealthCalculationService: PlantHealthCalculationService,
   ) {}
 
   /**
@@ -85,6 +88,12 @@ export class PlantCareService {
       // Process raw sensor data
       const processedData = this.processRawSensorData(rawData, objectId);
       
+      // Calculate plant health
+      const healthResult = await this.plantHealthCalculationService.calculatePlantHealth(objectId, rawData);
+      
+      // Update plant health in database
+      await this.updatePlantHealth(objectId, healthResult);
+      
       // Analyze plant conditions
       const analysis = await this.analyzePlantConditions(objectId, processedData);
       
@@ -97,7 +106,7 @@ export class PlantCareService {
       // Send notifications
       const alertsSent = await this.sendNotifications(objectId, processedData, analysis);
 
-      this.logger.log(`✅ Plant care processed successfully - ${alertsSent.length} alerts sent`);
+      this.logger.log(`✅ Plant care processed successfully - Health: ${healthResult.overallHealth}%, ${alertsSent.length} alerts sent`);
 
       return {
         success: true,
@@ -107,6 +116,7 @@ export class PlantCareService {
         alertsSent,
         timestamp: new Date().toISOString(),
         objectId,
+        healthResult, // Include health result in response
       };
     } catch (error) {
       this.logger.error(`❌ Error processing plant care: ${error.message}`);
@@ -476,6 +486,22 @@ export class PlantCareService {
         lastWateringTime: commands.isWillWatering ? new Date() : undefined,
       },
     );
+  }
+
+  /**
+   * Update plant health in database
+   */
+  async updatePlantHealth(objectId: number, healthResult: any): Promise<void> {
+    await this.objectProfileRepository.update(
+      { idObjectProfile: objectId },
+      {
+        healthPercentage: healthResult.overallHealth,
+        state: healthResult.state, // Update state for backward compatibility
+        updatedAt: new Date(),
+      },
+    );
+    
+    this.logger.log(`🏥 Updated plant health for object ${objectId}: ${healthResult.overallHealth}% (state: ${healthResult.state})`);
   }
 
   /**

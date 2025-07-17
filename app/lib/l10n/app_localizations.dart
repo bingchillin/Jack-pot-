@@ -802,6 +802,12 @@ abstract class AppLocalizations {
   /// **'Loading Error'**
   String get loadingError;
 
+  /// Perfect plant state
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect'**
+  String get statePerfect;
+
   /// Excellent plant state
   ///
   /// In en, this message translates to:
@@ -2385,6 +2391,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Encyclopedia'**
   String get encyclopedia;
+
+  /// Subtitle for the encyclopedia card on the plants page
+  ///
+  /// In en, this message translates to:
+  /// **'Discover all available plants'**
+  String get encyclopediaSubtitle;
 
   /// Search plants placeholder text
   ///

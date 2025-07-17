@@ -25,7 +25,7 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
   String _getStateText(AppLocalizations localizations, int? state) {
     switch (state) {
       case 0:
-        return "Perfect";
+        return localizations.statePerfect;
       case 1:
         return localizations.stateExcellent;
       case 2:
@@ -80,6 +80,12 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
   }
 
   int _getHealthScore() {
+    // Use health percentage if available, otherwise fall back to state-based calculation
+    if (widget.plant.healthPercentage != null) {
+      return widget.plant.healthPercentage!.round();
+    }
+    
+    // Fallback to state-based calculation for backward compatibility
     switch (widget.plant.state) {
       case 0:
         return 100; // Perfect
@@ -513,17 +519,18 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
             ),
             const SizedBox(height: 20),
             
-            // State Badge
+            // Health Percentage Display
             Row(
               children: [
+                // State Badge (smaller, secondary)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: stateColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: stateColor.withValues(alpha: 0.3),
-                      width: 1.5,
+                      width: 1,
                     ),
                   ),
                   child: Row(
@@ -531,14 +538,14 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
                     children: [
                       Icon(
                         _getStateIcon(widget.plant.state),
-                        size: 18,
+                        size: 16,
                         color: stateColor,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Text(
                         _getStateText(localizations, widget.plant.state),
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: stateColor,
                         ),
@@ -547,30 +554,38 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
                   ),
                 ),
                 const Spacer(),
+                // Health Percentage (prominent)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
-                    color: healthColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
+                    color: healthColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: healthColor.withValues(alpha: 0.3),
-                      width: 1.5,
+                      color: healthColor.withValues(alpha: 0.4),
+                      width: 2,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: healthColor.withValues(alpha: 0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         Icons.favorite,
-                        size: 18,
+                        size: 20,
                         color: healthColor,
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '$healthScore%',
+                        '${healthScore}%',
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                           color: healthColor,
                         ),
                       ),
@@ -598,8 +613,12 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
                 Container(
                   height: 8,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: Colors.grey[400]!,
+                      width: 0.5,
+                    ),
                   ),
                   child: FractionallySizedBox(
                     alignment: Alignment.centerLeft,
@@ -619,4 +638,8 @@ class _PlantOverviewTabState extends State<PlantOverviewTab> {
       ),
     );
   }
+
+
+
+
 }
