@@ -4,7 +4,6 @@ import { ObjectProfileService } from './object-profile.service';
 import { PlantCareService } from '../plant-care/plant-care.service';
 import { UpdateObjectProfileDto } from './dto/update-object-profile.dto';
 import { SensorDataDto } from './dto/sensor-data.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Object Profile Electronics')
 @UseInterceptors(ClassSerializerInterceptor)

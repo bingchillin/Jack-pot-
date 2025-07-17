@@ -1250,4 +1250,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ph => 'pH';
+
+  @override
+  String get family => 'Family';
+
+  @override
+  String get plantRequirements => 'Plant Requirements';
+
+  @override
+  String get optimalGrowingConditions => 'Optimal growing conditions';
+
+  @override
+  String get currentSoilMoistureLevel => 'Current soil moisture level';
+
+  @override
+  String get currentTemperature => 'Current temperature';
+
+  @override
+  String get currentLightExposure => 'Current light exposure';
+
+  @override
+  String get currentSoilPHLevel => 'Current soil pH level';
+
+  @override
+  String get conductivity => 'Conductivity';
+
+  @override
+  String get currentSoilConductivity => 'Current soil conductivity';
+
+  @override
+  String get currentAirHumidity => 'Current air humidity';
+
+  @override
+  String get optimalSoilMoistureRange => 'Optimal soil moisture range';
+
+  @override
+  String get optimalTemperatureRange => 'Optimal temperature range';
+
+  @override
+  String get optimalLightRange => 'Optimal light exposure range';
+
+  @override
+  String get optimalSoilPHRange => 'Optimal soil pH range';
+
+  @override
+  String get optimalSoilConductivityRange => 'Optimal soil conductivity range';
+
+  @override
+  String get optimalAirHumidityRange => 'Optimal air humidity range';
 }

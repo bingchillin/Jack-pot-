@@ -1924,5 +1924,85 @@
   "encyclopediaSubtitle": "Descubre todas las plantas disponibles",
   "@encyclopediaSubtitle": {
     "description": "Subtítulo para la tarjeta de enciclopedia en la página de plantas"
+  },
+
+  "family": "Familia",
+  "@family": {
+    "description": "Family label for plant types"
+  },
+
+  "plantRequirements": "Requisitos de la Planta",
+  "@plantRequirements": {
+    "description": "Plant requirements section title"
+  },
+
+  "optimalGrowingConditions": "Condiciones de crecimiento óptimas",
+  "@optimalGrowingConditions": {
+    "description": "Optimal growing conditions subtitle"
+  },
+
+  "currentSoilMoistureLevel": "Nivel de humedad del suelo actual",
+  "@currentSoilMoistureLevel": {
+    "description": "Current soil moisture level description"
+  },
+
+  "currentTemperature": "Temperatura actual",
+  "@currentTemperature": {
+    "description": "Current temperature description"
+  },
+
+  "currentLightExposure": "Exposición a la luz actual",
+  "@currentLightExposure": {
+    "description": "Current light exposure description"
+  },
+
+  "currentSoilPHLevel": "Nivel de pH del suelo actual",
+  "@currentSoilPHLevel": {
+    "description": "Current soil pH level description"
+  },
+
+  "conductivity": "Conductividad",
+  "@conductivity": {
+    "description": "Conductivity sensor label"
+  },
+
+  "currentSoilConductivity": "Conductividad del suelo actual",
+  "@currentSoilConductivity": {
+    "description": "Current soil conductivity description"
+  },
+
+  "currentAirHumidity": "Humedad del aire actual",
+  "@currentAirHumidity": {
+    "description": "Current air humidity description"
+  },
+
+  "optimalSoilMoistureRange": "Rango de humedad del suelo óptimo",
+  "@optimalSoilMoistureRange": {
+    "description": "Optimal soil moisture range description"
+  },
+
+  "optimalTemperatureRange": "Rango de temperatura óptimo",
+  "@optimalTemperatureRange": {
+    "description": "Optimal temperature range description"
+  },
+
+  "optimalLightRange": "Rango de exposición a la luz óptimo",
+  "@optimalLightRange": {
+    "description": "Optimal light exposure range description"
+  },
+
+  "optimalSoilPHRange": "Rango de pH del suelo óptimo",
+  "@optimalSoilPHRange": {
+    "description": "Optimal soil pH range description"
+  },
+
+  "optimalSoilConductivityRange": "Rango de conductividad del suelo óptimo",
+  "@optimalSoilConductivityRange": {
+    "description": "Optimal soil conductivity range description"
+  },
+
+  "optimalAirHumidityRange": "Rango de humedad del aire óptimo",
+  "@optimalAirHumidityRange": {
+    "description": "Optimal air humidity range description"
   }
 } 

@@ -2463,6 +2463,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'pH'**
   String get ph;
+
+  /// Family label for plant types
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get family;
+
+  /// Plant requirements section title
+  ///
+  /// In en, this message translates to:
+  /// **'Plant Requirements'**
+  String get plantRequirements;
+
+  /// Optimal growing conditions subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Optimal growing conditions'**
+  String get optimalGrowingConditions;
+
+  /// Current soil moisture level description
+  ///
+  /// In en, this message translates to:
+  /// **'Current soil moisture level'**
+  String get currentSoilMoistureLevel;
+
+  /// Current temperature description
+  ///
+  /// In en, this message translates to:
+  /// **'Current temperature'**
+  String get currentTemperature;
+
+  /// Current light exposure description
+  ///
+  /// In en, this message translates to:
+  /// **'Current light exposure'**
+  String get currentLightExposure;
+
+  /// Current soil pH level description
+  ///
+  /// In en, this message translates to:
+  /// **'Current soil pH level'**
+  String get currentSoilPHLevel;
+
+  /// Conductivity sensor label
+  ///
+  /// In en, this message translates to:
+  /// **'Conductivity'**
+  String get conductivity;
+
+  /// Current soil conductivity description
+  ///
+  /// In en, this message translates to:
+  /// **'Current soil conductivity'**
+  String get currentSoilConductivity;
+
+  /// Current air humidity description
+  ///
+  /// In en, this message translates to:
+  /// **'Current air humidity'**
+  String get currentAirHumidity;
+
+  /// Optimal soil moisture range description
+  ///
+  /// In en, this message translates to:
+  /// **'Optimal soil moisture range'**
+  String get optimalSoilMoistureRange;
+
+  /// Optimal temperature range description
+  ///
+  /// In en, this message translates to:
+  /// **'Optimal temperature range'**
+  String get optimalTemperatureRange;
+
+  /// Optimal light exposure range description
+  ///
+  /// In en, this message translates to:
+  /// **'Optimal light exposure range'**
+  String get optimalLightRange;
+
+  /// Optimal soil pH range description
+  ///
+  /// In en, this message translates to:
+  /// **'Optimal soil pH range'**
+  String get optimalSoilPHRange;
+
+  /// Optimal soil conductivity range description
+  ///
+  /// In en, this message translates to:
+  /// **'Optimal soil conductivity range'**
+  String get optimalSoilConductivityRange;
+
+  /// Optimal air humidity range description
+  ///
+  /// In en, this message translates to:
+  /// **'Optimal air humidity range'**
+  String get optimalAirHumidityRange;
 }
 
 class _AppLocalizationsDelegate

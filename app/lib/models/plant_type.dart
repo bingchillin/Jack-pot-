@@ -10,18 +10,37 @@ class PlantType {
   final String? typeName;
   final String? expositionType;
   final String? groundType;
-  final double? phGroundSensor;
-  final double? conductivityElectriqueFertilitySensor;
-  final double? lightSensor;
-  final double? temperatureSensorGround;
-  final double? temperatureSensorExtern;
-  final double? humidityAirSensor;
-  final double? humidityGroundSensor;
-  final double? expositionTimeSun;
+  
+  // pH range
+  final double? phMin;
+  final double? phMax;
+  
+  // Conductivity range
+  final double? conductivityElectriqueFertilityMin;
+  final double? conductivityElectriqueFertilityMax;
+  
+  // Temperature ranges
+  final double? temperatureSensorGroundMin;
+  final double? temperatureSensorGroundMax;
+  final double? temperatureSensorExternMin;
+  final double? temperatureSensorExternMax;
+  
+  // Humidity ranges
+  final double? humidityAirSensorMin;
+  final double? humidityAirSensorMax;
+  final double? humidityGroundSensorMin;
+  final double? humidityGroundSensorMax;
+  
+  // Light range
+  final double? lightSensorMin;
+  final double? lightSensorMax;
+  
+  // Sun exposure range
+  final double? expositionTimeSunMin;
+  final double? expositionTimeSunMax;
+  
   final String? pathPicture;
-
   final List<Avatar> avatars;
-
 
   PlantType({
     required this.idPlantType,
@@ -33,45 +52,73 @@ class PlantType {
     this.typeName,
     this.expositionType,
     this.groundType,
-    this.phGroundSensor,
-    this.conductivityElectriqueFertilitySensor,
-    this.lightSensor,
-    this.temperatureSensorGround,
-    this.temperatureSensorExtern,
-    this.humidityAirSensor,
-    this.humidityGroundSensor,
-    this.expositionTimeSun,
+    this.phMin,
+    this.phMax,
+    this.conductivityElectriqueFertilityMin,
+    this.conductivityElectriqueFertilityMax,
+    this.temperatureSensorGroundMin,
+    this.temperatureSensorGroundMax,
+    this.temperatureSensorExternMin,
+    this.temperatureSensorExternMax,
+    this.humidityAirSensorMin,
+    this.humidityAirSensorMax,
+    this.humidityGroundSensorMin,
+    this.humidityGroundSensorMax,
+    this.lightSensorMin,
+    this.lightSensorMax,
+    this.expositionTimeSunMin,
+    this.expositionTimeSunMax,
     this.pathPicture,
-
     required this.avatars,
   });
 
   factory PlantType.fromJson(Map<String, dynamic> json) {
     return PlantType(
-    idPlantType: json['idPlantType'],
-    title: json['title'],
-    description: json['description'],
-    advise: json['advise'],
-    scientistName: json['scientistName'],
-    familyName: json['familyName'],
-    typeName: json['typeName'],
-    expositionType: json['expositionType'],
-    groundType: json['groundType'],
-    phGroundSensor: json['phGroundSensor'] != null ? double.tryParse(json['phGroundSensor'].toString()) : null,
-    conductivityElectriqueFertilitySensor: json['conductivityElectriqueFertilitySensor'] != null ? double.tryParse(json['conductivityElectriqueFertilitySensor'].toString()) : null,
-    lightSensor: json['lightSensor'] != null ? double.tryParse(json['lightSensor'].toString()) : null,
-    temperatureSensorGround: json['temperatureSensorGround'] != null ? double.tryParse(json['temperatureSensorGround'].toString()) : null,
-    temperatureSensorExtern: json['temperatureSensorExtern'] != null ? double.tryParse(json['temperatureSensorExtern'].toString()) : null,
-    humidityAirSensor: json['humidityAirSensor'] != null ? double.tryParse(json['humidityAirSensor'].toString()) : null,
-    humidityGroundSensor: json['humidityGroundSensor'] != null ? double.tryParse(json['humidityGroundSensor'].toString()) : null,
-    expositionTimeSun: json['expositionTimeSun'] != null ? double.tryParse(json['expositionTimeSun'].toString()) : null,
-    pathPicture: json['pathPicture'],
-    avatars: (json['avatars'] as List<dynamic>?)
-        ?.map((avatarJson) {
-          return Avatar.fromJson(avatarJson);
-        })
-        .toList() ??
-        [],
+      idPlantType: json['idPlantType'],
+      title: json['title'],
+      description: json['description'],
+      advise: json['advise'],
+      scientistName: json['scientistName'],
+      familyName: json['familyName'],
+      typeName: json['typeName'],
+      expositionType: json['expositionType'],
+      groundType: json['groundType'],
+      
+      // pH range
+      phMin: json['phMin'] != null ? double.tryParse(json['phMin'].toString()) : null,
+      phMax: json['phMax'] != null ? double.tryParse(json['phMax'].toString()) : null,
+      
+      // Conductivity range
+      conductivityElectriqueFertilityMin: json['conductivityElectriqueFertilityMin'] != null ? double.tryParse(json['conductivityElectriqueFertilityMin'].toString()) : null,
+      conductivityElectriqueFertilityMax: json['conductivityElectriqueFertilityMax'] != null ? double.tryParse(json['conductivityElectriqueFertilityMax'].toString()) : null,
+      
+      // Temperature ranges
+      temperatureSensorGroundMin: json['temperatureSensorGroundMin'] != null ? double.tryParse(json['temperatureSensorGroundMin'].toString()) : null,
+      temperatureSensorGroundMax: json['temperatureSensorGroundMax'] != null ? double.tryParse(json['temperatureSensorGroundMax'].toString()) : null,
+      temperatureSensorExternMin: json['temperatureSensorExternMin'] != null ? double.tryParse(json['temperatureSensorExternMin'].toString()) : null,
+      temperatureSensorExternMax: json['temperatureSensorExternMax'] != null ? double.tryParse(json['temperatureSensorExternMax'].toString()) : null,
+      
+      // Humidity ranges
+      humidityAirSensorMin: json['humidityAirSensorMin'] != null ? double.tryParse(json['humidityAirSensorMin'].toString()) : null,
+      humidityAirSensorMax: json['humidityAirSensorMax'] != null ? double.tryParse(json['humidityAirSensorMax'].toString()) : null,
+      humidityGroundSensorMin: json['humidityGroundSensorMin'] != null ? double.tryParse(json['humidityGroundSensorMin'].toString()) : null,
+      humidityGroundSensorMax: json['humidityGroundSensorMax'] != null ? double.tryParse(json['humidityGroundSensorMax'].toString()) : null,
+      
+      // Light range
+      lightSensorMin: json['lightSensorMin'] != null ? double.tryParse(json['lightSensorMin'].toString()) : null,
+      lightSensorMax: json['lightSensorMax'] != null ? double.tryParse(json['lightSensorMax'].toString()) : null,
+      
+      // Sun exposure range
+      expositionTimeSunMin: json['expositionTimeSunMin'] != null ? double.tryParse(json['expositionTimeSunMin'].toString()) : null,
+      expositionTimeSunMax: json['expositionTimeSunMax'] != null ? double.tryParse(json['expositionTimeSunMax'].toString()) : null,
+      
+      pathPicture: json['pathPicture'],
+      avatars: (json['avatars'] as List<dynamic>?)
+          ?.map((avatarJson) {
+            return Avatar.fromJson(avatarJson);
+          })
+          .toList() ??
+          [],
     );
   }
 }

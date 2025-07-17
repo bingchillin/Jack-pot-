@@ -1971,5 +1971,85 @@
   "temperature": "Température",
   "light": "Lumière",
   "ph": "pH",
-  "totalScore": "Score total"
+  "totalScore": "Score total",
+
+  "family": "Famille",
+  "@family": {
+    "description": "Family label for plant types"
+  },
+
+  "plantRequirements": "Exigences de la Plante",
+  "@plantRequirements": {
+    "description": "Plant requirements section title"
+  },
+
+  "optimalGrowingConditions": "Conditions de croissance optimales",
+  "@optimalGrowingConditions": {
+    "description": "Optimal growing conditions subtitle"
+  },
+
+  "currentSoilMoistureLevel": "Niveau d'humidité du sol actuel",
+  "@currentSoilMoistureLevel": {
+    "description": "Current soil moisture level description"
+  },
+
+  "currentTemperature": "Température actuelle",
+  "@currentTemperature": {
+    "description": "Current temperature description"
+  },
+
+  "currentLightExposure": "Exposition à la lumière actuelle",
+  "@currentLightExposure": {
+    "description": "Current light exposure description"
+  },
+
+  "currentSoilPHLevel": "Niveau de pH du sol actuel",
+  "@currentSoilPHLevel": {
+    "description": "Current soil pH level description"
+  },
+
+  "conductivity": "Conductivité",
+  "@conductivity": {
+    "description": "Conductivity sensor label"
+  },
+
+  "currentSoilConductivity": "Conductivité du sol actuelle",
+  "@currentSoilConductivity": {
+    "description": "Current soil conductivity description"
+  },
+
+  "currentAirHumidity": "Humidité de l'air actuelle",
+  "@currentAirHumidity": {
+    "description": "Current air humidity description"
+  },
+
+  "optimalSoilMoistureRange": "Plage d'humidité du sol optimale",
+  "@optimalSoilMoistureRange": {
+    "description": "Optimal soil moisture range description"
+  },
+
+  "optimalTemperatureRange": "Plage de température optimale",
+  "@optimalTemperatureRange": {
+    "description": "Optimal temperature range description"
+  },
+
+  "optimalLightRange": "Plage d'exposition à la lumière optimale",
+  "@optimalLightRange": {
+    "description": "Optimal light exposure range description"
+  },
+
+  "optimalSoilPHRange": "Plage de pH du sol optimale",
+  "@optimalSoilPHRange": {
+    "description": "Optimal soil pH range description"
+  },
+
+  "optimalSoilConductivityRange": "Plage de conductivité du sol optimale",
+  "@optimalSoilConductivityRange": {
+    "description": "Optimal soil conductivity range description"
+  },
+
+  "optimalAirHumidityRange": "Plage d'humidité de l'air optimale",
+  "@optimalAirHumidityRange": {
+    "description": "Optimal air humidity range description"
+  }
 } 

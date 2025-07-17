@@ -5,6 +5,7 @@ import '../../services/plant_type_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../app_config.dart';
 import '../../models/avatar.dart';
+import 'plant_type_detail_page.dart';
 
 class EncyclopediaPage extends StatefulWidget {
   const EncyclopediaPage({Key? key}) : super(key: key);
@@ -199,11 +200,10 @@ class _EncyclopediaPageState extends State<EncyclopediaPage> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            // TODO: Navigate to plant type detail page
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${plantType.title} - Détails à venir'),
-                backgroundColor: Colors.green[600],
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PlantTypeDetailPage(plantType: plantType),
               ),
             );
           },

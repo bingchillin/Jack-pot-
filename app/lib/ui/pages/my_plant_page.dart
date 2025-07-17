@@ -496,6 +496,96 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
     );
   }
 
+  Widget _buildSectionHeaderWithEncyclopedia(String title, String subtitle, IconData icon, AppLocalizations localizations) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.green[600],
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green[300]!.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Encyclopedia Icon
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                Navigator.pushNamed(context, '/encyclopedia');
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.green[200]!,
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.book,
+                      size: 20,
+                      color: Colors.green[600],
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 16,
+                      color: Colors.green[600],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEmptyState(String title, String subtitle, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(48),
@@ -547,17 +637,17 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
         border: Border.all(
-          color: Colors.green[300]!.withValues(alpha: 0.3),
-          width: 2,
+          color: Colors.green[200]!.withValues(alpha: 0.3),
+          width: 1,
         ),
       ),
       child: Material(
@@ -566,38 +656,31 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
           onTap: () {
             Navigator.pushNamed(context, '/encyclopedia');
           },
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20),
             child: Row(
               children: [
                 // Encyclopedia Icon
                 Container(
-                  width: 80,
-                  height: 80,
+                  width: 60,
+                  height: 60,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.green[600]!, Colors.green[700]!],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.green[300]!.withValues(alpha: 0.6),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.book,
-                    size: 40,
+                    size: 28,
                     color: Colors.white,
                   ),
                 ),
                 
-                const SizedBox(width: 20),
+                const SizedBox(width: 16),
                 
                 // Text Content
                 Expanded(
@@ -606,19 +689,19 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
                     children: [
                       Text(
                         localizations.encyclopedia,
-                        style: const TextStyle(
-                          fontSize: 20,
+                        style: TextStyle(
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Colors.grey[800],
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4.0),
                       Text(
                         localizations.encyclopediaSubtitle,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color: Colors.grey[600],
-                          height: 1.4,
+                          height: 1.3,
                         ),
                       ),
                     ],
@@ -629,7 +712,7 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
                 Icon(
                   Icons.chevron_right,
                   color: Colors.green[600],
-                  size: 24,
+                  size: 20,
                 ),
               ],
             ),
@@ -721,10 +804,11 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
 
                   // My List Section
                   SliverToBoxAdapter(
-                    child: _buildSectionHeader(
+                    child: _buildSectionHeaderWithEncyclopedia(
                       localizations.myList,
                       localizations.myPlantsSubtitle,
                       Icons.list_alt,
+                      localizations,
                     ),
                   ),
 
@@ -764,24 +848,6 @@ class _MyPlantPageState extends State<MyPlantPage> with TickerProviderStateMixin
                         ),
                       );
                     },
-                  ),
-
-                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
-
-                  // Encyclopedia Section
-                  SliverToBoxAdapter(
-                    child: _buildSectionHeader(
-                      localizations.encyclopedia,
-                      localizations.encyclopedia,
-                      Icons.book,
-                    ),
-                  ),
-
-                  SliverToBoxAdapter(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 24),
-                      child: _buildEncyclopediaCard(localizations),
-                    ),
                   ),
 
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
