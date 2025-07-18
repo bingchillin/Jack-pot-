@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:jackpote/app_config.dart';
 import '../services/notification_service.dart';
+import '../services/crashlytics_service.dart';
 
 class CurrentUser {
   final int idPerson;
@@ -216,10 +217,25 @@ class AuthProvider extends ChangeNotifier {
         return true;
       } else {
         print('❌ Login failed: ${response.statusCode}');
+        // Enregistrer l'erreur d'API avec Crashlytics
+        await CrashlyticsService().recordApiError(
+          AppConfig.loginEndpoint,
+          response.statusCode,
+          response.body,
+          method: 'POST',
+          requestData: {'email': email},
+        );
         return false;
       }
     } catch (e) {
       print('❌ Login error: $e');
+      // Enregistrer l'erreur avec Crashlytics
+      await CrashlyticsService().recordError(
+        e,
+        StackTrace.current,
+        reason: 'Login error',
+        additionalData: {'email': email},
+      );
       return false;
     }
   }

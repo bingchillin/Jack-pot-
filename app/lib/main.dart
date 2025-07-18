@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 
 import 'bloc/object_profile/object_profile_event.dart';
 import 'routes/app_routes.dart';
@@ -23,6 +25,7 @@ import 'services/comment_service.dart';
 import 'services/notification_service.dart';
 import 'services/plant_care_score_service.dart';
 import 'services/daily_score_background_service.dart';
+import 'services/crashlytics_service.dart';
 import 'ui/pages/user_profile_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -44,6 +47,12 @@ Future<void> main() async {
   
   // Initialize Firebase
   await Firebase.initializeApp();
+  
+  // Initialize Crashlytics
+  await _initializeCrashlytics();
+  
+  // Initialize Crashlytics Service
+  await CrashlyticsService().initialize();
   
   // Set background message handler
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
@@ -205,6 +214,34 @@ class _RootAppState extends State<RootApp> {
         },
       ),
     );
+  }
+}
+
+/// Initialize Crashlytics with proper error handling
+Future<void> _initializeCrashlytics() async {
+  try {
+    // Pass all uncaught errors from the framework to Crashlytics
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+    
+    // Enable Crashlytics collection while doing development
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
+    
+    // Set user identifier if available
+    // await FirebaseCrashlytics.instance.setUserIdentifier('user_id');
+    
+    // Set custom keys for better crash analysis
+    await FirebaseCrashlytics.instance.setCustomKey('app_version', '1.0.3+2');
+    await FirebaseCrashlytics.instance.setCustomKey('platform', defaultTargetPlatform.toString());
+    
+    print('✅ Crashlytics initialized successfully');
+  } catch (e) {
+    print('❌ Error initializing Crashlytics: $e');
   }
 }
 
