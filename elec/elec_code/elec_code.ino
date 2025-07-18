@@ -3,6 +3,9 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
+// Deep sleep
+#include "esp_sleep.h"
+
 
 //sensor temperature ground
 #include <OneWire.h>
@@ -35,6 +38,7 @@
 #define BUTTON_PIN_BLUETOOTH 33
 #define BUTTON_PIN_RED_WATER 13
 #define BUTTON_PIN_WHITE_UV_LED 4
+#define BUTTON_PIN_IS_AUTO 25
 
 #define LED_PIN_BLUE 19
 #define LED_PIN_RED 27
@@ -98,13 +102,16 @@ bool activateBle = false;
 
 int lightSensorData = 0;
 bool isWillWateringData = false;
-bool isAutomaticData = true;
+bool isAutomaticData = false;
 int stateData = 0;
+
+bool isWillWateringDataInter = false;
 
 // patch to database
 
 int lightSensorDataPatch = 0;
 bool isWillWateringDataPatch = false;
+bool isAutoDataPatch = false;
 
 
 // ======= CONFIGURATION  WIFI=======
@@ -134,15 +141,13 @@ unsigned long lastBlinkTimeLedMotor = 0;
 
 bool isButtonPressedR = false;
 bool isButtonPressedW = false;
-
-
-const unsigned long NETWORK_SEND_INTERVAL_PATCH_ALL = 1800000; // 30min
-const unsigned long NETWORK_SEND_INTERVAL_GET_ALL = 3000; // 5s 
+bool isButtonPressedIA = false;
 
 // Glosary func
 void IRAM_ATTR onButtonPressedBluetooth();
 void IRAM_ATTR onButtonPressedWater();
 void IRAM_ATTR onButtonPressedUVLed();
+void IRAM_ATTR onButtonPressedIsAuto();
 void loadPreferences();
 
 void setup() {
@@ -172,12 +177,30 @@ void setup() {
   pinMode(BUTTON_PIN_BLUETOOTH, INPUT_PULLUP);
   pinMode(BUTTON_PIN_RED_WATER, INPUT_PULLUP);
   pinMode(BUTTON_PIN_WHITE_UV_LED, INPUT_PULLUP);
+  pinMode(BUTTON_PIN_IS_AUTO, INPUT_PULLUP);
 
   // Création sensor temperature humidity extern
   dht.begin();
 
   sensors.begin();
+  
+  // Begin with update data and retrieve data
+  checkWiFiConnection();
+        
+  if (WiFi.status() == WL_CONNECTED && id_object_profile != "") {
+    fetchObjectProfileData();
+  }
 
+   // Vérifie la cause du réveil
+  esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  if (wakeup_reason == ESP_SLEEP_WAKEUP_EXT0) {
+    Serial.println("🟢 Réveillé par le bouton IS_AUTO !");
+    isAutoDataPatch = false;
+    PatchDataBaseSpeAuto();
+    delay(300);
+  }
+        
 
   ///////////// Bluetooth task ////////////////
 
@@ -186,6 +209,9 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_RED_WATER), onButtonPressedWater, FALLING);
 
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_WHITE_UV_LED), onButtonPressedUVLed, FALLING);
+
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_IS_AUTO), onButtonPressedIsAuto, FALLING);
+
 
   xTaskCreate(taskPatchDynamic, "Patch after press button", 10000, NULL, 1, NULL);
   
@@ -222,11 +248,15 @@ void setup() {
   xTaskCreate(taskGetMotor, "Pression motor", 8192, NULL, 1, NULL);
 
   // function UV led 
-  xTaskCreate(taskGetUVLed, "UV Led", 8192, NULL, 1, NULL);
+  xTaskCreate(taskGetUVLed, "UV Led", 4096, NULL, 1, NULL);
 
   // function information led 
   xTaskCreate(taskGetInformationLed, "Information Led", 8192, NULL, 1, NULL);
 
+  // function deep sleep
+  xTaskCreate(taskCheckIfShouldSleep, "Check Auto Sleep", 8192, NULL, 1, NULL);
+
+  
     
 }
 
@@ -281,6 +311,7 @@ void checkWiFiConnection() {
 
 // For Patch http request
 void sendPatchRequest(String endpoint, const String& jsonPayload) {
+
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("📴 Pas de WiFi, requête ignorée.");
     return;
@@ -309,17 +340,17 @@ void sendPatchRequest(String endpoint, const String& jsonPayload) {
   http.end();
 }
 
-void taskPatchDataBase(void* parameter) {
+void taskPatchDataBase(void * parameter) {
   while (true) {
     if (activateBle == false){
       PatchDataBase();
     }
 
-    vTaskDelay(NETWORK_SEND_INTERVAL_PATCH_ALL / portTICK_PERIOD_MS);
+    vTaskDelay(60000 / portTICK_PERIOD_MS);
   }
 }
 
-void PatchDataBase(){
+void PatchDataBaseSpe(){
   checkWiFiConnection();
 
      if (WiFi.status() == WL_CONNECTED && id_object_profile != "") {
@@ -335,7 +366,57 @@ void PatchDataBase(){
           payload += "\"temperatureSensorExtern\":" + String(sensor_extern_temperature, 2) + ",";
           payload += "\"expositionTimeSun\":" + String(exposition_time_sun) + ",";
           payload += "\"water_sensor\":" + String(sensor_water_level, 2)+ ",";
+          payload += "\"isAutomatic\":" + String(isAutoDataPatch ? "true" : "false" )+ ",";
           payload += "\"isWillWatering\":" + String(isWillWateringDataPatch ? "true" : "false");
+          payload += "}";
+      
+          sendPatchRequest("/object-profile-elec/" + id_object_profile, payload);
+     }
+}
+
+void PatchDataBaseSpeMotor(){
+  checkWiFiConnection();
+
+     if (WiFi.status() == WL_CONNECTED && id_object_profile != "") {
+
+          // Construction du JSON
+          String payload = "{";
+          payload += "\"isWillWatering\":" + String(isWillWateringDataPatch ? "true" : "false" );
+          payload += "}";
+      
+          sendPatchRequest("/object-profile-elec/" + id_object_profile, payload);
+     }
+}
+
+void PatchDataBaseSpeAuto(){
+  checkWiFiConnection();
+
+     if (WiFi.status() == WL_CONNECTED && id_object_profile != "") {
+
+          // Construction du JSON
+          String payload = "{";
+          payload += "\"isAutomatic\":" + String(isAutoDataPatch ? "true" : "false" );
+          payload += "}";
+      
+          sendPatchRequest("/object-profile-elec/" + id_object_profile, payload);
+     }
+}
+
+void PatchDataBase(){
+  checkWiFiConnection();
+
+     if (WiFi.status() == WL_CONNECTED && id_object_profile != "") {
+
+          // Construction du JSON
+          String payload = "{";
+          payload += "\"humidityAirSensor\":" + String(sensor_extern_humidity, 2) + ",";
+          payload += "\"humidityGroundSensor\":" + String(sensor_ground_humidity, 2) + ",";
+          payload += "\"phGroundSensor\":" + String(ph_ground_sensor, 2) + ",";
+          payload += "\"conductivityElectriqueFertilitySensor\":" + String(conductivity_electrolyte, 2) + ",";
+          payload += "\"temperatureSensorGround\":" + String(sensor_temprature_ground, 2) + ",";
+          payload += "\"temperatureSensorExtern\":" + String(sensor_extern_temperature, 2) + ",";
+          payload += "\"expositionTimeSun\":" + String(exposition_time_sun) + ",";
+          payload += "\"water_sensor\":" + String(sensor_water_level, 2);
           payload += "}";
       
           sendPatchRequest("/object-profile-elec/" + id_object_profile, payload);
@@ -400,7 +481,7 @@ void parseObjectProfileData(String payload) {
 }
 
 
-void taskGetAllDataBase(void* parameter) {
+void taskGetAllDataBase(void * parameter) {
   while (true) {
      if (activateBle == false){
         checkWiFiConnection();
@@ -410,7 +491,7 @@ void taskGetAllDataBase(void* parameter) {
         }
      }
 
-    vTaskDelay(NETWORK_SEND_INTERVAL_GET_ALL / portTICK_PERIOD_MS);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
   }
 }
 
@@ -565,9 +646,6 @@ void taskGetMotor(void * parameter) {
 void handleGetMotor() {
 
   if(isWillWateringData){
-    isWillWateringDataPatch = false;
-    Serial.println("💧 Début arrosage (déclenché par isWillWateringData)");
-    PatchDataBase();
     motor = true;
   }
   
@@ -577,6 +655,11 @@ void handleGetMotor() {
     count_motor += 1;
   
     if (count_motor == 6) {
+      isWillWateringDataPatch = false;
+      Serial.println("💧 Fin arrosage (déclenché par isWillWateringData)");
+      
+      PatchDataBaseSpeMotor();
+     
       count_motor = 0;
       motor = false;
     }
@@ -654,6 +737,35 @@ bool getBlinkState(unsigned long currentTime) {
   return greenLedState ? HIGH : LOW;
 }
 
+
+void taskCheckIfShouldSleep(void* parameter) {
+  const int sleepDurationSeconds = 3600; // 1 heure de sommeil
+  //const int sleepDurationSeconds = 60; // 1 heure de sommeil
+
+  while (true) {
+    if(activateBle == false){
+      if (isAutomaticData && isAutoDataPatch && (isWillWateringData == false && lightSensorData == 0) ) {
+        PatchDataBase();
+        Serial.println("🔄 isAutomaticData = true → Deep Sleep pendant 1h");
+  
+        esp_sleep_enable_timer_wakeup(sleepDurationSeconds * 1000000ULL);
+  
+        Serial.flush(); // s'assurer que tout est envoyé à la console
+        // Configuration pour réveil avec le bouton GPIO 25 (falling edge si bouton connecté à GND)
+        esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN_IS_AUTO, 0); // 0 = niveau bas déclenche le réveil
+  
+        esp_deep_sleep_start(); 
+      }else{
+        Serial.println("🔄 isAutomaticData = false → On dort pas nous !");
+  
+      }
+    }
+
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+  }
+}
+
+
 /////////
 
 //// Button configuration/////
@@ -669,6 +781,11 @@ void IRAM_ATTR onButtonPressedUVLed() {
   isButtonPressedW = true;
 }
 
+void IRAM_ATTR onButtonPressedIsAuto() {
+  Serial.println("Press white IsAuto");
+  isButtonPressedIA = true;
+}
+
 void taskPatchDynamic(void* parameter) {
   while (true) {
 
@@ -678,14 +795,29 @@ void taskPatchDynamic(void* parameter) {
         Serial.println("Enter task R");
         isButtonPressedR = false;
         isWillWateringDataPatch = true;
+        isAutoDataPatch = false;
+        PatchDataBaseSpe();
       }
       
       if (isButtonPressedW){
         Serial.println("Enter task W");
         isButtonPressedW = false;
-        lightSensorDataPatch = !lightSensorDataPatch;
+        lightSensorDataPatch = !lightSensorData;
+        isAutoDataPatch = false;
+        PatchDataBaseSpe();
       }
-      PatchDataBase();
+
+     
+      if (isButtonPressedIA){
+        Serial.println("Enter task IA");
+        isButtonPressedIA = false;
+        isAutoDataPatch = !isAutomaticData;
+        PatchDataBaseSpeAuto();
+      }
+
+      
+      
+      
     }
 
     vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -700,6 +832,7 @@ void taskPatchDynamic(void* parameter) {
 /////////////////////////////////////// Bluetooth configuration ///////////////////////////////////
 // ==== ISR ====
 void IRAM_ATTR onButtonPressedBluetooth() {
+  Serial.println("PRESS BLUE");
   startBLERequested = true; 
 }
 
@@ -710,7 +843,10 @@ void IRAM_ATTR onButtonPressedBluetooth() {
 // ==== BLE CALLBACK ====
 class MyCallbacks : public NimBLECharacteristicCallbacks {
   void onWrite(NimBLECharacteristic* pChr, NimBLEConnInfo& info) override {
-    String value = pChr->getValue().c_str();
+
+    std::string stdValue = pChr->getValue();
+    String value = String(stdValue.c_str());
+
     Serial.print("📥 Reçu Flutter : ");
     Serial.println(value);
     lastActivity = millis();
@@ -798,7 +934,8 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
             digitalWrite(LED_PIN_BLUE, LOW);
         }
       }else {
-        Serial.println("❌ Erreur de parsing JSON");
+         Serial.print(F("Erreur de parsing JSON : "));
+        Serial.println(error.c_str());
       }
     }
 
@@ -925,27 +1062,38 @@ void taskPushIdObject(void *parameter) {
 
 ////// TEST WIFI ////////
 bool testWiFiConnection(const String& ssid, const String& password) {
+  Serial.println("📴 Déconnexion du Wi-Fi précédent...");
   WiFi.disconnect(true, true); 
-  delay(200);                  
+  delay(500); // un peu plus de temps pour que la déconnexion se fasse proprement
+  
   WiFi.mode(WIFI_STA);         
-  delay(100);         
+  delay(200);
+
+  Serial.print("🔌 Connexion à : ");
+  Serial.println(ssid);
+  
   WiFi.begin(ssid.c_str(), password.c_str());
 
-  Serial.println("🔌 Connexion Wi-Fi en cours...");
-
   unsigned long startAttemptTime = millis();
-  const unsigned long timeout = 15000; // 10 secondes
-
+  const unsigned long timeout = 15000; // 15 secondes
   while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
     delay(500);
     Serial.print(".");
   }
 
+  Serial.println(); // saut de ligne après les "..."
+
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\n✅ Connexion Wi-Fi réussie !");
+    Serial.println("✅ Connexion Wi-Fi réussie !");
+    Serial.print("📶 IP : ");
+    Serial.println(WiFi.localIP());
+    Serial.print("📡 RSSI : ");
+    Serial.println(WiFi.RSSI()); // qualité du signal
     return true;
   } else {
-    Serial.println("\n❌ Échec de connexion Wi-Fi.");
+    Serial.println("❌ Échec de connexion Wi-Fi.");
+    Serial.print("🧾 Statut WiFi : ");
+    Serial.println(WiFi.status()); // affiche le code (ex: 1 = NO_SSID_AVAILABLE)
     return false;
   }
 }
