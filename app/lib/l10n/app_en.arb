@@ -2322,5 +2322,70 @@
   "optimalAirHumidityRange": "Optimal air humidity range",
   "@optimalAirHumidityRange": {
     "description": "Optimal air humidity range description"
+  },
+
+  "leaderboard": "Leaderboard",
+  "@leaderboard": {
+    "description": "Leaderboard title"
+  },
+
+  "leaderboardDescription": "See how you rank among other plant caretakers!",
+  "@leaderboardDescription": {
+    "description": "Leaderboard description"
+  },
+
+  "viewRankings": "View Rankings",
+  "@viewRankings": {
+    "description": "View rankings button text"
+  },
+
+  "unranked": "Unranked",
+  "@unranked": {
+    "description": "Unranked status text"
+  },
+
+  "totalScore": "Total Score",
+  "@totalScore": {
+    "description": "Total score label"
+  },
+
+  "plants": "Plants",
+  "@plants": {
+    "description": "Plants label"
+  },
+
+  "rank": "Rank",
+  "@rank": {
+    "description": "Rank label"
+  },
+
+  "noData": "No Data",
+  "@noData": {
+    "description": "No data available text"
+  },
+
+  "errorLoadingLeaderboard": "Error loading leaderboard",
+  "@errorLoadingLeaderboard": {
+    "description": "Error loading leaderboard message"
+  },
+
+  "errorLoadingMoreData": "Error loading more data",
+  "@errorLoadingMoreData": {
+    "description": "Error loading more data message"
+  },
+
+  "eventsComingSoon": "Events Coming Soon",
+  "@eventsComingSoon": {
+    "description": "Events coming soon title"
+  },
+
+  "eventsDescription": "Stay tuned for exciting plant care events and challenges!",
+  "@eventsDescription": {
+    "description": "Events description text"
+  },
+
+  "errorLoadingStats": "Error loading stats",
+  "@errorLoadingStats": {
+    "description": "Error loading stats message"
   }
 } 

@@ -11,7 +11,6 @@ export interface LeaderboardEntry {
   username: string;
   totalScore: number;
   plantCount: number;
-  averageScore: number;
 }
 
 export interface LeaderboardResponse {
@@ -80,7 +79,6 @@ export class LeaderboardService {
         .select([
           'person.idPerson as userId',
           'SUM(score.dailyScore) as totalScore',
-          'AVG(score.dailyScore) as averageScore'
         ])
         .innerJoin('score.objectProfile', 'profile')
         .innerJoin('profile.person', 'person')
@@ -90,20 +88,18 @@ export class LeaderboardService {
       // Create a map of scores for quick lookup
       const scoreMap = new Map();
       userScores.forEach(score => {
-        scoreMap.set(score.userId, {
-          totalScore: parseInt(score.totalScore) || 0,
-          averageScore: parseFloat(score.averageScore) || 0
+        scoreMap.set(score.userid || score.userId, {
+          totalScore: parseInt(score.totalscore || score.totalScore) || 0,
         });
       });
 
       // Combine stats and scores
       const combinedStats = userStats.map(user => {
-        const scores = scoreMap.get(user.userId) || { totalScore: 0, averageScore: 0 };
+        const scores = scoreMap.get(user.userid || user.userId) || { totalScore: 0 };
         return {
-          userId: user.userId,
-          plantCount: parseInt(user.plantCount) || 0,
+          userId: user.userid || user.userId,
+          plantCount: parseInt(user.plantcount || user.plantCount) || 0,
           totalScore: scores.totalScore,
-          averageScore: scores.averageScore
         };
       });
 
@@ -119,10 +115,9 @@ export class LeaderboardService {
       this.leaderboardCache = combinedStats.map((user, index) => ({
         rank: index + 1,
         userId: user.userId,
-        username: userStats.find(u => u.userId === user.userId)?.firstname + ' ' + userStats.find(u => u.userId === user.userId)?.surname,
+        username: userStats.find(u => (u.userid || u.userId) === user.userId)?.firstname + ' ' + userStats.find(u => (u.userid || u.userId) === user.userId)?.surname,
         totalScore: user.totalScore,
         plantCount: user.plantCount,
-        averageScore: user.averageScore,
       }));
 
       this.lastCacheUpdate = new Date();
@@ -242,7 +237,6 @@ export class LeaderboardService {
           username: `${user.firstname} ${user.surname}`,
           totalScore: 0,
           plantCount: plantCount,
-          averageScore: 0,
         };
       }
 
@@ -287,18 +281,6 @@ export class LeaderboardService {
       const totalScore = parseInt(scoreResult?.totalScore) || 0;
       this.logger.log(`📊 Total score for user ${userId}: ${totalScore}`);
 
-      // Get average score for this user
-      const avgResult = await this.plantCareScoreRepository
-        .createQueryBuilder('score')
-        .select('AVG(score.dailyScore)', 'averageScore')
-        .innerJoin('score.objectProfile', 'profile')
-        .where('profile.person.idPerson = :userId', { userId })
-        .getRawOne();
-      
-      this.logger.log(`📊 Average result: ${JSON.stringify(avgResult)}`);
-      const averageScore = parseFloat(avgResult?.averageScore) || 0;
-      this.logger.log(`📊 Average score for user ${userId}: ${averageScore}`);
-
       // Get user's rank (only among users with scores)
       let rank = 0;
       if (totalScore > 0) {
@@ -340,7 +322,6 @@ export class LeaderboardService {
         username: `${user.firstname} ${user.surname}`,
         totalScore: totalScore,
         plantCount: plantCount,
-        averageScore: averageScore,
       };
 
       this.logger.log(`✅ Final result: ${JSON.stringify(result)}`);

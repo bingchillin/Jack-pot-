@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/leaderboard/leaderboard_item.dart';
 import '../../../services/leaderboard_service.dart';
@@ -81,7 +82,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading leaderboard: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.errorLoadingLeaderboard}: $e')),
         );
       }
     }
@@ -113,7 +114,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading more data: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.errorLoadingMoreData}: $e')),
         );
       }
     }
@@ -134,19 +135,14 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     
     return Scaffold(
       appBar: AppBar(
-        title: Text('Leaderboard'),
-        backgroundColor: Colors.green[600],
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshData,
-          ),
-        ],
+        title: Text(l10n.leaderboard),
+        backgroundColor: Colors.green[50],
+        foregroundColor: Colors.black,
+        elevation: 0
       ),
       body: Column(
         children: [
@@ -181,7 +177,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                     ),
                     child: Center(
                       child: Text(
-                        _myStats!.rank > 0 ? '#${_myStats!.rank}' : 'Unranked',
+                        _myStats!.rank > 0 ? '#${_myStats!.rank}' : l10n.unranked,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -205,7 +201,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Total Score: ${_myStats!.totalScore} • Plants: ${_myStats!.plantCount}',
+                          '${l10n.totalScore}: ${_myStats!.totalScore} • ${l10n.plants}: ${_myStats!.plantCount}',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withOpacity(0.9),

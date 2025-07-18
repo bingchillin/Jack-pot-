@@ -4,7 +4,6 @@ class LeaderboardEntry {
   final String username;
   final int totalScore;
   final int plantCount;
-  final double averageScore;
 
   LeaderboardEntry({
     required this.rank,
@@ -12,7 +11,6 @@ class LeaderboardEntry {
     required this.username,
     required this.totalScore,
     required this.plantCount,
-    required this.averageScore,
   });
 
   factory LeaderboardEntry.fromJson(Map<String, dynamic> json) {
@@ -22,7 +20,6 @@ class LeaderboardEntry {
       username: json['username'] ?? '',
       totalScore: json['totalScore'] ?? 0,
       plantCount: json['plantCount'] ?? 0,
-      averageScore: (json['averageScore'] ?? 0).toDouble(),
     );
   }
 
@@ -33,7 +30,6 @@ class LeaderboardEntry {
       'username': username,
       'totalScore': totalScore,
       'plantCount': plantCount,
-      'averageScore': averageScore,
     };
   }
 }

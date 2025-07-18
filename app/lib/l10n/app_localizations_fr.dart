@@ -750,7 +750,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get threadDiscussion => 'Discussion du Fil';
 
   @override
-  String get noData => 'Aucune donnée';
+  String get noData => 'Aucune Donnée';
 
   @override
   String get loginToLike => 'Connectez-vous pour aimer';
@@ -1337,4 +1337,37 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get optimalAirHumidityRange => 'Plage d\'humidité de l\'air optimale';
+
+  @override
+  String get leaderboard => 'Classement';
+
+  @override
+  String get leaderboardDescription =>
+      'Découvrez votre classement parmi les autres soigneurs de plantes !';
+
+  @override
+  String get viewRankings => 'Voir le Classement';
+
+  @override
+  String get unranked => 'Non classé';
+
+  @override
+  String get rank => 'Rang';
+
+  @override
+  String get errorLoadingLeaderboard => 'Erreur de chargement du classement';
+
+  @override
+  String get errorLoadingMoreData =>
+      'Erreur de chargement de données supplémentaires';
+
+  @override
+  String get eventsComingSoon => 'Événements à Venir';
+
+  @override
+  String get eventsDescription =>
+      'Restez à l\'écoute pour des événements et défis passionnants de soins des plantes !';
+
+  @override
+  String get errorLoadingStats => 'Erreur de chargement des statistiques';
 }
