@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/notification_model.dart';
 import '../app_config.dart';
+import '../models/notification_model.dart';
 
 class EnhancedNotificationService {
   static String get baseUrl => AppConfig.baseUrl;
@@ -128,6 +128,20 @@ class EnhancedNotificationService {
     }
   }
 
+  /// Get friend notifications
+  Future<List<NotificationModel>> getFriendNotifications(String token) async {
+    try {
+      final allNotifications = await getAllNotifications(token);
+      return allNotifications.where((notification) => 
+        notification.notificationType == 'friend_request_received' ||
+        notification.notificationType == 'friend_request_accepted' ||
+        notification.notificationType == 'friend_request_rejected'
+      ).toList();
+    } catch (e) {
+      throw Exception('Error fetching friend notifications: $e');
+    }
+  }
+
   /// Navigate to comment from notification
   String getCommentRoute(NotificationModel notification) {
     if (notification.idComment != null) {
@@ -142,20 +156,6 @@ class EnhancedNotificationService {
       return '/plant/${notification.idObject}';
     }
     return '/plants';
-  }
-
-  /// Get friend notifications
-  Future<List<NotificationModel>> getFriendNotifications(String token) async {
-    try {
-      final allNotifications = await getAllNotifications(token);
-      return allNotifications.where((notification) => 
-        notification.notificationType == 'friend_request_received' ||
-        notification.notificationType == 'friend_request_accepted' ||
-        notification.notificationType == 'friend_request_rejected'
-      ).toList();
-    } catch (e) {
-      throw Exception('Error fetching friend notifications: $e');
-    }
   }
 
   /// Get user route from notification
