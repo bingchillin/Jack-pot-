@@ -842,7 +842,6 @@ export class ApiController {
   // =========================================
   // Leaderboard Endpoints
   // =========================================
-  @UseGuards(JwtAuthGuard)
   @Get('/leaderboard')
   @ApiOperation({ summary: 'Get leaderboard with pagination' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number (default: 1)' })

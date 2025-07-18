@@ -10,17 +10,23 @@ class LeaderboardService {
   Future<LeaderboardResponse> getLeaderboard({
     int page = 1,
     int limit = 20,
-    required String token,
+    String? token,
   }) async {
     try {
       final uri = Uri.parse('$baseUrl/leaderboard?page=$page&limit=$limit');
       
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+      };
+      
+      // Add authorization header only if token is provided
+      if (token != null) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      
       final response = await http.get(
         uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {

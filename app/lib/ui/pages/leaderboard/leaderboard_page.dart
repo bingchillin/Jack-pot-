@@ -40,32 +40,38 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   Future<void> _loadToken() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
-    if (token != null) {
-      setState(() {
-        _token = token;
-      });
-      await _loadInitialData();
-    }
+    setState(() {
+      _token = token;
+    });
+    await _loadInitialData();
   }
 
   Future<void> _loadInitialData() async {
-    if (_token == null) return;
-
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Load leaderboard data
+      // Load leaderboard data (works for both guests and logged users)
       final response = await _leaderboardService.getLeaderboard(
         page: 1,
         limit: 20,
-        token: _token!,
+        token: _token,
       );
 
-      // Load user's rank and stats
-      final myRank = await _leaderboardService.getMyRank(_token!);
-      final myStats = await _leaderboardService.getMyStats(_token!);
+      // Load user's rank and stats (only for logged users)
+      int? myRank;
+      LeaderboardEntry? myStats;
+      
+      if (_token != null) {
+        try {
+          myRank = await _leaderboardService.getMyRank(_token!);
+          myStats = await _leaderboardService.getMyStats(_token!);
+        } catch (e) {
+          // User might not have data yet, that's okay
+          print('User stats not available: $e');
+        }
+      }
 
       setState(() {
         _entries.clear();
@@ -89,7 +95,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   }
 
   Future<void> _loadMoreData() async {
-    if (_token == null || _isLoading || !_hasMoreData) return;
+    if (_isLoading || !_hasMoreData) return;
 
     setState(() {
       _isLoading = true;
@@ -99,7 +105,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
       final response = await _leaderboardService.getLeaderboard(
         page: _currentPage + 1,
         limit: 20,
-        token: _token!,
+        token: _token,
       );
 
       setState(() {
