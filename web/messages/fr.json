@@ -456,7 +456,12 @@
       "each": "l'unité",
       "in_your_cart": "dans votre panier",
       "address_required": "L'adresse de livraison est requise. Veuillez d'abord mettre à jour votre profil.",
-      "email_verification_required": "La vérification de l'email est requise pour finaliser votre commande. Veuillez d'abord vérifier votre adresse email."
+      "email_verification_required": "La vérification de l'email est requise pour finaliser votre commande. Veuillez d'abord vérifier votre adresse email.",
+      "secure_payment": "Paiement sécurisé",
+      "redirect_to_stripe": "Vous serez redirigé vers Stripe pour le traitement sécurisé du paiement",
+      "proceed_to_payment": "Procéder au paiement",
+      "processing": "Traitement...",
+      "encrypted": "Chiffré"
     }
   },
   "checkout": {

@@ -199,6 +199,11 @@ export default function EditProfilePage() {
           error.message.includes('incorrect') || 
           error.message.includes('invalid')) {
         setError(t('auth.profile.edit.error.current_password_incorrect'));
+        // Clear the current password field to prevent error loop
+        setFormData(prev => ({
+          ...prev,
+          currentPassword: ''
+        }));
       } else {
         setError(error.message || t('auth.profile.edit.error.update_failed'));
       }

@@ -1,16 +1,21 @@
 "use client";
 
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Flower, Smartphone, Package, Plus } from 'lucide-react';
+import Link from 'next/link';
+import { Flower, Smartphone, Plus } from 'lucide-react';
+import { productService } from '@/services/product.service';
+import { Product, getProductPrice } from '@/interfaces/product.interface';
 
 interface ProductsProps {
-  t: any; // Translation object
+  t: any;
 }
 
 export default function Products({ t }: ProductsProps) {
   const params = useParams();
   const locale = params.locale as string;
+  const [jackProduct, setJackProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Helper function to get translated features dynamically
   const getTranslatedFeatures = (productKey: string) => {
@@ -31,6 +36,23 @@ export default function Products({ t }: ProductsProps) {
     return features;
   };
 
+  // Fetch Jack product data
+  useEffect(() => {
+    const fetchJackProduct = async () => {
+      try {
+        const products = await productService.getAllProducts();
+        const jack = products.find(p => p.name.toLowerCase().includes('jack') || p.name.toLowerCase().includes('smart pot'));
+        setJackProduct(jack || null);
+      } catch (error) {
+        console.error('Error fetching Jack product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJackProduct();
+  }, []);
+
   const products = [
     {
       icon: Flower,
@@ -39,7 +61,7 @@ export default function Products({ t }: ProductsProps) {
       title: t('products.jack.title'),
       description: t('products.jack.description'),
       features: getTranslatedFeatures('jack'),
-      price: t('products.jack.price'),
+      price: jackProduct ? `${getProductPrice(jackProduct).toFixed(2)} €` : t('products.jack.price'),
       buttonText: t('hero.cta'),
       buttonColor: 'bg-green-600 hover:bg-green-700',
       isPopular: true,
@@ -55,7 +77,7 @@ export default function Products({ t }: ProductsProps) {
       price: t('products.app.price'),
       buttonText: 'Download',
       buttonColor: 'bg-blue-600 hover:bg-blue-700',
-      link: '' // Blank for now - will be app store link later
+      link: 'https://play.google.com/store/apps/details?id=com.jackpote.jackpoteapp'
     }
   ];
 
@@ -96,11 +118,22 @@ export default function Products({ t }: ProductsProps) {
                   <div className="flex items-center justify-between mt-auto">
                     <span className="text-2xl font-bold text-gray-900">{product.price}</span>
                     {product.link ? (
-                      <Link href={product.link}>
-                        <button className={`${product.buttonColor} text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium`}>
+                      product.link.startsWith('http') ? (
+                        <a 
+                          href={product.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`${product.buttonColor} text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium inline-block`}
+                        >
                           {product.buttonText}
-                        </button>
-                      </Link>
+                        </a>
+                      ) : (
+                        <Link href={product.link}>
+                          <button className={`${product.buttonColor} text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium`}>
+                            {product.buttonText}
+                          </button>
+                        </Link>
+                      )
                     ) : (
                       <button className={`${product.buttonColor} text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium cursor-not-allowed opacity-75`}>
                         {product.buttonText}

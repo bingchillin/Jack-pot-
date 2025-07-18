@@ -394,11 +394,11 @@ export default function CartPage() {
                   <div className="flex items-center">
                     <Shield className="w-5 h-5 text-blue-600 mr-2" />
                     <span className="text-blue-800 text-sm font-medium">
-                      Secure Payment
+                      {t('secure_payment')}
                     </span>
                   </div>
                   <p className="text-blue-700 text-sm mt-1">
-                    You&#39;ll be redirected to Stripe for secure payment processing
+                    {t('redirect_to_stripe')}
                   </p>
                 </div>
                 
@@ -410,12 +410,12 @@ export default function CartPage() {
                   {isProcessing ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Processing...</span>
+                      <span>{t('processing')}</span>
                     </>
                   ) : (
                     <>
                       <CreditCard className="w-5 h-5" />
-                      <span>Proceed to Payment</span>
+                      <span>{t('proceed_to_payment')}</span>
                     </>
                   )}
                 </button>
@@ -423,11 +423,11 @@ export default function CartPage() {
                 <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-gray-500">
                   <div className="flex items-center">
                     <Shield className="w-4 h-4 mr-1" />
-                    Secure Payment
+                    {t('secure_payment')}
                   </div>
                   <div className="flex items-center">
                     <CheckCircle className="w-4 h-4 mr-1" />
-                    Encrypted
+                    {t('encrypted')}
                   </div>
                 </div>
                 

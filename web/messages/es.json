@@ -456,7 +456,12 @@
       "each": "cada uno",
       "in_your_cart": "en tu carrito",
       "address_required": "La dirección de envío es requerida. Por favor actualiza tu perfil primero.",
-      "email_verification_required": "La verificación del email es requerida para completar tu pedido. Por favor verifica tu dirección de email primero."
+      "email_verification_required": "La verificación del email es requerida para completar tu pedido. Por favor verifica tu dirección de email primero.",
+      "secure_payment": "Pago seguro",
+      "redirect_to_stripe": "Serás redirigido a Stripe para el procesamiento seguro del pago",
+      "proceed_to_payment": "Proceder al pago",
+      "processing": "Procesando...",
+      "encrypted": "Encriptado"
     }
   },
   "checkout": {

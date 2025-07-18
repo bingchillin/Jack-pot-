@@ -319,7 +319,12 @@
       "each": "each",
       "in_your_cart": "in your cart",
       "address_required": "Shipping address is required. Please update your profile first.",
-      "email_verification_required": "Email verification is required to complete your order. Please verify your email address first."
+      "email_verification_required": "Email verification is required to complete your order. Please verify your email address first.",
+      "secure_payment": "Secure Payment",
+      "redirect_to_stripe": "You'll be redirected to Stripe for secure payment processing",
+      "proceed_to_payment": "Proceed to Payment",
+      "processing": "Processing...",
+      "encrypted": "Encrypted"
     }
   },
   "contact": {

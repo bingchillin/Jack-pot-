@@ -20,11 +20,13 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </NextIntlClientProvider>
+        <div id="__next" className="flex flex-col min-h-screen">
+          <NextIntlClientProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </NextIntlClientProvider>
+        </div>
         <Toaster 
           position="top-right"
           containerStyle={{
