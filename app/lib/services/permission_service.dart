@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'crashlytics_service.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PermissionService {
@@ -82,7 +83,12 @@ class PermissionService {
           return false;
         }
       } catch (e) {
-        print('Error with photos permission: $e');
+        await CrashlyticsService().recordError(
+          e,
+          StackTrace.current,
+          reason: 'Error with photos permission',
+          fatal: false,
+        );
       }
       
       // Fallback vers l'ancienne permission storage pour Android < 13
@@ -107,7 +113,12 @@ class PermissionService {
           return false;
         }
       } catch (e) {
-        print('Error with storage permission: $e');
+        await CrashlyticsService().recordError(
+          e,
+          StackTrace.current,
+          reason: 'Error with storage permission',
+          fatal: false,
+        );
       }
       
       return false;

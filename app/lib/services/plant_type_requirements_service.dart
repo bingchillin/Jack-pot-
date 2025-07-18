@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../app_config.dart';
 import '../models/plant_type_requirements.dart';
+import 'crashlytics_service.dart';
 
 class PlantTypeRequirementsService {
   final String baseUrl = AppConfig.baseUrl;

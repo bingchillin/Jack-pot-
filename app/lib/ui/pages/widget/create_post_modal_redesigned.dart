@@ -163,7 +163,7 @@ class _CreatePostModalRedesignedState extends State<CreatePostModalRedesigned> w
                           TextButton(
                             onPressed: _canSubmit() ? _submitPost : null,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               decoration: BoxDecoration(
                                 color: _canSubmit() ? Colors.green[600] : Colors.grey[300],
                                 borderRadius: BorderRadius.circular(20),
@@ -177,13 +177,10 @@ class _CreatePostModalRedesignedState extends State<CreatePostModalRedesigned> w
                                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                       ),
                                     )
-                                  : Text(
-                                      localizations.post,
-                                      style: TextStyle(
-                                        color: _canSubmit() ? Colors.white : Colors.grey[600],
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  : Icon(
+                                      Icons.send,
+                                      color: _canSubmit() ? Colors.white : Colors.grey[600],
+                                      size: 20,
                                     ),
                             ),
                           ),

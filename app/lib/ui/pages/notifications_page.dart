@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/notification_model.dart' show NotificationModel, Person, PlantObject;
 import '../../services/enhanced_notification_service.dart';
+import '../../services/crashlytics_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../l10n/app_localizations.dart';
 import 'comment_detail_page.dart';
@@ -71,9 +72,9 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
 
       final allNotifications = await _notificationService.getAllNotifications(token);
       
-      print('Debug: Loaded ${allNotifications.length} total notifications');
+      await CrashlyticsService().log('Loaded ${allNotifications.length} total notifications');
       for (final notif in allNotifications) {
-        print('Debug: Notification type: ${notif.notificationType}, title: ${notif.title}');
+        await CrashlyticsService().log('Notification type: ${notif.notificationType}, title: ${notif.title}');
       }
       
       final socialNotifs = allNotifications
@@ -84,8 +85,8 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
           .where((n) => n.isPlantNotification)
           .toList();
       
-      print('Debug: Found ${socialNotifs.length} social notifications');
-      print('Debug: Found ${plantNotifs.length} plant notifications');
+      await CrashlyticsService().log('Found ${socialNotifs.length} social notifications');
+      await CrashlyticsService().log('Found ${plantNotifs.length} plant notifications');
       
       setState(() {
         _allNotifications = allNotifications;
@@ -94,7 +95,12 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
         _isLoading = false;
       });
     } catch (e) {
-      print('Debug: Error loading notifications: $e');
+      await CrashlyticsService().recordError(
+        e,
+        StackTrace.current,
+        reason: 'Error loading notifications',
+        fatal: false,
+      );
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -562,7 +568,7 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
           });
         }
         
-        print('DEBUG: Auto-marked ${unreadNotifications.length} notifications as read with animation');
+        await CrashlyticsService().log('Auto-marked ${unreadNotifications.length} notifications as read with animation');
       } else {
         // If API call failed, clear animation state
         if (mounted) {
@@ -572,7 +578,12 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
         }
       }
     } catch (e) {
-      print('Error auto-marking notifications as read: $e');
+      await CrashlyticsService().recordError(
+        e,
+        StackTrace.current,
+        reason: 'Error auto-marking notifications as read',
+        fatal: false,
+      );
       // Clear animation state on error
       if (mounted) {
         setState(() {
@@ -672,7 +683,12 @@ class _NotificationsPageState extends State<NotificationsPage> with TickerProvid
         });
       }
     } catch (e) {
-      print('Error marking notification as read: $e');
+      await CrashlyticsService().recordError(
+        e,
+        StackTrace.current,
+        reason: 'Error marking notification as read: ${notification.idNotification}',
+        fatal: false,
+      );
     }
   }
 }

@@ -285,41 +285,21 @@ class _PlantClassifierPageState extends State<PlantClassifierPage> with TickerPr
   }
   
   Widget _buildActionButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () => _pickImage(ImageSource.camera),
-            icon: const Icon(Icons.camera_alt),
-            label: const Text('Prendre une photo'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[600],
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () => _pickImage(ImageSource.camera),
+        icon: const Icon(Icons.camera_alt),
+        label: const Text('Prendre une photo'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green[600],
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () => _pickImage(ImageSource.gallery),
-            icon: const Icon(Icons.photo_library),
-            label: const Text('Galerie'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.green[600],
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.green[600]!),
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
   
@@ -422,37 +402,6 @@ class _PlantClassifierPageState extends State<PlantClassifierPage> with TickerPr
           ...(_classificationResult!.allPredictions.map((prediction) => 
             _buildPredictionItem(prediction)
           ).toList()),
-          
-          const SizedBox(height: 20),
-          
-          // Bouton d'action
-          if (_classificationResult!.isConfident) ...[
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  // Naviguer vers la page de sélection de plante avec le résultat
-                  Navigator.pushNamed(
-                    context,
-                    '/choose_your_plant',
-                    arguments: {
-                      'plantName': _classificationResult!.predictedPlant,
-                    },
-                  );
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Ajouter cette plante'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[600],
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-          ],
         ],
       ),
     );

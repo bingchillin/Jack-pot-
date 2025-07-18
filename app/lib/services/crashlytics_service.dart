@@ -1,5 +1,6 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// Service pour gérer Crashlytics et le logging des erreurs
 class CrashlyticsService {
@@ -19,26 +20,50 @@ class CrashlyticsService {
       // Configure les clés personnalisées pour une meilleure analyse
       await _setCustomKeys();
       
-      print('✅ CrashlyticsService initialized');
+      await _crashlytics.log('CrashlyticsService initialized successfully');
     } catch (e) {
-      print('❌ Error initializing CrashlyticsService: $e');
+      await _crashlytics.recordError(
+        e,
+        StackTrace.current,
+        reason: 'Failed to initialize CrashlyticsService',
+        fatal: false,
+      );
     }
   }
 
   /// Configure les clés personnalisées pour l'analyse des crashes
   Future<void> _setCustomKeys() async {
-    await _crashlytics.setCustomKey('app_version', '1.0.3+2');
-    await _crashlytics.setCustomKey('platform', defaultTargetPlatform.toString());
-    await _crashlytics.setCustomKey('build_type', kDebugMode ? 'debug' : 'release');
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      await _crashlytics.setCustomKey('app_version', '${packageInfo.version}+${packageInfo.buildNumber}');
+      await _crashlytics.setCustomKey('app_name', packageInfo.appName);
+      await _crashlytics.setCustomKey('package_name', packageInfo.packageName);
+      await _crashlytics.setCustomKey('platform', defaultTargetPlatform.toString());
+      await _crashlytics.setCustomKey('build_type', kDebugMode ? 'debug' : 'release');
+      
+      await _crashlytics.log('Custom keys configured successfully');
+    } catch (e) {
+      await _crashlytics.recordError(
+        e,
+        StackTrace.current,
+        reason: 'Failed to set custom keys',
+        fatal: false,
+      );
+    }
   }
 
   /// Définit l'identifiant de l'utilisateur pour le suivi des crashes
   Future<void> setUserIdentifier(String userId) async {
     try {
       await _crashlytics.setUserIdentifier(userId);
-      print('✅ User identifier set: $userId');
+      await _crashlytics.log('User identifier set: $userId');
     } catch (e) {
-      print('❌ Error setting user identifier: $e');
+      await _crashlytics.recordError(
+        e,
+        StackTrace.current,
+        reason: 'Failed to set user identifier: $userId',
+        fatal: false,
+      );
     }
   }
 
@@ -58,9 +83,14 @@ class CrashlyticsService {
       if (role != null) {
         await _crashlytics.setCustomKey('user_role', role);
       }
-      print('✅ User attributes set');
+      await _crashlytics.log('User attributes set successfully');
     } catch (e) {
-      print('❌ Error setting user attributes: $e');
+      await _crashlytics.recordError(
+        e,
+        StackTrace.current,
+        reason: 'Failed to set user attributes',
+        fatal: false,
+      );
     }
   }
 
@@ -91,9 +121,10 @@ class CrashlyticsService {
         fatal: fatal,
       );
 
-      print('✅ Error recorded: ${error.toString()}');
+      await _crashlytics.log('Error recorded: ${error.toString()}');
     } catch (e) {
-      print('❌ Error recording error: $e');
+      // Fallback to print only if Crashlytics itself fails
+      if (kDebugMode) print('❌ Error recording error: $e');
     }
   }
 
@@ -103,7 +134,8 @@ class CrashlyticsService {
       await _crashlytics.log(message);
       print('📝 Crashlytics log: $message');
     } catch (e) {
-      print('❌ Error logging message: $e');
+      // Fallback to print only if Crashlytics itself fails
+      if (kDebugMode) print('❌ Error logging message: $e');
     }
   }
 
