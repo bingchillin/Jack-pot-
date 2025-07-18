@@ -1,5 +1,6 @@
 import { Controller, Get, Query, UseGuards, Request, Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { LeaderboardService, LeaderboardResponse } from './leaderboard.service';
 
 @ApiTags('Leaderboard')
@@ -24,6 +25,7 @@ export class LeaderboardController {
     return await this.leaderboardService.getLeaderboard(pageNum, limitNum);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('my-rank')
   @ApiOperation({ summary: 'Get current user rank' })
   @ApiResponse({ status: 200, description: 'User rank retrieved successfully' })
@@ -37,6 +39,7 @@ export class LeaderboardController {
     return result;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('my-stats')
   @ApiOperation({ summary: 'Get current user leaderboard stats' })
   @ApiResponse({ status: 200, description: 'User stats retrieved successfully' })

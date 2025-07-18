@@ -750,7 +750,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get threadDiscussion => 'Discusión del Hilo';
 
   @override
-  String get noData => 'Sin datos';
+  String get noData => 'Sin Datos';
 
   @override
   String get loginToLike => 'Inicia sesión para dar me gusta';
@@ -1337,4 +1337,36 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get optimalAirHumidityRange => 'Rango de humedad del aire óptimo';
+
+  @override
+  String get leaderboard => 'Clasificación';
+
+  @override
+  String get leaderboardDescription =>
+      '¡Ve cómo te clasificas entre otros cuidadores de plantas!';
+
+  @override
+  String get viewRankings => 'Ver Clasificación';
+
+  @override
+  String get unranked => 'Sin Clasificar';
+
+  @override
+  String get rank => 'Rango';
+
+  @override
+  String get errorLoadingLeaderboard => 'Error al cargar la clasificación';
+
+  @override
+  String get errorLoadingMoreData => 'Error al cargar más datos';
+
+  @override
+  String get eventsComingSoon => 'Eventos Próximamente';
+
+  @override
+  String get eventsDescription =>
+      '¡Mantente atento a emocionantes eventos y desafíos de cuidado de plantas!';
+
+  @override
+  String get errorLoadingStats => 'Error al cargar estadísticas';
 }

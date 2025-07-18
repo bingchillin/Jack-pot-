@@ -616,7 +616,7 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
-  /// Total daily score label
+  /// Total score label
   ///
   /// In en, this message translates to:
   /// **'Total Score'**
@@ -1396,7 +1396,7 @@ abstract class AppLocalizations {
   /// **'Social'**
   String get social;
 
-  /// Plant notifications tab
+  /// Plants label
   ///
   /// In en, this message translates to:
   /// **'Plants'**
@@ -1510,10 +1510,10 @@ abstract class AppLocalizations {
   /// **'Thread Discussion'**
   String get threadDiscussion;
 
-  /// No data message
+  /// No data available text
   ///
   /// In en, this message translates to:
-  /// **'No data'**
+  /// **'No Data'**
   String get noData;
 
   /// Message shown when trying to like without being logged in
@@ -2595,6 +2595,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Optimal air humidity range'**
   String get optimalAirHumidityRange;
+
+  /// Leaderboard title
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboard'**
+  String get leaderboard;
+
+  /// Leaderboard description
+  ///
+  /// In en, this message translates to:
+  /// **'See how you rank among other plant caretakers!'**
+  String get leaderboardDescription;
+
+  /// View rankings button text
+  ///
+  /// In en, this message translates to:
+  /// **'View Rankings'**
+  String get viewRankings;
+
+  /// Unranked status text
+  ///
+  /// In en, this message translates to:
+  /// **'Unranked'**
+  String get unranked;
+
+  /// Rank label
+  ///
+  /// In en, this message translates to:
+  /// **'Rank'**
+  String get rank;
+
+  /// Error loading leaderboard message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading leaderboard'**
+  String get errorLoadingLeaderboard;
+
+  /// Error loading more data message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading more data'**
+  String get errorLoadingMoreData;
+
+  /// Events coming soon title
+  ///
+  /// In en, this message translates to:
+  /// **'Events Coming Soon'**
+  String get eventsComingSoon;
+
+  /// Events description text
+  ///
+  /// In en, this message translates to:
+  /// **'Stay tuned for exciting plant care events and challenges!'**
+  String get eventsDescription;
+
+  /// Error loading stats message
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading stats'**
+  String get errorLoadingStats;
 }
 
 class _AppLocalizationsDelegate

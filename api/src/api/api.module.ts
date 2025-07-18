@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiService } from './api.service';
 import { ApiController } from './api.controller';
 import { AuthModule } from "../auth/auth.module";
@@ -20,11 +21,13 @@ import { ParameterTypeModule } from '../parameter-type/parameter-type.module';
 import { ObjectModule } from '../object/object.module';
 import { NotificationModule } from '../notification/notification.module';
 import { LeaderboardModule } from '../leaderboard/leaderboard.module';
+import { Person } from '../person/entities/person.entity';
 
 @Module({
   controllers: [ApiController],
   providers: [ApiService],
   imports: [
+    TypeOrmModule.forFeature([Person]),
     AuthModule, PersonModule, PlantModule, EventPartyModule, GameModule, 
     PlantPersonModule, GamePersonModule, EventPartyPersonModule, RoleModule,
     CategoryTypeModule, PlantTypeModule, ObjectProfileModule, ContactModule,

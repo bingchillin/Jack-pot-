@@ -2129,5 +2129,35 @@
   "eventsDescription": "Restez à l'écoute pour des événements et défis passionnants de soins des plantes !",
   "@eventsDescription": {
     "description": "Events description"
+  },
+
+  "unranked": "Non classé",
+  "@unranked": {
+    "description": "Unranked status text"
+  },
+
+  "plants": "Plantes",
+  "@plants": {
+    "description": "Plants label"
+  },
+
+  "noData": "Aucune Donnée",
+  "@noData": {
+    "description": "No data available text"
+  },
+
+  "errorLoadingLeaderboard": "Erreur de chargement du classement",
+  "@errorLoadingLeaderboard": {
+    "description": "Error loading leaderboard message"
+  },
+
+  "errorLoadingMoreData": "Erreur de chargement de données supplémentaires",
+  "@errorLoadingMoreData": {
+    "description": "Error loading more data message"
+  },
+
+  "errorLoadingStats": "Erreur de chargement des statistiques",
+  "@errorLoadingStats": {
+    "description": "Error loading stats message"
   }
 } 

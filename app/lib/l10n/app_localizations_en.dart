@@ -744,7 +744,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get threadDiscussion => 'Thread Discussion';
 
   @override
-  String get noData => 'No data';
+  String get noData => 'No Data';
 
   @override
   String get loginToLike => 'Please login to like';
@@ -1322,4 +1322,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get optimalAirHumidityRange => 'Optimal air humidity range';
+
+  @override
+  String get leaderboard => 'Leaderboard';
+
+  @override
+  String get leaderboardDescription =>
+      'See how you rank among other plant caretakers!';
+
+  @override
+  String get viewRankings => 'View Rankings';
+
+  @override
+  String get unranked => 'Unranked';
+
+  @override
+  String get rank => 'Rank';
+
+  @override
+  String get errorLoadingLeaderboard => 'Error loading leaderboard';
+
+  @override
+  String get errorLoadingMoreData => 'Error loading more data';
+
+  @override
+  String get eventsComingSoon => 'Events Coming Soon';
+
+  @override
+  String get eventsDescription =>
+      'Stay tuned for exciting plant care events and challenges!';
+
+  @override
+  String get errorLoadingStats => 'Error loading stats';
 }

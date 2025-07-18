@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../models/leaderboard_entry.dart';
 
 class LeaderboardItem extends StatelessWidget {
@@ -45,6 +46,8 @@ class LeaderboardItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -82,7 +85,7 @@ class LeaderboardItem extends StatelessWidget {
         title: Row(
           children: [
             Text(
-              entry.rank > 0 ? '#${entry.rank}' : 'Unranked',
+              entry.rank > 0 ? '#${entry.rank}' : l10n.unranked,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -145,19 +148,10 @@ class LeaderboardItem extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                '${entry.plantCount} plants',
+                '${entry.plantCount} ${l10n.plants}',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[600],
-                ),
-              ),
-              const Spacer(),
-              Text(
-                'Avg: ${entry.averageScore.toStringAsFixed(1)}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                  fontStyle: FontStyle.italic,
                 ),
               ),
             ],

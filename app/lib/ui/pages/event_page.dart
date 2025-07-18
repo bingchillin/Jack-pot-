@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/app_localizations.dart';
 import '../../services/leaderboard_service.dart';
 import '../../models/leaderboard_entry.dart';
 
@@ -66,7 +67,7 @@ class _EventPageState extends State<EventPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading stats: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.errorLoadingStats}: $e')),
         );
       }
     }
@@ -74,19 +75,9 @@ class _EventPageState extends State<EventPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Events & Leaderboard'),
-        backgroundColor: Colors.green[600],
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadUserStats,
-          ),
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -121,19 +112,19 @@ class _EventPageState extends State<EventPage> {
                         color: Colors.white,
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        'Leaderboard',
-                        style: TextStyle(
+                      Text(
+                        l10n.leaderboard,
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'See how you rank among other plant caretakers!',
+                      Text(
+                        l10n.leaderboardDescription,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Colors.white70,
                         ),
@@ -148,9 +139,9 @@ class _EventPageState extends State<EventPage> {
                           color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Text(
-                          'View Rankings',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.viewRankings,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
@@ -181,7 +172,7 @@ class _EventPageState extends State<EventPage> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Events Coming Soon',
+                      l10n.eventsComingSoon,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -190,7 +181,7 @@ class _EventPageState extends State<EventPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Stay tuned for exciting plant care events and challenges!',
+                      l10n.eventsDescription,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -215,10 +206,10 @@ class _EventPageState extends State<EventPage> {
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _myStats == null
-                        ? const Center(
+                        ? Center(
                             child: Text(
-                              'No Data',
-                              style: TextStyle(
+                              l10n.noData,
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey,
@@ -230,18 +221,18 @@ class _EventPageState extends State<EventPage> {
                             children: [
                               _buildStatItem(
                                 icon: Icons.eco,
-                                label: 'Plants',
+                                label: l10n.plants,
                                 value: _myStats!.plantCount.toString(),
                               ),
                               _buildStatItem(
                                 icon: Icons.score,
-                                label: 'Total Score',
+                                label: l10n.totalScore,
                                 value: _myStats!.totalScore.toString(),
                               ),
                               _buildStatItem(
                                 icon: Icons.trending_up,
-                                label: 'Rank',
-                                value: _myRank != null && _myRank! > 0 ? '#$_myRank' : 'Unranked',
+                                label: l10n.rank,
+                                value: _myRank != null && _myRank! > 0 ? '#$_myRank' : l10n.unranked,
                               ),
                             ],
                           ),
