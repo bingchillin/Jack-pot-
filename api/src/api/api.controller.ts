@@ -75,6 +75,7 @@ import { NotificationDocs } from './swagger/notification.docs';
 import { ContactStatus } from '../contact/entities/contact.entity';
 import { ContactQueryDto } from '../contact/dto/contact-query.dto';
 import { MoreThan } from 'typeorm';
+import { LeaderboardService } from '../leaderboard/leaderboard.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('z-API')
@@ -99,6 +100,7 @@ export class ApiController {
     private readonly parameterTypeService: ParameterTypeService,
     private readonly objectService: ObjectService,
     private readonly notificationService: NotificationService,
+    private readonly leaderboardService: LeaderboardService,
   ) {}
 
   // =========================================
@@ -831,5 +833,40 @@ export class ApiController {
         unread: unreadNotifications
       }
     };
+  }
+
+  // =========================================
+  // Leaderboard Endpoints
+  // =========================================
+  @UseGuards(JwtAuthGuard)
+  @Get('/leaderboard')
+  @ApiOperation({ summary: 'Get leaderboard with pagination' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page (default: 20)' })
+  async getLeaderboard(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '20',
+  ) {
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 20;
+    
+    return await this.leaderboardService.getLeaderboard(pageNum, limitNum);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/leaderboard/my-rank')
+  @ApiOperation({ summary: 'Get current user rank' })
+  async getMyRank(@Request() req: any) {
+    const userId = req.user.idPerson;
+    const rank = await this.leaderboardService.getUserRank(userId);
+    return { rank };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/leaderboard/my-stats')
+  @ApiOperation({ summary: 'Get current user leaderboard stats' })
+  async getMyStats(@Request() req: any) {
+    const userId = req.user.idPerson;
+    return await this.leaderboardService.getUserStats(userId);
   }
 }

@@ -19,6 +19,7 @@ import { PersonParameterModule } from '../lnk-person-parameter/person-parameter.
 import { ParameterTypeModule } from '../parameter-type/parameter-type.module';
 import { ObjectModule } from '../object/object.module';
 import { NotificationModule } from '../notification/notification.module';
+import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 
 @Module({
   controllers: [ApiController],
@@ -28,7 +29,7 @@ import { NotificationModule } from '../notification/notification.module';
     PlantPersonModule, GamePersonModule, EventPartyPersonModule, RoleModule,
     CategoryTypeModule, PlantTypeModule, ObjectProfileModule, ContactModule,
     AvatarModule, PersonParameterModule, ParameterTypeModule, ObjectModule,
-    NotificationModule
+    NotificationModule, LeaderboardModule
   ]
 })
 export class ApiModule { }

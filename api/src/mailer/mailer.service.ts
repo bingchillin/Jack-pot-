@@ -27,7 +27,7 @@ export class MailerService {
       
       await this.mailerService.sendMail({
         to: email,
-        subject: 'Verify your email address for Jack Pot',
+        subject: 'Verify your email address for Jackpote',
         html,
       });
 
@@ -44,7 +44,7 @@ export class MailerService {
       
       await this.mailerService.sendMail({
         to: email,
-        subject: 'Reset your password for Jack Pot',
+        subject: 'Reset your password for Jackpote',
         html,
       });
 
@@ -112,9 +112,9 @@ export class MailerService {
       // Get localized text for subject
       const getLocalizedSubject = (locale: string) => {
         const translations = {
-          en: 'Order Confirmation - Jack Pot',
-          fr: 'Confirmation de commande - Jack Pot',
-          es: 'Confirmación de pedido - Jack Pot',
+          en: 'Order Confirmation - Jackpote',
+          fr: 'Confirmation de commande - Jackpote',
+          es: 'Confirmación de pedido - Jackpote',
         };
         return translations[locale as keyof typeof translations] || translations.en;
       };
@@ -189,9 +189,9 @@ export class MailerService {
       // Get localized text for subject
       const getLocalizedSubject = (locale: string) => {
         const translations = {
-          en: 'Order Cancellation - Jack Pot',
-          fr: 'Annulation de commande - Jack Pot',
-          es: 'Cancelación de pedido - Jack Pot',
+          en: 'Order Cancellation - Jackpote',
+          fr: 'Annulation de commande - Jackpote',
+          es: 'Cancelación de pedido - Jackpote',
         };
         return translations[locale as keyof typeof translations] || translations.en;
       };

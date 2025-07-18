@@ -57,6 +57,7 @@ import { SensorsModule } from './sensors/sensors.module';
 import { UploadModule } from './upload/upload.module';
 import { PlantCareScoreModule } from './plant-care-score/plant-care-score.module';
 import { PlantCareModule } from './plant-care/plant-care.module';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -143,6 +144,7 @@ import { PlantCareModule } from './plant-care/plant-care.module';
     UploadModule,
     PlantCareScoreModule,
     PlantCareModule,
+    LeaderboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
