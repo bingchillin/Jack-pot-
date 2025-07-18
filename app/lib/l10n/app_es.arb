@@ -2049,5 +2049,38 @@
   "optimalAirHumidityRange": "Rango de humedad del aire óptimo",
   "@optimalAirHumidityRange": {
     "description": "Optimal air humidity range description"
+  },
+
+  "leaderboard": "Clasificación",
+  "@leaderboard": {
+    "description": "Leaderboard title"
+  },
+  "rank": "Rango",
+  "@rank": {
+    "description": "Rank label"
+  },
+  "totalPlants": "Plantas Totales",
+  "@totalPlants": {
+    "description": "Total plants label"
+  },
+  "averageScore": "Puntuación Promedio",
+  "@averageScore": {
+    "description": "Average score label"
+  },
+  "viewRankings": "Ver Clasificación",
+  "@viewRankings": {
+    "description": "View rankings button text"
+  },
+  "leaderboardDescription": "¡Ve cómo te clasificas entre otros cuidadores de plantas!",
+  "@leaderboardDescription": {
+    "description": "Leaderboard description"
+  },
+  "eventsComingSoon": "Eventos Próximamente",
+  "@eventsComingSoon": {
+    "description": "Events coming soon title"
+  },
+  "eventsDescription": "¡Mantente atento a emocionantes eventos y desafíos de cuidado de plantas!",
+  "@eventsDescription": {
+    "description": "Events description"
   }
 } 

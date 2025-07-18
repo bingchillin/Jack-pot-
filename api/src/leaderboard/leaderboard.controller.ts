@@ -1,12 +1,12 @@
-import { Controller, Get, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Request, Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { LeaderboardService, LeaderboardResponse } from './leaderboard.service';
 
 @ApiTags('Leaderboard')
 @Controller('leaderboard')
-@UseGuards(JwtAuthGuard)
 export class LeaderboardController {
+  private readonly logger = new Logger(LeaderboardController.name);
+
   constructor(private readonly leaderboardService: LeaderboardService) {}
 
   @Get()
@@ -29,8 +29,12 @@ export class LeaderboardController {
   @ApiResponse({ status: 200, description: 'User rank retrieved successfully' })
   async getMyRank(@Request() req: any): Promise<{ rank: number | null }> {
     const userId = req.user.idPerson;
-    const rank = await this.leaderboardService.getUserRank(userId);
-    return { rank };
+    this.logger.log(`🎯 getMyRank called for user ID: ${userId}`);
+    const stats = await this.leaderboardService.getCurrentUserStats(userId);
+    this.logger.log(`🎯 getMyRank result: ${JSON.stringify(stats)}`);
+    const result = { rank: stats?.rank || 0 };
+    this.logger.log(`🎯 getMyRank returning: ${JSON.stringify(result)}`);
+    return result;
   }
 
   @Get('my-stats')
@@ -38,6 +42,9 @@ export class LeaderboardController {
   @ApiResponse({ status: 200, description: 'User stats retrieved successfully' })
   async getMyStats(@Request() req: any) {
     const userId = req.user.idPerson;
-    return await this.leaderboardService.getUserStats(userId);
+    this.logger.log(`📊 getMyStats called for user ID: ${userId}`);
+    const result = await this.leaderboardService.getCurrentUserStats(userId);
+    this.logger.log(`📊 getMyStats returning: ${JSON.stringify(result)}`);
+    return result;
   }
 } 

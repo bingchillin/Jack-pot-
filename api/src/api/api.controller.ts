@@ -76,6 +76,9 @@ import { ContactStatus } from '../contact/entities/contact.entity';
 import { ContactQueryDto } from '../contact/dto/contact-query.dto';
 import { MoreThan } from 'typeorm';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
+import { Repository } from 'typeorm';
+import { Person } from '../person/entities/person.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('z-API')
@@ -101,6 +104,7 @@ export class ApiController {
     private readonly objectService: ObjectService,
     private readonly notificationService: NotificationService,
     private readonly leaderboardService: LeaderboardService,
+    @InjectRepository(Person) private readonly personRepository: Repository<Person>,
   ) {}
 
   // =========================================
@@ -858,8 +862,8 @@ export class ApiController {
   @ApiOperation({ summary: 'Get current user rank' })
   async getMyRank(@Request() req: any) {
     const userId = req.user.idPerson;
-    const rank = await this.leaderboardService.getUserRank(userId);
-    return { rank };
+    const stats = await this.leaderboardService.getCurrentUserStats(userId);
+    return { rank: stats?.rank || 0 };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -867,6 +871,23 @@ export class ApiController {
   @ApiOperation({ summary: 'Get current user leaderboard stats' })
   async getMyStats(@Request() req: any) {
     const userId = req.user.idPerson;
-    return await this.leaderboardService.getUserStats(userId);
+    return await this.leaderboardService.getCurrentUserStats(userId);
+  }
+
+  @Get('/leaderboard/user/:id')
+  @ApiOperation({ summary: 'Get user details by ID (for leaderboard)' })
+  async getUserDetails(@Param('id') id: string) {
+    const userId = parseInt(id);
+    const user = await this.personRepository.findOne({ where: { idPerson: userId } });
+    
+    if (!user) {
+      return { error: 'User not found' };
+    }
+    
+    return {
+      userId: user.idPerson,
+      username: `${user.firstname} ${user.surname}`,
+      email: user.email
+    };
   }
 }
