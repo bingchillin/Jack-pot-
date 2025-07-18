@@ -360,7 +360,15 @@ export class PlantHealthCalculationService {
     let score: number;
     let status: 'perfect' | 'good' | 'fair' | 'poor' | 'critical';
 
-    if (currentValue >= min && currentValue <= max) {
+    // Special handling for conductivity when it's 0 (no nutrients)
+    if (sensorName === 'conductivity' && Number(currentValue) === 0) {
+      score = 0;
+      status = 'critical';
+    } else if (sensorName === 'ph' && Number(currentValue) === 0) {
+      // pH of 0 is impossible and indicates sensor error
+      score = 0;
+      status = 'critical';
+    } else if (currentValue >= min && currentValue <= max) {
       // Perfect - within optimal range
       score = 100;
       status = 'perfect';
