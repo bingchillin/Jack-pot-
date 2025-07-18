@@ -530,6 +530,12 @@ export class ApiController {
     return this.objectProfileService.remove(+id);
   }
 
+  @Post('/object-profile/:id/recalculate-health')
+  @ApiOperation({ summary: 'Recalculate health for an object profile' })
+  recalculateHealth(@Param('id') id: string) {
+    return this.objectProfileService.recalculateHealth(+id);
+  }
+
   // =========================================
   // Contact Management Endpoints
   // =========================================

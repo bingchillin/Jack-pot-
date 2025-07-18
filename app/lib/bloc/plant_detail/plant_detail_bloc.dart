@@ -63,7 +63,7 @@ class PlantDetailBloc extends Bloc<PlantDetailEvent, PlantDetailState> {
           'Content-Type': 'application/json',
         });
         print('🔄 PlantDetailBloc triggered health recalculation for plant $plantId - Status: ${healthResponse.statusCode}');
-        if (healthResponse.statusCode != 200) {
+        if (healthResponse.statusCode != 200 && healthResponse.statusCode != 201) {
           print('⚠️ Health recalculation failed with status: ${healthResponse.statusCode}');
           print('Response body: ${healthResponse.body}');
         }

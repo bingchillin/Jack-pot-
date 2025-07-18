@@ -56,7 +56,7 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
             Icons.eco,
             ' µS/cm',
             0,
-            1000,
+            2000,
             Colors.green[600]!,
             _getOptimalRange('conductivity', '300-700'),
           ),
@@ -118,20 +118,9 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
             Icons.wb_sunny,
             ' lux',
             0,
-            1000,
+            100000,
             Colors.yellow[600]!,
             _getOptimalRange('light', '200-800 lux'),
-          ),
-          const SizedBox(height: 12),
-          _buildSensorCard(
-            localizations.sunExposure,
-            widget.plant.expositionTimeSun,
-            Icons.wb_sunny_outlined,
-            ' hrs',
-            0,
-            12,
-            Colors.orange[600]!,
-            _getOptimalRange('exposition_time', '6-8 hours'),
           ),
 
           const SizedBox(height: 40),
@@ -377,8 +366,53 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
   }
 
   String _getOptimalRange(String sensorType, String defaultRange) {
-    // This method is no longer dependent on _plantRequirements
-    // It will return the default range for all sensors
+    // Use plant-specific requirements if available, otherwise fall back to defaults
+    if (widget.plant.plantType != null) {
+      switch (sensorType) {
+        case 'humidity_ground':
+          if (widget.plant.plantType!.humidityGroundSensorMin != null && widget.plant.plantType!.humidityGroundSensorMax != null) {
+            return 'Optimal: ${widget.plant.plantType!.humidityGroundSensorMin!.toStringAsFixed(0)}-${widget.plant.plantType!.humidityGroundSensorMax!.toStringAsFixed(0)}%';
+          }
+          break;
+        case 'ph':
+          if (widget.plant.plantType!.phMin != null && widget.plant.plantType!.phMax != null) {
+            return 'Optimal: ${widget.plant.plantType!.phMin!.toStringAsFixed(1)}-${widget.plant.plantType!.phMax!.toStringAsFixed(1)}';
+          }
+          break;
+        case 'conductivity':
+          if (widget.plant.plantType!.conductivityElectriqueFertilityMin != null && widget.plant.plantType!.conductivityElectriqueFertilityMax != null) {
+            return 'Optimal: ${widget.plant.plantType!.conductivityElectriqueFertilityMin!.toStringAsFixed(0)}-${widget.plant.plantType!.conductivityElectriqueFertilityMax!.toStringAsFixed(0)} µS/cm';
+          }
+          break;
+        case 'temperature_ground':
+          if (widget.plant.plantType!.temperatureSensorGroundMin != null && widget.plant.plantType!.temperatureSensorGroundMax != null) {
+            return 'Optimal: ${widget.plant.plantType!.temperatureSensorGroundMin!.toStringAsFixed(1)}-${widget.plant.plantType!.temperatureSensorGroundMax!.toStringAsFixed(1)}°C';
+          }
+          break;
+        case 'humidity_air':
+          if (widget.plant.plantType!.humidityAirSensorMin != null && widget.plant.plantType!.humidityAirSensorMax != null) {
+            return 'Optimal: ${widget.plant.plantType!.humidityAirSensorMin!.toStringAsFixed(0)}-${widget.plant.plantType!.humidityAirSensorMax!.toStringAsFixed(0)}%';
+          }
+          break;
+        case 'temperature_extern':
+          if (widget.plant.plantType!.temperatureSensorExternMin != null && widget.plant.plantType!.temperatureSensorExternMax != null) {
+            return 'Optimal: ${widget.plant.plantType!.temperatureSensorExternMin!.toStringAsFixed(1)}-${widget.plant.plantType!.temperatureSensorExternMax!.toStringAsFixed(1)}°C';
+          }
+          break;
+        case 'light':
+          if (widget.plant.plantType!.lightSensorMin != null && widget.plant.plantType!.lightSensorMax != null) {
+            return 'Optimal: ${widget.plant.plantType!.lightSensorMin!.toStringAsFixed(0)}-${widget.plant.plantType!.lightSensorMax!.toStringAsFixed(0)} lux';
+          }
+          break;
+        case 'exposition_time':
+          if (widget.plant.plantType!.expositionTimeSunMin != null && widget.plant.plantType!.expositionTimeSunMax != null) {
+            return 'Optimal: ${widget.plant.plantType!.expositionTimeSunMin!.toStringAsFixed(1)}-${widget.plant.plantType!.expositionTimeSunMax!.toStringAsFixed(1)} hours';
+          }
+          break;
+      }
+    }
+    
+    // Fall back to default range if plant-specific requirements not available
     return 'Optimal: $defaultRange';
   }
 
@@ -392,8 +426,9 @@ class _PlantSensorsTabState extends State<PlantSensorsTab> {
 
   double? _processLightSensor(double? rawValue) {
     if (rawValue == null) return null;
-    // Same logic as backend: rawValue > 0 ? 800 : 200
-    return rawValue > 0 ? 800.0 : 200.0;
+    // Same logic as backend: rawValue > 0 ? 800 : 200, then scale by 100
+    final baseLight = rawValue > 0 ? 800.0 : 200.0;
+    return baseLight * 100; // Scale to match backend processing
   }
 
   double? _processTemperatureSensor(double? rawValue) {

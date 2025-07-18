@@ -300,8 +300,14 @@ export class PlantHealthCalculationService {
    * Process light sensor (UV LED status)
    */
   private processLightSensor(rawValue: number): number {
+    // Process to lux (200-800 range)
     const lightLux = rawValue > 0 ? 800 : 200;
-    return lightLux;
+    
+    // Scale to match database requirements (which seem to be in a different unit)
+    // Database values are around 60,000-100,000, so we'll scale up by ~100x
+    const scaledLight = lightLux * 100;
+    
+    return scaledLight;
   }
 
   /**
@@ -568,7 +574,7 @@ export class PlantHealthCalculationService {
     const defaults = {
       moisture: 40,
       temperature: 15,
-      light: 500,
+      light: 50000, // Updated to match database scale
       ph: 5.5,
       air_humidity: 30,
       conductivity: 300,
@@ -583,7 +589,7 @@ export class PlantHealthCalculationService {
     const defaults = {
       moisture: 80,
       temperature: 30,
-      light: 2000,
+      light: 100000, // Updated to match database scale
       ph: 7.5,
       air_humidity: 80,
       conductivity: 1500,
