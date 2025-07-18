@@ -163,7 +163,7 @@ class _CreatePostModalRedesignedState extends State<CreatePostModalRedesigned> w
                           TextButton(
                             onPressed: _canSubmit() ? _submitPost : null,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: _canSubmit() ? Colors.green[600] : Colors.grey[300],
                                 borderRadius: BorderRadius.circular(20),
