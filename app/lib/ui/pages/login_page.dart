@@ -228,16 +228,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin, Pa
                                     value == null || value.length < 6 ? localizations.passwordMinimum : null,
                                 ),
                                 
-                                // Forgot Password
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: SimpleTextButton(
-                                    text: localizations.forgotPassword,
-                                    onPressed: () {
-                                      Navigator.pushNamed(context, '/forgot_password');
-                                    },
-                                  ),
-                                ),
                                 const SizedBox(height: 24),
                                 
                                 // Login Button
